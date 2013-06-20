@@ -88,7 +88,7 @@ class PluginHost {
 	}
 
 	function add_hook($type, $sender) {
-		if (!is_array($this->hooks[$type])) {
+            if (!isset($this->hooks[$type]) || !is_array($this->hooks[$type])) {
 			$this->hooks[$type] = array();
 		}
 

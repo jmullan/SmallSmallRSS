@@ -48,7 +48,7 @@ class Opml extends Handler_Protected {
 
 	// Export
 
-	private function opml_export_category($owner_uid, $cat_id, $hide_private_feeds=false) {
+	private function opml_export_category($owner_uid, $cat_id, $hide_private_feeds = false) {
 
 		if ($cat_id) {
 			$cat_qpart = "parent_cat = '$cat_id'";
@@ -105,12 +105,12 @@ class Opml extends Handler_Protected {
 		return $out;
 	}
 
-	function opml_export($name, $owner_uid, $hide_private_feeds=false, $include_settings=true) {
+	function opml_export($name, $owner_uid, $hide_private_feeds = false, $include_settings = true) {
 		if (!$owner_uid) return;
 
 		if (!isset($_REQUEST["debug"])) {
 			header("Content-type: application/xml+opml");
-			header("Content-Disposition: attachment; filename=" . $name );
+			header("Content-Disposition: attachment; filename=" . $name);
 		} else {
 			header("Content-type: text/xml");
 		}
@@ -129,7 +129,7 @@ class Opml extends Handler_Protected {
 		# export tt-rss settings
 
 		if ($include_settings) {
-			$out .= "<outline text=\"tt-rss-prefs\" schema-version=\"".SCHEMA_VERSION."\">";
+			$out .= "<outline text=\"tt-rss-prefs\" schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
 			$result = $this->dbh->query("SELECT pref_name, value FROM ttrss_user_prefs WHERE
 			   profile IS NULL AND owner_uid = " . $_SESSION["uid"] . " ORDER BY pref_name");
@@ -143,7 +143,7 @@ class Opml extends Handler_Protected {
 
 			$out .= "</outline>";
 
-			$out .= "<outline text=\"tt-rss-labels\" schema-version=\"".SCHEMA_VERSION."\">";
+			$out .= "<outline text=\"tt-rss-labels\" schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
 			$result = $this->dbh->query("SELECT * FROM ttrss_labels2 WHERE
 				owner_uid = " . $_SESSION['uid']);
@@ -159,7 +159,7 @@ class Opml extends Handler_Protected {
 
 			$out .= "</outline>";
 
-			$out .= "<outline text=\"tt-rss-filters\" schema-version=\"".SCHEMA_VERSION."\">";
+			$out .= "<outline text=\"tt-rss-filters\" schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
 			$result = $this->dbh->query("SELECT * FROM ttrss_filters2
 				WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY id");
@@ -362,7 +362,7 @@ class Opml extends Handler_Protected {
 
 						$cat_filter = bool_to_sql_bool($rule["cat_filter"]);
 						$reg_exp = $this->dbh->escape_string($rule["reg_exp"]);
-						$filter_type = (int)$rule["filter_type"];
+						$filter_type = (int) $rule["filter_type"];
 
 						$this->dbh->query("INSERT INTO ttrss_filters2_rules (feed_id,cat_id,filter_id,filter_type,reg_exp,cat_filter)
 							VALUES ($feed_id, $cat_id, $filter_id, $filter_type, '$reg_exp', $cat_filter)");
@@ -370,7 +370,7 @@ class Opml extends Handler_Protected {
 
 					foreach ($filter["actions"] as $action) {
 
-						$action_id = (int)$action["action_id"];
+						$action_id = (int) $action["action_id"];
 						$action_param = $this->dbh->escape_string($action["action_param"]);
 
 						$this->dbh->query("INSERT INTO ttrss_filters2_actions (filter_id,action_id,action_param)
@@ -491,7 +491,7 @@ class Opml extends Handler_Protected {
 			$doc = new DOMDocument();
 			$doc->load($tmp_file);
 			unlink($tmp_file);
-		} else if (!$doc) {
+		} elseif (!$doc) {
 			print_error(__('Error: unable to find moved OPML file.'));
 			return;
 		}
@@ -507,7 +507,7 @@ class Opml extends Handler_Protected {
 		print "$msg<br/>";
 	}
 
-	static function opml_publish_url(){
+	static function opml_publish_url() {
 
 		$url_path = get_self_url_prefix();
 		$url_path .= "/opml.php?op=publish&key=" .

@@ -49,8 +49,8 @@ class Db implements IDb {
 		return self::$instance;
 	}
 
-	static function quote($str){
-		return("'$str'");
+	static function quote($str) {
+		return ("'$str'");
 	}
 
 	function reconnect() {
@@ -59,7 +59,7 @@ class Db implements IDb {
 
 	function connect($host, $user, $pass, $db, $port) {
 		//return $this->adapter->connect($host, $user, $pass, $db, $port);
-		return ;
+		return;
 	}
 
 	function escape_string($s, $strip_tags = true) {

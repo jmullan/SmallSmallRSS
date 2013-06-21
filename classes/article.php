@@ -39,9 +39,9 @@ class Article extends Handler_Protected {
 
 		if ($mode == "") {
 			array_push($articles, format_article($id, false));
-		} else if ($mode == "zoom") {
+		} elseif ($mode == "zoom") {
 			array_push($articles, format_article($id, true, true));
-		} else if ($mode == "raw") {
+		} elseif ($mode == "raw") {
 			if ($_REQUEST['html']) {
 				header("Content-Type: text/html");
 				print '<link rel="stylesheet" type="text/css" href="css/tt-rss.css"/>';
@@ -71,7 +71,7 @@ class Article extends Handler_Protected {
 			$this->dbh->query("UPDATE ttrss_user_entries SET
 			unread = false,last_read = NOW()
 			WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]);
-		} else if ($cmode == 1) {
+		} elseif ($cmode == 1) {
 			$this->dbh->query("UPDATE ttrss_user_entries SET
 			unread = true
 			WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]);
@@ -210,7 +210,7 @@ class Article extends Handler_Protected {
 
 	function setScore() {
 		$ids = $this->dbh->escape_string($_REQUEST['id']);
-		$score = (int)$this->dbh->escape_string($_REQUEST['score']);
+		$score = (int) $this->dbh->escape_string($_REQUEST['score']);
 
 		$this->dbh->query("UPDATE ttrss_user_entries SET
 			score = '$score' WHERE ref_id IN ($ids) AND owner_uid = " . $_SESSION["uid"]);
@@ -280,7 +280,7 @@ class Article extends Handler_Protected {
 
 		if (!$tags_str_full) $tags_str_full = __("no tags");
 
-		print json_encode(array("id" => (int)$id,
+		print json_encode(array("id" => (int) $id,
 				"content" => $tags_str, "content_full" => $tags_str_full));
 	}
 

@@ -133,7 +133,7 @@ class PluginHost {
 				if (file_exists($file)) require_once $file;
 
 				if (class_exists($class) && is_subclass_of($class, "Plugin")) {
-					$plugin = new $class($this);
+					$plugin = new $class ($this);
 
 					$plugin_api = $plugin->api_version();
 

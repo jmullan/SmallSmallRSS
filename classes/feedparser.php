@@ -68,7 +68,7 @@ class FeedParser {
 					$this->type = $this::FEED_ATOM;
 					break;
 				default:
-					if( !isset($this->error) ){
+					if (!isset($this->error)) {
 						$this->error = "Unknown/unsupported feed type";
 					}
 					return;
@@ -120,7 +120,7 @@ class FeedParser {
 				if ($link) {
 					if ($link->getAttribute("href"))
 						$this->link = $link->getAttribute("href");
-					else if ($link->nodeValue)
+					elseif ($link->nodeValue)
 						$this->link = $link->nodeValue;
 				}
 
@@ -156,7 +156,7 @@ class FeedParser {
 
 			}
 		} else {
-			if( !isset($this->error) ){
+			if (!isset($this->error)) {
 				$this->error = "Unknown/unsupported feed type";
 			}
 			return;

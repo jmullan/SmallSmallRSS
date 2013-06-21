@@ -1,53 +1,53 @@
 <?php
-	if (file_exists("install") && !file_exists("config.php")) {
-		header("Location: install/");
-	}
+if (file_exists("install") && !file_exists("config.php")) {
+    header("Location: install/");
+}
 
-	if (!file_exists("config.php")) {
-		print "<b>Fatal Error</b>: You forgot to copy
+if (!file_exists("config.php")) {
+    print "<b>Fatal Error</b>: You forgot to copy
 		<b>config.php-dist</b> to <b>config.php</b> and edit it.\n";
-		exit;
-	}
+    exit;
+}
 
-	// we need a separate check here because functions.php might get parsed
-	// incorrectly before 5.3 because of :: syntax.
-	if (version_compare(PHP_VERSION, '5.3.0', '<')) {
-		print "<b>Fatal Error</b>: PHP version 5.3.0 or newer required.\n";
-		exit;
-	}
+// we need a separate check here because functions.php might get parsed
+// incorrectly before 5.3 because of :: syntax.
+if (version_compare(PHP_VERSION, '5.3.0', '<')) {
+    print "<b>Fatal Error</b>: PHP version 5.3.0 or newer required.\n";
+    exit;
+}
+require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-	set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
-		get_include_path());
+set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
+                 get_include_path());
+require_once "sessions.php";
+require_once "sanity_check.php";
+require_once "version.php";
+require_once "db-prefs.php";
+require_once "lib/Mobile_Detect.php";
 
-	require_once "autoload.php";
-	require_once "sessions.php";
-	require_once "functions.php";
-	require_once "sanity_check.php";
-	require_once "version.php";
-	require_once "config.php";
-	require_once "db-prefs.php";
-	require_once "lib/Mobile_Detect.php";
+$mobile = new Mobile_Detect();
 
-	$mobile = new Mobile_Detect();
+if (!init_plugins()) {
+    return;
+}
 
-	if (!init_plugins()) return;
+if (!$_REQUEST['mobile']) {
+    if ($mobile->isTablet() && PluginHost::getInstance()->get_plugin("digest")) {
+        header('Location: backend.php?op=digest');
+        exit;
+    } elseif ($mobile->isMobile() && PluginHost::getInstance()->get_plugin("mobile")) {
+        header('Location: backend.php?op=mobile');
+        exit;
+    } elseif ($mobile->isMobile() && PluginHost::getInstance()->get_plugin("digest")) {
+        header('Location: backend.php?op=digest');
+        exit;
+    }
+}
 
-	if (!$_REQUEST['mobile']) {
-		if ($mobile->isTablet() && PluginHost::getInstance()->get_plugin("digest")) {
-			header('Location: backend.php?op=digest');
-			exit;
-		} else if ($mobile->isMobile() && PluginHost::getInstance()->get_plugin("mobile")) {
-			header('Location: backend.php?op=mobile');
-			exit;
-		} else if ($mobile->isMobile() && PluginHost::getInstance()->get_plugin("digest")) {
-			header('Location: backend.php?op=digest');
-			exit;
-		}
-	}
+login_sequence();
 
-	login_sequence();
-
-	header('Content-Type: text/html; charset=utf-8');
+header('Content-Type: text/html; charset=utf-8');
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -60,7 +60,7 @@
 	<?php stylesheet_tag("css/layout.css"); ?>
 
 	<?php if ($_SESSION["uid"]) {
-		$theme = get_pref( "USER_CSS_THEME", $_SESSION["uid"], false);
+		$theme = get_pref("USER_CSS_THEME", $_SESSION["uid"], false);
 		if ($theme && file_exists("themes/$theme")) {
 			stylesheet_tag("themes/$theme");
 		} else {

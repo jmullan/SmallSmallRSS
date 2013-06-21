@@ -115,7 +115,7 @@ class RPC extends Handler_Protected {
 		set_pref($key, !get_pref($key));
 		$value = get_pref($key);
 
-		print json_encode(array("param" =>$key, "value" => $value));
+		print json_encode(array("param" => $key, "value" => $value));
 	}
 
 	function setpref() {
@@ -125,7 +125,7 @@ class RPC extends Handler_Protected {
 
 		set_pref($key, $value, $_SESSION['uid'], $key != 'USER_STYLESHEET');
 
-		print json_encode(array("param" =>$key, "value" => $value));
+		print json_encode(array("param" => $key, "value" => $value));
 	}
 
 	function mark() {
@@ -386,7 +386,7 @@ class RPC extends Handler_Protected {
 
 		require_once "feedbrowser.php";
 
-		print json_encode(array("content" =>
+		print json_encode(array("content" => 
 			make_feed_browser($search, $limit, $mode),
 				"mode" => $mode));
 	}
@@ -415,7 +415,7 @@ class RPC extends Handler_Protected {
 									'$feed_url', '$title', NULL, '')");
 				}
 			}
-		} else if ($mode == 2) {
+		} elseif ($mode == 2) {
 			// feed archive
 			foreach ($payload as $id) {
 				$result = $this->dbh->query("SELECT * FROM ttrss_archived_feeds
@@ -573,7 +573,7 @@ class RPC extends Handler_Protected {
 			$this->dbh->query("UPDATE ttrss_user_entries SET
 			marked = false, last_marked = NOW()
 			WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]);
-		} else if ($cmode == 1) {
+		} elseif ($cmode == 1) {
 			$this->dbh->query("UPDATE ttrss_user_entries SET
 			marked = true, last_marked = NOW()
 			WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]);
@@ -598,7 +598,7 @@ class RPC extends Handler_Protected {
 			$this->dbh->query("UPDATE ttrss_user_entries SET
 			published = false,last_published = NOW()
 			WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]);
-		} else if ($cmode == 1) {
+		} elseif ($cmode == 1) {
 			$this->dbh->query("UPDATE ttrss_user_entries SET
 			published = true,last_published = NOW()
 			WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]);

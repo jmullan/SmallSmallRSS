@@ -114,7 +114,7 @@ class Dlg extends Handler_Protected {
 			$tags[$line["tag_name"]] = $line["count"];
 		}
 
-        if(count($tags) == 0 ){ return; }
+        if (count($tags) == 0) { return; }
 
 		ksort($tags);
 

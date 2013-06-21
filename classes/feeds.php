@@ -58,7 +58,7 @@ class Feeds extends Handler_Protected {
 
 			$target = "target=\"_blank\"";
 			$reply .= "<a title=\"$last_updated\" $target href=\"$feed_site_url\">".
-				truncate_string($feed_title,30)."</a>";
+				truncate_string($feed_title, 30)."</a>";
 
 			if ($error) {
 				$reply .= " (<span class=\"error\" title=\"$error\">Error</span>)";
@@ -209,7 +209,7 @@ class Feeds extends Handler_Protected {
 		if ($_REQUEST["debug"]) $timing_info = print_checkpoint("H0", $timing_info);
 
 //		error_log("format_headlines_list: [" . $feed . "] method [" . $method . "]");
-		if($search_mode == '' && $method != '' ){
+		if ($search_mode == '' && $method != '') {
 		    $search_mode = $method;
 		}
 //		error_log("search_mode: " . $search_mode);
@@ -378,7 +378,7 @@ class Feeds extends Handler_Protected {
 
 				if ($score > 500) {
 					$hlc_suffix = "H";
-				} else if ($score < -100) {
+				} elseif ($score < -100) {
 					$hlc_suffix = "L";
 				} else {
 					$hlc_suffix = "";
@@ -473,7 +473,7 @@ class Feeds extends Handler_Protected {
 							$rgba = @$rgba_cache[$feed_id];
 
 							$reply['content'] .= "<a class=\"hlFeed\" style=\"background : rgba($rgba, 0.3)\" href=\"#\" onclick=\"viewfeed($feed_id)\">".
-								truncate_string($line["feed_title"],30)."</a>";
+								truncate_string($line["feed_title"], 30)."</a>";
 						}
 					}
 
@@ -585,7 +585,7 @@ class Feeds extends Handler_Protected {
 							$reply['content'] .= "<div class=\"hlFeed\">
 								<a href=\"#\" style=\"background-color: rgba($rgba,0.3)\"
 								onclick=\"viewfeed($feed_id)\">".
-								truncate_string($line["feed_title"],30)."</a>
+								truncate_string($line["feed_title"], 30)."</a>
 							</div>";
 						}
 					}
@@ -812,10 +812,10 @@ class Feeds extends Handler_Protected {
 			$label_feed = feed_to_label_id($feed);
 			$result = $this->dbh->query("SELECT id FROM ttrss_labels2 WHERE
 							id = '$label_feed' AND owner_uid = " . $_SESSION['uid']);
-		} else if (!$cat_view && is_numeric($feed) && $feed > 0) {
+		} elseif (!$cat_view && is_numeric($feed) && $feed > 0) {
 			$result = $this->dbh->query("SELECT id FROM ttrss_feeds WHERE
 							id = '$feed' AND owner_uid = " . $_SESSION['uid']);
-		} else if ($cat_view && is_numeric($feed) && $feed > 0) {
+		} elseif ($cat_view && is_numeric($feed) && $feed > 0) {
 			$result = $this->dbh->query("SELECT id FROM ttrss_feed_categories WHERE
 							id = '$feed' AND owner_uid = " . $_SESSION['uid']);
 		}

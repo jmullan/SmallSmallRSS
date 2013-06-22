@@ -199,7 +199,7 @@ function _color_hue2rgb($m1, $m2, $h) {
 
 ### Convert a hex color into an RGB triplet.
 function _color_unpack($hex, $normalize = false) {
-
+    $out = array();
     if (strpos($hex, '#') !== 0)
         $hex = _resolve_htmlcolor($hex);
 
@@ -208,14 +208,17 @@ function _color_unpack($hex, $normalize = false) {
     } $c = hexdec($hex);
     for ($i = 16; $i >= 0; $i -= 8) {
         $out[] = (($c >> $i) & 0xFF) / ($normalize ? 255 : 1);
-    } return $out;
+    }
+    return $out;
 }
 
 ### Convert an RGB triplet to a hex color.
 function _color_pack($rgb, $normalize = false) {
+    $out = 0;
     foreach ($rgb as $k => $v) {
         $out |= (($v * ($normalize ? 255 : 1)) << (16 - $k * 8));
-    }return '#'. str_pad(dechex($out), 6, 0, STR_PAD_LEFT);
+    }
+    return '#'. str_pad(dechex($out), 6, 0, STR_PAD_LEFT);
 }
 
 function rgb2hsl($arr) {

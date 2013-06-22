@@ -3,11 +3,11 @@
 require_once __DIR__ . "/../config.php";
 require_once __DIR__ . '/../SmallSmallRSS/bootstrap.php';
 
-require_once "classes/db.php";
-require_once "errorhandler.php";
-require_once "lib/accept-to-gettext.php";
-require_once "lib/gettext/gettext.inc";
-require_once "version.php";
+require_once __DIR__ . "/../classes/db.php";
+require_once __DIR__ . "/errorhandler.php";
+require_once __DIR__ . "/../lib/accept-to-gettext.php";
+require_once __DIR__ . "/../lib/gettext/gettext.inc";
+require_once __DIR__ . "/version.php";
 
 $session_expire = max(SESSION_COOKIE_LIFETIME, 86400);
 $session_name = (!defined('TTRSS_SESSION_NAME')) ? "ttrss_sid" : TTRSS_SESSION_NAME;
@@ -135,6 +135,6 @@ if (!SINGLE_USER_MODE /* && DB_TYPE == "pgsql" */) {
 
 if (!defined('NO_SESSION_AUTOSTART')) {
     if (isset($_COOKIE[session_name()])) {
-        @session_start();
+        session_start();
     }
 }

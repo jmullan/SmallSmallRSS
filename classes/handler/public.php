@@ -518,8 +518,6 @@ class Handler_Public extends Handler {
                 session_set_cookie_params(0);
             }
 
-            @session_start();
-
             if (authenticate_user($login, $password)) {
                 $_POST["password"] = "";
 
@@ -528,14 +526,14 @@ class Handler_Public extends Handler {
                 }
 
                 $_SESSION["ref_schema_version"] = SmallSmallRSS\Sanity::get_schema_version(true);
-                $_SESSION["bw_limit"] = !!$_POST["bw_limit"];
+                $_SESSION["bw_limit"] = !empty($_POST["bw_limit"]);
 
                 if ($_POST["profile"]) {
 
                     $profile = $this->dbh->escape_string($_POST["profile"]);
 
                     $result = $this->dbh->query("SELECT id FROM ttrss_settings_profiles
-						WHERE id = '$profile' AND owner_uid = " . $_SESSION["uid"]);
+                                                 WHERE id = '$profile' AND owner_uid = " . $_SESSION["uid"]);
 
                     if ($this->dbh->num_rows($result) != 0) {
                         $_SESSION["profile"] = $profile;
@@ -557,7 +555,7 @@ class Handler_Public extends Handler {
         if (SINGLE_USER_MODE) {
             login_sequence();
         }
-
+        $feed_urls = false;
         if ($_SESSION["uid"]) {
 
             $feed_url = $this->dbh->escape_string(trim($_REQUEST["feed_url"]));

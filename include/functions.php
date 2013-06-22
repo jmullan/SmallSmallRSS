@@ -1,4 +1,4 @@
- <?php
+<?php
 define('EXPECTED_CONFIG_VERSION', 26);
 
 define('LABEL_BASE_INDEX', -1024);
@@ -14,12 +14,11 @@ $fetch_curl_used = false;
 mb_internal_encoding("UTF-8");
 date_default_timezone_set('UTC');
 if (defined('E_DEPRECATED')) {
-    error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
-} else {
-    error_reporting(E_ALL & ~E_NOTICE);
+    error_reporting(-1);
 }
 
 require_once __DIR__ . "/../config.php";
+require_once __DIR__ . '/sessions.php';
 
 /**
  * Define a constant if not already defined
@@ -97,7 +96,7 @@ function startup_gettext() {
         $lang = _TRANSLATION_OVERRIDE_DEFAULT;
     }
 
-    if ($_SESSION["uid"]
+    if (!empty($_SESSION["uid"])
         && SmallSmallRSS\Sanity::get_schema_version() >= 120) {
         $pref_lang = get_pref("USER_LANGUAGE", $_SESSION["uid"]);
 
@@ -202,7 +201,11 @@ function purge_feed($feed_id, $purge_interval, $debug = false) {
         $purge_interval = FORCE_ARTICLE_PURGE;
     }
 
-    if (!$purge_unread) $query_limit = " unread = false AND ";
+    if (!$purge_unread) {
+        $query_limit = " unread = false AND ";
+    } else {
+        $query_limit = '';
+    }
 
     if (DB_TYPE == "pgsql") {
         $pg_version = get_pgsql_version();
@@ -637,7 +640,8 @@ function initialize_user_prefs($uid, $profile = false) {
 }
 
 function get_ssl_certificate_id() {
-    if ($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"]) {
+
+    if (!empty($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"])) {
         return sha1($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"] .
                     $_SERVER["REDIRECT_SSL_CLIENT_V_START"] .
                     $_SERVER["REDIRECT_SSL_CLIENT_V_END"] .
@@ -647,22 +651,18 @@ function get_ssl_certificate_id() {
 }
 
 function authenticate_user($login, $password, $check_only = false) {
-
     if (!SINGLE_USER_MODE) {
         $user_id = false;
-
         foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_AUTH_USER) as $plugin) {
-
             $user_id = (int) $plugin->authenticate($login, $password);
-
             if ($user_id) {
-                $_SESSION["auth_module"] = strtolower(get_class($plugin));
+                $auth_module = strtolower(get_class($plugin));
                 break;
             }
         }
 
         if ($user_id && !$check_only) {
-            @session_start();
+            $_SESSION["auth_module"] = $auth_module;
 
             $_SESSION["uid"] = $user_id;
             $_SESSION["version"] = VERSION_STATIC;
@@ -674,8 +674,7 @@ function authenticate_user($login, $password, $check_only = false) {
             $_SESSION["access_level"] = db_fetch_result($result, 0, "access_level");
             $_SESSION["csrf_token"] = sha1(uniqid(rand(), true));
 
-            db_query("UPDATE ttrss_users SET last_login = NOW() WHERE id = " .
-                     $_SESSION["uid"]);
+            db_query("UPDATE ttrss_users SET last_login = NOW() WHERE id = " . $_SESSION["uid"]);
 
             $_SESSION["ip_address"] = $_SERVER["REMOTE_ADDR"];
             $_SESSION["user_agent"] = sha1($_SERVER['HTTP_USER_AGENT']);
@@ -691,7 +690,6 @@ function authenticate_user($login, $password, $check_only = false) {
         return false;
 
     } else {
-
         $_SESSION["uid"] = 1;
         $_SESSION["name"] = "admin";
         $_SESSION["access_level"] = 10;
@@ -772,7 +770,6 @@ function load_user_plugins($owner_uid) {
 
 function login_sequence() {
     if (SINGLE_USER_MODE) {
-        @session_start();
         authenticate_user("admin", null);
         load_user_plugins($_SESSION["uid"]);
     } else {
@@ -925,7 +922,7 @@ function bool_to_sql_bool($s) {
 }
 
 function sanity_check() {
-    require_once __DIR__ . '/../errors.php';
+    require_once __DIR__ . '/errordefs.php';
 
     $error_code = 0;
     $schema_version = SmallSmallRSS\Sanity::get_schema_version(true);
@@ -1393,6 +1390,7 @@ function getFeedArticles($feed, $is_cat = false, $unread_only = false,
             $from_where = "ttrss_entries.id = ttrss_user_entries.ref_id AND";
         } else {
             $from_qpart = "ttrss_user_entries";
+            $from_where = '';
         }
 
         $query = "SELECT count(int_id) AS unread
@@ -1952,7 +1950,11 @@ function make_init_params() {
     $params["hotkeys"] = get_hotkeys_map();
 
     $params["csrf_token"] = $_SESSION["csrf_token"];
-    $params["widescreen"] = (int) $_COOKIE["ttrss_widescreen"];
+    if (!empty($_COOKIE["ttrss_widescreen"])) {
+        $params["widescreen"] = (int) $_COOKIE["ttrss_widescreen"];
+    } else {
+        $params["widescreen"] = 0;
+    }
 
     $params['simple_update'] = defined('SIMPLE_UPDATE_MODE') && SIMPLE_UPDATE_MODE;
 
@@ -2297,7 +2299,9 @@ function getChildCategories($cat, $owner_uid) {
 }
 
 function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $search_mode, $override_order = false, $offset = 0, $owner_uid = 0, $filter = false, $since_id = 0, $include_children = false, $ignore_vfeed_group = false) {
-
+    $last_updated = 0;
+    $last_error = 0;
+    $feed_site_url = '';
     if (!$owner_uid) $owner_uid = $_SESSION["uid"];
 
     $ext_tables_part = "";
@@ -2591,10 +2595,12 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
         } else {
             $from_qpart = "ttrss_entries$ext_tables_part,ttrss_user_entries
 						LEFT JOIN ttrss_feeds ON (feed_id = ttrss_feeds.id)";
+            $feed_check_qpart = '';
         }
 
-        if ($vfeed_query_part)
+        if ($vfeed_query_part) {
             $vfeed_query_part .= "favicon_avg_color,";
+        }
 
         $query = "SELECT DISTINCT
 						date_entered,
@@ -2628,7 +2634,7 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
 					$query_strategy_part ORDER BY $order_by
 					$limit_query_part $offset_query_part";
 
-        if ($_REQUEST["debug"]) print $query;
+        if (!empty($_REQUEST["debug"])) print $query;
 
         $result = db_query($query);
 
@@ -2753,7 +2759,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
 
             if ($entry->nodeName == 'img') {
                 if (($owner && get_pref("STRIP_IMAGES", $owner)) ||
-                    $force_remove_images || $_SESSION["bw_limit"]) {
+                    $force_remove_images || !empty($_SESSION["bw_limit"])) {
 
                     $p = $doc->createElement('p');
 
@@ -2793,7 +2799,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
                               'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'time',
                               'tr', 'track', 'tt', 'u', 'ul', 'var', 'wbr', 'video');
 
-    if ($_SESSION['hasSandbox']) $allowed_elements[] = 'iframe';
+    if (!empty($_SESSION['hasSandbox'])) $allowed_elements[] = 'iframe';
 
     $disallowed_attributes = array('id', 'style', 'class');
 
@@ -3404,6 +3410,7 @@ function init_plugins() {
 }
 
 function format_tags_string($tags, $id) {
+    $tags_str = '';
     if (!is_array($tags) || count($tags) == 0) {
         return __("no tags");
     } else {

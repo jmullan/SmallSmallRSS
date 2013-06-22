@@ -9,6 +9,22 @@ class API extends Handler {
 
     private $seq;
 
+    function request_sql_bool($key) {
+        $value = '';
+        if (isset($_REQUEST[$key])) {
+            $value = $_REQUEST[$key];
+        }
+        return sql_bool_to_bool($value);
+    }
+
+    function escape_from_request($key) {
+        $value = '';
+        if (isset($_REQUEST[$key])) {
+            $value = $this->dbh->escape_string($_REQUEST[$key]);
+        }
+        return $value;
+    }
+
     function before($method) {
         if (parent::before($method)) {
             header("Content-Type: text/json");
@@ -23,7 +39,7 @@ class API extends Handler {
                 return false;
             }
 
-            $this->seq = (int) $_REQUEST['seq'];
+            $this->seq = (int) (isset($_REQUEST['seq']) ? $_REQUEST['seq'] : 0);
 
             return true;
         }
@@ -47,12 +63,12 @@ class API extends Handler {
     }
 
     function login() {
-        @session_destroy();
-        @session_start();
+        session_destroy();
+        session_start();
 
-        $login = $this->dbh->escape_string($_REQUEST["user"]);
+        $login = $this->escape_from_request("user");
         $password = $_REQUEST["password"];
-        $password_base64 = base64_decode($_REQUEST["password"]);
+        $password_base64 = base64_decode($password);
 
         if (SINGLE_USER_MODE) $login = "admin";
 
@@ -95,8 +111,8 @@ class API extends Handler {
     }
 
     function getUnread() {
-        $feed_id = $this->dbh->escape_string($_REQUEST["feed_id"]);
-        $is_cat = $this->dbh->escape_string($_REQUEST["is_cat"]);
+        $feed_id = $this->escape_from_request("feed_id");
+        $is_cat = $this->escape_from_request("is_cat");
 
         if ($feed_id) {
             $this->wrap(self::STATUS_OK, array("unread" => getFeedUnread($feed_id, $is_cat)));
@@ -111,11 +127,11 @@ class API extends Handler {
     }
 
     function getFeeds() {
-        $cat_id = $this->dbh->escape_string($_REQUEST["cat_id"]);
-        $unread_only = sql_bool_to_bool($_REQUEST["unread_only"]);
-        $limit = (int) $this->dbh->escape_string($_REQUEST["limit"]);
-        $offset = (int) $this->dbh->escape_string($_REQUEST["offset"]);
-        $include_nested = sql_bool_to_bool($_REQUEST["include_nested"]);
+        $cat_id = $this->escape_from_request("cat_id");
+        $unread_only = $this->request_sql_bool("unread_only");
+        $limit = (int) $this->escape_from_request("limit");
+        $offset = (int) $this->escape_from_request("offset");
+        $include_nested = $this->request_sql_bool("include_nested");
 
         $feeds = $this->api_get_feeds($cat_id, $unread_only, $limit, $offset, $include_nested);
 
@@ -123,9 +139,9 @@ class API extends Handler {
     }
 
     function getCategories() {
-        $unread_only = sql_bool_to_bool($_REQUEST["unread_only"]);
-        $enable_nested = sql_bool_to_bool($_REQUEST["enable_nested"]);
-        $include_empty = sql_bool_to_bool($_REQUEST['include_empty']);
+        $unread_only = $this->request_sql_bool("unread_only");
+        $enable_nested = $this->request_sql_bool("enable_nested");
+        $include_empty = $this->request_sql_bool('include_empty');
 
         // TODO do not return empty categories, return Uncategorized and standard virtual cats
 
@@ -180,25 +196,25 @@ class API extends Handler {
     }
 
     function getHeadlines() {
-        $feed_id = $this->dbh->escape_string($_REQUEST["feed_id"]);
+        $feed_id = $this->escape_from_request("feed_id");
         if ($feed_id != "") {
 
-            $limit = (int) $this->dbh->escape_string($_REQUEST["limit"]);
+            $limit = (int) $this->escape_from_request("limit");
 
             if (!$limit || $limit >= 200) $limit = 200;
 
-            $offset = (int) $this->dbh->escape_string($_REQUEST["skip"]);
-            $filter = $this->dbh->escape_string($_REQUEST["filter"]);
-            $is_cat = sql_bool_to_bool($_REQUEST["is_cat"]);
-            $show_excerpt = sql_bool_to_bool($_REQUEST["show_excerpt"]);
-            $show_content = sql_bool_to_bool($_REQUEST["show_content"]);
+            $offset = (int) $this->escape_from_request("skip");
+            $filter = $this->escape_from_request("filter");
+            $is_cat = $this->request_sql_bool("is_cat");
+            $show_excerpt = $this->request_sql_bool("show_excerpt");
+            $show_content = $this->request_sql_bool("show_content");
             /* all_articles, unread, adaptive, marked, updated */
-            $view_mode = $this->dbh->escape_string($_REQUEST["view_mode"]);
-            $include_attachments = sql_bool_to_bool($_REQUEST["include_attachments"]);
-            $since_id = (int) $this->dbh->escape_string($_REQUEST["since_id"]);
-            $include_nested = sql_bool_to_bool($_REQUEST["include_nested"]);
-            $sanitize_content = !isset($_REQUEST["sanitize"]) || 
-                sql_bool_to_bool($_REQUEST["sanitize"]);
+            $view_mode = $this->escape_from_request("view_mode");
+            $include_attachments = $this->request_sql_bool("include_attachments");
+            $since_id = (int) $this->escape_from_request("since_id");
+            $include_nested = $this->request_sql_bool("include_nested");
+            $sanitize_content = !isset($_REQUEST["sanitize"]) ||
+                $this->request_sql_bool("sanitize");
 
             $override_order = false;
             switch ($_REQUEST["order_by"]) {
@@ -212,8 +228,8 @@ class API extends Handler {
 
             /* do not rely on params below */
 
-            $search = $this->dbh->escape_string($_REQUEST["search"]);
-            $search_mode = $this->dbh->escape_string($_REQUEST["search_mode"]);
+            $search = $this->escape_from_request("search");
+            $search_mode = $this->escape_from_request("search_mode");
 
             $headlines = $this->api_get_headlines($feed_id, $limit, $offset,
                                                   $filter, $is_cat, $show_excerpt, $show_content, $view_mode, $override_order,
@@ -227,10 +243,10 @@ class API extends Handler {
     }
 
     function updateArticle() {
-        $article_ids = array_filter(explode(",", $this->dbh->escape_string($_REQUEST["article_ids"])), is_numeric);
-        $mode = (int) $this->dbh->escape_string($_REQUEST["mode"]);
-        $data = $this->dbh->escape_string($_REQUEST["data"]);
-        $field_raw = (int) $this->dbh->escape_string($_REQUEST["field"]);
+        $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
+        $mode = (int) $this->escape_from_request("mode");
+        $data = $this->escape_from_request("data");
+        $field_raw = (int) $this->escape_from_request("field");
 
         $field = "";
         $set_to = "";
@@ -305,7 +321,7 @@ class API extends Handler {
 
     function getArticle() {
 
-        $article_id = join(",", array_filter(explode(",", $this->dbh->escape_string($_REQUEST["article_id"])), is_numeric));
+        $article_id = join(",", array_filter(explode(",", $this->escape_from_request("article_id")), 'is_numeric'));
 
         if ($article_id) {
 
@@ -381,7 +397,7 @@ class API extends Handler {
     function updateFeed() {
         require_once "include/rssfuncs.php";
 
-        $feed_id = (int) $this->dbh->escape_string($_REQUEST["feed_id"]);
+        $feed_id = (int) $this->escape_from_request("feed_id");
 
         update_rss_feed($feed_id, true);
 
@@ -389,8 +405,8 @@ class API extends Handler {
     }
 
     function catchupFeed() {
-        $feed_id = $this->dbh->escape_string($_REQUEST["feed_id"]);
-        $is_cat = $this->dbh->escape_string($_REQUEST["is_cat"]);
+        $feed_id = $this->escape_from_request("feed_id");
+        $is_cat = $this->escape_from_request("is_cat");
 
         catchup_feed($feed_id, $is_cat);
 
@@ -398,14 +414,12 @@ class API extends Handler {
     }
 
     function getPref() {
-        $pref_name = $this->dbh->escape_string($_REQUEST["pref_name"]);
+        $pref_name = $this->escape_from_request("pref_name");
 
         $this->wrap(self::STATUS_OK, array("value" => get_pref($pref_name)));
     }
 
     function getLabels() {
-        //$article_ids = array_filter(explode(",", $this->dbh->escape_string($_REQUEST["article_ids"])), is_numeric);
-
         $article_id = (int) $_REQUEST['article_id'];
 
         $rv = array();
@@ -442,9 +456,9 @@ class API extends Handler {
 
     function setArticleLabel() {
 
-        $article_ids = array_filter(explode(",", $this->dbh->escape_string($_REQUEST["article_ids"])), is_numeric);
-        $label_id = (int) $this->dbh->escape_string($_REQUEST['label_id']);
-        $assign = (bool) $this->dbh->escape_string($_REQUEST['assign']) == "true";
+        $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
+        $label_id = (int) $this->escape_from_request('label_id');
+        $assign = (bool) $this->escape_from_request('assign') == "true";
 
         $label = $this->dbh->escape_string(label_find_caption(
                                                $label_id, $_SESSION["uid"]));
@@ -460,7 +474,7 @@ class API extends Handler {
                 else
                     label_remove_article($id, $label, $_SESSION["uid"]);
 
-                ++$num_updated;
+                $num_updated += 1;
 
             }
         }
@@ -638,7 +652,7 @@ class API extends Handler {
         $headlines = array();
 
         while ($line = db_fetch_assoc($result)) {
-            $is_updated = ($line["last_read"] == "" && 
+            $is_updated = ($line["last_read"] == "" &&
                            ($line["unread"] != "t" && $line["unread"] != "1"));
 
             $tags = explode(",", $line["tag_cache"]);
@@ -712,7 +726,7 @@ class API extends Handler {
     }
 
     function unsubscribeFeed() {
-        $feed_id = (int) $this->dbh->escape_string($_REQUEST["feed_id"]);
+        $feed_id = (int) $this->escape_from_request("feed_id");
 
         $result = $this->dbh->query("SELECT id FROM ttrss_feeds WHERE
 			id = '$feed_id' AND owner_uid = ".$_SESSION["uid"]);
@@ -726,10 +740,10 @@ class API extends Handler {
     }
 
     function subscribeToFeed() {
-        $feed_url = $this->dbh->escape_string($_REQUEST["feed_url"]);
-        $category_id = (int) $this->dbh->escape_string($_REQUEST["category_id"]);
-        $login = $this->dbh->escape_string($_REQUEST["login"]);
-        $password = $this->dbh->escape_string($_REQUEST["password"]);
+        $feed_url = $this->escape_from_request("feed_url");
+        $category_id = (int) $this->escape_from_request("category_id");
+        $login = $this->escape_from_request("login");
+        $password = $this->escape_from_request("password");
 
         if ($feed_url) {
             $rc = subscribe_to_feed($feed_url, $category_id, $login, $password);
@@ -741,7 +755,7 @@ class API extends Handler {
     }
 
     function getFeedTree() {
-        $include_empty = sql_bool_to_bool($_REQUEST['include_empty']);
+        $include_empty = $this->request_sql_bool('include_empty');
 
         $pf = new Pref_Feeds($_REQUEST);
 
@@ -752,7 +766,7 @@ class API extends Handler {
             $data = $pf->makefeedtree();
             $this->wrap(self::STATUS_OK, array("categories" => $data));
         } else {
-            $this->wrap(self::STATUS_ERR, array("error" => 
+            $this->wrap(self::STATUS_ERR, array("error" =>
                                                 'UNABLE_TO_INSTANTIATE_OBJECT'));
         }
 

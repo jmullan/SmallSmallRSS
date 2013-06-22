@@ -9,8 +9,6 @@ if (!file_exists("config.php")) {
     exit;
 }
 
-// we need a separate check here because functions.php might get parsed
-// incorrectly before 5.3 because of :: syntax.
 if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     print "<b>Fatal Error</b>: PHP version 5.3.0 or newer required.\n";
     exit;
@@ -32,7 +30,7 @@ if (!init_plugins()) {
     return;
 }
 
-if (!$_REQUEST['mobile']) {
+if (empty($_REQUEST['mobile'])) {
     if ($mobile->isTablet() && PluginHost::getInstance()->get_plugin("digest")) {
         header('Location: backend.php?op=digest');
         exit;
@@ -246,7 +244,7 @@ header('Content-Type: text/html; charset=utf-8');
 						}
 					?>
 
-					<?php if (!$_SESSION["hide_logout"]) { ?>
+<?php if (empty($_SESSION["hide_logout"])) { ?>
 						<div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcLogout')"><?php echo __('Logout') ?></div>
 					<?php } ?>
 				</div>

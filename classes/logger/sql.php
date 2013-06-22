@@ -10,8 +10,13 @@ class Logger_SQL {
             $line = Db::get()->escape_string($line);
             $context = ''; // backtrace is a lot of data which is not really critical to store
             //$context = $this->dbh->escape_string(serialize($context));
-
-            $owner_uid = $_SESSION["uid"] ? $_SESSION["uid"] : "NULL";
+            $owner_uid = 'NULL';
+            if (!isset($_SESSION)) {
+                trigger_error('Tried to access $_SESSION before it was created');
+            }
+            if (!empty($_SESSION['uid'])) {
+                $owner_uid = $_SESSION["uid"];
+            }
 
             $result = Db::get()->query(
                 "INSERT INTO ttrss_error_log

@@ -187,7 +187,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 // ignore_daemon is not used
 function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
-    $debug_enabled = defined('DAEMON_EXTENDED_DEBUG') || $_REQUEST['xdebug'];
+    $debug_enabled = defined('DAEMON_EXTENDED_DEBUG') || !empty($_REQUEST['xdebug']);
 
     _debug("start", $debug_enabled);
 
@@ -249,7 +249,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
     $rss_hash = false;
 
     $force_refetch = isset($_REQUEST["force_refetch"]);
-
+    $feed_data = '';
     if (file_exists($cache_filename) &&
         is_readable($cache_filename) &&
         !$auth_login && !$auth_pass &&
@@ -357,7 +357,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
         // cache data for later
         if (!$auth_pass && !$auth_login && is_writable(CACHE_DIR . "/simplepie")) {
-            $new_rss_hash = sha1($rss_data);
+            $new_rss_hash = md5($feed_data);
 
             if ($new_rss_hash != $rss_hash && count($rss->get_items()) > 0) {
                 _debug("saving $cache_filename", $debug_enabled);
@@ -505,7 +505,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
         _debug("processing articles...", $debug_enabled);
 
         foreach ($items as $item) {
-            if ($_REQUEST['xdebug'] == 3) {
+            if (!empty($_REQUEST['xdebug']) && $_REQUEST['xdebug'] == 3) {
                 print_r($item);
             }
 
@@ -554,7 +554,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             $entry_content = $item->get_content();
             if (!$entry_content) $entry_content = $item->get_description();
 
-            if ($_REQUEST["xdebug"] == 2) {
+            if (!empty($_REQUEST['xdebug']) && $_REQUEST["xdebug"] == 2) {
                 print "content: ";
                 print $entry_content;
                 print "\n";
@@ -777,8 +777,6 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
                 $query = "SELECT ref_id, int_id FROM ttrss_user_entries WHERE
 							ref_id = '$ref_id' AND owner_uid = '$owner_uid'
 							$dupcheck_qpart";
-
-                //					if ($_REQUEST["xdebug"]) print "$query\n";
 
                 $result = db_query($query);
 

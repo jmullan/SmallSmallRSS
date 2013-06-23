@@ -1,4 +1,9 @@
-<?php startup_gettext(); ?>
+<?php
+startup_gettext();
+$login_error_msg = isset($_SESSION["login_error_msg"]) ? $_SESSION["login_error_msg"] : '';
+$fake_login = isset($fake_login) ? $fake_login : '';
+$fake_password = isset($_SESSION["fake_password"]) ? $_SESSION["fake_password"] : '';
+?>
 <html>
 <head>
 	<title>Tiny Tiny RSS : Login</title>
@@ -173,11 +178,11 @@ function bwLimitChange(elem) {
 <div class='form'>
 
 	<fieldset>
-		<?php if ($_SESSION["login_error_msg"]) { ?>
+<?php if (!empty($login_error_msg)) { ?>
 		<div class="row-error">
-			<?php echo $_SESSION["login_error_msg"] ?>
+			<?php echo $login_error_msg ?>
 		</div>
-			<?php $_SESSION["login_error_msg"] = ""; ?>
+			<?php $login_error_msg = ""; ?>
 		<?php } ?>
 		<div class="row">
 			<label><?php echo __("Login:") ?></label>
@@ -185,7 +190,7 @@ function bwLimitChange(elem) {
 				onchange="fetchProfiles()" onfocus="fetchProfiles()" onblur="fetchProfiles()"
 				style="width : 220px"
 				required="1"
-				value="<?php echo $_SESSION["fake_login"] ?>" />
+				value="<?php echo $fake_login ?>" />
 		</div>
 
 
@@ -193,7 +198,7 @@ function bwLimitChange(elem) {
 			<label><?php echo __("Password:") ?></label>
 			<input type="password" name="password" required="1"
 					style="width : 220px" class="input"
-					value="<?php echo $_SESSION["fake_password"] ?>"/>
+					value="<?php echo $fake_password ?>"/>
 			<label></label>
 		<?php if (strpos(PLUGINS, "auth_internal") !== FALSE) { ?>
 			<a class='forgotpass' href="public.php?op=forgotpass"><?php echo __("I forgot my password") ?></a>
@@ -214,7 +219,7 @@ function bwLimitChange(elem) {
 			<label>&nbsp;</label>
 			<input dojoType="dijit.form.CheckBox" name="bw_limit" id="bw_limit" type="checkbox"
 				onchange="bwLimitChange(this)">
-			<label id="bw_limit_label" style='display : inline' for="bw_limit"><?php echo __("Use less traffic") ?></label>
+			<label id="bw_limit_label" for="bw_limit"><?php echo __("Use less traffic") ?></label>
 		</div>
 
 		<div dojoType="dijit.Tooltip" connectId="bw_limit_label" position="below" style="display:none">
@@ -225,8 +230,8 @@ function bwLimitChange(elem) {
 
 		<div class="row">
 			<label>&nbsp;</label>
-			<input dojoType="dijit.form.CheckBox" name="remember_me" id="remember_me" type="checkbox">
-			<label style='display : inline' for="remember_me"><?php echo __("Remember me") ?></label>
+			<input dojoType="dijit.form.CheckBox" name="remember_me" id="remember_me" type="checkbox" checked="checked">
+			<label for="remember_me"><?php echo __("Remember me") ?></label>
 		</div>
 
 		<?php } ?>

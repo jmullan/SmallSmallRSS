@@ -510,7 +510,7 @@ class Handler_Public extends Handler {
 
             $login = $this->dbh->escape_string($_POST["login"]);
             $password = $_POST["password"];
-            $remember_me = $_POST["remember_me"];
+            $remember_me = !empty($_POST["remember_me"]);
 
             if ($remember_me) {
                 session_set_cookie_params(SESSION_COOKIE_LIFETIME);

@@ -36,7 +36,6 @@ class Auth_Internal extends Plugin implements IAuthModule {
                     if ($otp_enabled) {
                         if ($otp) {
                             if ($otp != $otp_check) {
-                                trigger_error('User not logged in');
                                 return false;
                             }
                         } else {
@@ -71,7 +70,6 @@ class Auth_Internal extends Plugin implements IAuthModule {
             $result = db_query("SELECT salt FROM ttrss_users WHERE
 				login = '$login'");
             if (db_num_rows($result) != 1) {
-                trigger_error('User not logged in');
                 return false;
             }
             $salt = db_fetch_result($result, 0, "salt");
@@ -94,7 +92,6 @@ class Auth_Internal extends Plugin implements IAuthModule {
 		            FROM ttrss_users WHERE
 						login = '$login' AND pwd_hash = '$pwd_hash'";
                 } else {
-                    trigger_error('User not logged in');
                     return false;
                 }
 
@@ -115,7 +112,6 @@ class Auth_Internal extends Plugin implements IAuthModule {
         if (db_num_rows($result) == 1) {
             return db_fetch_result($result, 0, "id");
         }
-        trigger_error('User not logged in');
         return false;
     }
 

@@ -29,7 +29,13 @@ function validate_session() {
         return true;
     }
 
-    if (VERSION_STATIC != $_SESSION["version"]) return false;
+    if (!isset($_COOKIE[session_name()]) || !isset($_SESSION)) {
+        return false;
+    }
+
+    if (VERSION_STATIC != $_SESSION["version"]) {
+        return false;
+    }
 
     $check_ip = $_SESSION['ip_address'];
 

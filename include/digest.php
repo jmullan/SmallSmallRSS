@@ -36,12 +36,6 @@ function send_headlines_digests($debug = false) {
                 if ($debug) _debug("Sending digest for UID:" . $line['id'] . " - " . $line["email"]);
 
                 $do_catchup = get_pref('DIGEST_CATCHUP', $line['id'], false);
-
-                global $tz_offset;
-
-                // reset tz_offset global to prevent tz cache clash between users
-                $tz_offset = -1;
-
                 $tuple = prepare_headlines_digest($line["id"], 1, $limit);
                 $digest = $tuple[0];
                 $headlines_count = $tuple[1];

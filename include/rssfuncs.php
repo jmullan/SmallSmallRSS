@@ -277,18 +277,12 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             _debug("fetching [$fetch_url]...", $debug_enabled);
             _debug("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $last_article_timestamp), $debug_enabled);
 
-            $feed_data = fetch_file_contents($fetch_url, false,
-                                             $auth_login, $auth_pass, false,
-                                             $no_cache ? FEED_FETCH_NO_CACHE_TIMEOUT : FEED_FETCH_TIMEOUT,
-                                             $force_refetch ? 0 : $last_article_timestamp);
-
-            global $fetch_curl_used;
-
-            if (!$fetch_curl_used) {
-                $tmp = @gzdecode($feed_data);
-
-                if ($tmp) $feed_data = $tmp;
-            }
+            $feed_data = fetch_file_contents(
+                $fetch_url, false,
+                $auth_login, $auth_pass, false,
+                $no_cache ? FEED_FETCH_NO_CACHE_TIMEOUT : FEED_FETCH_TIMEOUT,
+                $force_refetch ? 0 : $last_article_timestamp
+            );
 
             $feed_data = trim($feed_data);
 

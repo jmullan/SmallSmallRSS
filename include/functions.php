@@ -9,7 +9,6 @@ define('COOKIE_LIFETIME_LONG', 86400*365);
 $fetch_last_error = false;
 $fetch_last_error_code = false;
 $fetch_last_content_type = false;
-$fetch_curl_used = false;
 
 mb_internal_encoding("UTF-8");
 date_default_timezone_set('UTC');
@@ -307,19 +306,13 @@ function get_feed_update_interval($feed_id) {
     }
 }
 
-function fetch_file_contents($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0) {
-
+function fetch_file_contents($url, $type=false, $login=false, $pass=false, $post_query=false, $timeout=false, $timestamp=0) {
     global $fetch_last_error;
     global $fetch_last_error_code;
     global $fetch_last_content_type;
-    global $fetch_curl_used;
-
     $url = str_replace(' ', '%20', $url);
-
     if (!defined('NO_CURL') && function_exists('curl_init')) {
-
         $fetch_curl_used = true;
-
         if (ini_get("safe_mode") || ini_get("open_basedir")) {
             $new_url = geturl($url);
             if (!$new_url) {
@@ -330,12 +323,10 @@ function fetch_file_contents($url, $type = false, $login = false, $pass = false,
         } else {
             $ch = curl_init($url);
         }
-
         if ($timestamp && !$post_query) {
             curl_setopt($ch, CURLOPT_HTTPHEADER,
                         array("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $timestamp)));
         }
-
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout ? $timeout : FILE_FETCH_CONNECT_TIMEOUT);
         curl_setopt($ch, CURLOPT_TIMEOUT, $timeout ? $timeout : FILE_FETCH_TIMEOUT);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, !ini_get("safe_mode") && !ini_get("open_basedir"));
@@ -353,9 +344,9 @@ function fetch_file_contents($url, $type = false, $login = false, $pass = false,
             curl_setopt($ch, CURLOPT_POSTFIELDS, $post_query);
         }
 
-        if ($login && $pass)
+        if ($login && $pass) {
             curl_setopt($ch, CURLOPT_USERPWD, "$login:$pass");
-
+        }
         $contents = @curl_exec($ch);
 
         if (curl_errno($ch) === 23 || curl_errno($ch) === 61) {
@@ -385,7 +376,6 @@ function fetch_file_contents($url, $type = false, $login = false, $pass = false,
         }
 
         curl_close($ch);
-
         return $contents;
     } else {
 
@@ -441,9 +431,12 @@ function fetch_file_contents($url, $type = false, $login = false, $pass = false,
                 $fetch_last_error = "HTTP Code: $fetch_last_error_code";
             }
         }
+        $tmp = @gzdecode($data);
+        if ($tmp) {
+            $data = $tmp;
+        }
         return $data;
     }
-
 }
 
 /**
@@ -456,11 +449,8 @@ function fetch_file_contents($url, $type = false, $login = false, $pass = false,
  * @return mixed The favicon URL, or false if none was found.
  */
 function get_favicon_url($url) {
-
     $favicon_url = false;
-
     if ($html = @fetch_file_contents($url)) {
-
         libxml_use_internal_errors(true);
 
         $doc = new DOMDocument();
@@ -482,9 +472,9 @@ function get_favicon_url($url) {
         }
     }
 
-    if (!$favicon_url)
+    if (!$favicon_url) {
         $favicon_url = rewrite_relative_url($url, "/favicon.ico");
-
+    }
     return $favicon_url;
 } // function get_favicon_url
 

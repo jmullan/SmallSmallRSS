@@ -393,6 +393,10 @@ class PluginHost {
     }
 
     function get_api_method($name) {
-        return $this->api_methods[$name];
+        $name = strtolower($name);
+        if (isset($this->api_methods[$name])) {
+            return $this->api_methods[$name];
+        }
+        return null;
     }
 }

@@ -686,9 +686,7 @@ function authenticate_user($login, $password, $check_only = false) {
 
             return true;
         }
-
         return false;
-
     } else {
         $_SESSION["uid"] = 1;
         $_SESSION["name"] = "admin";

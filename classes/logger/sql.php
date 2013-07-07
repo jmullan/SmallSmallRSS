@@ -1,6 +1,5 @@
 <?php
 class Logger_SQL {
-
     function log_error($errno, $errstr, $file, $line, $context) {
         if (Db::get() && SmallSmallRSS\Sanity::get_schema_version() > 117) {
 
@@ -8,7 +7,8 @@ class Logger_SQL {
             $errstr = Db::get()->escape_string($errstr);
             $file = Db::get()->escape_string($file);
             $line = Db::get()->escape_string($line);
-            $context = ''; // backtrace is a lot of data which is not really critical to store
+            $context = '';
+            // backtrace is a lot of data which is not really critical to store
             //$context = $this->dbh->escape_string(serialize($context));
             $owner_uid = 'NULL';
             if (!isset($_SESSION)) {
@@ -28,5 +28,4 @@ class Logger_SQL {
 
         return false;
     }
-
 }

@@ -28,13 +28,12 @@ class API extends Handler {
     function before($method) {
         if (parent::before($method)) {
             header("Content-Type: text/json");
-
-            if (!$_SESSION["uid"] && $method != "login" && $method != "isloggedin") {
+            if (empty($_SESSION['uid']) && $method != "login" && $method != "isloggedin") {
                 $this->wrap(self::STATUS_ERR, array("error" => 'NOT_LOGGED_IN'));
                 return false;
             }
 
-            if ($_SESSION["uid"] && $method != "logout" && !get_pref('ENABLE_API_ACCESS')) {
+            if (!empty($_SESSION["uid"]) && $method != "logout" && !get_pref('ENABLE_API_ACCESS')) {
                 $this->wrap(self::STATUS_ERR, array("error" => 'API_DISABLED'));
                 return false;
             }
@@ -63,42 +62,41 @@ class API extends Handler {
     }
 
     function login() {
-        session_destroy();
-        session_start();
-
         $login = $this->escape_from_request("user");
         $password = $_REQUEST["password"];
         $password_base64 = base64_decode($password);
-
-        if (SINGLE_USER_MODE) $login = "admin";
-
-        $result = $this->dbh->query("SELECT id FROM ttrss_users WHERE login = '$login'");
-
-        if ($this->dbh->num_rows($result) != 0) {
-            $uid = $this->dbh->fetch_result($result, 0, "id");
-        } else {
-            $uid = 0;
+        if (SINGLE_USER_MODE) {
+            $login = "admin";
         }
 
+        $result = $this->dbh->query("SELECT id FROM ttrss_users WHERE login = '$login'");
+        if ($this->dbh->num_rows($result) != 0) {
+            $uid = $this->dbh->fetch_result($result, 0, "id");
+        }
         if (!$uid) {
+            Logger::get()->log("Could not find user: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "LOGIN_ERROR"));
             return;
         }
-
-        if (get_pref("ENABLE_API_ACCESS", $uid)) {
-            if (authenticate_user($login, $password)) {               // try login with normal password
-                $this->wrap(self::STATUS_OK, array("session_id" => session_id(),
-                                                   "api_level" => self::API_LEVEL));
-            } elseif (authenticate_user($login, $password_base64)) { // else try with base64_decoded password
-                $this->wrap(self::STATUS_OK, array("session_id" => session_id(),
-                                                      "api_level" => self::API_LEVEL));
-            } else {                                                         // else we are not logged in
-                $this->wrap(self::STATUS_ERR, array("error" => "LOGIN_ERROR"));
-            }
-        } else {
+        if (!get_pref("ENABLE_API_ACCESS", $uid)) {
+            Logger::get()->log("Api access disabled for: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "API_DISABLED"));
+            return;
         }
 
+        session_set_cookie_params(SESSION_COOKIE_LIFETIME);
+        if (authenticate_user($login, $password)) {
+            // try login with normal password
+            $this->wrap(self::STATUS_OK, array("session_id" => session_id(),
+                                               "api_level" => self::API_LEVEL));
+        } elseif (authenticate_user($login, $password_base64)) {
+            // else try with base64_decoded password
+            $this->wrap(self::STATUS_OK, array("session_id" => session_id(),
+                                               "api_level" => self::API_LEVEL));
+        } else {
+            Logger::get()->log("Could not log in: '$login'");
+            $this->wrap(self::STATUS_ERR, array("error" => "LOGIN_ERROR"));
+        }
     }
 
     function logout() {
@@ -486,14 +484,25 @@ class API extends Handler {
 
     function index($method) {
         $plugin = PluginHost::getInstance()->get_api_method(strtolower($method));
-
         if ($plugin && method_exists($plugin, $method)) {
             $reply = $plugin->$method();
-
             $this->wrap($reply[0], $reply[1]);
-
         } else {
-            $this->wrap(self::STATUS_ERR, array("error" => 'UNKNOWN_METHOD', "method" => $method));
+            $methods = array(
+                'getVersion' => '',
+                'getApiLevel' => '',
+                'getUnread' => '',
+                'getCounters' => '',
+                'getFeeds' => '',
+                'getCategories' => '',
+                'getHeadlines' => '',
+                'getArticle' => '',
+                'getConfig' => '',
+                'getPref' => '',
+                'getLabels' => '',
+                'getFeedTree' => ''
+            );
+            $this->wrap(self::STATUS_OK, array('methods' => $methods));
         }
     }
 

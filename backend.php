@@ -2,26 +2,8 @@
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-set_include_path(
-    dirname(__FILE__) ."/include" . PATH_SEPARATOR . get_include_path());
-
-/* remove ill effects of magic quotes */
-
-if (get_magic_quotes_gpc()) {
-    function stripslashes_deep($value) {
-        $value = is_array($value) ?
-            array_map('stripslashes_deep', $value) : stripslashes($value);
-        return $value;
-    }
-
-    $_POST = array_map('stripslashes_deep', $_POST);
-    $_GET = array_map('stripslashes_deep', $_GET);
-    $_COOKIE = array_map('stripslashes_deep', $_COOKIE);
-    $_REQUEST = array_map('stripslashes_deep', $_REQUEST);
-}
-
-$op = $_REQUEST["op"];
-@$method = $_REQUEST['subop'] ? $_REQUEST['subop'] : $_REQUEST["method"];
+$op = (isset($_REQUEST['op']) ? $_REQUEST["op"] : '');
+@$method = (!empty($_REQUEST['subop']) ? $_REQUEST['subop'] : $_REQUEST["method"]);
 
 if (!$method) {
     $method = 'index';
@@ -41,7 +23,7 @@ if (array_search($op, $public_calls) !== false) {
     return;
 }
 
-@$csrf_token = $_REQUEST['csrf_token'];
+$csrf_token = (isset($_REQUEST['csrf_token']) ? $_REQUEST['csrf_token'] : '');
 
 require_once "sessions.php";
 require_once "db.php";

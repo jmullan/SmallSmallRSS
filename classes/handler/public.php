@@ -506,12 +506,15 @@ class Handler_Public extends Handler {
     }
 
     function login() {
+        $login = $this->dbh->escape_string($_POST["login"]);
+        $password = $_POST["password"];
+        $remember_me = !empty($_POST["remember_me"]);
+
+        if (SINGLE_USER_MODE) {
+            $login = "admin";
+        }
+
         if (!SINGLE_USER_MODE) {
-
-            $login = $this->dbh->escape_string($_POST["login"]);
-            $password = $_POST["password"];
-            $remember_me = !empty($_POST["remember_me"]);
-
             if ($remember_me) {
                 session_set_cookie_params(SESSION_COOKIE_LIFETIME);
             } else {
@@ -528,7 +531,7 @@ class Handler_Public extends Handler {
                 $_SESSION["ref_schema_version"] = SmallSmallRSS\Sanity::get_schema_version(true);
                 $_SESSION["bw_limit"] = !empty($_POST["bw_limit"]);
 
-                if ($_POST["profile"]) {
+                if (!empty($_POST["profile"])) {
 
                     $profile = $this->dbh->escape_string($_POST["profile"]);
 
@@ -556,7 +559,7 @@ class Handler_Public extends Handler {
             login_sequence();
         }
         $feed_urls = false;
-        if ($_SESSION["uid"]) {
+        if (!empty($_SESSION["uid"])) {
 
             $feed_url = $this->dbh->escape_string(trim($_REQUEST["feed_url"]));
 

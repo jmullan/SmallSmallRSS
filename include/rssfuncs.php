@@ -412,6 +412,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             if ($favicon_modified_new > $favicon_modified)
                 $favicon_avg_color = '';
 
+            $favicon_colorstring = '';
             if (file_exists($favicon_file) && function_exists("imagecreatefromstring") && $favicon_avg_color == '') {
                 require_once "colors.php";
 

@@ -9,19 +9,6 @@ require_once __DIR__ . "/../lib/accept-to-gettext.php";
 require_once __DIR__ . "/../lib/gettext/gettext.inc";
 require_once __DIR__ . "/version.php";
 
-$session_expire = max(SESSION_COOKIE_LIFETIME, 86400);
-$session_name = (!defined('TTRSS_SESSION_NAME')) ? "ttrss_sid" : TTRSS_SESSION_NAME;
-
-if (@$_SERVER['HTTPS'] == "on") {
-    $session_name .= "_ssl";
-    ini_set("session.cookie_secure", true);
-}
-
-ini_set("session.gc_probability", 75);
-ini_set("session.name", $session_name);
-ini_set("session.use_only_cookies", true);
-ini_set("session.gc_maxlifetime", $session_expire);
-ini_set("session.cookie_lifetime", min(0, SESSION_COOKIE_LIFETIME));
 
 
 function validate_session() {
@@ -29,7 +16,7 @@ function validate_session() {
         return true;
     }
 
-    if (!isset($_COOKIE[session_name()]) || !isset($_SESSION)) {
+    if (!isset($_COOKIE[session_name()]) || !isset($_SESSION) || !isset($_SESSION["version"])) {
         return false;
     }
 
@@ -89,13 +76,11 @@ function ttrss_open($s, $n) {
 }
 
 function ttrss_read($id) {
-    global $session_expire;
-
     $res = Db::get()->query("SELECT data FROM ttrss_sessions WHERE id='$id'");
 
     if (Db::get()->num_rows($res) != 1) {
 
-        $expire = time() + $session_expire;
+        $expire = time() + \SmallSmallRSS\Session::$session_expire;
 
         Db::get()->query("INSERT INTO ttrss_sessions (id, data, expire)
 					VALUES ('$id', '', '$expire')");
@@ -108,13 +93,9 @@ function ttrss_read($id) {
 }
 
 function ttrss_write($id, $data) {
-    global $session_expire;
-
     $data = base64_encode($data);
-    $expire = time() + $session_expire;
-
+    $expire = time() + \SmallSmallRSS\Session::$session_expire;
     Db::get()->query("UPDATE ttrss_sessions SET data='$data', expire='$expire' WHERE id='$id'");
-
     return true;
 }
 
@@ -132,15 +113,4 @@ function ttrss_gc($expire) {
     Db::get()->query("DELETE FROM ttrss_sessions WHERE expire < " . time());
 }
 
-if (!SINGLE_USER_MODE /* && DB_TYPE == "pgsql" */) {
-    session_set_save_handler("ttrss_open",
-                             "ttrss_close", "ttrss_read", "ttrss_write",
-                             "ttrss_destroy", "ttrss_gc");
-    register_shutdown_function('session_write_close');
-}
-
-if (!defined('NO_SESSION_AUTOSTART')) {
-    if (isset($_COOKIE[session_name()])) {
-        session_start();
-    }
-}
+\SmallSmallRSS\Session::init();

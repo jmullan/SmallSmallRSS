@@ -8,7 +8,9 @@ class Db_Prefs {
         $this->dbh = Db::get();
         $this->cache = array();
 
-        if ($_SESSION["uid"]) $this->cache();
+        if (!empty($_SESSION["uid"])) {
+            $this->cache();
+        }
     }
 
     private function __clone() {
@@ -16,17 +18,17 @@ class Db_Prefs {
     }
 
     public static function get() {
-        if (self::$instance == null)
+        if (self::$instance == null) {
             self::$instance = new self();
-
+        }
         return self::$instance;
     }
 
     function cache() {
         $profile = false;
 
-        $user_id = $_SESSION["uid"];
-        @$profile = $_SESSION["profile"];
+        $user_id = (!empty($_SESSION["uid"]) ? $_SESSION["uid"] : null);
+        $profile = (!empty($_SESSION["profile"]) ? $_SESSION["profile"] : null);
 
         if ($profile) {
             $profile_qpart = "profile = '$profile' AND";
@@ -97,7 +99,7 @@ class Db_Prefs {
             $value = db_fetch_result($result, 0, "value");
             $type_name = db_fetch_result($result, 0, "type_name");
 
-            if ($user_id == $_SESSION["uid"]) {
+            if (!empty($_SESSION["uid"]) && $user_id == $_SESSION["uid"]) {
                 $this->cache[$pref_name]["type"] = $type_name;
                 $this->cache[$pref_name]["value"] = $value;
             }

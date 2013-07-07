@@ -31,56 +31,12 @@ if (!function_exists('pcntl_fork')) {
 
 $master_handlers_installed = false;
 
-$children = array();
-$ctimes = array();
 
 $last_checkpoint = -1;
 
-function reap_children() {
-    global $children;
-    global $ctimes;
-
-    $tmp = array();
-
-    foreach ($children as $pid) {
-        if (pcntl_waitpid($pid, $status, WNOHANG) != $pid) {
-
-            if (file_is_locked("update_daemon-$pid.lock")) {
-                array_push($tmp, $pid);
-            } else {
-                _debug("[reap_children] child $pid seems active but lockfile is unlocked.");
-                unset($ctimes[$pid]);
-
-            }
-        } else {
-            _debug("[reap_children] child $pid reaped.");
-            unset($ctimes[$pid]);
-        }
-    }
-
-    $children = $tmp;
-
-    return count($tmp);
-}
-
-function check_ctimes() {
-    global $ctimes;
-
-    foreach (array_keys($ctimes) as $pid) {
-        $started = $ctimes[$pid];
-
-        if (time() - $started > MAX_CHILD_RUNTIME) {
-            _debug("[MASTER] child process $pid seems to be stuck, aborting...");
-            posix_kill($pid, SIGKILL);
-        }
-    }
-}
-
 function sigchld_handler($signal) {
-    $running_jobs = reap_children();
-
+    $running_jobs = \SmallSmallRSS\Daemon::reap_children();
     _debug("[SIGCHLD] jobs left: $running_jobs");
-
     pcntl_waitpid(-1, $status, WNOHANG);
 }
 
@@ -95,7 +51,6 @@ function shutdown($caller_pid) {
 
 function task_shutdown() {
     $pid = posix_getpid();
-
     if (file_exists(LOCK_DIRECTORY . "/update_daemon-$pid.lock")) {
         _debug("removing lockfile ($pid)...");
         unlink(LOCK_DIRECTORY . "/update_daemon-$pid.lock");
@@ -169,7 +124,7 @@ if (!$lock_handle) {
     die("error: Can't create lockfile. ".
         "Maybe another daemon is already running.\n");
 }
-SmallSmallRSS\Sanity::schema_or_die();
+\SmallSmallRSS\Sanity::schema_or_die();
 
 // Protip: children close shared database handle when terminating, it's a bad idea to
 // do database stuff on main process from now on.
@@ -181,20 +136,19 @@ while (true) {
     $next_spawn = $last_checkpoint + $spawn_interval - time();
 
     if ($next_spawn % 60 == 0) {
-        $running_jobs = count($children);
+        $running_jobs = \SmallSmallRSS\Daemon::running_jobs();
         _debug("[MASTER] active jobs: $running_jobs, next spawn at $next_spawn sec.");
     }
 
     if ($last_checkpoint + $spawn_interval < time()) {
-        check_ctimes();
-        reap_children();
+        \SmallSmallRSS\Daemon::kill_stuck_children();
+        \SmallSmallRSS\Daemon::reap_children();
 
-        for ($j = count($children); $j < $max_jobs; $j++) {
+        for ($j = \SmallSmallRSS\Daemon::running_jobs(); $j < $max_jobs; $j++) {
             $pid = pcntl_fork();
             if ($pid == -1) {
                 die("fork failed!\n");
             } elseif ($pid) {
-
                 if (!$master_handlers_installed) {
                     _debug("[MASTER] installing shutdown handlers");
                     pcntl_signal(SIGINT, 'sigint_handler');
@@ -204,8 +158,7 @@ while (true) {
                 }
 
                 _debug("[MASTER] spawned client $j [PID:$pid]...");
-                array_push($children, $pid);
-                $ctimes[$pid] = time();
+                \SmallSmallRSS\Daemon::track_pid($pid);
             } else {
                 pcntl_signal(SIGCHLD, SIG_IGN);
                 pcntl_signal(SIGINT, 'task_sigint_handler');

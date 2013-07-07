@@ -548,9 +548,6 @@ class Pref_Feeds extends Handler_Protected {
     }
 
     function editfeed() {
-        global $purge_intervals;
-        global $update_intervals;
-
         $feed_id = $this->escape_from_request("id");
 
         $result = $this->dbh->query(
@@ -621,8 +618,12 @@ class Pref_Feeds extends Handler_Protected {
 
         $update_interval = $this->dbh->fetch_result($result, 0, "update_interval");
 
-        print_select_hash("update_interval", $update_interval, $update_intervals,
-                          'dojoType="dijit.form.Select"');
+        print_select_hash(
+            "update_interval",
+            $update_interval,
+            \SmallSmallRSS\Constants::update_intervals(),
+            'dojoType="dijit.form.Select"'
+        );
 
         /* Purge intl */
 
@@ -631,9 +632,12 @@ class Pref_Feeds extends Handler_Protected {
         print "<hr/>";
         print __('Article purging:') . " ";
 
-        print_select_hash("purge_interval", $purge_interval, $purge_intervals,
-                          'dojoType="dijit.form.Select" ' .
-                          ((FORCE_ARTICLE_PURGE == 0) ? "" : 'disabled="1"'));
+        print_select_hash(
+            "purge_interval",
+            $purge_interval,
+            \SmallSmallRSS\Constants::purge_intervals(),
+            'dojoType="dijit.form.Select" ' . ((FORCE_ARTICLE_PURGE == 0) ? "" : 'disabled="1"')
+        );
 
         print "</div>";
         print "<div class=\"dlgSec\">".__("Authentication")."</div>";
@@ -797,8 +801,6 @@ class Pref_Feeds extends Handler_Protected {
     }
 
     function editfeeds() {
-        global $purge_intervals;
-        global $update_intervals;
 
         $feed_ids = $this->escape_from_request("ids");
 
@@ -854,8 +856,12 @@ class Pref_Feeds extends Handler_Protected {
 
         /* Update Interval */
 
-        print_select_hash("update_interval", "", $update_intervals,
-                          'disabled="1" dojoType="dijit.form.Select"');
+        print_select_hash(
+            "update_interval",
+            "",
+            \SmallSmallRSS\Constants::update_intervals(),
+            'disabled="1" dojoType="dijit.form.Select"'
+        );
 
         $this->batch_edit_cbox("update_interval");
 
@@ -867,8 +873,12 @@ class Pref_Feeds extends Handler_Protected {
 
             print __('Article purging:') . " ";
 
-            print_select_hash("purge_interval", "", $purge_intervals,
-                              'disabled="1" dojoType="dijit.form.Select"');
+            print_select_hash(
+                "purge_interval",
+                "",
+                \SmallSmallRSS\Constants::purge_intervals(),
+                'disabled="1" dojoType="dijit.form.Select"'
+            );
 
             $this->batch_edit_cbox("purge_interval");
         }

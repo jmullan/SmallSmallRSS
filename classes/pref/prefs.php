@@ -178,8 +178,7 @@ class Pref_Prefs extends Handler_Protected {
 
     function index() {
 
-        global $access_level_names;
-
+        $access_level_names =  \SmallSmallRSS\Constants::access_level_names();
         $prefs_blacklist = array("STRIP_UNSAFE_TAGS", "REVERSE_HEADLINES",
                                  "SORT_HEADLINES_BY_FEED_DATE", "DEFAULT_ARTICLE_LIMIT");
 
@@ -577,11 +576,12 @@ class Pref_Prefs extends Handler_Protected {
 
 
             } else if ($pref_name == "DEFAULT_UPDATE_INTERVAL") {
-
-                global $update_intervals_nodefault;
-
-                print_select_hash($pref_name, $value, $update_intervals_nodefault,
-                                  'dojoType="dijit.form.Select"');
+                print_select_hash(
+                    $pref_name,
+                    $value,
+                    \SmallSmallRSS\Constants::update_intervals_nodefault(),
+                    'dojoType="dijit.form.Select"'
+                );
 
             } else if ($type_name == "bool") {
 

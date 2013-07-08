@@ -287,24 +287,6 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             $feed_data = trim($feed_data);
 
             _debug("fetch done.", $debug_enabled);
-
-            /* if ($feed_data) {
-               $error = verify_feed_xml($feed_data);
-
-               if ($error) {
-               _debug("error verifying XML, code: " . $error->code, $debug_enabled);
-
-               if ($error->code == 26) {
-               _debug("got error 26, trying to decode entities...", $debug_enabled);
-
-               $feed_data = html_entity_decode($feed_data, ENT_COMPAT, 'UTF-8');
-
-               $error = verify_feed_xml($feed_data);
-
-               if ($error) $feed_data = '';
-               }
-               }
-               } */
         }
 
         if (!$feed_data) {

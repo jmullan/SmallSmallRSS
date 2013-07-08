@@ -161,7 +161,6 @@ function _debug($msg, $show = true) {
 /**
  * Purge a feed old posts.
  *
- * @param mixed $link A database connection.
  * @param mixed $feed_id The id of the purged feed.
  * @param mixed $purge_interval Olderness of purged posts.
  * @param boolean $debug Set to True to enable the debug. False by default.
@@ -170,7 +169,9 @@ function _debug($msg, $show = true) {
  */
 function purge_feed($feed_id, $purge_interval, $debug = false) {
 
-    if (!$purge_interval) $purge_interval = feed_purge_interval($feed_id);
+    if (!$purge_interval) {
+        $purge_interval = feed_purge_interval($feed_id);
+    }
 
     $rows = -1;
 
@@ -2968,19 +2969,16 @@ function render_login_form() {
 }
 
 function format_warning($msg, $id = "") {
-    global $link;
     return "<div class=\"warning\" id=\"$id\">
 			<span><img src=\"images/sign_excl.svg\"></span><span>$msg</span></div>";
 }
 
 function format_notice($msg, $id = "") {
-    global $link;
     return "<div class=\"notice\" id=\"$id\">
 			<span><img src=\"images/sign_info.svg\"></span><span>$msg</span></div>";
 }
 
 function format_error($msg, $id = "") {
-    global $link;
     return "<div class=\"error\" id=\"$id\">
 			<span><img src=\"images/sign_excl.svg\"></span><span>$msg</span></div>";
 }

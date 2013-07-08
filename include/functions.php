@@ -833,16 +833,17 @@ function convert_timestamp($timestamp, $source_tz, $dest_tz) {
     return $dt->format('U') + $dest_tz->getOffset($dt);
 }
 
-function make_local_datetime($timestamp, $long, $owner_uid = false,
-                             $no_smart_dt = false) {
-
-    if (!$owner_uid) $owner_uid = $_SESSION['uid'];
-    if (!$timestamp) $timestamp = '1970-01-01 0:00';
-
-    global $utc_tz;
-    global $user_tz;
-
-    if (!$utc_tz) $utc_tz = new DateTimeZone('UTC');
+function make_local_datetime($timestamp, $long, $owner_uid=false, $no_smart_dt=false) {
+    static $utc_tz = null;
+    if (is_null($utc_tz)) {
+        $utc_tz = new DateTimeZone('UTC');
+    }
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION['uid'];
+    }
+    if (!$timestamp) {
+        $timestamp = '1970-01-01 0:00';
+    }
 
     $timestamp = substr($timestamp, 0, 19);
 
@@ -850,15 +851,12 @@ function make_local_datetime($timestamp, $long, $owner_uid = false,
     $dt = new DateTime($timestamp, $utc_tz);
 
     $user_tz_string = get_pref('USER_TIMEZONE', $owner_uid);
-
     if ($user_tz_string != 'Automatic') {
-
         try {
-            if (!$user_tz) $user_tz = new DateTimeZone($user_tz_string);
+            $user_tz = new DateTimeZone($user_tz_string);
         } catch (Exception $e) {
             $user_tz = $utc_tz;
         }
-
         $tz_offset = $user_tz->getOffset($dt);
     } else {
         $tz_offset = (int) -$_SESSION["clientTzOffset"];
@@ -867,21 +865,21 @@ function make_local_datetime($timestamp, $long, $owner_uid = false,
     $user_timestamp = $dt->format('U') + $tz_offset;
 
     if (!$no_smart_dt) {
-        return smart_date_time($user_timestamp,
-                               $tz_offset, $owner_uid);
+        return smart_date_time($user_timestamp, $tz_offset, $owner_uid);
     } else {
-        if ($long)
+        if ($long) {
             $format = get_pref('LONG_DATE_FORMAT', $owner_uid);
-        else
+        } else {
             $format = get_pref('SHORT_DATE_FORMAT', $owner_uid);
-
+        }
         return date($format, $user_timestamp);
     }
 }
 
-function smart_date_time($timestamp, $tz_offset = 0, $owner_uid = false) {
-    if (!$owner_uid) $owner_uid = $_SESSION['uid'];
-
+function smart_date_time($timestamp, $tz_offset=0, $owner_uid=false) {
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION['uid'];
+    }
     if (date("Y.m.d", $timestamp) == date("Y.m.d", time() + $tz_offset)) {
         return date("G:i", $timestamp);
     } elseif (date("Y", $timestamp) == date("Y", time() + $tz_offset)) {

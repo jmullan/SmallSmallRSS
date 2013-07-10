@@ -1,3 +1,4 @@
+<?php
 namespace SmallSmallRSS;
 class Daemon {
     static public $children = array();

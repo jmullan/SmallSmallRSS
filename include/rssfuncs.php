@@ -276,8 +276,8 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
         if (!$feed_data) {
             _debug("fetching [$fetch_url]...", $debug_enabled);
             _debug("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $last_article_timestamp), $debug_enabled);
-
-            $feed_data = fetch_file_contents(
+            $fetcher = new \SmallSmallRSS\Fetch();
+            $feed_data = $fetcher->get_file_contents(
                 $fetch_url, false,
                 $auth_login, $auth_pass, false,
                 $no_cache ? FEED_FETCH_NO_CACHE_TIMEOUT : FEED_FETCH_TIMEOUT,
@@ -290,9 +290,8 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
         }
 
         if (!$feed_data) {
-            global $fetch_last_error;
-            global $fetch_last_error_code;
-
+            $fetch_last_error = $fetcher->last_error;
+            $fetch_last_error_code = $fetcher->last_error_code;
             _debug("unable to fetch: $fetch_last_error [$fetch_last_error_code]", $debug_enabled);
 
             $error_escaped = '';
@@ -306,8 +305,8 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
             db_query(
                 "UPDATE ttrss_feeds SET last_error = '$error_escaped',
-						last_updated = NOW() WHERE id = '$feed'");
-
+		last_updated = NOW() WHERE id = '$feed'"
+            );
             return;
         }
     }

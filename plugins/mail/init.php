@@ -56,7 +56,7 @@ class Mail extends Plugin {
 		$tpl->setVariable('USER_EMAIL', $user_email, true);
 		$tpl->setVariable('TTRSS_HOST', $_SERVER["HTTP_HOST"], true);
 
-		$result = db_query("SELECT link, content, title, note 
+		$result = db_query("SELECT link, content, title, note
 			FROM ttrss_user_entries, ttrss_entries WHERE id = ref_id AND
 			id IN ($param) AND owner_uid = " . $_SESSION["uid"]);
 
@@ -133,11 +133,9 @@ class Mail extends Plugin {
 	}
 
 	function sendEmail() {
-		require_once 'classes/ttrssmailer.php';
-
 		$reply = array();
 
-		$mail = new ttrssMailer();
+		$mail = new \SmallSmallRSS\Mailer();
 
 		$mail->From = strip_tags($_REQUEST['from_email']);
 		$mail->FromName = strip_tags($_REQUEST['from_name']);

@@ -1,17 +1,15 @@
 <?php
+namespace SmallSmallRSS;
+require_once 'lib/phpmailer/class.phpmailer.php';
+
 /**
- *	@class ttrssMailer
- *	@brief A TTRSS extension to the PHPMailer class
+ *	@class Mailer
+ *	@brief A SmallSmallRSS extension to the PHPMailer class
  *	Configures default values through the __construct() function
  *	@author Derek Murawsky
  *	@version .1 (alpha)
  */
-require_once 'lib/phpmailer/class.phpmailer.php';
-
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../SmallSmallRSS/bootstrap.php';
-
-class ttrssMailer extends PHPMailer {
+class Mailer extends PHPMailer {
     //define all items that we want to override with defaults in PHPMailer
     public $From = SMTP_FROM_ADDRESS;
     public $FromName = SMTP_FROM_NAME;
@@ -29,7 +27,9 @@ class ttrssMailer extends PHPMailer {
             $this->Host = $pair[0];
             $this->Port = $pair[1];
 
-            if (!$this->Port) $this->Port = 25;
+            if (!$this->Port) {
+                $this->Port = 25;
+            }
         } else {
             $this->Host = '';
             $this->Port = '';
@@ -45,7 +45,8 @@ class ttrssMailer extends PHPMailer {
         if (SMTP_SECURE)
             $this->SMTPSecure = SMTP_SECURE;
     }
-    /*	@brief a simple mail function to send email using the defaults
+    /**
+     *  A simple mail function to send email using the defaults
      *	This will send an HTML email using the configured defaults
      *	@param $toAddress A string with the recipients email address
      *	@param $toName A string with the recipients name

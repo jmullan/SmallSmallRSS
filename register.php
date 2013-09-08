@@ -9,7 +9,6 @@ require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
                  get_include_path());
-require_once 'classes/ttrssmailer.php';
 require_once "sessions.php";
 require_once "sanity_check.php";
 require_once "db.php";
@@ -205,7 +204,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 
 <?php if (!REG_MAX_USERS || $num_users < REG_MAX_USERS) { ?>
 
-<!-- If you have any rules or ToS you'd like to display, enter them here -->
+<!-- If you have any rules or ToS you would like to display, enter them here -->
 
 	<?php	if (file_exists("templates/register_notice.txt")) {
 			require_once "templates/register_notice.txt";
@@ -307,7 +306,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 						"\n".
 						"If that wasn't you, just ignore this message. Thanks.";
 
-					$mail = new ttrssMailer();
+					$mail = new \SmallSmallRSS\Mailer();
 					$mail->IsHTML(false);
 					$rc = $mail->quickMail($email, "", "Registration information for Tiny Tiny RSS", $reg_text, false);
 
@@ -324,7 +323,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 						"Email: $email\n";
 
 
-					$mail = new ttrssMailer();
+					$mail = new \SmallSmallRSS\Mailer();
 					$mail->IsHTML(false);
 					$rc = $mail->quickMail(REG_NOTIFY_ADDRESS, "", "Registration notice for Tiny Tiny RSS", $reg_text, false);
 					if (!$rc) print_error($mail->ErrorInfo);

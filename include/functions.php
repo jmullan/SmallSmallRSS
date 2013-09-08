@@ -132,17 +132,17 @@ $schema_version = false;
  * @param string $msg The debug message.
  * @return void
  */
-function _debug($msg, $show = true) {
-
+function _debug($msg, $show=true, $is_debug=true) {
+    if (!$is_debug) {
+        return;
+    }
     $ts = strftime("%H:%M:%S", time());
     if (function_exists('posix_getpid')) {
         $ts = "$ts/" . posix_getpid();
     }
-
     if ($show && !(defined('QUIET') && QUIET)) {
         print "[$ts] $msg\n";
     }
-
     if (defined('LOGFILE'))  {
         $fp = fopen(LOGFILE, 'a+');
 
@@ -151,8 +151,7 @@ function _debug($msg, $show = true) {
             fclose($fp);
         }
     }
-
-} // function _debug
+}
 
 /**
  * Purge a feed old posts.
@@ -1486,8 +1485,7 @@ function subscribe_to_feed($url, $cat_id = 0,
 			WHERE feed_url = '$url' AND owner_uid = ".$_SESSION["uid"]);
 
     if (strlen(FEED_CRYPT_KEY) > 0) {
-        require_once __DIR__ . "/crypt.php";
-        $auth_pass = substr(encrypt_string($auth_pass), 0, 250);
+        $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
         $auth_pass_encrypted = 'true';
     } else {
         $auth_pass_encrypted = 'false';

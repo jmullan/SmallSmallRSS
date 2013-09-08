@@ -652,8 +652,7 @@ class Pref_Feeds extends Handler_Protected {
         $auth_pass = $this->dbh->fetch_result($result, 0, "auth_pass");
 
         if ($auth_pass_encrypted) {
-            require_once "crypt.php";
-            $auth_pass = decrypt_string($auth_pass);
+            $auth_pass = \SmallSmallRSS\Crypt::de($auth_pass);
         }
 
         $auth_pass = htmlspecialchars($auth_pass);
@@ -989,8 +988,7 @@ class Pref_Feeds extends Handler_Protected {
             $this->dbh->escape_string($_POST["mark_unread_on_update"]));
 
         if (strlen(FEED_CRYPT_KEY) > 0) {
-            require_once "crypt.php";
-            $auth_pass = substr(encrypt_string($auth_pass), 0, 250);
+            $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
             $auth_pass_encrypted = 'true';
         } else {
             $auth_pass_encrypted = 'false';
@@ -1902,8 +1900,7 @@ class Pref_Feeds extends Handler_Protected {
 					WHERE feed_url = '$feed' AND owner_uid = ".$_SESSION["uid"]);
 
                 if (strlen(FEED_CRYPT_KEY) > 0) {
-                    require_once "crypt.php";
-                    $pass = substr(encrypt_string($pass), 0, 250);
+                    $pass = substr(\SmallSmallRSS\Crypt::en($pass), 0, 250);
                     $auth_pass_encrypted = 'true';
                 } else {
                     $auth_pass_encrypted = 'false';

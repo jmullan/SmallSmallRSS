@@ -175,11 +175,8 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
         }
     }
 
-    require_once "digest.php";
-
     // Send feed digests by email if needed.
-    send_headlines_digests($debug);
-
+    \SmallSmallRSS\Digest::send_headlines($debug);
     return $nf;
 
 } // function update_daemon_common
@@ -224,8 +221,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
     $auth_pass = db_fetch_result($result, 0, "auth_pass");
 
     if ($auth_pass_encrypted) {
-        require_once "crypt.php";
-        $auth_pass = decrypt_string($auth_pass);
+        $auth_pass = \SmallSmallRSS\Crypt::de($auth_pass);
     }
 
     $cache_images = sql_bool_to_bool(db_fetch_result($result, 0, "cache_images"));

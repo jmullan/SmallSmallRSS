@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 
-require_once __DIR__ . '../include.db.php';
+require_once __DIR__ . '/../include.db.php';
 
 class CounterCache {
     static public function zero_all($owner_uid) {

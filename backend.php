@@ -25,7 +25,8 @@ if (array_search($op, $public_calls) !== false) {
 
 $csrf_token = (isset($_REQUEST['csrf_token']) ? $_REQUEST['csrf_token'] : '');
 
-require_once "sessions.php";
+\SmallSmallRSS\Session::init();
+
 require_once "db.php";
 require_once "db-prefs.php";
 
@@ -47,7 +48,7 @@ if (SINGLE_USER_MODE) {
 }
 
 if ($_SESSION["uid"]) {
-    if (!validate_session()) {
+    if (!\SmallSmallRSS\Session::validate()) {
         header("Content-Type: text/json");
         print json_encode(array("error" => array("code" => 6)));
         return;

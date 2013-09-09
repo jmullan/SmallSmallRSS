@@ -16,7 +16,8 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-require_once "sessions.php";
+\SmallSmallRSS\Session::init();
+
 require_once "sanity_check.php";
 require_once "version.php";
 require_once "db-prefs.php";

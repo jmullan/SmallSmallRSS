@@ -9,9 +9,10 @@ require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
                  get_include_path());
-require_once "sessions.php";
 require_once "sanity_check.php";
 require_once "db.php";
+
+\SmallSmallRSS\Session::init();
 
 startup_gettext();
 

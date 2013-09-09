@@ -13,7 +13,8 @@ if (defined('E_DEPRECATED')) {
 }
 
 require_once __DIR__ . "/../config.php";
-require_once __DIR__ . '/sessions.php';
+
+\SmallSmallRSS\Session::init();
 
 /**
  * Define a constant if not already defined
@@ -629,7 +630,7 @@ function login_sequence() {
         authenticate_user("admin", null);
         load_user_plugins($_SESSION["uid"]);
     } else {
-        if (!validate_session()) $_SESSION["uid"] = false;
+        if (!\SmallSmallRSS\Session::validate()) $_SESSION["uid"] = false;
 
         if (!$_SESSION["uid"]) {
 

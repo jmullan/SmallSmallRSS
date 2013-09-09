@@ -1,6 +1,4 @@
 <?php
-require_once "colors.php";
-
 class Feeds extends Handler_Protected {
 
     function escape_from_request($key) {
@@ -415,11 +413,9 @@ class Feeds extends Handler_Protected {
                 //setting feed headline background color, needs to change text color based on dark/light
                 $fav_color = $line['favicon_avg_color'];
 
-                require_once "colors.php";
-
                 if ($fav_color && $fav_color != 'fail') {
                     if (!isset($rgba_cache[$feed_id])) {
-                        $rgba_cache[$feed_id] = join(",", _color_unpack($fav_color));
+                        $rgba_cache[$feed_id] = join(",", \SmallSmallRSS\Color::unpack($fav_color));
                     }
                 }
 

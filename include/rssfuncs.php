@@ -385,13 +385,11 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
             $favicon_colorstring = '';
             if (file_exists($favicon_file) && function_exists("imagecreatefromstring") && $favicon_avg_color == '') {
-                require_once "colors.php";
-
                 db_query("UPDATE ttrss_feeds SET favicon_avg_color = 'fail' WHERE
 							id = '$feed'");
 
                 $favicon_color = db_escape_string(
-                    calculate_avg_color($favicon_file));
+                    \SmallSmallRSS\Color::calculate_avg_color($favicon_file));
 
                 $favicon_colorstring = ",favicon_avg_color = '".$favicon_color."'";
             } elseif ($favicon_avg_color == 'fail') {

@@ -389,7 +389,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 							id = '$feed'");
 
                 $favicon_color = db_escape_string(
-                    \SmallSmallRSS\Color::calculate_avg_color($favicon_file));
+                    \SmallSmallRSS\Colors::calculate_avg_color($favicon_file));
 
                 $favicon_colorstring = ",favicon_avg_color = '".$favicon_color."'";
             } elseif ($favicon_avg_color == 'fail') {

@@ -415,7 +415,7 @@ class Feeds extends Handler_Protected {
 
                 if ($fav_color && $fav_color != 'fail') {
                     if (!isset($rgba_cache[$feed_id])) {
-                        $rgba_cache[$feed_id] = join(",", \SmallSmallRSS\Color::unpack($fav_color));
+                        $rgba_cache[$feed_id] = join(",", \SmallSmallRSS\Colors::unpack($fav_color));
                     }
                 }
 

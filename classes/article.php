@@ -82,7 +82,7 @@ class Article extends Handler_Protected {
         }
 
         $feed_id = getArticleFeed($id);
-        ccache_update($feed_id, $_SESSION["uid"]);
+        \SmallSmallRSS\CounterCache::update($feed_id, $_SESSION["uid"]);
     }
 
     static function create_published_article($title, $url, $content, $labels_str,

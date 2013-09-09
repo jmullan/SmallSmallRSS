@@ -117,7 +117,6 @@ function startup_gettext() {
 
 require_once __DIR__ . '/db-prefs.php';
 require_once __DIR__ . '/version.php';
-require_once __DIR__ . '/ccache.php';
 require_once __DIR__ . '/labels.php';
 
 define('SELF_USER_AGENT', 'Tiny Tiny RSS/' . VERSION . ' (http://tt-rss.org/)');
@@ -182,7 +181,7 @@ function purge_feed($feed_id, $purge_interval, $debug = false) {
 
     if ($purge_interval == -1 || !$purge_interval) {
         if ($owner_uid) {
-            ccache_update($feed_id, $owner_uid);
+            \SmallSmallRSS\CounterCache::update($feed_id, $owner_uid);
         }
         return;
     }
@@ -244,7 +243,7 @@ function purge_feed($feed_id, $purge_interval, $debug = false) {
 
     $rows = db_affected_rows($result);
 
-    ccache_update($feed_id, $owner_uid);
+    \SmallSmallRSS\CounterCache::update($feed_id, $owner_uid);
 
     if ($debug) {
         _debug("Purged feed $feed_id ($purge_interval): deleted $rows articles");
@@ -1000,7 +999,7 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
 
         }
 
-        ccache_update($feed, $owner_uid, $cat_view);
+        \SmallSmallRSS\CounterCache::update($feed, $owner_uid, $cat_view);
 
     } else { // tag
         db_query("UPDATE ttrss_user_entries
@@ -1080,7 +1079,7 @@ function getCategoryCounters() {
     /* Special case: NULL category doesn't actually exist in the DB */
 
     $cv = array("id" => 0, "kind" => "cat",
-                "counter" => (int) ccache_find(0, $_SESSION["uid"], true));
+                "counter" => (int) \SmallSmallRSS\CounterCache::find(0, $_SESSION["uid"], true));
 
     array_push($ret_arr, $cv);
 
@@ -2746,7 +2745,7 @@ function catchupArticlesById($ids, $cmode, $owner_uid = false) {
 			WHERE ($ids_qpart) AND owner_uid = $owner_uid");
 
     while ($line = db_fetch_assoc($result)) {
-        ccache_update($line["feed_id"], $owner_uid);
+        \SmallSmallRSS\CounterCache::update($line["feed_id"], $owner_uid);
     }
 }
 
@@ -2921,7 +2920,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
 				SET unread = false,last_read = NOW()
 				WHERE ref_id = '$id' AND owner_uid = $owner_uid");
 
-        ccache_update($feed_id, $owner_uid);
+        \SmallSmallRSS\CounterCache::update($feed_id, $owner_uid);
     }
 
     $result = db_query("SELECT id,title,link,content,feed_id,comments,int_id,

@@ -20,7 +20,7 @@ define_default('MAX_CHILD_RUNTIME', 1800); // seconds
 define_default('MAX_JOBS', 2);
 define_default('SPAWN_INTERVAL', DAEMON_SLEEP_INTERVAL); // seconds
 
-require_once "sanity_check.php";
+\SmallSmallRSS\Sanity::initial_check();
 require_once "db.php";
 require_once "db-prefs.php";
 

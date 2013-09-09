@@ -1,8 +1,7 @@
 <?php
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
-
-require_once "sanity_check.php";
+\SmallSmallRSS\Sanity::initial_check();
 require_once "db.php";
 require_once "db-prefs.php";
 

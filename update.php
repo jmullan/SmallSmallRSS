@@ -11,7 +11,7 @@ define('DISABLE_SESSIONS', true);
 chdir(dirname(__FILE__));
 
 require_once "rssfuncs.php";
-require_once "sanity_check.php";
+\SmallSmallRSS\Sanity::initial_check();
 require_once "db.php";
 require_once "db-prefs.php";
 

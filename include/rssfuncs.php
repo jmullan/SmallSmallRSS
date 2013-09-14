@@ -5,14 +5,14 @@ define_default('DAEMON_SLEEP_INTERVAL', 120);
 
 function update_feedbrowser_cache() {
 
-    $result = db_query("SELECT feed_url, site_url, title, COUNT(id) AS subscribers
-	  		FROM ttrss_feeds WHERE (SELECT COUNT(id) = 0 FROM ttrss_feeds AS tf
-				WHERE tf.feed_url = ttrss_feeds.feed_url
-				AND (private IS true OR auth_login != '' OR auth_pass != '' OR feed_url LIKE '%:%@%/%'))
-				GROUP BY feed_url, site_url, title ORDER BY subscribers DESC LIMIT 1000");
-
+    $result = db_query(
+        "SELECT feed_url, site_url, title, COUNT(id) AS subscribers
+	 FROM ttrss_feeds WHERE (SELECT COUNT(id) = 0 FROM ttrss_feeds AS tf
+	 WHERE tf.feed_url = ttrss_feeds.feed_url
+	 AND (private IS true OR auth_login != '' OR auth_pass != '' OR feed_url LIKE '%:%@%/%'))
+	 GROUP BY feed_url, site_url, title ORDER BY subscribers DESC LIMIT 1000"
+    );
     db_query("BEGIN");
-
     db_query("DELETE FROM ttrss_feedbrowser_cache");
 
     $count = 0;
@@ -27,21 +27,15 @@ function update_feedbrowser_cache() {
 				ttrss_feedbrowser_cache WHERE feed_url = '$feed_url'");
 
         if (db_num_rows($tmp_result) == 0) {
-
-            db_query("INSERT INTO ttrss_feedbrowser_cache
-					(feed_url, site_url, title, subscribers) VALUES ('$feed_url',
-						'$site_url', '$title', '$subscribers')");
-
-            ++$count;
-
+            db_query(
+                "INSERT INTO ttrss_feedbrowser_cache
+		 (feed_url, site_url, title, subscribers)
+                 VALUES ('$feed_url', '$site_url', '$title', '$subscribers')");
+            $count += 1;
         }
-
     }
-
     db_query("COMMIT");
-
     return $count;
-
 }
 
 
@@ -76,15 +70,19 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 
     // Test if the feed need a update (update interval exceded).
     if (DB_TYPE == "pgsql") {
-        $update_limit_qpart = "AND ((
-					ttrss_feeds.update_interval = 0
-					AND ttrss_user_prefs.value != '-1'
-					AND ttrss_feeds.last_updated < NOW() - CAST((ttrss_user_prefs.value || ' minutes') AS INTERVAL)
-				) OR (
-					ttrss_feeds.update_interval > 0
-					AND ttrss_feeds.last_updated < NOW() - CAST((ttrss_feeds.update_interval || ' minutes') AS INTERVAL)
-				) OR ttrss_feeds.last_updated IS NULL
-				OR last_updated = '1970-01-01 00:00:00')";
+        $update_limit_qpart = "AND (
+            (
+                ttrss_feeds.update_interval = 0
+                AND ttrss_user_prefs.value != '-1'
+                AND ttrss_feeds.last_updated < NOW() - CAST(
+                (ttrss_user_prefs.value || ' minutes') AS INTERVAL
+            )
+	) OR (
+            ttrss_feeds.update_interval > 0
+            AND ttrss_feeds.last_updated < NOW() - CAST(
+                (ttrss_feeds.update_interval || ' minutes') AS INTERVAL)
+        ) OR ttrss_feeds.last_updated IS NULL
+	OR last_updated = '1970-01-01 00:00:00')";
     } else {
         $update_limit_qpart = "AND ((
 					ttrss_feeds.update_interval = 0
@@ -109,20 +107,19 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
     if ($limit) $query_limit = sprintf("LIMIT %d", $limit);
 
     $query = "SELECT DISTINCT ttrss_feeds.feed_url, ttrss_feeds.last_updated
-			FROM
-				ttrss_feeds, ttrss_users, ttrss_user_prefs
-			WHERE
-				ttrss_feeds.owner_uid = ttrss_users.id
-				AND ttrss_users.id = ttrss_user_prefs.owner_uid
-				AND ttrss_user_prefs.pref_name = 'DEFAULT_UPDATE_INTERVAL'
-				$login_thresh_qpart $update_limit_qpart
-				$updstart_thresh_qpart
-				ORDER BY last_updated $query_limit";
+              FROM ttrss_feeds, ttrss_users, ttrss_user_prefs
+              WHERE
+                  ttrss_feeds.owner_uid = ttrss_users.id
+                  AND ttrss_users.id = ttrss_user_prefs.owner_uid
+                  AND ttrss_user_prefs.pref_name = 'DEFAULT_UPDATE_INTERVAL'
+                  $login_thresh_qpart $update_limit_qpart
+                  $updstart_thresh_qpart
+              ORDER BY last_updated $query_limit";
 
     // We search for feed needing update.
     $result = db_query($query);
 
-    if ($debug) _debug(sprintf("Scheduled %d feeds to update...", db_num_rows($result)));
+    _debug(sprintf("Scheduled %d feeds to update...", db_num_rows($result)), $debug);
 
     // Here is a little cache magic in order to minimize risk of double feed updates.
     $feeds_to_update = array();
@@ -149,7 +146,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 
     // For each feed, we call the feed update function.
     foreach ($feeds_to_update as $feed) {
-        if ($debug) _debug("Base feed: $feed");
+        _debug("Base feed: $feed", $debug);
 
         //update_rss_feed($line["id"], true);
 
@@ -168,7 +165,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 
         if (db_num_rows($tmp_result) > 0) {
             while ($tline = db_fetch_assoc($tmp_result)) {
-                if ($debug) _debug(" => " . $tline["last_updated"] . ", " . $tline["id"] . " " . $tline["owner_uid"]);
+                _debug(" => " . $tline["last_updated"] . ", " . $tline["id"] . " " . $tline["owner_uid"], $debug);
                 update_rss_feed($tline["id"], true);
                 ++$nf;
             }
@@ -480,8 +477,17 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             }
 
             $entry_guid = $item->get_id();
-            if (!$entry_guid) $entry_guid = $item->get_link();
-            if (!$entry_guid) $entry_guid = make_guid_from_title($item->get_title());
+            if (!$entry_guid) {
+                $entry_guid = $item->get_link();
+            }
+            if (!$entry_guid) {
+                $entry_guid = make_guid_from_title($item->get_title());
+            }
+            $hooks = $pluginhost->get_hooks(PluginHost::HOOK_GUID_FILTER);
+            foreach ($hook as $plugin) {
+                $guid = $plugin->hook_article_filter($item, $guid);
+            }
+
 
             _debug("f_guid $entry_guid", $debug_enabled);
 
@@ -558,8 +564,9 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
             $entry_tags = array_unique($additional_tags);
 
-            for ($i = 0; $i < count($entry_tags); $i++)
+            for ($i = 0; $i < count($entry_tags); $i++) {
                 $entry_tags[$i] = mb_strtolower($entry_tags[$i], 'utf-8');
+            }
 
             _debug("tags found: " . join(",", $entry_tags), $debug_enabled);
 
@@ -585,15 +592,17 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
                 $stored_article = array();
             }
 
-            $article = array("owner_uid" => $owner_uid, // read only
-                             "guid" => $entry_guid, // read only
-                             "title" => $entry_title,
-                             "content" => $entry_content,
-                             "link" => $entry_link,
-                             "tags" => $entry_tags,
-                             "plugin_data" => $entry_plugin_data,
-                             "author" => $entry_author,
-                             "stored" => $stored_article);
+            $article = array(
+                "owner_uid" => $owner_uid, // read only
+                "guid" => $entry_guid, // read only
+                "title" => $entry_title,
+                "content" => $entry_content,
+                "link" => $entry_link,
+                "tags" => $entry_tags,
+                "plugin_data" => $entry_plugin_data,
+                "author" => $entry_author,
+                "stored" => $stored_article
+            );
 
             foreach ($pluginhost->get_hooks(PluginHost::HOOK_ARTICLE_FILTER) as $plugin) {
                 $article = $plugin->hook_article_filter($article);
@@ -620,7 +629,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             db_query("BEGIN");
 
             $result = db_query("SELECT id FROM	ttrss_entries
-					WHERE (guid = '$entry_guid' OR guid = '$entry_guid_hashed')");
+			        WHERE (guid = '$entry_guid' OR guid = '$entry_guid_hashed')");
 
             if (db_num_rows($result) == 0) {
 

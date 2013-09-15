@@ -484,7 +484,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
                 $entry_guid = make_guid_from_title($item->get_title());
             }
             $hooks = $pluginhost->get_hooks(PluginHost::HOOK_GUID_FILTER);
-            foreach ($hook as $plugin) {
+            foreach ($hooks as $plugin) {
                 $guid = $plugin->hook_article_filter($item, $guid);
             }
 
@@ -576,17 +576,25 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
             _debug("applying plugin filters..", $debug_enabled);
 
-            // FIXME not sure if owner_uid is a good idea here, we may have a base entry without user entry (?)
-            $result = db_query("SELECT plugin_data,title,content,link,tag_cache,author FROM ttrss_entries, ttrss_user_entries
-					WHERE ref_id = id AND (guid = '".db_escape_string($entry_guid)."' OR guid = '$entry_guid_hashed') AND owner_uid = $owner_uid");
+            // FIXME not sure if owner_uid is a good idea here, we may have a base
+            // entry (?)
+            $result = db_query(
+                "SELECT plugin_data,title,content,link,tag_cache,author
+                 FROM ttrss_entries, ttrss_user_entries
+                 WHERE
+                     ref_id = id AND (guid = '" . db_escape_string($entry_guid) . "'
+                     OR guid = '$entry_guid_hashed') AND owner_uid = $owner_uid"
+            );
 
             if (db_num_rows($result) != 0) {
                 $entry_plugin_data = db_fetch_result($result, 0, "plugin_data");
-                $stored_article = array("title" => db_fetch_result($result, 0, "title"),
-                                        "content" => db_fetch_result($result, 0, "content"),
-                                        "link" => db_fetch_result($result, 0, "link"),
-                                        "tags" => explode(",", db_fetch_result($result, 0, "tag_cache")),
-                                        "author" => db_fetch_result($result, 0, "author"));
+                $stored_article = array(
+                    "title" => db_fetch_result($result, 0, "title"),
+                    "content" => db_fetch_result($result, 0, "content"),
+                    "link" => db_fetch_result($result, 0, "link"),
+                    "tags" => explode(",", db_fetch_result($result, 0, "tag_cache")),
+                    "author" => db_fetch_result($result, 0, "author")
+                );
             } else {
                 $entry_plugin_data = "";
                 $stored_article = array();
@@ -628,46 +636,46 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
             db_query("BEGIN");
 
-            $result = db_query("SELECT id FROM	ttrss_entries
-			        WHERE (guid = '$entry_guid' OR guid = '$entry_guid_hashed')");
+            $result = db_query(
+                "SELECT id FROM	ttrss_entries
+		 WHERE (guid = '$entry_guid' OR guid = '$entry_guid_hashed')");
 
             if (db_num_rows($result) == 0) {
-
                 _debug("base guid [$entry_guid] not found", $debug_enabled);
 
                 // base post entry does not exist, create it
 
                 $result = db_query(
-                    "INSERT INTO ttrss_entries
-							(title,
-							guid,
-							link,
-							updated,
-							content,
-							content_hash,
-							cached_content,
-							no_orig_date,
-							date_updated,
-							date_entered,
-							comments,
-							num_comments,
-							plugin_data,
-							author)
-						VALUES
-							('$entry_title',
-							'$entry_guid_hashed',
-							'$entry_link',
-							'$entry_timestamp_fmt',
-							'$entry_content',
-							'$content_hash',
-							'',
-							$no_orig_date,
-							NOW(),
-							'$date_feed_processed',
-							'$entry_comments',
-							'$num_comments',
-							'$entry_plugin_data',
-							'$entry_author')");
+                    "INSERT INTO ttrss_entries (
+                         title,
+			 guid,
+			 link,
+			 updated,
+			 content,
+			 content_hash,
+			 cached_content,
+			 no_orig_date,
+			 date_updated,
+			 date_entered,
+			 comments,
+			 num_comments,
+			 plugin_data,
+			 author
+                     ) VALUES (
+                         '$entry_title',
+			'$entry_guid_hashed',
+			'$entry_link',
+			'$entry_timestamp_fmt',
+			'$entry_content',
+			'$content_hash',
+			'',
+			$no_orig_date,
+			NOW(),
+			'$date_feed_processed',
+			'$entry_comments',
+			'$num_comments',
+			'$entry_plugin_data',
+			'$entry_author')");
 
                 $article_labels = array();
 
@@ -688,13 +696,13 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             // now it should exist, if not - bad luck then
 
             $result = db_query("SELECT
-						id,content_hash,no_orig_date,title,plugin_data,guid,
-						".SUBSTRING_FOR_DATE."(date_updated,1,19) as date_updated,
-						".SUBSTRING_FOR_DATE."(updated,1,19) as updated,
-						num_comments
-					FROM
-						ttrss_entries
-					WHERE guid = '$entry_guid' OR guid = '$entry_guid_hashed'");
+				id,content_hash,no_orig_date,title,plugin_data,guid,
+				".SUBSTRING_FOR_DATE."(date_updated,1,19) as date_updated,
+				".SUBSTRING_FOR_DATE."(updated,1,19) as updated,
+				num_comments
+				FROM
+					ttrss_entries
+				WHERE guid = '$entry_guid' OR guid = '$entry_guid_hashed'");
 
             $entry_ref_id = 0;
             $entry_int_id = 0;

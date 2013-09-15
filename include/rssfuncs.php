@@ -485,13 +485,15 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             }
             $hooks = $pluginhost->get_hooks(PluginHost::HOOK_GUID_FILTER);
             foreach ($hooks as $plugin) {
-                $guid = $plugin->hook_article_filter($item, $guid);
+                $entry_guid = $plugin->hook_article_filter($item, $entry_guid);
             }
 
 
             _debug("f_guid $entry_guid", $debug_enabled);
 
-            if (!$entry_guid) continue;
+            if (!$entry_guid) {
+                continue;
+            }
 
             $entry_guid = "$owner_uid,$entry_guid";
 

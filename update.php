@@ -20,21 +20,23 @@ if (!defined('PHP_EXECUTABLE'))
 
 init_plugins();
 
-$longopts = array("feeds",
-                  "feedbrowser",
-                  "daemon",
-                  "daemon-loop",
-                  "task:",
-                  "cleanup-tags",
-                  "quiet",
-                  "log:",
-                  "indexes",
-                  "pidlock:",
-                  "update-schema",
-                  "convert-filters",
-                  "force-update",
-                  "list-plugins",
-                  "help");
+$longopts = array(
+    "feeds",
+    "feedbrowser",
+    "daemon",
+    "daemon-loop",
+    "task:",
+    "cleanup-tags",
+    "quiet",
+    "log:",
+    "indexes",
+    "pidlock:",
+    "update-schema",
+    "convert-filters",
+    "force-update",
+    "list-plugins",
+    "help"
+);
 
 foreach (PluginHost::getInstance()->get_commands() as $command => $data) {
     array_push($longopts, $command . $data["suffix"]);

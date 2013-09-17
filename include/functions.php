@@ -776,8 +776,6 @@ function bool_to_sql_bool($s) {
 }
 
 function sanity_check() {
-    require_once __DIR__ . '/errordefs.php';
-
     $error_code = 0;
     $schema_version = SmallSmallRSS\Sanity::get_schema_version(true);
 
@@ -796,7 +794,10 @@ function sanity_check() {
         $error_code = 12;
     }
 
-    return array("code" => $error_code, "message" => $ERRORS[$error_code]);
+    return array(
+        "code" => $error_code,
+        "message" => \SmallSmallRSS\Constants::error_description($error_code)
+    );
 }
 
 function file_is_locked($filename) {

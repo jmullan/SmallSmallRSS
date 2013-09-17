@@ -485,7 +485,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             }
             $hooks = $pluginhost->get_hooks(PluginHost::HOOK_GUID_FILTER);
             foreach ($hooks as $plugin) {
-                $entry_guid = $plugin->hook_article_filter($item, $entry_guid);
+                $entry_guid = $plugin->hook_guid_filter($item, $entry_guid);
             }
 
 

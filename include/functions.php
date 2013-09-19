@@ -116,7 +116,6 @@ function startup_gettext() {
 }
 
 require_once __DIR__ . '/db-prefs.php';
-require_once __DIR__ . '/version.php';
 require_once __DIR__ . '/labels.php';
 
 define(

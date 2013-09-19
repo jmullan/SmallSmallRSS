@@ -5,7 +5,6 @@ require_once __DIR__ . "/../config.php";
 require_once __DIR__ . "/../classes/db.php";
 require_once __DIR__ . "/../lib/accept-to-gettext.php";
 require_once __DIR__ . "/../lib/gettext/gettext.inc";
-require_once __DIR__ . "/../include/version.php";
 
 \SmallSmallRSS\ErrorHandler::register();
 

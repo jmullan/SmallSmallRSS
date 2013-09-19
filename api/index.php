@@ -27,7 +27,6 @@ require_once __DIR__ . '/../SmallSmallRSS/bootstrap.php';
 
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initial_check();
-require_once "version.php";
 require_once "db-prefs.php";
 
 

@@ -119,7 +119,10 @@ require_once __DIR__ . '/db-prefs.php';
 require_once __DIR__ . '/version.php';
 require_once __DIR__ . '/labels.php';
 
-define('SELF_USER_AGENT', 'Tiny Tiny RSS/' . VERSION . ' (http://tt-rss.org/)');
+define(
+    'SELF_USER_AGENT',
+    'Tiny Tiny RSS/' . \SmallSmallRSS\Constants::VERSION . ' (http://tt-rss.org/)'
+);
 ini_set('user_agent', SELF_USER_AGENT);
 
 require_once __DIR__ . '/../lib/pubsubhubbub/publisher.php';
@@ -523,7 +526,7 @@ function authenticate_user($login, $password, $check_only = false) {
             $_SESSION["auth_module"] = $auth_module;
 
             $_SESSION["uid"] = $user_id;
-            $_SESSION["version"] = VERSION_STATIC;
+            $_SESSION["version"] = \SmallSmallRSS\Constants::VERSION;
 
             $result = db_query("SELECT login,access_level,pwd_hash FROM ttrss_users
 					WHERE id = '$user_id'");
@@ -2004,15 +2007,6 @@ function make_runtime_info() {
         }
     }
 
-    if ($_SESSION["last_version_check"] + 86400 + rand(-1000, 1000) < time()) {
-        $new_version_details = @check_for_update();
-
-        $data['new_version_available'] = (int) ($new_version_details != false);
-
-        $_SESSION["last_version_check"] = time();
-        $_SESSION["version_data"] = $new_version_details;
-    }
-
     return $data;
 }
 
@@ -2695,21 +2689,6 @@ function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes) {
 }
 
 function check_for_update() {
-    if (CHECK_FOR_NEW_VERSION && $_SESSION['access_level'] >= 10) {
-        $version_url = "http://tt-rss.org/version.php?ver=" . VERSION .
-            "&iid=" . sha1(SELF_URL_PATH);
-
-        $version_data = @fetch_file_contents($version_url);
-
-        if ($version_data) {
-            $version_data = json_decode($version_data, true);
-            if ($version_data && $version_data['version']) {
-                if (version_compare(VERSION_STATIC, $version_data['version']) == -1) {
-                    return $version_data;
-                }
-            }
-        }
-    }
     return false;
 }
 

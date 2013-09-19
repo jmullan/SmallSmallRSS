@@ -18,7 +18,6 @@ require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initial_check();
-require_once "version.php";
 require_once "db-prefs.php";
 require_once "lib/Mobile_Detect.php";
 
@@ -207,12 +206,6 @@ header('Content-Type: text/html; charset=utf-8');
 				title="<?php echo __("Communication problem with server.") ?>">
 			<img
 				src="images/alert.png" />
-			</button>
-
-			<button id="newVersionIcon" dojoType="dijit.form.Button" style="display : none">
-			<img onclick="newVersionDlg()"
-				src="images/new_version.png"
-				title="<?php echo __('New version of Tiny Tiny RSS is available!') ?>" />
 			</button>
 
 

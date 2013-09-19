@@ -1,6 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 class Constants {
+    const VERSION = '1.8';
     const EXPECTED_CONFIG_VERSION = 26;
     const SCHEMA_VERSION = 121;
     const LABEL_BASE_INDEX = -1024;

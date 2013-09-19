@@ -15,7 +15,6 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initial_check();
-require_once "version.php";
 require_once "db-prefs.php";
 
 if (!init_plugins()) return;
@@ -138,9 +137,6 @@ init_js_translations();
 <div id="footer" dojoType="dijit.layout.ContentPane" region="bottom">
      <a class="insensitive" target="_blank" href="http://tt-rss.org/">
      Tiny Tiny RSS</a>
-<?php if (!defined('HIDE_VERSION')) { ?>
-v<?php echo VERSION ?>
-<?php } ?>
      &copy; 2005-<?php echo date('Y') ?>
      <a class="insensitive" target="_blank"
                 href="http://fakecake.org/">Andrew Dolgov</a>

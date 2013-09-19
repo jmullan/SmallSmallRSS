@@ -53,7 +53,7 @@ class Session {
             return false;
         }
 
-        if (VERSION_STATIC != $_SESSION["version"]) {
+        if (\SmallSmallRSS\Constants::VERSION != $_SESSION["version"]) {
             return false;
         }
 

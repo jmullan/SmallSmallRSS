@@ -11,7 +11,6 @@ chdir(dirname(__FILE__));
 
 define('DISABLE_SESSIONS', true);
 
-require_once "version.php";
 require_once "rssfuncs.php";
 
 // defaults

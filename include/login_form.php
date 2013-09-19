@@ -9,6 +9,7 @@ $fake_password = isset($_SESSION["fake_password"]) ? $_SESSION["fake_password"] 
 	<title>Tiny Tiny RSS : Login</title>
 	<link rel="stylesheet" type="text/css" href="lib/dijit/themes/claro/claro.css"/>
 	<link rel="stylesheet" type="text/css" href="css/tt-rss.css">
+	<link rel="stylesheet" type="text/css" href="css/login.css">
 	<link rel="shortcut icon" type="image/png" href="images/favicon.png">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<script type="text/javascript" src="lib/dojo/dojo.js"></script>
@@ -22,88 +23,6 @@ $fake_password = isset($_SESSION["fake_password"]) ? $_SESSION["fake_password"] 
 			init();
 		});
 	</script>
-	<style type="text/css">
-	body#ttrssLogin {
-		padding : 2em;
-		font-size : 14px;
-	}
-
-	fieldset {
-		margin-left : auto;
-		margin-right : auto;
-		display : block;
-		width : 400px;
-		border-width : 0px;
-	}
-
-	input.input {
-		font-family : sans-serif;
-		font-size : medium;
-		border-spacing : 2px;
-		border : 1px solid #b5bcc7;
-		padding : 2px;
-	}
-
-	label {
-		width : 120px;
-		margin-right : 20px;
-		display : inline-block;
-		text-align : right;
-		color : gray;
-	}
-
-	div.header {
-		border-width : 0px 0px 1px 0px;
-		border-style : solid;
-		border-color : #88b0f0;
-		margin-bottom : 1em;
-		padding-bottom : 5px;
-	}
-
-	div.footer {
-		margin-top : 1em;
-		padding-top : 5px;
-		border-width : 1px 0px 0px 0px;
-		border-style : solid;
-		border-color : #88b0f0;
-		text-align : center;
-		color : gray;
-		font-size : 12px;
-	}
-
-	a.forgotpass {
-		text-align : right;
-		font-size : 11px;
-		display : inline-block;
-	}
-
-	a {
-		color : #4684ff;
-	}
-
-	a:hover {
-		color : black;
-	}
-
-	div.footer a {
-		color : gray;
-	}
-
-	div.footer a:hover {
-		color : #88b0f0;
-	}
-
-	div.row {
-		padding : 0px 0px 5px 0px;
-	}
-
-	div.row-error {
-		color : red;
-		text-align : center;
-		padding : 0px 0px 5px 0px;
-	}
-
-	</style>
 </head>
 
 <body id="ttrssLogin" class="claro">
@@ -251,12 +170,10 @@ function bwLimitChange(elem) {
 
 <div class='footer'>
 	<a href="http://tt-rss.org/">Tiny Tiny RSS</a>
-	<?php if (!defined('HIDE_VERSION')) { ?>
-		 v<?php echo VERSION ?>
-	<?php } ?>
 	&copy; 2005&ndash;<?php echo date('Y') ?> <a href="http://fakecake.org/">Andrew Dolgov</a>
 </div>
 
 </form>
 
-</body></html>
+</body>
+</html>

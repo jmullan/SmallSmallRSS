@@ -90,11 +90,11 @@ if (count($options) == 0 || isset($options["help"])) {
 }
 
 if (!isset($options['daemon'])) {
-    require_once "errorhandler.php";
+    \SmallSmallRss\ErrorHandler::register();
 }
 
 if (!isset($options['update-schema'])) {
-    SmallSmallRSS\Sanity::schema_or_die();
+    \SmallSmallRSS\Sanity::schema_or_die();
 }
 
 define('QUIET', isset($options['quiet']));

@@ -45,8 +45,6 @@ class Sanity {
             array_push($errors, "Configuration file not found. Looks like you forgot to copy config.php-dist to config.php and edit it.");
         } else {
 
-            require_once "sanity_config.php";
-
             if (file_exists("install") && !file_exists("config.php")) {
                 array_push($errors, "Please copy config.php-dist to config.php or run the installer in install/");
             }
@@ -89,18 +87,6 @@ class Sanity {
 
             if (strlen(FEED_CRYPT_KEY) > 0 && !function_exists("mcrypt_decrypt")) {
                 array_push($errors, "FEED_CRYPT_KEY requires mcrypt functions which are not found.");
-            }
-
-            if (GENERATED_CONFIG_CHECK != EXPECTED_CONFIG_VERSION) {
-                array_push($errors,
-                           "Configuration option checker sanity_config.php is outdated, please recreate it using ./utils/regen_config_checks.sh");
-            }
-
-            foreach ($requred_defines as $d) {
-                if (!defined($d)) {
-                    array_push($errors,
-                               "Required configuration file parameter $d is not defined in config.php. You might need to copy it from config.php-dist.");
-                }
             }
 
             if (SINGLE_USER_MODE) {

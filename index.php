@@ -44,91 +44,60 @@ login_sequence();
 
 header('Content-Type: text/html; charset=utf-8');
 
+
+
+require 'lib/jshrink/Minifier.php';
+
+
+$theme_css = 'themes/default.css';
+if ($_SESSION["uid"]) {
+    $theme = get_pref("USER_CSS_THEME", $_SESSION["uid"], false);
+    if ($theme && file_exists("themes/$theme")) {
+        $theme_css = "themes/$theme";
+    }
+}
+
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-	<title>Tiny Tiny RSS</title>
-
-	<?php stylesheet_tag("lib/dijit/themes/claro/claro.css"); ?>
-	<?php stylesheet_tag("css/layout.css"); ?>
-
-	<?php if ($_SESSION["uid"]) {
-		$theme = get_pref("USER_CSS_THEME", $_SESSION["uid"], false);
-		if ($theme && file_exists("themes/$theme")) {
-			stylesheet_tag("themes/$theme");
-		} else {
-			stylesheet_tag("themes/default.css");
-		}
-	}
-	?>
-
-	<?php print_user_stylesheet() ?>
-
-	<style type="text/css">
-	<?php
-		foreach (PluginHost::getInstance()->get_plugins() as $n => $p) {
-			if (method_exists($p, "get_css")) {
-				echo $p->get_css();
-			}
-		}
-	?>
-	</style>
-
-	<link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
-	<link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
-
-	<?php
-	foreach (array("lib/prototype.js",
-				"lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
-				"lib/dojo/dojo.js",
-				"lib/dojo/tt-rss-layer.js",
-				"errors.php?mode=js") as $jsfile) {
-
-		javascript_tag($jsfile);
-
-	} ?>
-
-	<script type="text/javascript">
-		require({cache:{}});
-	<?php
-		require 'lib/jshrink/Minifier.php';
-
-		print get_minified_js(array("tt-rss",
-			"functions", "feedlist", "viewfeed", "FeedTree", "PluginHost"));
-
-		foreach (PluginHost::getInstance()->get_plugins() as $n => $p) {
-			if (method_exists($p, "get_js")) {
-				echo JShrink\Minifier::minify($p->get_js());
-			}
-		}
-
-		init_js_translations();
-	?>
-	</script>
-
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-	<script type="text/javascript">
-		Event.observe(window, 'load', function() {
-			init();
-		});
-	</script>
+  <title>Small Small RSS</title>
+  <?php stylesheet_tag("lib/dijit/themes/claro/claro.css"); ?>
+  <?php stylesheet_tag("css/layout.css"); ?>
+  <?php stylesheet_tag($theme_css); ?>
+  <?php print_user_stylesheet() ?>
+  <style type="text/css">
+<?php
+foreach (PluginHost::getInstance()->get_plugins() as $n => $p) {
+    if (method_exists($p, "get_css")) {
+        echo $p->get_css();
+    }
+}
+?>
+  </style>
+  <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
+  <link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
+  <?php
+foreach (array("lib/prototype.js",
+               "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
+               "lib/dojo/dojo.js",
+               "lib/dojo/tt-rss-layer.js",
+               "errors.php?mode=js") as $jsfile) {
+    javascript_tag($jsfile);
+}
+?>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 </head>
 
 <body id="ttrssMain" class="claro">
 
-<div id="overlay" style="display : block">
-	<div id="overlay_inner">
-		<div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
-		<div dojoType="dijit.ProgressBar" places="0" style="width : 300px" id="loading_bar"
-	     progress="0" maximum="100">
-		</div>
-		<noscript><br/><?php  \SmallSmallRSS\Renderers\Messages\print_error('Javascript is disabled. Please enable it.') ?></noscript>
-	</div>
+<div id="overlay" style="display: block">
+  <div id="overlay_inner">
+    <div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
+    <div dojoType="dijit.ProgressBar" places="0" style="width : 300px" id="loading_bar" progress="0" maximum="100"></div>
+    <noscript><br/><?php \SmallSmallRSS\Renderers\Messages\print_error('Javascript is disabled. Please enable it.') ?></noscript>
+  </div>
 </div>
-
 <div id="notify" class="notify" style="display : none"></div>
 <div id="cmdline" style="display : none"></div>
 <div id="headlines-tmp" style="display : none"></div>
@@ -265,6 +234,25 @@ header('Content-Type: text/html; charset=utf-8');
 </div>
 </div>
 </div>
+
+
+<script type="text/javascript">
+require({cache:{}});
+<?php
+print get_minified_js(array("tt-rss", "functions", "feedlist", "viewfeed", "FeedTree", "PluginHost"));
+foreach (PluginHost::getInstance()->get_plugins() as $n => $p) {
+    if (method_exists($p, "get_js")) {
+        echo JShrink\Minifier::minify($p->get_js());
+    }
+}
+init_js_translations();
+?>
+</script>
+<script type="text/javascript">
+  Event.observe(window, 'load', function() {
+    init();
+  });
+</script>
 
 </body>
 </html>

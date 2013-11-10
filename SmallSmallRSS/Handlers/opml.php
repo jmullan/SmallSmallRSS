@@ -465,8 +465,8 @@ class Opml extends Handler_Protected {
         #		if ($debug) $doc = DOMDocument::load("/tmp/test.opml");
 
         if ($_FILES['opml_file']['error'] != 0) {
-             \SmallSmallRSS\Renderers\Messages\print_error(T_sprintf("Upload failed with error code %d",
-                                  $_FILES['opml_file']['error']));
+            \SmallSmallRSS\Renderers\Messages\print_error(T_sprintf("Upload failed with error code %d",
+                                                                    $_FILES['opml_file']['error']));
             return;
         }
 
@@ -479,11 +479,11 @@ class Opml extends Handler_Protected {
                                          $tmp_file);
 
             if (!$result) {
-                 \SmallSmallRSS\Renderers\Messages\print_error(__("Unable to move uploaded file."));
+                \SmallSmallRSS\Renderers\Messages\print_error(__("Unable to move uploaded file."));
                 return;
             }
         } else {
-             \SmallSmallRSS\Renderers\Messages\print_error(__('Error: please upload OPML file.'));
+            \SmallSmallRSS\Renderers\Messages\print_error(__('Error: please upload OPML file.'));
             return;
         }
 
@@ -492,14 +492,14 @@ class Opml extends Handler_Protected {
             $doc->load($tmp_file);
             unlink($tmp_file);
         } elseif (!$doc) {
-             \SmallSmallRSS\Renderers\Messages\print_error(__('Error: unable to find moved OPML file.'));
+            \SmallSmallRSS\Renderers\Messages\print_error(__('Error: unable to find moved OPML file.'));
             return;
         }
 
         if ($doc) {
             $this->opml_import_category($doc, false, $owner_uid, false);
         } else {
-             \SmallSmallRSS\Renderers\Messages\print_error(__('Error while parsing document.'));
+            \SmallSmallRSS\Renderers\Messages\print_error(__('Error while parsing document.'));
         }
     }
 

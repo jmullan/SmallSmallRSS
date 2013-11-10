@@ -1,6 +1,6 @@
 <?php
 
-class Pref_Prefs extends Handler_Protected {
+class Pref_Prefs extends ProtectedHandler {
 
     private $pref_help = array();
     private $pref_sections = array();

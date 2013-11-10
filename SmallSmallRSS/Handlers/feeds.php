@@ -1,5 +1,6 @@
 <?php
-class Feeds extends Handler_Protected {
+namespace SmallSmallRSS\Handlers;
+class Feeds extends ProtectedHandler {
 
     function escape_from_request($key) {
         $value = '';

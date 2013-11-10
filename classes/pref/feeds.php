@@ -1,5 +1,5 @@
 <?php
-class Pref_Feeds extends Handler_Protected {
+class Pref_Feeds extends ProtectedHandler {
 
     function get_mode() {
         return isset($_REQUEST['mode']) ? $_REQUEST['mode'] : '';

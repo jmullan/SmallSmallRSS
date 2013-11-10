@@ -1,4 +1,5 @@
 <?php
+namespace SmallSmallRSS\Handlers;
 class Backend extends Handler {
     function loading() {
         header("Content-type: text/html");

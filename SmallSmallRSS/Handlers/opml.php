@@ -1,5 +1,6 @@
 <?php
-class Opml extends Handler_Protected {
+namespace SmallSmallRSS\Handlers;
+class Opml extends ProtectedHandler {
 
     function csrf_ignore($method) {
         $csrf_ignored = array("export", "import");
@@ -518,4 +519,3 @@ class Opml extends Handler_Protected {
 
 
 }
-

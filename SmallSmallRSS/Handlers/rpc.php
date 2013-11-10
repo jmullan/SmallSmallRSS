@@ -1,5 +1,7 @@
 <?php
-class RPC extends Handler_Protected {
+namespace SmallSmallRSS\Handlers;
+
+class RPC extends ProtectedHandler {
     function csrf_ignore($method) {
         $csrf_ignored = array("sanitycheck", "completelabels");
 

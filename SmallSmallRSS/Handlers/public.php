@@ -1,4 +1,5 @@
 <?php
+namespace SmallSmallRSS\Handlers;
 class Handler_Public extends Handler {
 
     private function generate_syndicated_feed($owner_uid, $feed, $is_cat,
@@ -751,8 +752,8 @@ class Handler_Public extends Handler {
     }
 
     function index() {
-        header("Content-Type: text/plain");
-        print json_encode(array("error" => array("code" => 7)));
+        $renderer = new \SmallSmallRSS\Renderers\JSONError(7);
+        $renderer->render();
     }
 
     function forgotpass() {
@@ -887,7 +888,8 @@ class Handler_Public extends Handler {
 
 <?php
                                   @$op = $_REQUEST["subop"];
-                                  $updater = new DbUpdater(Db::get(), DB_TYPE, SmallSmallRSS\Constants::SCHEMA_VERSION);
+                                  $updater = new DbUpdater(
+                                      \Db::get(), DB_TYPE, SmallSmallRSS\Constants::SCHEMA_VERSION);
 
                                   if ($op == "performupdate") {
                                       if ($updater->isUpdateRequired()) {

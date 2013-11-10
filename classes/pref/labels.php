@@ -1,5 +1,5 @@
 <?php
-class Pref_Labels extends Handler_Protected {
+class Pref_Labels extends ProtectedHandler {
 
 	function csrf_ignore($method) {
 		$csrf_ignored = array("index", "getlabeltree", "edit");

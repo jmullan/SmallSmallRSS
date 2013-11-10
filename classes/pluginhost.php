@@ -49,14 +49,12 @@ class PluginHost {
         $this->storage = array();
     }
 
-    private function __clone() {
-        //
-    }
+    private function __clone() {}
 
     public static function getInstance() {
-        if (self::$instance == null)
+        if (self::$instance == null) {
             self::$instance = new self();
-
+        }
         return self::$instance;
     }
 
@@ -130,7 +128,9 @@ class PluginHost {
             $class = trim($class);
             $class_file = strtolower(basename($class));
 
-            if (!is_dir(dirname(__FILE__)."/../plugins/$class_file")) continue;
+            if (!is_dir(dirname(__FILE__)."/../plugins/$class_file")) {
+                continue;
+            }
 
             $file = dirname(__FILE__)."/../plugins/$class_file/init.php";
 
@@ -143,7 +143,10 @@ class PluginHost {
                     $plugin_api = $plugin->api_version();
 
                     if ($plugin_api < PluginHost::API_VERSION) {
-                        user_error("Plugin $class is not compatible with current API version (need: " . PluginHost::API_VERSION . ", got: $plugin_api)", E_USER_WARNING);
+                        user_error(
+                            "Plugin $class is not compatible with current API version (need: "
+                            . PluginHost::API_VERSION
+                            . ", got: $plugin_api)", E_USER_WARNING);
                         continue;
                     }
 

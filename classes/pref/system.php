@@ -1,5 +1,5 @@
 <?php
-class Pref_System extends Handler_Protected {
+class Pref_System extends ProtectedHandler {
     function before($method) {
         if (parent::before($method)) {
             if ($_SESSION["access_level"] < 10) {

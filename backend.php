@@ -49,29 +49,21 @@ if (SINGLE_USER_MODE) {
 
 if ($_SESSION["uid"]) {
     if (!\SmallSmallRSS\Session::validate()) {
-        header("Content-Type: text/json");
-        print json_encode(array("error" => array("code" => 6)));
+        $renderer = new \SmallSmallRSS\Renderers\JSONError(6);
+        $renderer->render();
         return;
     }
     load_user_plugins($_SESSION["uid"]);
 }
-
-#$error = sanity_check();
-
-#if ($error['code'] != 0 && $op != "logout") {
-#	print json_encode(array("error" => $error));
-#	return;
-#}
-
 $op = str_replace("-", "_", $op);
-
+$handler = '\\SmallSmallRSS\\Handlers\\' . $op;
 $override = PluginHost::getInstance()->lookup_handler($op, $method);
-
-if (class_exists($op) || $override) {
+$error_code = 7;
+if (class_exists($handler) || $override) {
     if ($override) {
         $handler = $override;
     } else {
-        $handler = new $op($_REQUEST);
+        $handler = new $handler($_REQUEST);
     }
 
     if ($handler && implements_interface($handler, 'IHandler')) {
@@ -87,17 +79,12 @@ if (class_exists($op) || $override) {
                 $handler->after();
                 return;
             } else {
-                header("Content-Type: text/json");
-                print json_encode(array("error" => array("code" => 6)));
-                return;
+                $error_code = 6;
             }
         } else {
-            header("Content-Type: text/json");
-            print json_encode(array("error" => array("code" => 6)));
-            return;
+            $error_code = 6;
         }
     }
 }
-
-header("Content-Type: text/json");
-print json_encode(array("error" => array("code" => 7)));
+$renderer = new \SmallSmallRSS\Renderers\JSONError($error_code);
+$renderer->render();

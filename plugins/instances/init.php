@@ -384,7 +384,8 @@ class Instances extends Plugin implements IHandler {
 
             print json_encode(array("feeds" => $feeds));
         } else {
-            print json_encode(array("error" => array("code" => 6)));
+            $renderer = new \SmallSmallRSS\Renderers\JSONError(6);
+            $renderer->render();
         }
     }
 

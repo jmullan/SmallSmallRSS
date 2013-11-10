@@ -36,6 +36,5 @@ if (implements_interface($handler, "IHandler") && $handler->before($method)) {
     $handler->after();
     return;
 }
-
-header("Content-Type: text/plain");
-print json_encode(array("error" => array("code" => 7)));
+$renderer = new \SmallSmallRSS\Renderers\JSONError(7);
+$renderer->render();

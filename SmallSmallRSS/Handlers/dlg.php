@@ -1,5 +1,6 @@
 <?php
-class Dlg extends Handler_Protected {
+namespace SmallSmallRSS\Handlers;
+class Dlg extends ProtectedHandler {
     private $param;
 
     function before($method) {

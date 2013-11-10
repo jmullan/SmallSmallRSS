@@ -1,5 +1,5 @@
 <?php
-class Pref_Filters extends Handler_Protected {
+class Pref_Filters extends ProtectedHandler {
 
 	function csrf_ignore($method) {
 		$csrf_ignored = array("index", "getfiltertree", "edit", "newfilter", "newrule",

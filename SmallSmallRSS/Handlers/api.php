@@ -1,5 +1,5 @@
 <?php
-
+namespace SmallSmallRSS\Handlers;
 class API extends Handler {
 
     const API_LEVEL = 7;

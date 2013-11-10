@@ -1,5 +1,5 @@
 <?php
-class GoogleReaderKeys extends Plugin {
+class GoogleReaderKeys extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function about() {

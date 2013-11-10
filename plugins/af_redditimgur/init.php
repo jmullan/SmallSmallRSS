@@ -1,5 +1,5 @@
 <?php
-class Af_RedditImgur extends Plugin {
+class Af_RedditImgur extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function about() {

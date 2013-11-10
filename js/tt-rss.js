@@ -51,9 +51,6 @@ function setActiveFeedId(id, is_cat) {
 function updateFeedList() {
     try {
 
-        //              $("feeds-holder").innerHTML = "<div id=\"feedlistLoading\">" +
-        //                      __("Loading, please wait...") + "</div>";
-
         Element.show("feedlistLoading");
 
         if (dijit.byId("feedTree")) {
@@ -74,30 +71,23 @@ function updateFeedList() {
                                                });
 
         var tree = new fox.FeedTree({
-                                        model: treeModel,
-                                        onClick: function (item, node) {
-                                            var id = String(item.id);
-                                            var is_cat = id.match("^CAT:");
-                                            var feed = id.substr(id.indexOf(":")+1);
-                                            viewfeed(feed, '', is_cat);
-                                            return false;
-                                        },
-                                        openOnClick: false,
-                                        showRoot: false,
-                                        id: "feedTree",
-                                    }, "feedTree");
+            model: treeModel,
+            onClick: function (item, node) {
+                var id = String(item.id);
+                var is_cat = id.match("^CAT:");
+                var feed = id.substr(id.indexOf(":")+1);
+                viewfeed(feed, '', is_cat);
+                return false;
+            },
+            openOnClick: false,
+            showRoot: false,
+            id: "feedTree"
+        }, "feedTree");
 
-        /*              var menu = new dijit.Menu({id: 'feedMenu'});
-
-         menu.addChild(new dijit.MenuItem({
-         label: "Simple menu item"
-         }));
-
-         //              menu.bindDomNode(tree.domNode); */
 
         var tmph = dojo.connect(dijit.byId('feedMenu'), '_openMyself', function (event) {
-                                    console.log(dijit.getEnclosingWidget(event.target));
-                                    dojo.disconnect(tmph);
+                       console.log(dijit.getEnclosingWidget(event.target));
+                               dojo.disconnect(tmph);
                                 });
 
         $("feeds-holder").appendChild(tree.domNode);
@@ -617,10 +607,7 @@ function init_second_stage() {
         hotkeys[1] = tmp;
         setInitParam("hotkeys", hotkeys);
 
-        console.log("second stage ok");
-
         if (getInitParam("simple_update")) {
-            console.log("scheduling simple feed updater...");
             window.setTimeout("update_random_feed()", 30*1000);
         }
 

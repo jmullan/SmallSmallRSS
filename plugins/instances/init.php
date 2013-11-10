@@ -1,5 +1,5 @@
 <?php
-class Instances extends Plugin implements IHandler {
+class Instances extends \SmallSmallRSS\Plugin implements IHandler {
     private $host;
 
     private $status_codes = array(
@@ -351,8 +351,9 @@ class Instances extends Plugin implements IHandler {
 
         print "</div>"; #pane
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB,
-                                             "hook_prefs_tab", "prefInstances");
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
+            "hook_prefs_tab", "prefInstances");
 
         print "</div>"; #container
 

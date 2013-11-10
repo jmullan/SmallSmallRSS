@@ -20,8 +20,6 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
     try {
         handle_rpc_json(transport);
 
-        console.log("headlines_callback2 [offset=" + offset + "] B:" + background + " I:" + infscroll_req);
-
         var is_cat = false;
         var feed_id = false;
 
@@ -113,8 +111,6 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
             } else {
 
                 if (headlines_count > 0 && feed_id == getActiveFeedId() && is_cat == activeFeedIsCat()) {
-                    console.log("adding some more headlines: " + headlines_count);
-
                     var c = dijit.byId("headlines-frame");
                     var ids = getSelectedArticleIds2();
                     var new_elems = [];
@@ -147,12 +143,8 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
                         c.domNode.appendChild(hsp);
                     }
 
-                    console.log("added " + new_elems.size() + " headlines");
-
                     if (new_elems.size() == 0)
                         _infscroll_disable = true;
-
-                    console.log("restore selected ids: " + ids);
 
                     for (var i = 0; i < ids.length; i++) {
                         markHeadline(ids[i]);
@@ -168,8 +160,6 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
                                    });
 
                 } else {
-                    console.log("no new headlines received");
-
                     var hsp = $("headlines-spacer");
 
                     if (hsp) hsp.innerHTML = "";
@@ -286,8 +276,6 @@ function showArticleInHeadlines(id, noexpand) {
 
 function article_callback2(transport, id) {
     try {
-        console.log("article_callback2 " + id);
-
         handle_rpc_json(transport);
 
         var reply = false;
@@ -309,11 +297,6 @@ function article_callback2(transport, id) {
                            cache_set("article:" + article['id'], article['content']);
                        });
 
-            //                      if (id != last_requested_article) {
-            //                              console.log("requested article id is out of sequence, aborting");
-            //                              return;
-            //                      }
-
         } else if (transport.responseText) {
             console.error("Invalid object received: " + transport.responseText);
 
@@ -323,20 +306,8 @@ function article_callback2(transport, id) {
             Element.show(dijit.byId("net-alert").domNode);
         }
 
-        var unread_in_buffer = $$("#headlines-frame > div[id*=RROW][class*=Unread]").length
+        var unread_in_buffer = $$("#headlines-frame > div[id*=RROW][class*=Unread]").length;
         request_counters(unread_in_buffer == 0);
-
-        //headlines_scroll_handler($("headlines-frame"));
-
-        /*              try {
-         if (!_infscroll_disable &&
-         $$("#headlines-frame > div[id*=RROW]").last().hasClassName("Selected")) {
-
-         loadMoreHeadlines();
-         }
-         } catch (e) {
-         console.warn(e);
-         } */
 
         notify("");
     } catch (e) {
@@ -360,17 +331,10 @@ function view(id, activefeed, noexpand) {
             return;
         }
 
-        console.log("loading article: " + id);
-
         var cached_article = cache_get("article:" + id);
-
-        console.log("cache check result: " + (cached_article != false));
-
         var query = "?op=article&method=view&id=" + param_escape(id);
 
         var neighbor_ids = getRelativePostIds(id);
-
-        /* only request uncached articles */
 
         var cids_to_request = [];
 
@@ -381,8 +345,6 @@ function view(id, activefeed, noexpand) {
                     cids_requested.push(neighbor_ids[i]);
                 }
         }
-
-        console.log("additional ids: " + cids_to_request.toString());
 
         query = query + "&cids=" + cids_to_request.toString();
 
@@ -423,8 +385,6 @@ function view(id, activefeed, noexpand) {
         }
 
         last_requested_article = id;
-
-        console.log(query);
 
         if (article_is_unread) {
             decrementFeedCounter(getActiveFeedId(), activeFeedIsCat());
@@ -764,8 +724,6 @@ function selectionRemoveLabel(id, ids) {
         var query = "?op=article&method=removeFromLabel&ids=" +
             param_escape(ids.toString()) + "&lid=" + param_escape(id);
 
-        console.log(query);
-
         new Ajax.Request("backend.php", {
                              parameters: query,
                              onComplete: function(transport) {
@@ -791,8 +749,6 @@ function selectionAssignLabel(id, ids) {
 
         var query = "?op=article&method=assignToLabel&ids=" +
             param_escape(ids.toString()) + "&lid=" + param_escape(id);
-
-        console.log(query);
 
         new Ajax.Request("backend.php", {
                              parameters: query,
@@ -1051,8 +1007,6 @@ function deleteSelection() {
 
         query = "?op=rpc&method=delete&ids=" + param_escape(rows);
 
-        console.log(query);
-
         new Ajax.Request("backend.php", {
                              parameters: query,
                              onComplete: function(transport) {
@@ -1099,8 +1053,6 @@ function archiveSelection() {
         }
 
         query = "?op=rpc&method="+op+"&ids=" + param_escape(rows);
-
-        console.log(query);
 
         for (var i = 0; i < rows.length; i++) {
             cache_delete("article:" + rows[i]);
@@ -1174,8 +1126,6 @@ function editArticleTags(id) {
 
                                                                        if (data) {
                                                                            var id = data.id;
-
-                                                                           console.log(id);
 
                                                                            var tags = $("ATSTR-" + id);
                                                                            var tooltip = dijit.byId("ATSTRTIP-" + id);
@@ -1335,7 +1285,6 @@ function headlines_scroll_handler(e) {
                         if (catchup_id_batch.indexOf(id) == -1)
                             catchup_id_batch.push(id);
 
-                        //console.log("auto_catchup_batch: " + catchup_id_batch.toString());
                     }
 
                 });
@@ -1364,8 +1313,6 @@ function catchupBatchedArticles() {
             var query = "?op=rpc&method=catchupSelected" +
                 "&cmode=0&ids=" + param_escape(batch.toString());
 
-            console.log(query);
-
             new Ajax.Request("backend.php", {
                                  parameters: query,
                                  onComplete: function(transport) {
@@ -1375,7 +1322,6 @@ function catchupBatchedArticles() {
                                      var batch = reply.ids;
 
                                      batch.each(function(id) {
-                                                    console.log(id);
                                                     var elem = $("RROW-" + id);
                                                     if (elem) elem.removeClassName("Unread");
                                                     catchup_id_batch.remove(id);
@@ -1498,8 +1444,6 @@ function cdmCollapseArticle(event, id, unmark) {
 
 function cdmExpandArticle(id, noexpand) {
     try {
-        console.log("cdmExpandArticle " + id);
-
         if (!$("RROW-" + id)) return false;
 
         var oldrow = $("RROW-" + getActiveArticleId());
@@ -1857,9 +1801,6 @@ function correctHeadlinesOffset(id) {
         var rel_offset_top = row.offsetTop - container.scrollTop;
         var rel_offset_bottom = row.offsetTop + row.offsetHeight - container.scrollTop;
 
-        //console.log("Rtop: " + rel_offset_top + " Rbtm: " + rel_offset_bottom);
-        //console.log("Vport: " + viewport);
-
         if (rel_offset_top <= 0 || rel_offset_top > viewport) {
             container.scrollTop = row.offsetTop;
         } else if (rel_offset_bottom > viewport) {
@@ -2060,7 +2001,6 @@ function initHeadlinesMenu() {
 }
 
 function cache_set(id, obj) {
-    //console.log("cache_set: " + id);
     if (has_storage)
         try {
             sessionStorage[id] = obj;
@@ -2098,8 +2038,6 @@ function setSelectionScore() {
         var ids = getSelectedArticleIds2();
 
         if (ids.length > 0) {
-            console.log(ids);
-
             var score = prompt(__("Please enter new score for selected articles:"), score);
 
             if (score != undefined) {
@@ -2111,8 +2049,6 @@ function setSelectionScore() {
                                      onComplete: function(transport) {
                                          var reply = JSON.parse(transport.responseText);
                                          if (reply) {
-                                             console.log(ids);
-
                                              ids.each(function(id) {
                                                           var row = $("RROW-" + id);
 

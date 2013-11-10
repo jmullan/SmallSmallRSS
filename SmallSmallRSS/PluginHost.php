@@ -1,4 +1,5 @@
 <?php
+namespace SmallSmallRSS;
 class PluginHost {
     private $dbh;
     private $hooks = array();
@@ -44,7 +45,7 @@ class PluginHost {
     const KIND_USER = 3;
 
     function __construct() {
-        $this->dbh = Db::get();
+        $this->dbh = \Db::get();
 
         $this->storage = array();
     }
@@ -59,7 +60,6 @@ class PluginHost {
     }
 
     private function register_plugin($name, $plugin) {
-        //array_push($this->plugins, $plugin);
         $this->plugins[$name] = $plugin;
     }
 
@@ -128,24 +128,26 @@ class PluginHost {
             $class = trim($class);
             $class_file = strtolower(basename($class));
 
-            if (!is_dir(dirname(__FILE__)."/../plugins/$class_file")) {
+            if (!is_dir(__DIR__ . "/../plugins/$class_file")) {
                 continue;
             }
 
-            $file = dirname(__FILE__)."/../plugins/$class_file/init.php";
+            $file = __DIR__ . "/../plugins/$class_file/init.php";
 
             if (!isset($this->plugins[$class])) {
-                if (file_exists($file)) require_once $file;
+                if (file_exists($file)) {
+                    require_once $file;
+                }
 
-                if (class_exists($class) && is_subclass_of($class, "Plugin")) {
-                    $plugin = new $class ($this);
+                if (class_exists($class) && is_subclass_of($class, Plugin)) {
+                    $plugin = new $class($this);
 
                     $plugin_api = $plugin->api_version();
 
-                    if ($plugin_api < PluginHost::API_VERSION) {
+                    if ($plugin_api < \SmallSmallRSS\PluginHost::API_VERSION) {
                         user_error(
                             "Plugin $class is not compatible with current API version (need: "
-                            . PluginHost::API_VERSION
+                            . \SmallSmallRSS\PluginHost::API_VERSION
                             . ", got: $plugin_api)", E_USER_WARNING);
                         continue;
                     }

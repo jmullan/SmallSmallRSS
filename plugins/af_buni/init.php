@@ -1,5 +1,5 @@
 <?php
-class Af_Buni extends Plugin {
+class Af_Buni extends \SmallSmallRSS\Plugin {
 
 	private $host;
 

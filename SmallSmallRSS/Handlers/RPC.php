@@ -652,7 +652,7 @@ class RPC extends ProtectedHandler {
         $logmsg = $this->dbh->escape_string($_REQUEST['logmsg']);
 
         if ($logmsg) {
-            Logger::get()->log_error(E_USER_WARNING,
+            \Logger::get()->log_error(E_USER_WARNING,
                                      $logmsg, '[client-js]', 0, false);
         }
 

@@ -204,11 +204,11 @@ class Handler_Public extends Handler {
                 array_push($feed['articles'], $article);
             }
 
-            header("Content-Type: text/json; charset=utf-8");
+            header("Content-Type: application/json; charset=utf-8");
             print json_encode($feed);
 
         } else {
-            header("Content-Type: text/plain; charset=utf-8");
+            header("Content-Type: application/json; charset=utf-8");
             print json_encode(array("error" => array("message" => "Unknown format")));
         }
     }
@@ -384,7 +384,7 @@ class Handler_Public extends Handler {
         update_daemon_common(0, true, false);
         housekeeping_common(false);
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
 
     }
 

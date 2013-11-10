@@ -1,5 +1,5 @@
 <?php
-class Af_Unburn extends Plugin {
+class Af_Unburn extends \SmallSmallRSS\Plugin {
     private $host;
 
     function about() {

@@ -63,7 +63,7 @@ javascript_tag($jsfile);
 <?php
 require 'lib/jshrink/Minifier.php';
 
-foreach (PluginHost::getInstance()->get_plugins() as $n => $p) {
+foreach (\SmallSmallRss\PluginHost::getInstance()->get_plugins() as $n => $p) {
     if (method_exists($p, "get_prefs_js")) {
         echo JShrink\Minifier::minify($p->get_prefs_js());
     }
@@ -129,8 +129,9 @@ init_js_translations();
      title="<?php echo __('System') ?>"></div>
 <?php } ?>
 <?php
-     PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TABS,
-                                          "hook_prefs_tabs", false);
+     \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+         \SmallSmallRSS\PluginHost::HOOK_PREFS_TABS,
+         "hook_prefs_tabs", false);
 ?>
 </div>
 

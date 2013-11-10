@@ -1,5 +1,5 @@
 <?php
-class Import_Export extends Plugin implements IHandler {
+class Import_Export extends \SmallSmallRSS\Plugin implements IHandler {
     private $host;
 
     function init($host) {

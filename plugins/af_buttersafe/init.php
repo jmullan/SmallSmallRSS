@@ -1,5 +1,5 @@
 <?php
-class Af_Buttersafe extends Plugin {
+class Af_Buttersafe extends \SmallSmallRSS\Plugin {
 
 	private $host;
 

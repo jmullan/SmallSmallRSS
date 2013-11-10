@@ -513,7 +513,7 @@ function get_ssl_certificate_id() {
 function authenticate_user($login, $password, $check_only = false) {
     if (!SINGLE_USER_MODE) {
         $user_id = false;
-        foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_AUTH_USER) as $plugin) {
+        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_AUTH_USER) as $plugin) {
             $user_id = (int) $plugin->authenticate($login, $password);
             if ($user_id) {
                 $auth_module = strtolower(get_class($plugin));
@@ -618,10 +618,10 @@ function load_user_plugins($owner_uid) {
     if ($owner_uid) {
         $plugins = get_pref("_ENABLED_PLUGINS", $owner_uid);
 
-        PluginHost::getInstance()->load($plugins, PluginHost::KIND_USER, $owner_uid);
+        \SmallSmallRSS\PluginHost::getInstance()->load($plugins, \SmallSmallRSS\PluginHost::KIND_USER, $owner_uid);
 
         if (SmallSmallRSS\Sanity::get_schema_version() > 100) {
-            PluginHost::getInstance()->load_data();
+            \SmallSmallRSS\PluginHost::getInstance()->load_data();
         }
     }
 }
@@ -1333,11 +1333,11 @@ function getVirtCounters() {
         array_push($ret_arr, $cv);
     }
 
-    $feeds = PluginHost::getInstance()->get_feeds(-1);
+    $feeds = \SmallSmallRSS\PluginHost::getInstance()->get_feeds(-1);
 
     if (is_array($feeds)) {
         foreach ($feeds as $feed) {
-            $cv = array("id" => PluginHost::pfeed_to_feed_id($feed['id']),
+            $cv = array("id" => \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']),
                         "counter" => $feed['sender']->get_unread($feed['id']));
             array_push($ret_arr, $cv);
         }
@@ -1868,7 +1868,7 @@ function get_hotkeys_info() {
             "help_dialog" => __("Show help dialog"))
     );
 
-    foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_HOTKEY_INFO) as $plugin) {
+    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_HOTKEY_INFO) as $plugin) {
         $hotkeys = $plugin->hook_hotkey_info($hotkeys);
     }
 
@@ -1944,7 +1944,7 @@ function get_hotkeys_map() {
         $hotkeys["^(40)|Ctrl-down"] = "next_article_noscroll";
     }
 
-    foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_HOTKEY_MAP) as $plugin) {
+    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP) as $plugin) {
         $hotkeys = $plugin->hook_hotkey_map($hotkeys);
     }
 
@@ -2638,7 +2638,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
 
     $disallowed_attributes = array('id', 'style', 'class');
 
-    foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_SANITIZE) as $plugin) {
+    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_SANITIZE) as $plugin) {
         $retval = $plugin->hook_sanitize($doc, $site_url, $allowed_elements, $disallowed_attributes);
         if (is_array($retval)) {
             $doc = $retval[0];
@@ -2894,7 +2894,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
                                     sql_bool_to_bool($line['hide_images']),
                                     $owner_uid, $line["site_url"]);
 
-        foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_RENDER_ARTICLE) as $p) {
+        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE) as $p) {
             $line = $p->hook_render_article($line);
         }
 
@@ -2969,7 +2969,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
 					id=\"ATSTRTIP-$id\" connectId=\"ATSTR-$id\"
 					position=\"below\">$tags_str_full</div>";
 
-            foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_ARTICLE_BUTTON) as $p) {
+            foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON) as $p) {
                 $rv['content'] .= $p->hook_article_button($line);
             }
 
@@ -2980,7 +2980,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         $rv['content'] .= "</div>";
         $rv['content'] .= "<div clear='both'>";
 
-        foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_ARTICLE_LEFT_BUTTON) as $p) {
+        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_LEFT_BUTTON) as $p) {
             $rv['content'] .= $p->hook_article_left_button($line);
         }
 
@@ -3186,7 +3186,7 @@ function feed_has_icon($id) {
 }
 
 function init_plugins() {
-    PluginHost::getInstance()->load(PLUGINS, PluginHost::KIND_ALL);
+    \SmallSmallRSS\PluginHost::getInstance()->load(PLUGINS, \SmallSmallRSS\PluginHost::KIND_ALL);
 
     return true;
 }
@@ -3858,10 +3858,6 @@ function getFeedCategory($feed) {
 
 }
 
-function implements_interface($class, $interface) {
-    return in_array($interface, class_implements($class));
-}
-
 function get_minified_js($files) {
     require_once __DIR__ . '/../lib/jshrink/Minifier.php';
 
@@ -3892,7 +3888,6 @@ function get_minified_js($files) {
 
 function stylesheet_tag($filename) {
     $timestamp = filemtime($filename);
-
     echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$filename?$timestamp\"/>\n";
 }
 
@@ -3900,13 +3895,15 @@ function javascript_tag($filename) {
     $query = "";
 
     if (!(strpos($filename, "?") === FALSE)) {
-        $query = substr($filename, strpos($filename, "?")+1);
+        $query = substr($filename, strpos($filename, "?") + 1);
         $filename = substr($filename, 0, strpos($filename, "?"));
     }
 
     $timestamp = filemtime($filename);
 
-    if ($query) $timestamp .= "&$query";
+    if ($query) {
+        $timestamp .= "&$query";
+    }
 
     echo "<script type=\"text/javascript\" charset=\"utf-8\" src=\"$filename?$timestamp\"></script>\n";
 }

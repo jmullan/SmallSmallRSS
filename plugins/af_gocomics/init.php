@@ -1,5 +1,5 @@
 <?php
-class Af_GoComics extends Plugin {
+class Af_GoComics extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function about() {

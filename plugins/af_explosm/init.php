@@ -1,5 +1,5 @@
 <?php
-class Af_Explosm extends Plugin {
+class Af_Explosm extends \SmallSmallRSS\Plugin {
 
 	private $host;
 

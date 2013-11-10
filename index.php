@@ -28,13 +28,13 @@ if (!init_plugins()) {
 }
 
 if (empty($_REQUEST['mobile'])) {
-    if ($mobile->isTablet() && PluginHost::getInstance()->get_plugin("digest")) {
+    if ($mobile->isTablet() && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("digest")) {
         header('Location: backend.php?op=digest');
         exit;
-    } elseif ($mobile->isMobile() && PluginHost::getInstance()->get_plugin("mobile")) {
+    } elseif ($mobile->isMobile() && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("mobile")) {
         header('Location: backend.php?op=mobile');
         exit;
-    } elseif ($mobile->isMobile() && PluginHost::getInstance()->get_plugin("digest")) {
+    } elseif ($mobile->isMobile() && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("digest")) {
         header('Location: backend.php?op=digest');
         exit;
     }
@@ -68,7 +68,7 @@ if ($_SESSION["uid"]) {
   <?php print_user_stylesheet() ?>
   <style type="text/css">
 <?php
-foreach (PluginHost::getInstance()->get_plugins() as $n => $p) {
+foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
     if (method_exists($p, "get_css")) {
         echo $p->get_css();
     }
@@ -166,7 +166,7 @@ foreach (array("lib/prototype.js",
 		<div class="actionChooser">
 
 			<?php
-				foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_TOOLBAR_BUTTON) as $p) {
+				foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_TOOLBAR_BUTTON) as $p) {
 					 echo $p->hook_toolbar_button();
 				}
 			?>
@@ -199,7 +199,7 @@ foreach (array("lib/prototype.js",
 					<div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcHKhelp')"><?php echo __('Keyboard shortcuts help') ?></div>
 
 					<?php
-						foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_ACTION_ITEM) as $p) {
+						foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ACTION_ITEM) as $p) {
 						 echo $p->hook_action_item();
 						}
 					?>
@@ -240,7 +240,7 @@ foreach (array("lib/prototype.js",
 require({cache:{}});
 <?php
 print get_minified_js(array("tt-rss", "functions", "feedlist", "viewfeed", "FeedTree", "PluginHost"));
-foreach (PluginHost::getInstance()->get_plugins() as $n => $p) {
+foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
     if (method_exists($p, "get_js")) {
         echo JShrink\Minifier::minify($p->get_js());
     }

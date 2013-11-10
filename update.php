@@ -38,7 +38,7 @@ $longopts = array(
     "help"
 );
 
-foreach (PluginHost::getInstance()->get_commands() as $command => $data) {
+foreach (\SmallSmallRSS\PluginHost::getInstance()->get_commands() as $command => $data) {
     array_push($longopts, $command . $data["suffix"]);
 }
 
@@ -82,7 +82,7 @@ if (count($options) == 0 || isset($options["help"])) {
     print "  --help               - show this help\n";
     print "Plugin options:\n";
 
-    foreach (PluginHost::getInstance()->get_commands() as $command => $data) {
+    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_commands() as $command => $data) {
         $args = $data['arghelp'];
         printf(" --%-19s - %s\n", "$command $args", $data["description"]);
     }
@@ -150,7 +150,7 @@ if (isset($options["feeds"])) {
     update_daemon_common();
     housekeeping_common(true);
 
-    PluginHost::getInstance()->run_hooks(PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
+    \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
 }
 
 if (isset($options["feedbrowser"])) {
@@ -178,7 +178,7 @@ if (isset($options["daemon-loop"])) {
     if (!isset($options["pidlock"]) || $options["task"] == 0)
         housekeeping_common(true);
 
-    PluginHost::getInstance()->run_hooks(PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
+    \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
 }
 
 if (isset($options["cleanup-tags"])) {
@@ -322,7 +322,7 @@ if (isset($options["update-schema"])) {
 }
 
 if (isset($options["list-plugins"])) {
-    $tmppluginhost = new PluginHost();
+    $tmppluginhost = new \SmallSmallRSS\PluginHost();
     $tmppluginhost->load_all($tmppluginhost::KIND_ALL);
     $enabled = array_map("trim", explode(",", PLUGINS));
 
@@ -343,7 +343,7 @@ if (isset($options["list-plugins"])) {
 
 }
 
-PluginHost::getInstance()->run_commands($options);
+\SmallSmallRSS\PluginHost::getInstance()->run_commands($options);
 
 if (file_exists(LOCK_DIRECTORY . "/$lock_filename")) {
     unlink(LOCK_DIRECTORY . "/$lock_filename");

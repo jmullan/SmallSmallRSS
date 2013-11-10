@@ -1,5 +1,5 @@
 <?php
-class Close_Button extends Plugin {
+class Close_Button extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function init($host) {

@@ -1,5 +1,5 @@
 <?php
-class Auth_Remote extends Plugin implements IAuthModule {
+class Auth_Remote extends \SmallSmallRSS\Plugin implements IAuthModule {
 
 	private $host;
 	private $base;

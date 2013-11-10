@@ -1,5 +1,5 @@
 <?php
-class Bookmarklets extends Plugin {
+class Bookmarklets extends \SmallSmallRSS\Plugin {
     private $host;
 
     function about() {

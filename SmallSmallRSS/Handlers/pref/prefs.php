@@ -1,5 +1,5 @@
 <?php
-
+namespace SmallSmallRSS\Handlers;
 class Pref_Prefs extends ProtectedHandler {
 
     private $pref_help = array();
@@ -80,7 +80,7 @@ class Pref_Prefs extends ProtectedHandler {
             return;
         }
 
-        $authenticator = PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
+        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
 
         if (method_exists($authenticator, "change_password")) {
             print $authenticator->change_password($_SESSION["uid"], $old_pw, $new_pw);
@@ -249,7 +249,7 @@ class Pref_Prefs extends ProtectedHandler {
         print "</form>";
 
         if ($_SESSION["auth_module"]) {
-            $authenticator = PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
+            $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
         } else {
             $authenticator = false;
         }
@@ -436,7 +436,7 @@ class Pref_Prefs extends ProtectedHandler {
             }
         }
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB_SECTION,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
                                              "hook_prefs_tab_section", "prefPrefsAuth");
 
         print "</div>"; #pane
@@ -664,7 +664,7 @@ class Pref_Prefs extends ProtectedHandler {
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB_SECTION,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
                                              "hook_prefs_tab_section", "prefPrefsPrefsInside");
 
         print '</div>'; # inside pane
@@ -700,7 +700,7 @@ class Pref_Prefs extends ProtectedHandler {
            <label for='prefs_show_advanced'>" .
            __("Show additional preferences") . "</label>"; */
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB_SECTION,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
                                              "hook_prefs_tab_section", "prefPrefsPrefsOutside");
 
         print "</form>";
@@ -752,7 +752,7 @@ class Pref_Prefs extends ProtectedHandler {
         $system_enabled = array_map("trim", explode(",", PLUGINS));
         $user_enabled = array_map("trim", explode(",", get_pref("_ENABLED_PLUGINS")));
 
-        $tmppluginhost = new PluginHost();
+        $tmppluginhost = new \SmallSmallRSS\PluginHost();
         $tmppluginhost->load_all($tmppluginhost::KIND_ALL, $_SESSION["uid"]);
         $tmppluginhost->load_data(true);
 
@@ -863,7 +863,7 @@ class Pref_Prefs extends ProtectedHandler {
 
         print "</div>"; #pane
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
                                              "hook_prefs_tab", "prefPrefs");
 
         print "</div>"; #container
@@ -903,7 +903,7 @@ class Pref_Prefs extends ProtectedHandler {
         $password = $_REQUEST["password"];
         $otp = $_REQUEST["otp"];
 
-        $authenticator = PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
+        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
 
         if ($authenticator->check_password($_SESSION["uid"], $password)) {
 
@@ -935,7 +935,7 @@ class Pref_Prefs extends ProtectedHandler {
     function otpdisable() {
         $password = $this->dbh->escape_string($_REQUEST["password"]);
 
-        $authenticator = PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
+        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
 
         if ($authenticator->check_password($_SESSION["uid"], $password)) {
 
@@ -961,7 +961,7 @@ class Pref_Prefs extends ProtectedHandler {
     function clearplugindata() {
         $name = $this->dbh->escape_string($_REQUEST["name"]);
 
-        PluginHost::getInstance()->clear_data(PluginHost::getInstance()->get_plugin($name));
+        \SmallSmallRSS\PluginHost::getInstance()->clear_data(\SmallSmallRSS\PluginHost::getInstance()->get_plugin($name));
     }
 
     function customizeCSS() {
@@ -1128,4 +1128,3 @@ class Pref_Prefs extends ProtectedHandler {
         return "";
     }
 }
-

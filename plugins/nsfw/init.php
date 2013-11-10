@@ -1,5 +1,5 @@
 <?php
-class NSFW extends Plugin {
+class NSFW extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function about() {

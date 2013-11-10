@@ -19,7 +19,7 @@ if (ENABLE_GZIP_OUTPUT && function_exists("ob_gzhandler")) {
 
 $method = $_REQUEST["op"];
 
-$override = PluginHost::getInstance()->lookup_handler("public", $method);
+$override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler("public", $method);
 
 if ($override) {
     $handler = $override;

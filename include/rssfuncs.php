@@ -230,12 +230,12 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
     $cache_filename = CACHE_DIR . "/simplepie/" . sha1($fetch_url) . ".xml";
 
-    $pluginhost = new PluginHost();
+    $pluginhost = new \SmallSmallRSS\PluginHost();
     $pluginhost->set_debug($debug_enabled);
     $user_plugins = get_pref("_ENABLED_PLUGINS", $owner_uid);
 
-    $pluginhost->load(PLUGINS, PluginHost::KIND_ALL);
-    $pluginhost->load($user_plugins, PluginHost::KIND_USER, $owner_uid);
+    $pluginhost->load(PLUGINS, \SmallSmallRSS\PluginHost::KIND_ALL);
+    $pluginhost->load($user_plugins, \SmallSmallRSS\PluginHost::KIND_USER, $owner_uid);
     $pluginhost->load_data();
 
     $rss = false;
@@ -262,7 +262,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
     if (!$rss) {
 
-        foreach ($pluginhost->get_hooks(PluginHost::HOOK_FETCH_FEED) as $plugin) {
+        foreach ($pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FETCH_FEED) as $plugin) {
             $feed_data = $plugin->hook_fetch_feed($feed_data, $fetch_url, $owner_uid, $feed);
         }
 
@@ -304,7 +304,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
         }
     }
 
-    foreach ($pluginhost->get_hooks(PluginHost::HOOK_FEED_FETCHED) as $plugin) {
+    foreach ($pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_FETCHED) as $plugin) {
         $feed_data = $plugin->hook_feed_fetched($feed_data, $fetch_url, $owner_uid, $feed);
     }
 
@@ -334,7 +334,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
         }
 
         // We use local pluginhost here because we need to load different per-user feed plugins
-        $pluginhost->run_hooks(PluginHost::HOOK_FEED_PARSED, "hook_feed_parsed", $rss);
+        $pluginhost->run_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_PARSED, "hook_feed_parsed", $rss);
 
         _debug("processing feed data...", $debug_enabled);
 
@@ -483,7 +483,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             if (!$entry_guid) {
                 $entry_guid = make_guid_from_title($item->get_title());
             }
-            $hooks = $pluginhost->get_hooks(PluginHost::HOOK_GUID_FILTER);
+            $hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_GUID_FILTER);
             foreach ($hooks as $plugin) {
                 $entry_guid = $plugin->hook_guid_filter($item, $entry_guid);
             }
@@ -614,7 +614,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
                 "stored" => $stored_article
             );
 
-            foreach ($pluginhost->get_hooks(PluginHost::HOOK_ARTICLE_FILTER) as $plugin) {
+            foreach ($pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER) as $plugin) {
                 $article = $plugin->hook_article_filter($article);
             }
 

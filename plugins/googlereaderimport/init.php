@@ -1,5 +1,5 @@
 <?php
-class GoogleReaderImport extends Plugin {
+class GoogleReaderImport extends \SmallSmallRSS\Plugin {
     private $host;
 
     function about() {

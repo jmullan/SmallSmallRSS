@@ -1,5 +1,5 @@
 <?php
-class Mark_Button extends Plugin {
+class Mark_Button extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function init($host) {

@@ -1,4 +1,5 @@
 <?php
+namespace SmallSmallRSS\Handlers;
 class Pref_Users extends ProtectedHandler {
     function before($method) {
         if (parent::before($method)) {
@@ -355,7 +356,7 @@ class Pref_Users extends ProtectedHandler {
 				<button dojoType=\"dijit.form.Button\" onclick=\"resetSelectedUserPass()\">".
             __('Reset password')."</button dojoType=\"dijit.form.Button\">";
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB_SECTION,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
                                              "hook_prefs_tab_section", "prefUsersToolbar");
 
         print "</div>"; #toolbar
@@ -449,12 +450,8 @@ class Pref_Users extends ProtectedHandler {
         }
 
         print "</div>"; #pane
-
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
                                              "hook_prefs_tab", "prefUsers");
-
         print "</div>"; #container
-
     }
-
 }

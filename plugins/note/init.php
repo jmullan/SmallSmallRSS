@@ -1,5 +1,5 @@
 <?php
-class Note extends Plugin {
+class Note extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function about() {

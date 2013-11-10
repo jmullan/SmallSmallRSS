@@ -1,4 +1,5 @@
 <?php
+namespace SmallSmallRSS\Handlers;
 class Pref_Feeds extends ProtectedHandler {
 
     function get_mode() {
@@ -147,11 +148,11 @@ class Pref_Feeds extends ProtectedHandler {
 
             /* Plugin feeds for -1 */
 
-            $feeds = PluginHost::getInstance()->get_feeds(-1);
+            $feeds = \SmallSmallRSS\PluginHost::getInstance()->get_feeds(-1);
 
             if ($feeds) {
                 foreach ($feeds as $feed) {
-                    $feed_id = PluginHost::pfeed_to_feed_id($feed['id']);
+                    $feed_id = \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']);
 
                     $item = array();
                     $item['id'] = 'FEED:' . $feed_id;
@@ -766,7 +767,7 @@ class Pref_Feeds extends ProtectedHandler {
 
         print "</div>";
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_EDIT_FEED,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_EDIT_FEED,
                                              "hook_prefs_edit_feed", $feed_id);
 
         $title = htmlspecialchars($title, ENT_QUOTES);
@@ -1026,7 +1027,7 @@ class Pref_Feeds extends ProtectedHandler {
 				mark_unread_on_update = $mark_unread_on_update
 			WHERE id = '$feed_id' AND owner_uid = " . $_SESSION["uid"]);
 
-            PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_SAVE_FEED,
+            \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_SAVE_FEED,
                                                  "hook_prefs_save_feed", $feed_id);
 
         } else {
@@ -1482,7 +1483,7 @@ class Pref_Feeds extends ProtectedHandler {
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return displayDlg('".__("Public OPML URL")."','pubOPMLUrl')\">".
             __('Display published OPML URL')."</button> ";
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB_SECTION,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
                                              "hook_prefs_tab_section", "prefFeedsOPML");
 
         print "</div>"; # pane
@@ -1535,12 +1536,12 @@ class Pref_Feeds extends ProtectedHandler {
 
         print "</p>";
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB_SECTION,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
                                              "hook_prefs_tab_section", "prefFeedsPublishedGenerated");
 
         print "</div>"; #pane
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
                                              "hook_prefs_tab", "prefFeeds");
 
         print "</div>"; #container

@@ -1,5 +1,5 @@
 <?php
-class Mail extends Plugin {
+class Mail extends \SmallSmallRSS\Plugin {
 
 	private $host;
 

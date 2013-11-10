@@ -3,7 +3,7 @@ require_once __DIR__ . "/../../lib/otphp/vendor/base32.php";
 require_once __DIR__ . "/../../lib/otphp/lib/otp.php";
 require_once __DIR__ . "/../../lib/otphp/lib/totp.php";
 
-class Auth_Internal extends Plugin implements IAuthModule {
+class Auth_Internal extends \SmallSmallRSS\Plugin implements IAuthModule {
     private $host;
 
     function about() {

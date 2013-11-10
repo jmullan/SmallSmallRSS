@@ -56,8 +56,14 @@ if ($_SESSION["uid"]) {
     load_user_plugins($_SESSION["uid"]);
 }
 $op = str_replace("-", "_", $op);
+$legacy_ops = array(
+    'rpc' => 'RPC',
+);
+if (isset($legacy_ops[$op])) {
+    $op = $legacy_ops[$op];
+}
 $handler = '\\SmallSmallRSS\\Handlers\\' . $op;
-$override = PluginHost::getInstance()->lookup_handler($op, $method);
+$override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler($op, $method);
 $error_code = 7;
 if (class_exists($handler) || $override) {
     if ($override) {
@@ -65,9 +71,10 @@ if (class_exists($handler) || $override) {
     } else {
         $handler = new $handler($_REQUEST);
     }
-
-    if ($handler && implements_interface($handler, 'IHandler')) {
-        if (validate_csrf($csrf_token) || $handler->csrf_ignore($method)) {
+    if ($handler) {
+        if (!$handler instanceof \SmallSmallRSS\Handlers\IHandler) {
+            $error_code = 6;
+        } elseif (validate_csrf($csrf_token) || $handler->csrf_ignore($method)) {
             if ($handler->before($method)) {
                 if ($method && method_exists($handler, $method)) {
                     $handler->$method();

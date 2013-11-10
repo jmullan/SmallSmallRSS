@@ -1,5 +1,5 @@
 <?php
-class Embed_Original extends Plugin {
+class Embed_Original extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function init($host) {

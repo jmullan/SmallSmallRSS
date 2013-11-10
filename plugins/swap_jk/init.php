@@ -1,5 +1,5 @@
 <?php
-class Swap_JK extends Plugin {
+class Swap_JK extends \SmallSmallRSS\Plugin {
 
 	private $host;
 

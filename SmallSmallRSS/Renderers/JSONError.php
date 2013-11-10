@@ -8,7 +8,7 @@ class JSONError extends \SmallSmallRSS\Renderers\Base {
         $this->error_code = $error_code;
     }
     public function render() {
-        header("Content-Type: text/json");
+        header("Content-Type: application/json");
         print json_encode(array("error" => array("code" => $this->error_code)));
     }
 }

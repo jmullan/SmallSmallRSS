@@ -1,5 +1,5 @@
 <?php
-class Af_SFBG extends Plugin {
+class Af_SFBG extends \SmallSmallRSS\Plugin {
 
     private $host;
 

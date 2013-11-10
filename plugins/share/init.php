@@ -1,5 +1,5 @@
 <?php
-class Share extends Plugin {
+class Share extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function about() {

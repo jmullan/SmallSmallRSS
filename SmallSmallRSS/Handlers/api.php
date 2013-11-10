@@ -27,7 +27,7 @@ class API extends Handler {
 
     function before($method) {
         if (parent::before($method)) {
-            header("Content-Type: text/json");
+            header("Content-Type: application/json");
             if (empty($_SESSION['uid']) && $method != "login" && $method != "isloggedin") {
                 $this->wrap(self::STATUS_ERR, array("error" => 'NOT_LOGGED_IN'));
                 return false;
@@ -74,12 +74,12 @@ class API extends Handler {
             $uid = $this->dbh->fetch_result($result, 0, "id");
         }
         if (!$uid) {
-            Logger::get()->log("Could not find user: '$login'");
+            \Logger::get()->log("Could not find user: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "LOGIN_ERROR"));
             return;
         }
         if (!get_pref("ENABLE_API_ACCESS", $uid)) {
-            Logger::get()->log("Api access disabled for: '$login'");
+            \Logger::get()->log("Api access disabled for: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "API_DISABLED"));
             return;
         }
@@ -94,7 +94,7 @@ class API extends Handler {
             $this->wrap(self::STATUS_OK, array("session_id" => session_id(),
                                                "api_level" => self::API_LEVEL));
         } else {
-            Logger::get()->log("Could not log in: '$login'");
+            \Logger::get()->log("Could not log in: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "LOGIN_ERROR"));
         }
     }
@@ -359,7 +359,7 @@ class API extends Handler {
                         "feed_title" => $line["feed_title"]
                     );
 
-                    foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_RENDER_ARTICLE_API) as $p) {
+                    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_API) as $p) {
                         $article = $p->hook_render_article_api(array("article" => $article));
                     }
 
@@ -483,7 +483,7 @@ class API extends Handler {
     }
 
     function index($method) {
-        $plugin = PluginHost::getInstance()->get_api_method(strtolower($method));
+        $plugin = \SmallSmallRSS\PluginHost::getInstance()->get_api_method(strtolower($method));
         if ($plugin && method_exists($plugin, $method)) {
             $reply = $plugin->$method();
             $this->wrap($reply[0], $reply[1]);
@@ -724,7 +724,7 @@ class API extends Handler {
             $headline_row["author"] = $line["author"];
             $headline_row["score"] = (int) $line["score"];
 
-            foreach (PluginHost::getInstance()->get_hooks(PluginHost::HOOK_RENDER_ARTICLE_API) as $p) {
+            foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_API) as $p) {
                 $headline_row = $p->hook_render_article_api(array("headline" => $headline_row));
             }
 

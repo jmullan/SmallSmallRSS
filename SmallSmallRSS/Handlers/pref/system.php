@@ -1,4 +1,5 @@
 <?php
+namespace SmallSmallRSS\Handlers;
 class Pref_System extends ProtectedHandler {
     function before($method) {
         if (parent::before($method)) {
@@ -57,7 +58,7 @@ class Pref_System extends ProtectedHandler {
                     $line[$k] = htmlspecialchars($v);
                 }
 
-                print "<td class='errno'>" . Logger::$errornames[$line["errno"]] . " (" . $line["errno"] . ")</td>";
+                print "<td class='errno'>" . \Logger::$errornames[$line["errno"]] . " (" . $line["errno"] . ")</td>";
                 print "<td class='filename'>" . $line["filename"] . ":" . $line["lineno"] . "</td>";
                 print "<td class='errstr'>" . $line["errstr"] . "</td>";
                 print "<td class='login'>" . $line["login"] . "</td>";
@@ -79,7 +80,7 @@ class Pref_System extends ProtectedHandler {
 
         print "</div>";
 
-        PluginHost::getInstance()->run_hooks(PluginHost::HOOK_PREFS_TAB,
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
                                              "hook_prefs_tab", "prefSystem");
 
         print "</div>"; #container

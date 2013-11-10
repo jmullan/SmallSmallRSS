@@ -1,5 +1,5 @@
 <?php
-class Af_Whomp extends Plugin {
+class Af_Whomp extends \SmallSmallRSS\Plugin {
 	private $host;
 
 	function about() {

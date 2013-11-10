@@ -270,8 +270,6 @@ function setCookie(name, value, lifetime, path, domain, secure) {
                 d.setTime(d.getTime() + (lifetime * 1000));
         }
 
-        console.log("setCookie: " + name + " => " + value + ": " + d);
-
         int_setCookie(name, value, d, path, domain, secure);
 
 }
@@ -466,7 +464,6 @@ function infobox_callback2(transport, title) {
                         dialog = dijit.byId("infoBox");
                 }
 
-                //console.log("infobox_callback2");
                 notify('');
 
                 var content = transport.responseText;
@@ -630,9 +627,7 @@ function loading_set_progress(p) {
 function remove_splash() {
 
         if (Element.visible("overlay")) {
-                console.log("about to remove splash, OMG!");
                 Element.hide("overlay");
-                console.log("removed splash!");
         }
 }
 
@@ -717,9 +712,6 @@ function removeFeedIcon(id) {
 
                 if (confirm(__("Remove stored feed icon?"))) {
                         var query = "backend.php?op=pref-feeds&method=removeicon&feed_id=" + param_escape(id);
-
-                        console.log(query);
-
                         notify_progress("Removing feed icon...", true);
 
                         new Ajax.Request("backend.php", {
@@ -909,8 +901,6 @@ function createNewRuleElement(parentNode, replaceNode) {
                 var query = "backend.php?op=pref-filters&method=printrulename&rule="+
                         param_escape(dojo.formToJson(form));
 
-                console.log(query);
-
                 new Ajax.Request("backend.php", {
                         parameters: query,
                         onComplete: function (transport) {
@@ -958,8 +948,6 @@ function createNewActionElement(parentNode, replaceNode) {
 
                 var query = "backend.php?op=pref-filters&method=printactionname&action="+
                         param_escape(dojo.formToJson(form));
-
-                console.log(query);
 
                 new Ajax.Request("backend.php", {
                         parameters: query,
@@ -1063,8 +1051,6 @@ function quickAddFilter() {
                         query = "backend.php?op=pref-filters&method=newfilter";
                 }
 
-                console.log(query);
-
                 if (dijit.byId("feedEditDlg"))
                         dijit.byId("feedEditDlg").destroyRecursive();
 
@@ -1132,8 +1118,6 @@ function quickAddFilter() {
 
                                         var query = dojo.formToQuery("filter_new_form");
 
-                                        console.log(query);
-
                                         new Ajax.Request("backend.php", {
                                                 parameters: query,
                                                 onComplete: function (transport) {
@@ -1163,8 +1147,6 @@ function quickAddFilter() {
                                         if (reply && reply) title = reply.title;
 
                                         if (title || getActiveFeedId() || activeFeedIsCat()) {
-
-                                                console.log(title + " " + getActiveFeedId());
 
                                                 var feed_id = activeFeedIsCat() ? 'CAT:' + parseInt(getActiveFeedId()) :
                                                         getActiveFeedId();
@@ -1262,17 +1244,12 @@ function backend_sanity_check_callback(transport) {
                         return fatalError(error_code, reply['error']['message']);
                 }
 
-                console.log("sanity check ok");
-
                 var params = reply['init-params'];
 
                 if (params) {
-                        console.log('reading init-params...');
 
                         for (k in params) {
                                 var v = params[k];
-                                console.log("IP: " + k + " => " + v);
-
                                 if (k == "label_base_index") _label_base_index = parseInt(v);
                         }
 
@@ -1548,8 +1525,6 @@ function editFeed(feed, event) {
                 var query = "backend.php?op=pref-feeds&method=editfeed&id=" +
                         param_escape(feed);
 
-                console.log(query);
-
                 if (dijit.byId("filterEditDlg"))
                         dijit.byId("filterEditDlg").destroyRecursive();
 
@@ -1562,8 +1537,6 @@ function editFeed(feed, event) {
                         style: "width: 600px",
                         execute: function() {
                                 if (this.validate()) {
-//                                      console.log(dojo.objectToQuery(this.attr('value')));
-
                                         notify_progress("Saving data...", true);
 
                                         new Ajax.Request("backend.php", {
@@ -1646,8 +1619,6 @@ function feedBrowser() {
 
                                         var query = "?op=rpc&method=massSubscribe&payload="+
                                                 param_escape(dojo.toJson(selected)) + "&mode=" + param_escape(mode);
-
-                                        console.log(query);
 
                                         new Ajax.Request("backend.php", {
                                                 parameters: query,

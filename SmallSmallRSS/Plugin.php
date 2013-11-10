@@ -1,4 +1,5 @@
 <?php
+namespace SmallSmallRSS;
 class Plugin {
     private $dbh;
     private $host;

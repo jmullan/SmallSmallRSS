@@ -1,5 +1,5 @@
 <?php
-class Af_PennyArcade extends Plugin {
+class Af_PennyArcade extends \SmallSmallRSS\Plugin {
 
     private $host;
 

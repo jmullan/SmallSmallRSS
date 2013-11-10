@@ -645,7 +645,7 @@ function login_sequence() {
                 @session_destroy();
                 setcookie(session_name(), '', time()-42000, '/');
 
-                render_login_form();
+                \SmallSmallRSS\Renderers\LoginPage\render_login_form();
                 exit;
             }
 
@@ -2793,41 +2793,6 @@ function tag_is_valid($tag) {
 
     return true;
 }
-
-function render_login_form() {
-    header('Cache-Control: public');
-
-    require_once __DIR__ . "/login_form.php";
-    exit;
-}
-
-function format_warning($msg, $id = "") {
-    return "<div class=\"warning\" id=\"$id\">
-			<span><img src=\"images/sign_excl.svg\"></span><span>$msg</span></div>";
-}
-
-function format_notice($msg, $id = "") {
-    return "<div class=\"notice\" id=\"$id\">
-			<span><img src=\"images/sign_info.svg\"></span><span>$msg</span></div>";
-}
-
-function format_error($msg, $id = "") {
-    return "<div class=\"error\" id=\"$id\">
-			<span><img src=\"images/sign_excl.svg\"></span><span>$msg</span></div>";
-}
-
-function print_notice($msg) {
-    return print format_notice($msg);
-}
-
-function print_warning($msg) {
-    return print format_warning($msg);
-}
-
-function print_error($msg) {
-    return print format_error($msg);
-}
-
 
 function T_sprintf() {
     $args = func_get_args();

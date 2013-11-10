@@ -410,11 +410,9 @@ class Pref_Feeds extends Handler_Protected {
         #file_put_contents("/tmp/saveorder.json", $_POST['payload']);
         #$data = json_decode(file_get_contents("/tmp/saveorder.json"), true);
 
-        if (!is_array($data['items']))
+        if (!is_array($data['items'])) {
             $data['items'] = json_decode($data['items'], true);
-
-        #		print_r($data['items']);
-
+        }
         if (is_array($data) && is_array($data['items'])) {
             $cat_order_id = 0;
 
@@ -803,7 +801,8 @@ class Pref_Feeds extends Handler_Protected {
 
         $feed_ids = $this->escape_from_request("ids");
 
-        print_notice("Enable the options you wish to apply using checkboxes on the right:");
+        \SmallSmallRSS\Renderers\Messages\print_notice(
+            "Enable the options you wish to apply using checkboxes on the right:");
 
         print "<p>";
 
@@ -1446,7 +1445,10 @@ class Pref_Feeds extends Handler_Protected {
 
         print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('OPML')."\">";
 
-        print_notice(__("Using OPML you can export and import your feeds, filters, labels and Tiny Tiny RSS settings.") . __("Only main settings profile can be migrated using OPML."));
+        \SmallSmallRSS\Renderers\Messages\print_notice(
+            __("Using OPML you can export and import your feeds, filters, labels and Tiny Tiny RSS settings.")
+            . __("Only main settings profile can be migrated using OPML.")
+        );
 
         print "<iframe id=\"upload_iframe\"
 			name=\"upload_iframe\" onload=\"opmlImportComplete(this)\"
@@ -1489,7 +1491,8 @@ class Pref_Feeds extends Handler_Protected {
 
             print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Firefox integration')."\">";
 
-            print_notice(__('This Tiny Tiny RSS site can be used as a Firefox Feed Reader by clicking the link below.'));
+            \SmallSmallRSS\Renderers\Messages\print_notice(
+                __('This Tiny Tiny RSS site can be used as a Firefox Feed Reader by clicking the link below.'));
 
             print "<p>";
 
@@ -1506,7 +1509,8 @@ class Pref_Feeds extends Handler_Protected {
 
         print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Published & shared articles / Generated feeds')."\">";
 
-        print_notice(__('Published articles are exported as a public RSS feed and can be subscribed by anyone who knows the URL specified below.'));
+        \SmallSmallRSS\Renderers\Messages\print_notice(
+            __('Published articles are exported as a public RSS feed and can be subscribed by anyone who knows the URL specified below.'));
 
         $rss_url = '-2::' . htmlspecialchars(get_self_url_prefix() .
                                              "/public.php?op=rss&id=-2&view-mode=all_articles");;
@@ -1521,7 +1525,8 @@ class Pref_Feeds extends Handler_Protected {
 
         print "</p>";
 
-        print_warning(__("You can disable all articles shared by unique URLs here."));
+        \SmallSmallRSS\Renderers\Messages\print_warning(
+            __("You can disable all articles shared by unique URLs here."));
 
         print "<p>";
 

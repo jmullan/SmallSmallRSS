@@ -173,7 +173,10 @@ class Sanity {
                 <p>Tiny Tiny RSS was unable to start properly. This usually means a misconfiguration or an incomplete upgrade. Please fix
                 errors indicated by the following messages:</p>
 
-<?php foreach ($errors as $error) { echo format_error($error); } ?>
+<?php
+foreach ($errors as $error) {
+     \SmallSmallRSS\Renderers\Messages\print_error($error);
+} ?>
 
                 <p>You might want to check tt-rss <a href="http://tt-rss.org/wiki">wiki</a> or the
                 <a href="http://tt-rss.org/forum">forums</a> for more information. Please search the forums before creating new topic

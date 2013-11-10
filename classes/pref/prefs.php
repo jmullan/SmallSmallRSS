@@ -263,7 +263,8 @@ class Pref_Prefs extends Handler_Protected {
 				= 'SHA1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'");
 
             if ($this->dbh->num_rows($result) != 0) {
-                print format_warning(__("Your password is at default value, please change it."), "default_pass_warning");
+                \SmallSmallRSS\Renderers\Messages\print_warning(
+                    __("Your password is at default value, please change it."), "default_pass_warning");
             }
 
             print "<form dojoType=\"dijit.form.Form\">";
@@ -290,7 +291,8 @@ class Pref_Prefs extends Handler_Protected {
 			</script>";
 
             if ($otp_enabled) {
-                print_notice(__("Changing your current password will disable OTP."));
+                \SmallSmallRSS\Renderers\Messages\print_notice(
+                    __("Changing your current password will disable OTP."));
             }
 
             print "<table width=\"100%\" class=\"prefPrefsList\">";
@@ -323,7 +325,8 @@ class Pref_Prefs extends Handler_Protected {
 
                 if ($otp_enabled) {
 
-                    print_notice(__("One time passwords are currently enabled. Enter your current password below to disable."));
+                    \SmallSmallRSS\Renderers\Messages\print_notice(
+                        __("One time passwords are currently enabled. Enter your current password below to disable."));
 
                     print "<form dojoType=\"dijit.form.Form\">";
 
@@ -365,7 +368,8 @@ class Pref_Prefs extends Handler_Protected {
 
                 } else if (function_exists("imagecreatefromstring")) {
 
-                    print_warning(__("You will need a compatible Authenticator to use this. Changing your password would automatically disable OTP."));
+                    \SmallSmallRSS\Renderers\Messages\print_warning(
+                        __("You will need a compatible Authenticator to use this. Changing your password would automatically disable OTP."));
 
                     print "<p>".__("Scan the following code by the Authenticator application:")."</p>";
 
@@ -424,7 +428,8 @@ class Pref_Prefs extends Handler_Protected {
 
                 } else {
 
-                    print_notice(__("PHP GD functions are required for OTP support."));
+                    \SmallSmallRSS\Renderers\Messages\print_notice(
+                        __("PHP GD functions are required for OTP support."));
 
                 }
 
@@ -467,7 +472,8 @@ class Pref_Prefs extends Handler_Protected {
         print '<div dojoType="dijit.layout.ContentPane" region="center" style="overflow-y : auto">';
 
         if (!empty($_SESSION["profile"])) {
-            print_notice(__("Some preferences are only available in default profile."));
+            \SmallSmallRSS\Renderers\Messages\print_notice(
+                __("Some preferences are only available in default profile."));
         }
 
         if (!empty($_SESSION["profile"])) {
@@ -707,7 +713,8 @@ class Pref_Prefs extends Handler_Protected {
 
         print "<p>" . __("You will need to reload Tiny Tiny RSS for plugin changes to take effect.") . "</p>";
 
-        print_notice(__("Download more plugins at tt-rss.org <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/forum/viewforum.php?f=22\">forums</a> or <a target=\"_blank\" class=\"visibleLink\" href=\"http://tt-rss.org/wiki/Plugins\">wiki</a>."));
+        \SmallSmallRSS\Renderers\Messages\print_notice(
+            __("Download more plugins at tt-rss.org <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/forum/viewforum.php?f=22\">forums</a> or <a target=\"_blank\" class=\"visibleLink\" href=\"http://tt-rss.org/wiki/Plugins\">wiki</a>."));
 
         print "<form dojoType=\"dijit.form.Form\" id=\"changePluginsForm\">";
 
@@ -962,7 +969,8 @@ class Pref_Prefs extends Handler_Protected {
 
         $value = str_replace("<br/>", "\n", $value);
 
-        print_notice(T_sprintf("You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target=\"_blank\" class=\"visibleLink\" href=\"%s\">This file</a> can be used as a baseline.", "css/tt-rss.css"));
+        \SmallSmallRSS\Renderers\Messages\print_notice(
+            T_sprintf("You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target=\"_blank\" class=\"visibleLink\" href=\"%s\">This file</a> can be used as a baseline.", "css/tt-rss.css"));
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"rpc\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"setpref\">";

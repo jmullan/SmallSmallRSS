@@ -67,6 +67,7 @@ class Pref_Users extends Handler_Protected {
         $result = $this->dbh->query("SELECT id,title,site_url FROM ttrss_feeds
 				WHERE owner_uid = '$uid' ORDER BY title");
 
+
         print "<ul class=\"userFeedList\">";
 
         while ($line = $this->dbh->fetch_assoc($result)) {
@@ -229,18 +230,20 @@ class Pref_Users extends Handler_Protected {
 
                 $new_uid = $this->dbh->fetch_result($result, 0, "id");
 
-                print format_notice(T_sprintf("Added user <b>%s</b> with password <b>%s</b>",
-                                              $login, $tmp_user_pwd));
+                \SmallSmallRSS\Renderers\Messages\print_notice(
+                    T_sprintf("Added user <b>%s</b> with password <b>%s</b>", $login, $tmp_user_pwd));
 
                 initialize_user($new_uid);
 
             } else {
 
-                print format_warning(T_sprintf("Could not create user <b>%s</b>", $login));
+                \SmallSmallRSS\Renderers\Messages\print_warning(
+                    T_sprintf("Could not create user <b>%s</b>", $login));
 
             }
         } else {
-            print format_warning(T_sprintf("User <b>%s</b> already exists.", $login));
+            \SmallSmallRSS\Renderers\Messages\print_warning(
+                T_sprintf("User <b>%s</b> already exists.", $login));
         }
     }
 
@@ -264,7 +267,8 @@ class Pref_Users extends Handler_Protected {
         if ($show_password) {
             print T_sprintf("Changed password of user <b>%s</b> to <b>%s</b>", $login, $tmp_user_pwd);
         } else {
-            print_notice(T_sprintf("Sending new password of user <b>%s</b> to <b>%s</b>", $login, $email));
+            \SmallSmallRSS\Renderers\Messages\print_notice(
+                T_sprintf("Sending new password of user <b>%s</b> to <b>%s</b>", $login, $email));
         }
 
         if ($email) {
@@ -289,7 +293,9 @@ class Pref_Users extends Handler_Protected {
                                    __("[tt-rss] Password change notification"),
                                    $message, false);
 
-            if (!$rc) print_error($mail->ErrorInfo);
+            if (!$rc) {
+                \SmallSmallRSS\Renderers\Messages\print_error($mail->ErrorInfo);
+            }
         }
     }
 
@@ -434,9 +440,9 @@ class Pref_Users extends Handler_Protected {
         } else {
             print "<p>";
             if (!$user_search) {
-                print_warning(__('No users defined.'));
+                \SmallSmallRSS\Renderers\Messages\print_warning(__('No users defined.'));
             } else {
-                print_warning(__('No matching users found.'));
+                \SmallSmallRSS\Renderers\Messages\print_warning(__('No matching users found.'));
             }
             print "</p>";
 

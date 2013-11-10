@@ -1,76 +1,77 @@
 <?php
 class Import_Export extends Plugin implements IHandler {
-	private $host;
+    private $host;
 
-	function init($host) {
-		$this->host = $host;
+    function init($host) {
+        $this->host = $host;
 
-		$host->add_hook($host::HOOK_PREFS_TAB, $this);
-		$host->add_command("xml-import", "import articles from XML", $this, ":", "FILE");
-	}
+        $host->add_hook($host::HOOK_PREFS_TAB, $this);
+        $host->add_command("xml-import", "import articles from XML", $this, ":", "FILE");
+    }
 
-	function about() {
-		return array(1.0,
-			"Imports and exports user data using neutral XML format",
-			"fox");
-	}
+    function about() {
+        return array(1.0,
+                     "Imports and exports user data using neutral XML format",
+                     "fox");
+    }
 
-	function xml_import($args) {
+    function xml_import($args) {
 
-		$filename = $args['xml_import'];
+        $filename = $args['xml_import'];
 
-		if (!is_file($filename)) {
-			print "error: input filename ($filename) doesn't exist.\n";
-			return;
-		}
+        if (!is_file($filename)) {
+            print "error: input filename ($filename) doesn't exist.\n";
+            return;
+        }
 
-		_debug("please enter your username:");
+        _debug("please enter your username:");
 
-		$username = db_escape_string(trim(read_stdin()));
+        $username = db_escape_string(trim(read_stdin()));
 
-		_debug("importing $filename for user $username...\n");
+        _debug("importing $filename for user $username...\n");
 
-		$result = db_query("SELECT id FROM ttrss_users WHERE login = '$username'");
+        $result = db_query("SELECT id FROM ttrss_users WHERE login = '$username'");
 
-		if (db_num_rows($result) == 0) {
-			print "error: could not find user $username.\n";
-			return;
-		}
+        if (db_num_rows($result) == 0) {
+            print "error: could not find user $username.\n";
+            return;
+        }
 
-		$owner_uid = db_fetch_result($result, 0, "id");
+        $owner_uid = db_fetch_result($result, 0, "id");
 
-		$this->perform_data_import($filename, $owner_uid);
-	}
+        $this->perform_data_import($filename, $owner_uid);
+    }
 
-	function save() {
-		$example_value = db_escape_string($_POST["example_value"]);
+    function save() {
+        $example_value = db_escape_string($_POST["example_value"]);
 
-		echo "Value set to $example_value (not really)";
-	}
+        echo "Value set to $example_value (not really)";
+    }
 
-	function get_prefs_js() {
-		return file_get_contents(dirname(__FILE__) . "/import_export.js");
-	}
+    function get_prefs_js() {
+        return file_get_contents(dirname(__FILE__) . "/import_export.js");
+    }
 
-	function hook_prefs_tab($args) {
-		if ($args != "prefFeeds") return;
+    function hook_prefs_tab($args) {
+        if ($args != "prefFeeds") return;
 
-		print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Import and export')."\">";
+        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Import and export')."\">";
 
-		print_notice(__("You can export and import your Starred and Archived articles for safekeeping or when migrating between tt-rss instances of same version."));
+        \SmallSmallRSS\Renderers\Messages\print_notice(
+            __("You can export and import your Starred and Archived articles for safekeeping or when migrating between tt-rss instances of same version."));
 
-		print "<p>";
+        print "<p>";
 
-		print "<button dojoType=\"dijit.form.Button\" onclick=\"return exportData()\">".
-			__('Export my data')."</button> ";
+        print "<button dojoType=\"dijit.form.Button\" onclick=\"return exportData()\">".
+            __('Export my data')."</button> ";
 
-		print "<hr>";
+        print "<hr>";
 
-		print "<iframe id=\"data_upload_iframe\"
+        print "<iframe id=\"data_upload_iframe\"
 			name=\"data_upload_iframe\" onload=\"dataImportComplete(this)\"
 			style=\"width: 400px; height: 100px; display: none;\"></iframe>";
 
-		print "<form name=\"import_form\" style='display : block' target=\"data_upload_iframe\"
+        print "<form name=\"import_form\" style='display : block' target=\"data_upload_iframe\"
 			enctype=\"multipart/form-data\" method=\"POST\"
 			action=\"backend.php\">
 			<input id=\"export_file\" name=\"export_file\" type=\"file\">&nbsp;
@@ -78,53 +79,53 @@ class Import_Export extends Plugin implements IHandler {
 			<input type=\"hidden\" name=\"plugin\" value=\"import_export\">
 			<input type=\"hidden\" name=\"method\" value=\"dataimport\">
 			<button dojoType=\"dijit.form.Button\" onclick=\"return importData();\" type=\"submit\">" .
-			__('Import') . "</button>";
+            __('Import') . "</button>";
 
-		print "</form>";
+        print "</form>";
 
-		print "</p>";
+        print "</p>";
 
-		print "</div>"; # pane
-	}
+        print "</div>"; # pane
+    }
 
-	function csrf_ignore($method) {
-		return in_array($method, array("exportget"));
-	}
+    function csrf_ignore($method) {
+        return in_array($method, array("exportget"));
+    }
 
-	function before($method) {
-		return $_SESSION["uid"] != false;
-	}
+    function before($method) {
+        return $_SESSION["uid"] != false;
+    }
 
-	function after() {
-		return true;
-	}
+    function after() {
+        return true;
+    }
 
-	function exportget() {
-		$exportname = CACHE_DIR . "/export/" .
-			sha1($_SESSION['uid'] . $_SESSION['login']) . ".xml";
+    function exportget() {
+        $exportname = CACHE_DIR . "/export/" .
+            sha1($_SESSION['uid'] . $_SESSION['login']) . ".xml";
 
-		if (file_exists($exportname)) {
-			header("Content-type: text/xml");
+        if (file_exists($exportname)) {
+            header("Content-type: text/xml");
 
-			if (function_exists('gzencode')) {
-				header("Content-Disposition: attachment; filename=TinyTinyRSS_exported.xml.gz");
-				echo gzencode(file_get_contents($exportname));
-			} else {
-				header("Content-Disposition: attachment; filename=TinyTinyRSS_exported.xml");
-				echo file_get_contents($exportname);
-			}
-		} else {
-			echo "File not found.";
-		}
-	}
+            if (function_exists('gzencode')) {
+                header("Content-Disposition: attachment; filename=TinyTinyRSS_exported.xml.gz");
+                echo gzencode(file_get_contents($exportname));
+            } else {
+                header("Content-Disposition: attachment; filename=TinyTinyRSS_exported.xml");
+                echo file_get_contents($exportname);
+            }
+        } else {
+            echo "File not found.";
+        }
+    }
 
-	function exportrun() {
-		$offset = (int) db_escape_string($_REQUEST['offset']);
-		$exported = 0;
-		$limit = 250;
+    function exportrun() {
+        $offset = (int) db_escape_string($_REQUEST['offset']);
+        $exported = 0;
+        $limit = 250;
 
-		if ($offset < 10000 && is_writable(CACHE_DIR . "/export")) {
-			$result = db_query("SELECT
+        if ($offset < 10000 && is_writable(CACHE_DIR . "/export")) {
+            $result = db_query("SELECT
 					ttrss_entries.guid,
 					ttrss_entries.title,
 					content,
@@ -147,117 +148,109 @@ class Import_Export extends Plugin implements IHandler {
 					ttrss_user_entries.owner_uid = " . $_SESSION['uid'] . "
 				ORDER BY ttrss_entries.id LIMIT $limit OFFSET $offset");
 
-			$exportname = sha1($_SESSION['uid'] . $_SESSION['login']);
+            $exportname = sha1($_SESSION['uid'] . $_SESSION['login']);
 
-			if ($offset == 0) {
-				$fp = fopen(CACHE_DIR . "/export/$exportname.xml", "w");
-				fputs($fp, "<articles schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">");
-			} else {
-				$fp = fopen(CACHE_DIR . "/export/$exportname.xml", "a");
-			}
+            if ($offset == 0) {
+                $fp = fopen(CACHE_DIR . "/export/$exportname.xml", "w");
+                fputs($fp, "<articles schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">");
+            } else {
+                $fp = fopen(CACHE_DIR . "/export/$exportname.xml", "a");
+            }
 
-			if ($fp) {
+            if ($fp) {
 
-				while ($line = db_fetch_assoc($result)) {
-					fputs($fp, "<article>");
+                while ($line = db_fetch_assoc($result)) {
+                    fputs($fp, "<article>");
 
-					foreach ($line as $k => $v) {
-						$v = str_replace("]]>", "]]]]><![CDATA[>", $v);
-						fputs($fp, "<$k><![CDATA[$v]]></$k>");
-					}
+                    foreach ($line as $k => $v) {
+                        $v = str_replace("]]>", "]]]]><![CDATA[>", $v);
+                        fputs($fp, "<$k><![CDATA[$v]]></$k>");
+                    }
 
-					fputs($fp, "</article>");
-				}
+                    fputs($fp, "</article>");
+                }
 
-				$exported = db_num_rows($result);
+                $exported = db_num_rows($result);
 
-				if ($exported < $limit && $exported > 0) {
-					fputs($fp, "</articles>");
-				}
+                if ($exported < $limit && $exported > 0) {
+                    fputs($fp, "</articles>");
+                }
 
-				fclose($fp);
-			}
+                fclose($fp);
+            }
 
-		}
+        }
 
-		print json_encode(array("exported" => $exported));
-	}
+        print json_encode(array("exported" => $exported));
+    }
 
-	function perform_data_import($filename, $owner_uid) {
+    function perform_data_import($filename, $owner_uid) {
 
-		$num_imported = 0;
-		$num_processed = 0;
-		$num_feeds_created = 0;
+        $num_imported = 0;
+        $num_processed = 0;
+        $num_feeds_created = 0;
 
-		$doc = @DOMDocument::load($filename);
+        $doc = @DOMDocument::load($filename);
 
-		if (!$doc) {
-			$contents = file_get_contents($filename);
+        if (!$doc) {
+            $contents = file_get_contents($filename);
 
-			if ($contents) {
-				$data = @gzuncompress($contents);
-			}
+            if ($contents) {
+                $data = @gzuncompress($contents);
+            }
 
-			if (!$data) {
-				$data = @gzdecode($contents);
-			}
+            if (!$data) {
+                $data = @gzdecode($contents);
+            }
 
-			if ($data)
-				$doc = DOMDocument::loadXML($data);
-		}
+            if ($data)
+                $doc = DOMDocument::loadXML($data);
+        }
 
-		if ($doc) {
+        if ($doc) {
 
-			$xpath = new DOMXpath($doc);
+            $xpath = new DOMXpath($doc);
 
-			$container = $doc->firstChild;
+            $container = $doc->firstChild;
 
-			if ($container && $container->hasAttribute('schema-version')) {
-				$schema_version = $container->getAttribute('schema-version');
+            if ($container && $container->hasAttribute('schema-version')) {
+                $schema_version = $container->getAttribute('schema-version');
 
-				if ($schema_version != SmallSmallRSS\Constants::SCHEMA_VERSION) {
-					print "<p>" .__("Could not import: incorrect schema version.") . "</p>";
-					return;
-				}
+                if ($schema_version != SmallSmallRSS\Constants::SCHEMA_VERSION) {
+                    print "<p>" .__("Could not import: incorrect schema version.") . "</p>";
+                    return;
+                }
 
-			} else {
-				print "<p>" . __("Could not import: unrecognized document format.") . "</p>";
-				return;
-			}
+            } else {
+                print "<p>" . __("Could not import: unrecognized document format.") . "</p>";
+                return;
+            }
 
-			$articles = $xpath->query("//article");
+            $articles = $xpath->query("//article");
 
-			foreach ($articles as $article_node) {
-				if ($article_node->childNodes) {
+            foreach ($articles as $article_node) {
+                if ($article_node->childNodes) {
 
-					$ref_id = 0;
+                    $ref_id = 0;
 
-					$article = array();
+                    $article = array();
 
-					foreach ($article_node->childNodes as $child) {
-						if ($child->nodeName != 'label_cache')
-							$article[$child->nodeName] = db_escape_string($child->nodeValue);
-						else
-							$article[$child->nodeName] = $child->nodeValue;
-					}
+                    foreach ($article_node->childNodes as $child) {
+                        if ($child->nodeName != 'label_cache')
+                            $article[$child->nodeName] = db_escape_string($child->nodeValue);
+                        else
+                            $article[$child->nodeName] = $child->nodeValue;
+                    }
 
-					//print_r($article);
-
-					if ($article['guid']) {
-
-						++$num_processed;
-
-						//db_query("BEGIN");
-
-						//print 'GUID:' . $article['guid'] . "\n";
-
-						$result = db_query("SELECT id FROM ttrss_entries
+                    if ($article['guid']) {
+                        ++$num_processed;
+                        $result = db_query("SELECT id FROM ttrss_entries
 							WHERE guid = '".$article['guid']."'");
 
-						if (db_num_rows($result) == 0) {
+                        if (db_num_rows($result) == 0) {
 
-							$result = db_query(
-								"INSERT INTO ttrss_entries
+                            $result = db_query(
+                                "INSERT INTO ttrss_entries
 									(title,
 									guid,
 									link,
@@ -284,180 +277,182 @@ class Import_Export extends Plugin implements IHandler {
 									'0',
 									'')");
 
-							$result = db_query("SELECT id FROM ttrss_entries
+                            $result = db_query("SELECT id FROM ttrss_entries
 								WHERE guid = '".$article['guid']."'");
 
-							if (db_num_rows($result) != 0) {
-								$ref_id = db_fetch_result($result, 0, "id");
-							}
+                            if (db_num_rows($result) != 0) {
+                                $ref_id = db_fetch_result($result, 0, "id");
+                            }
 
-						} else {
-							$ref_id = db_fetch_result($result, 0, "id");
-						}
+                        } else {
+                            $ref_id = db_fetch_result($result, 0, "id");
+                        }
 
-						//print "Got ref ID: $ref_id\n";
+                        //print "Got ref ID: $ref_id\n";
 
-						if ($ref_id) {
+                        if ($ref_id) {
 
-							$feed_url = $article['feed_url'];
-							$feed_title = $article['feed_title'];
+                            $feed_url = $article['feed_url'];
+                            $feed_title = $article['feed_title'];
 
-							$feed = 'NULL';
+                            $feed = 'NULL';
 
-							if ($feed_url && $feed_title) {
-								$result = db_query("SELECT id FROM ttrss_feeds
+                            if ($feed_url && $feed_title) {
+                                $result = db_query("SELECT id FROM ttrss_feeds
 									WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'");
 
-								if (db_num_rows($result) != 0) {
-									$feed = db_fetch_result($result, 0, "id");
-								} else {
-									// try autocreating feed in Uncategorized...
+                                if (db_num_rows($result) != 0) {
+                                    $feed = db_fetch_result($result, 0, "id");
+                                } else {
+                                    // try autocreating feed in Uncategorized...
 
-									$result = db_query("INSERT INTO ttrss_feeds (owner_uid,
+                                    $result = db_query("INSERT INTO ttrss_feeds (owner_uid,
 										feed_url, title) VALUES ($owner_uid, '$feed_url', '$feed_title')");
 
-									$result = db_query("SELECT id FROM ttrss_feeds
+                                    $result = db_query("SELECT id FROM ttrss_feeds
 										WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'");
 
-									if (db_num_rows($result) != 0) {
-										++$num_feeds_created;
+                                    if (db_num_rows($result) != 0) {
+                                        ++$num_feeds_created;
 
-										$feed = db_fetch_result($result, 0, "id");
-									}
-								}
-							}
+                                        $feed = db_fetch_result($result, 0, "id");
+                                    }
+                                }
+                            }
 
-							if ($feed != 'NULL')
-								$feed_qpart = "feed_id = $feed";
-							else
-								$feed_qpart = "feed_id IS NULL";
+                            if ($feed != 'NULL')
+                                $feed_qpart = "feed_id = $feed";
+                            else
+                                $feed_qpart = "feed_id IS NULL";
 
-							//print "$ref_id / $feed / " . $article['title'] . "\n";
+                            //print "$ref_id / $feed / " . $article['title'] . "\n";
 
-							$result = db_query("SELECT int_id FROM ttrss_user_entries
+                            $result = db_query("SELECT int_id FROM ttrss_user_entries
 								WHERE ref_id = '$ref_id' AND owner_uid = '$owner_uid' AND $feed_qpart");
 
-							if (db_num_rows($result) == 0) {
+                            if (db_num_rows($result) == 0) {
 
-								$marked = bool_to_sql_bool(sql_bool_to_bool($article['marked']));
-								$published = bool_to_sql_bool(sql_bool_to_bool($article['published']));
-								$score = (int) $article['score'];
+                                $marked = bool_to_sql_bool(sql_bool_to_bool($article['marked']));
+                                $published = bool_to_sql_bool(sql_bool_to_bool($article['published']));
+                                $score = (int) $article['score'];
 
-								$tag_cache = $article['tag_cache'];
-								$label_cache = db_escape_string($article['label_cache']);
-								$note = $article['note'];
+                                $tag_cache = $article['tag_cache'];
+                                $label_cache = db_escape_string($article['label_cache']);
+                                $note = $article['note'];
 
-								//print "Importing " . $article['title'] . "<br/>";
+                                //print "Importing " . $article['title'] . "<br/>";
 
-								++$num_imported;
+                                ++$num_imported;
 
-								$result = db_query(
-									"INSERT INTO ttrss_user_entries
+                                $result = db_query(
+                                    "INSERT INTO ttrss_user_entries
 									(ref_id, owner_uid, feed_id, unread, last_read, marked,
 										published, score, tag_cache, label_cache, uuid, note)
 									VALUES ($ref_id, $owner_uid, $feed, false,
 										NULL, $marked, $published, $score, '$tag_cache',
 											'$label_cache', '', '$note')");
 
-								$label_cache = json_decode($label_cache, true);
+                                $label_cache = json_decode($label_cache, true);
 
-								if (is_array($label_cache) && $label_cache["no-labels"] != 1) {
-									foreach ($label_cache as $label) {
+                                if (is_array($label_cache) && $label_cache["no-labels"] != 1) {
+                                    foreach ($label_cache as $label) {
 
-										label_create($label[1],
-											$label[2], $label[3], $owner_uid);
+                                        label_create($label[1],
+                                                     $label[2], $label[3], $owner_uid);
 
-										label_add_article($ref_id, $label[1], $owner_uid);
+                                        label_add_article($ref_id, $label[1], $owner_uid);
 
-									}
-								}
+                                    }
+                                }
 
-								//db_query("COMMIT");
-							}
-						}
-					}
-				}
-			}
+                                //db_query("COMMIT");
+                            }
+                        }
+                    }
+                }
+            }
 
-			print "<p>" .
-				__("Finished: ").
-				vsprintf(ngettext("%d article processed, ", "%d articles processed, ", $num_processed), $num_processed).
-				vsprintf(ngettext("%d imported, ", "%d imported, ", $num_imported), $num_imported).
-				vsprintf(ngettext("%d feed created.", "%d feeds created.", $num_feeds_created), $num_feeds_created).
-					"</p>";
+            print "<p>" .
+                __("Finished: ").
+                vsprintf(ngettext("%d article processed, ", "%d articles processed, ", $num_processed), $num_processed).
+                vsprintf(ngettext("%d imported, ", "%d imported, ", $num_imported), $num_imported).
+                vsprintf(ngettext("%d feed created.", "%d feeds created.", $num_feeds_created), $num_feeds_created).
+                "</p>";
 
-		} else {
+        } else {
 
-			print "<p>" . __("Could not load XML document.") . "</p>";
+            print "<p>" . __("Could not load XML document.") . "</p>";
 
-		}
-	}
+        }
+    }
 
-	function exportData() {
+    function exportData() {
 
-		print "<p style='text-align : center' id='export_status_message'>You need to prepare exported data first by clicking the button below.</p>";
+        print "<p style='text-align : center' id='export_status_message'>You need to prepare exported data first by clicking the button below.</p>";
 
-		print "<div align='center'>";
-		print "<button dojoType=\"dijit.form.Button\"
+        print "<div align='center'>";
+        print "<button dojoType=\"dijit.form.Button\"
 			onclick=\"dijit.byId('dataExportDlg').prepare()\">".
-			__('Prepare data')."</button>";
+            __('Prepare data')."</button>";
 
-		print "<button dojoType=\"dijit.form.Button\"
+        print "<button dojoType=\"dijit.form.Button\"
 			onclick=\"dijit.byId('dataExportDlg').hide()\">".
-			__('Close this window')."</button>";
+            __('Close this window')."</button>";
 
-		print "</div>";
+        print "</div>";
 
 
-	}
+    }
 
-	function dataImport() {
-		header("Content-Type: text/html"); # required for iframe
+    function dataImport() {
+        header("Content-Type: text/html"); # required for iframe
 
-		print "<div style='text-align : center'>";
+        print "<div style='text-align : center'>";
 
-		if ($_FILES['export_file']['error'] != 0) {
-			print_error(T_sprintf("Upload failed with error code %d",
-				$_FILES['export_file']['error']));
-			return;
-		}
+        if ($_FILES['export_file']['error'] != 0) {
+            \SmallSmallRSS\Renderers\Messages\print_error(
+                T_sprintf("Upload failed with error code %d",
+                                  $_FILES['export_file']['error']));
+            return;
+        }
 
-		$tmp_file = false;
+        $tmp_file = false;
 
-		if (is_uploaded_file($_FILES['export_file']['tmp_name'])) {
-			$tmp_file = tempnam(CACHE_DIR . '/upload', 'export');
+        if (is_uploaded_file($_FILES['export_file']['tmp_name'])) {
+            $tmp_file = tempnam(CACHE_DIR . '/upload', 'export');
 
-			$result = move_uploaded_file($_FILES['export_file']['tmp_name'],
-				$tmp_file);
+            $result = move_uploaded_file($_FILES['export_file']['tmp_name'],
+                                         $tmp_file);
 
-			if (!$result) {
-				print_error(__("Unable to move uploaded file."));
-				return;
-			}
-		} else {
-			print_error(__('Error: please upload OPML file.'));
-			return;
-		}
+            if (!$result) {
+                \SmallSmallRSS\Renderers\Messages\print_error(
+                    __("Unable to move uploaded file."));
+                return;
+            }
+        } else {
+            \SmallSmallRSS\Renderers\Messages\print_error(__('Error: please upload OPML file.'));
+            return;
+        }
 
-		if (is_file($tmp_file)) {
-			$this->perform_data_import($tmp_file, $_SESSION['uid']);
-			unlink($tmp_file);
-		} else {
-			print_error(__('No file uploaded.'));
-			return;
-		}
+        if (is_file($tmp_file)) {
+            $this->perform_data_import($tmp_file, $_SESSION['uid']);
+            unlink($tmp_file);
+        } else {
+            \SmallSmallRSS\Renderers\Messages\print_error(__('No file uploaded.'));
+            return;
+        }
 
-		print "<button dojoType=\"dijit.form.Button\"
+        print "<button dojoType=\"dijit.form.Button\"
 			onclick=\"dijit.byId('dataImportDlg').hide()\">".
-			__('Close this window')."</button>";
+            __('Close this window')."</button>";
 
-		print "</div>";
+        print "</div>";
 
-	}
+    }
 
-	function api_version() {
-		return 2;
-	}
+    function api_version() {
+        return 2;
+    }
 
 }
-?>
+

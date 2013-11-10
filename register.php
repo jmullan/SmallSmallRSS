@@ -188,7 +188,8 @@ function validateRegForm() {
 
 <?php
     if (!ENABLE_REGISTRATION) {
-        print_error(__("New user registrations are administratively disabled."));
+        \SmallSmallRSS\Renderers\Messages\print_error(
+            __("New user registrations are administratively disabled."));
 
         print "<p><form method=\"GET\" action=\"backend.php\">
 				<input type=\"hidden\" name=\"op\" value=\"logout\">
@@ -248,7 +249,8 @@ $num_users = db_fetch_result($result, 0, "cu");
 		$test = trim(db_escape_string($_REQUEST["turing_test"]));
 
 		if (!$login || !$email || !$test) {
-			print_error(__("Your registration information is incomplete."));
+			\SmallSmallRSS\Renderers\Messages\print_error(
+                            __("Your registration information is incomplete."));
 			print "<p><form method=\"GET\" action=\"index.php\">
 				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 				</form>";
@@ -263,7 +265,8 @@ $num_users = db_fetch_result($result, 0, "cu");
 			$is_registered = db_num_rows($result) > 0;
 
 			if ($is_registered) {
-				print_error(__('Sorry, this username is already taken.'));
+				\SmallSmallRSS\Renderers\Messages\print_error(
+                                    __('Sorry, this username is already taken.'));
 				print "<p><form method=\"GET\" action=\"index.php\">
 				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 				</form>";
@@ -282,7 +285,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 					login = '$login' AND pwd_hash = '$pwd_hash'");
 
 				if (db_num_rows($result) != 1) {
-					print_error(__('Registration failed.'));
+					\SmallSmallRSS\Renderers\Messages\print_error(__('Registration failed.'));
 					print "<p><form method=\"GET\" action=\"index.php\">
 					<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 					</form>";
@@ -311,7 +314,9 @@ $num_users = db_fetch_result($result, 0, "cu");
 					$mail->IsHTML(false);
 					$rc = $mail->quickMail($email, "", "Registration information for Tiny Tiny RSS", $reg_text, false);
 
-					if (!$rc) print_error($mail->ErrorInfo);
+					if (!$rc) {
+                                            \SmallSmallRSS\Renderers\Messages\print_error($mail->ErrorInfo);
+                                        }
 
 					unset($reg_text);
 					unset($mail);
@@ -327,9 +332,12 @@ $num_users = db_fetch_result($result, 0, "cu");
 					$mail = new \SmallSmallRSS\Mailer();
 					$mail->IsHTML(false);
 					$rc = $mail->quickMail(REG_NOTIFY_ADDRESS, "", "Registration notice for Tiny Tiny RSS", $reg_text, false);
-					if (!$rc) print_error($mail->ErrorInfo);
+					if (!$rc) {
+                                            \SmallSmallRSS\Renderers\Messages\print_error($mail->ErrorInfo);
+                                        }
 
-					print_notice(__("Account created successfully."));
+					\SmallSmallRSS\Renderers\Messages\print_notice(
+                                            __("Account created successfully."));
 
 					print "<p><form method=\"GET\" action=\"index.php\">
 					<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
@@ -339,19 +347,20 @@ $num_users = db_fetch_result($result, 0, "cu");
 
 			}
 
-			} else {
-				print_error('Plese check the form again, you have failed the robot test.');
-				print "<p><form method=\"GET\" action=\"index.php\">
+                } else {
+                    \SmallSmallRSS\Renderers\Messages\print_error(
+                        'Plese check the form again, you have failed the robot test.');
+                    print "<p><form method=\"GET\" action=\"index.php\">
 				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 				</form>";
 
-			}
-		}
+                }
+}
 	?>
 
 <?php } else { ?>
 
-	<?php print_notice(__('New user registrations are currently closed.')) ?>
+	<?php \SmallSmallRSS\Renderers\Messages\print_notice(__('New user registrations are currently closed.')) ?>
 
 	<?php print "<p><form method=\"GET\" action=\"index.php\">
 				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">

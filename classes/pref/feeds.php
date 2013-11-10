@@ -801,7 +801,7 @@ class Pref_Feeds extends Handler_Protected {
 
         $feed_ids = $this->escape_from_request("ids");
 
-        \SmallSmallRSS\Renderers\Messages\print_notice(
+        \SmallSmallRSS\Renderers\Messages::print_notice(
             "Enable the options you wish to apply using checkboxes on the right:");
 
         print "<p>";
@@ -1445,7 +1445,7 @@ class Pref_Feeds extends Handler_Protected {
 
         print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('OPML')."\">";
 
-        \SmallSmallRSS\Renderers\Messages\print_notice(
+        \SmallSmallRSS\Renderers\Messages::print_notice(
             __("Using OPML you can export and import your feeds, filters, labels and Tiny Tiny RSS settings.")
             . __("Only main settings profile can be migrated using OPML.")
         );
@@ -1491,7 +1491,7 @@ class Pref_Feeds extends Handler_Protected {
 
             print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Firefox integration')."\">";
 
-            \SmallSmallRSS\Renderers\Messages\print_notice(
+            \SmallSmallRSS\Renderers\Messages::print_notice(
                 __('This Tiny Tiny RSS site can be used as a Firefox Feed Reader by clicking the link below.'));
 
             print "<p>";
@@ -1509,7 +1509,7 @@ class Pref_Feeds extends Handler_Protected {
 
         print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Published & shared articles / Generated feeds')."\">";
 
-        \SmallSmallRSS\Renderers\Messages\print_notice(
+        \SmallSmallRSS\Renderers\Messages::print_notice(
             __('Published articles are exported as a public RSS feed and can be subscribed by anyone who knows the URL specified below.'));
 
         $rss_url = '-2::' . htmlspecialchars(get_self_url_prefix() .
@@ -1525,7 +1525,7 @@ class Pref_Feeds extends Handler_Protected {
 
         print "</p>";
 
-        \SmallSmallRSS\Renderers\Messages\print_warning(
+        \SmallSmallRSS\Renderers\Messages::print_warning(
             __("You can disable all articles shared by unique URLs here."));
 
         print "<p>";

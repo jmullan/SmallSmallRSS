@@ -579,27 +579,27 @@ class Handler_Public extends Handler {
 
             switch ($rc['code']) {
                 case 0:
-                    \SmallSmallRSS\Renderers\Messages\print_warning(
+                    \SmallSmallRSS\Renderers\Messages::print_warning(
                         T_sprintf("Already subscribed to <b>%s</b>.", $feed_url));
                     break;
                 case 1:
-                    \SmallSmallRSS\Renderers\Messages\print_notice(
+                    \SmallSmallRSS\Renderers\Messages::print_notice(
                         T_sprintf("Subscribed to <b>%s</b>.", $feed_url));
                     break;
                 case 2:
-                    \SmallSmallRSS\Renderers\Messages\print_error(
+                    \SmallSmallRSS\Renderers\Messages::print_error(
                         T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url));
                     break;
                 case 3:
-                    \SmallSmallRSS\Renderers\Messages\print_error(
+                    \SmallSmallRSS\Renderers\Messages::print_error(
                         T_sprintf("No feeds found in <b>%s</b>.", $feed_url));
                     break;
                 case 4:
-                    \SmallSmallRSS\Renderers\Messages\print_notice(__("Multiple feed URLs found."));
+                    \SmallSmallRSS\Renderers\Messages::print_notice(__("Multiple feed URLs found."));
                     $feed_urls = $rc["feeds"];
                     break;
                 case 5:
-                    \SmallSmallRSS\Renderers\Messages\print_error(
+                    \SmallSmallRSS\Renderers\Messages::print_error(
                         T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url));
                     break;
             }
@@ -673,30 +673,30 @@ class Handler_Public extends Handler {
 
         switch ($rc) {
             case 1:
-                \SmallSmallRSS\Renderers\Messages\print_notice(
+                \SmallSmallRSS\Renderers\Messages::print_notice(
                     T_sprintf("Subscribed to <b>%s</b>.", $feed_url));
                 break;
             case 2:
-                \SmallSmallRSS\Renderers\Messages\print_error(
+                \SmallSmallRSS\Renderers\Messages::print_error(
                     T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url));
                 break;
             case 3:
-                \SmallSmallRSS\Renderers\Messages\print_error(
+                \SmallSmallRSS\Renderers\Messages::print_error(
                     T_sprintf("No feeds found in <b>%s</b>.", $feed_url));
                 break;
             case 0:
-                \SmallSmallRSS\Renderers\Messages\print_warning(
+                \SmallSmallRSS\Renderers\Messages::print_warning(
                     T_sprintf("Already subscribed to <b>%s</b>.", $feed_url));
                 break;
             case 4:
-                \SmallSmallRSS\Renderers\Messages\print_notice(__("Multiple feed URLs found."));
+                \SmallSmallRSS\Renderers\Messages::print_notice(__("Multiple feed URLs found."));
                 $contents = @fetch_file_contents($url, false, $auth_login, $auth_pass);
                 if (is_html($contents)) {
                     $feed_urls = get_feeds_from_html($url, $contents);
                 }
                 break;
             case 5:
-                \SmallSmallRSS\Renderers\Messages\print_error(
+                \SmallSmallRSS\Renderers\Messages::print_error(
                     T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url));
                 break;
         }
@@ -774,7 +774,7 @@ class Handler_Public extends Handler {
         @$method = $_POST['method'];
 
         if (!$method) {
-            \SmallSmallRSS\Renderers\Messages\print_notice(
+            \SmallSmallRSS\Renderers\Messages::print_notice(
                 __("You will need to provide valid account name and email. New password will be sent on your email address."));
 
             print "<form method='POST' action='public.php'>";
@@ -807,7 +807,7 @@ class Handler_Public extends Handler {
             $test = $this->dbh->escape_string($_POST["test"]);
 
             if (($test != 4 && $test != 'four') || !$email || !$login) {
-                 \SmallSmallRSS\Renderers\Messages\print_error(
+                 \SmallSmallRSS\Renderers\Messages::print_error(
                      __('Some of the required form parameters are missing or incorrect.'));
 
                 print "<form method=\"GET\" action=\"public.php\">
@@ -834,7 +834,7 @@ class Handler_Public extends Handler {
 						</form>";
 
                 } else {
-                     \SmallSmallRSS\Renderers\Messages\print_error(
+                     \SmallSmallRSS\Renderers\Messages::print_error(
                          __("Sorry, login and email combination not found."));
 
                     print "<form method=\"GET\" action=\"public.php\">
@@ -906,7 +906,7 @@ class Handler_Public extends Handler {
                                               if (!$result) {
                                                   print "<span class='err'>FAILED!</span></li></ul>";
 
-                                                  \SmallSmallRSS\Renderers\Messages\print_warning(
+                                                  \SmallSmallRSS\Renderers\Messages::print_warning(
                                                       "One of the updates failed. Either retry the process or perform updates manually.");
                                                   print "<p><form method=\"GET\" action=\"index.php\">
 								<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
@@ -920,7 +920,7 @@ class Handler_Public extends Handler {
 
                                           print "</ul>";
 
-                                          \SmallSmallRSS\Renderers\Messages\print_notice(
+                                          \SmallSmallRSS\Renderers\Messages::print_notice(
                                               "Your Tiny Tiny RSS database is now updated to the latest version.");
 
                                           print "<p><form method=\"GET\" action=\"index.php\">
@@ -944,7 +944,7 @@ class Handler_Public extends Handler {
                                                  $updater->getSchemaVersion(), SmallSmallRSS\Constants::SCHEMA_VERSION);
                                           print "</h3>";
 
-                                          \SmallSmallRSS\Renderers\Messages\print_warning(
+                                          \SmallSmallRSS\Renderers\Messages::print_warning(
                                               "Please backup your database before proceeding.");
 
                                           print "<form method='POST'>
@@ -954,7 +954,7 @@ class Handler_Public extends Handler {
 
                                       } else {
 
-                                          \SmallSmallRSS\Renderers\Messages\print_notice("Tiny Tiny RSS database is up to date.");
+                                          \SmallSmallRSS\Renderers\Messages::print_notice("Tiny Tiny RSS database is up to date.");
 
                                           print "<p><form method=\"GET\" action=\"index.php\">
 							<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">

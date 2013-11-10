@@ -96,7 +96,7 @@ init_js_translations();
     <div dojoType="dijit.ProgressBar" places="0" style="width : 300px" id="loading_bar"
     progress="0" maximum="100">
     </div>
-    <noscript><br/><?php  \SmallSmallRSS\Renderers\Messages\print_error('Javascript is disabled. Please enable it.') ?></noscript>
+    <noscript><br/><?php  \SmallSmallRSS\Renderers\Messages::print_error('Javascript is disabled. Please enable it.') ?></noscript>
     </div>
     </div>
 

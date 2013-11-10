@@ -185,7 +185,7 @@ if (file_exists("../config.php")) {
     require "../config.php";
 
     if (!defined('_INSTALLER_IGNORE_CONFIG_CHECK')) {
-        \SmallSmallRSS\Renderers\Messages\print_error(
+        \SmallSmallRSS\Renderers\Messages::print_error(
             "Error: config.php already exists in tt-rss directory; aborting.");
         exit;
     }
@@ -314,7 +314,7 @@ if ($op == 'testconfig') {
     }
 
     if (count($notices) > 0) {
-        \SmallSmallRSS\Renderers\Messages\print_notice(
+        \SmallSmallRSS\Renderers\Messages::print_notice(
             "Configuration check succeeded with minor problems:");
 
         print "<ul>";
@@ -325,24 +325,24 @@ if ($op == 'testconfig') {
 
         print "</ul>";
     } else {
-        \SmallSmallRSS\Renderers\Messages\print_notice("Configuration check succeeded.");
+        \SmallSmallRSS\Renderers\Messages::print_notice("Configuration check succeeded.");
     }
     echo '<h2>Checking database</h2>';
     $link = db_connect($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_TYPE, $DB_PORT);
 
     if (!$link) {
-        \SmallSmallRSS\Renderers\Messages\print_error(
+        \SmallSmallRSS\Renderers\Messages::print_error(
             "Unable to connect to database using specified parameters.");
         exit;
     }
 
-    \SmallSmallRSS\Renderers\Messages\print_notice("Database test succeeded.");
+    \SmallSmallRSS\Renderers\Messages::print_notice("Database test succeeded.");
 
     echo '<h2>Initialize database</h2>';
     echo '<p>Before you can start using tt-rss, database needs to be initialized. Click on the button below to do that now.</p>';
     $result = @db_query($link, "SELECT true FROM ttrss_feeds", $DB_TYPE, false);
     if ($result) {
-        \SmallSmallRSS\Renderers\Messages\print_error(
+        \SmallSmallRSS\Renderers\Messages::print_error(
             "Existing tt-rss tables will be removed from the database. If you would like to keep your data, skip database initialization.");
         $need_confirm = true;
     } else {
@@ -394,7 +394,7 @@ if ($op == 'testconfig') {
     $link = db_connect($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_TYPE, $DB_PORT);
 
     if (!$link) {
-        \SmallSmallRSS\Renderers\Messages\print_error(
+        \SmallSmallRSS\Renderers\Messages::print_error(
             "Unable to connect to database using specified parameters.");
         exit;
     }
@@ -411,11 +411,11 @@ if ($op == 'testconfig') {
             }
         }
 
-        \SmallSmallRSS\Renderers\Messages\print_notice(
+        \SmallSmallRSS\Renderers\Messages::print_notice(
             "Database initialization completed.");
 
     } else {
-        \SmallSmallRSS\Renderers\Messages\print_notice(
+        \SmallSmallRSS\Renderers\Messages::print_notice(
             "Database initialization skipped.");
     }
 
@@ -443,10 +443,10 @@ echo make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS, $DB_PORT, $SE
     <p><input type="submit" value="Save configuration"></p>
 <?php
 } else {
-    \SmallSmallRSS\Renderers\Messages\print_error(
+    \SmallSmallRSS\Renderers\Messages::print_error(
         "Unfortunately, parent directory is not writable, so we're unable to save config.php automatically.");
 }
-\SmallSmallRSS\Renderers\Messages\print_notice(
+\SmallSmallRSS\Renderers\Messages::print_notice(
     "You can generate the file again by changing the form above.");
 ?>
 </form>
@@ -466,21 +466,21 @@ echo make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS, $DB_PORT, $SE
                                                $DB_PORT, $SELF_URL_PATH));
 
             if ($written > 0) {
-                \SmallSmallRSS\Renderers\Messages\print_notice(
+                \SmallSmallRSS\Renderers\Messages::print_notice(
                     "Successfully saved config.php. You can try <a href=\"..\">loading tt-rss now</a>.");
 
             } else {
-                \SmallSmallRSS\Renderers\Messages\print_notice(
+                \SmallSmallRSS\Renderers\Messages::print_notice(
                     "Unable to write into config.php in tt-rss directory.");
             }
 
             fclose($fp);
         } else {
-            \SmallSmallRSS\Renderers\Messages\print_error(
+            \SmallSmallRSS\Renderers\Messages::print_error(
                 "Unable to open config.php in tt-rss directory for writing.");
         }
     } else {
-        \SmallSmallRSS\Renderers\Messages\print_error(
+        \SmallSmallRSS\Renderers\Messages::print_error(
             "config.php already present in tt-rss directory, refusing to overwrite.");
     }
 }

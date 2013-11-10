@@ -57,7 +57,7 @@ class Import_Export extends Plugin implements IHandler {
 
         print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Import and export')."\">";
 
-        \SmallSmallRSS\Renderers\Messages\print_notice(
+        \SmallSmallRSS\Renderers\Messages::print_notice(
             __("You can export and import your Starred and Archived articles for safekeeping or when migrating between tt-rss instances of same version."));
 
         print "<p>";
@@ -410,7 +410,7 @@ class Import_Export extends Plugin implements IHandler {
         print "<div style='text-align : center'>";
 
         if ($_FILES['export_file']['error'] != 0) {
-            \SmallSmallRSS\Renderers\Messages\print_error(
+            \SmallSmallRSS\Renderers\Messages::print_error(
                 T_sprintf("Upload failed with error code %d",
                                   $_FILES['export_file']['error']));
             return;
@@ -425,12 +425,12 @@ class Import_Export extends Plugin implements IHandler {
                                          $tmp_file);
 
             if (!$result) {
-                \SmallSmallRSS\Renderers\Messages\print_error(
+                \SmallSmallRSS\Renderers\Messages::print_error(
                     __("Unable to move uploaded file."));
                 return;
             }
         } else {
-            \SmallSmallRSS\Renderers\Messages\print_error(__('Error: please upload OPML file.'));
+            \SmallSmallRSS\Renderers\Messages::print_error(__('Error: please upload OPML file.'));
             return;
         }
 
@@ -438,7 +438,7 @@ class Import_Export extends Plugin implements IHandler {
             $this->perform_data_import($tmp_file, $_SESSION['uid']);
             unlink($tmp_file);
         } else {
-            \SmallSmallRSS\Renderers\Messages\print_error(__('No file uploaded.'));
+            \SmallSmallRSS\Renderers\Messages::print_error(__('No file uploaded.'));
             return;
         }
 

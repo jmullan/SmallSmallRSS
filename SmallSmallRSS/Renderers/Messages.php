@@ -17,19 +17,18 @@ class Messages extends \SmallSmallRSS\Renderers\Base {
             print '<div class="' . $class . '"><span><img src="' . $image . '"></span><span>' . $msg . '</span></div>';
         }
     }
-}
+    public static function print_warning($msg, $id="") {
+        $message = new self();
+        $message->render_warning($msg, $id);
+    }
 
-function print_warning($msg, $id="") {
-    $message = new \SmallSmallRSS\Renderers\Messages();
-    $message->render_warning($msg, $id);
-}
+    public static function print_notice($msg, $id="") {
+        $message = new self();
+        $message->render_notice($msg, $id);
+    }
 
-function print_notice($msg, $id="") {
-    $message = new \SmallSmallRSS\Renderers\Messages();
-    $message->render_notice($msg, $id);
-}
-
-function print_error($msg, $id="") {
-    $message = new \SmallSmallRSS\Renderers\Messages();
-    $message->render_error($msg, $id);
+    public static function print_error($msg, $id="") {
+        $message = new self();
+        $message->render_error($msg, $id);
+    }
 }

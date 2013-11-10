@@ -22,7 +22,7 @@ class Article extends Handler_Protected {
             return;
 
         } else {
-             \SmallSmallRSS\Renderers\Messages\print_error(__("Article not found."));
+             \SmallSmallRSS\Renderers\Messages::print_error(__("Article not found."));
         }
     }
 

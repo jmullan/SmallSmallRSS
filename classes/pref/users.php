@@ -230,19 +230,19 @@ class Pref_Users extends Handler_Protected {
 
                 $new_uid = $this->dbh->fetch_result($result, 0, "id");
 
-                \SmallSmallRSS\Renderers\Messages\print_notice(
+                \SmallSmallRSS\Renderers\Messages::print_notice(
                     T_sprintf("Added user <b>%s</b> with password <b>%s</b>", $login, $tmp_user_pwd));
 
                 initialize_user($new_uid);
 
             } else {
 
-                \SmallSmallRSS\Renderers\Messages\print_warning(
+                \SmallSmallRSS\Renderers\Messages::print_warning(
                     T_sprintf("Could not create user <b>%s</b>", $login));
 
             }
         } else {
-            \SmallSmallRSS\Renderers\Messages\print_warning(
+            \SmallSmallRSS\Renderers\Messages::print_warning(
                 T_sprintf("User <b>%s</b> already exists.", $login));
         }
     }
@@ -267,7 +267,7 @@ class Pref_Users extends Handler_Protected {
         if ($show_password) {
             print T_sprintf("Changed password of user <b>%s</b> to <b>%s</b>", $login, $tmp_user_pwd);
         } else {
-            \SmallSmallRSS\Renderers\Messages\print_notice(
+            \SmallSmallRSS\Renderers\Messages::print_notice(
                 T_sprintf("Sending new password of user <b>%s</b> to <b>%s</b>", $login, $email));
         }
 
@@ -294,7 +294,7 @@ class Pref_Users extends Handler_Protected {
                                    $message, false);
 
             if (!$rc) {
-                \SmallSmallRSS\Renderers\Messages\print_error($mail->ErrorInfo);
+                \SmallSmallRSS\Renderers\Messages::print_error($mail->ErrorInfo);
             }
         }
     }
@@ -440,9 +440,9 @@ class Pref_Users extends Handler_Protected {
         } else {
             print "<p>";
             if (!$user_search) {
-                \SmallSmallRSS\Renderers\Messages\print_warning(__('No users defined.'));
+                \SmallSmallRSS\Renderers\Messages::print_warning(__('No users defined.'));
             } else {
-                \SmallSmallRSS\Renderers\Messages\print_warning(__('No matching users found.'));
+                \SmallSmallRSS\Renderers\Messages::print_warning(__('No matching users found.'));
             }
             print "</p>";
 

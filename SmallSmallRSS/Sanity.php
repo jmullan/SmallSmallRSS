@@ -175,7 +175,7 @@ class Sanity {
 
 <?php
 foreach ($errors as $error) {
-     \SmallSmallRSS\Renderers\Messages\print_error($error);
+     \SmallSmallRSS\Renderers\Messages::print_error($error);
 } ?>
 
                 <p>You might want to check tt-rss <a href="http://tt-rss.org/wiki">wiki</a> or the

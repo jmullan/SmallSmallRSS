@@ -1,5 +1,5 @@
 <?php
-namespace SmallSmallRSS\FeedItem;
+namespace SmallSmallRSS;
 
 class FeedItem_RSS extends FeedItem_Common {
     function get_id() {

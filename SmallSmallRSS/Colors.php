@@ -239,9 +239,9 @@ class Colors {
         } else {
             $s = $del_Max / $var_Max;
 
-            $del_R = ((($var_Max - $var_R) / 6) + ($del_Max / 2) ) / $del_Max;
-            $del_G = ((($var_Max - $var_G) / 6) + ($del_Max / 2) ) / $del_Max;
-            $del_B = ((($var_Max - $var_B) / 6) + ($del_Max / 2) ) / $del_Max;
+            $del_R = ((($var_Max - $var_R) / 6) + ($del_Max / 2)) / $del_Max;
+            $del_G = ((($var_Max - $var_G) / 6) + ($del_Max / 2)) / $del_Max;
+            $del_B = ((($var_Max - $var_B) / 6) + ($del_Max / 2)) / $del_Max;
 
             if ($var_R == $var_Max) {
                 $h = $del_B - $del_G;
@@ -283,8 +283,8 @@ class Colors {
             $var_H = $h * 6;
             $var_i = floor($var_H);
             $var_1 = $v * (1 - $s);
-            $var_2 = $v * (1 - $s * ($var_H - $var_i) );
-            $var_3 = $v * (1 - $s * (1 - ($var_H - $var_i) ));
+            $var_2 = $v * (1 - $s * ($var_H - $var_i));
+            $var_3 = $v * (1 - $s * (1 - ($var_H - $var_i)));
 
             if ($var_i == 0) {
                 $var_R = $v; $var_G = $var_3; $var_B = $var_1;

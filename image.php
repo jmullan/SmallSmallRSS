@@ -14,7 +14,7 @@ if ($hash) {
     if (file_exists($filename)) {
         /* See if we can use X-Sendfile */
         $xsendfile = false;
-        if (function_exists('apache_get_modules') &&
+        if (function_exists('apache_get_modules') && 
             array_search('mod_xsendfile', apache_get_modules()))
             $xsendfile = true;
 

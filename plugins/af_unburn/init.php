@@ -28,7 +28,7 @@ class Af_Unburn extends \SmallSmallRSS\Plugin {
             if (strpos($article["plugin_data"], "unburn,$owner_uid:") === FALSE) {
 
                 if (ini_get("safe_mode") || ini_get("open_basedir")) {
-                    $fetcher = new \SmallSmallRSS\Fetch();
+                    $fetcher = new \SmallSmallRSS\Fetcher();
                     $url = $fetcher->curl_resolve_url($article["link"]);
                 } else {
                     $ch = curl_init($article["link"]);
@@ -71,7 +71,7 @@ class Af_Unburn extends \SmallSmallRSS\Plugin {
                     $article["plugin_data"] = "unburn,$owner_uid:" . $article["plugin_data"];
                     $article["link"] = $real_url;
                 }
-            } else if (isset($article["stored"]["link"])) {
+            } elseif (isset($article["stored"]["link"])) {
                 $article["link"] = $article["stored"]["link"];
             }
         }

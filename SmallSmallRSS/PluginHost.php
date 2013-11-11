@@ -146,7 +146,7 @@ class PluginHost {
                     Logger::log("Wrong class type $class: $subclassing");
                     continue;
                 }
-                $plugin = new $class($this);
+                $plugin = new $class ($this);
                 $plugin_api = $plugin->api_version();
                 if ($plugin_api < \SmallSmallRSS\PluginHost::API_VERSION) {
                     user_error(

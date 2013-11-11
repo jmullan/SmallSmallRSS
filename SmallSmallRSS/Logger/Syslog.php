@@ -24,7 +24,7 @@ class Logger_Syslog {
 
     }
 
-    function log($string, $priority=LOG_ERR) {
+    function log($string, $priority = LOG_ERR) {
         if (!is_string($string)) {
             $string = var_export($string, true);
         }

@@ -22,7 +22,7 @@ class Af_Explosm extends \SmallSmallRSS\Plugin {
 			if (strpos($article["plugin_data"], "explosm,$owner_uid:") === FALSE) {
 
 				$doc = new DOMDocument();
-				@$doc->loadHTML(fetch_file_contents($article["link"]));
+				@$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
 
 				$basenode = false;
 
@@ -46,7 +46,7 @@ class Af_Explosm extends \SmallSmallRSS\Plugin {
 						$article["plugin_data"] = "explosm,$owner_uid:" . $article["plugin_data"];
 					}
 				}
-			} else if (isset($article["stored"]["content"])) {
+			} elseif (isset($article["stored"]["content"])) {
 				$article["content"] = $article["stored"]["content"];
 			}
 		}

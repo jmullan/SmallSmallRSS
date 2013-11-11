@@ -1,6 +1,6 @@
 <?php
 namespace SmallSmallRSS;
-class Fetch {
+class Fetcher {
 
     function __construct() {
         $this->fetch_curl_used = false;
@@ -9,7 +9,12 @@ class Fetch {
         $this->fetch_last_content_code = false;
     }
 
-    function get_file_contents($url, $type=false, $login=false, $pass=false, $post_query=false, $timeout=false, $timestamp=0) {
+    function fetch($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0) {
+        $fetcher = new self();
+        return $fetcher->get_file_contents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
+    }
+
+    function get_file_contents($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0) {
         $url = str_replace(' ', '%20', $url);
         if (!defined('NO_CURL') && function_exists('curl_init')) {
             $this->fetch_curl_used = true;

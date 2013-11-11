@@ -97,4 +97,4 @@ if (class_exists($handler) || $override) {
 $renderer = new \SmallSmallRSS\Renderers\JSONError($error_code);
 $renderer->render();
 $end = time();
-\SmallSmallRSS\Logger::log(array($op, $method, $end - $start));
+\SmallSmallRSS\Logger::log(array($op, $method, $end - $start)); 

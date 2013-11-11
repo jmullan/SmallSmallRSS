@@ -115,8 +115,8 @@ class Db_Prefs {
     function convert($value, $type_name) {
         if ($type_name == "bool") {
             return $value == "true";
-        } else if ($type_name == "integer") {
-            return (int)$value;
+        } elseif ($type_name == "integer") {
+            return (int) $value;
         } else {
             return $value;
         }
@@ -159,7 +159,7 @@ class Db_Prefs {
 
             if (db_num_rows($result) > 0)
                 $type_name = db_fetch_result($result, 0, "type_name");
-        } else if ($current_value == $value) {
+        } elseif ($current_value == $value) {
             return;
         }
 
@@ -170,7 +170,7 @@ class Db_Prefs {
                 } else {
                     $value = "false";
                 }
-            } else if ($type_name == "integer") {
+            } elseif ($type_name == "integer") {
                 $value = sprintf("%d", $value);
             }
 

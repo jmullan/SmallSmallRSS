@@ -50,7 +50,7 @@ class Af_RedditImgur extends \SmallSmallRSS\Plugin {
 
 								$token = $matches[1];
 
-								$album_content = fetch_file_contents($entry->getAttribute("href"),
+								$album_content = \SmallSmallRSS\Fetcher::fetch($entry->getAttribute("href"),
 									false, false, false, false, 10);
 
 								if ($album_content && $token) {
@@ -83,7 +83,7 @@ class Af_RedditImgur extends \SmallSmallRSS\Plugin {
 							// linked albums, ffs
 							if (preg_match("/^http:\/\/imgur.com\/(a|album)\/[^\.]+$/", $entry->getAttribute("href"), $matches)) {
 
-								$album_content = fetch_file_contents($entry->getAttribute("href"),
+								$album_content = \SmallSmallRSS\Fetcher::fetch($entry->getAttribute("href"),
 									false, false, false, false, 10);
 
 								if ($album_content) {
@@ -126,7 +126,7 @@ class Af_RedditImgur extends \SmallSmallRSS\Plugin {
 						if (!$force) $article["plugin_data"] = "redditimgur,$owner_uid:" . $article["plugin_data"];
 					}
 				}
-			} else if (isset($article["stored"]["content"])) {
+			} elseif (isset($article["stored"]["content"])) {
 				$article["content"] = $article["stored"]["content"];
 			}
 		}

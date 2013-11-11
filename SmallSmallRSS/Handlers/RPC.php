@@ -390,7 +390,7 @@ class RPC extends ProtectedHandler {
 
         require_once "feedbrowser.php";
 
-        print json_encode(array("content" =>
+        print json_encode(array("content" => 
                                 make_feed_browser($search, $limit, $mode),
 				"mode" => $mode));
     }

@@ -178,7 +178,7 @@ class Pref_Prefs extends ProtectedHandler {
 
     function index() {
 
-        $access_level_names =  \SmallSmallRSS\Constants::access_level_names();
+        $access_level_names = \SmallSmallRSS\Constants::access_level_names();
         $prefs_blacklist = array("STRIP_UNSAFE_TAGS", "REVERSE_HEADLINES",
                                  "SORT_HEADLINES_BY_FEED_DATE", "DEFAULT_ARTICLE_LIMIT");
 
@@ -366,7 +366,7 @@ class Pref_Prefs extends ProtectedHandler {
 
                     print "</form>";
 
-                } else if (function_exists("imagecreatefromstring")) {
+                } elseif (function_exists("imagecreatefromstring")) {
 
                     \SmallSmallRSS\Renderers\Messages::print_warning(
                         __("You will need a compatible Authenticator to use this. Changing your password would automatically disable OTP."));
@@ -563,17 +563,17 @@ class Pref_Prefs extends ProtectedHandler {
                 print_select_hash($pref_name, $value, get_translations(),
                                   "style='width : 220px; margin : 0px' dojoType='dijit.form.Select'");
 
-            } else if ($pref_name == "USER_TIMEZONE") {
+            } elseif ($pref_name == "USER_TIMEZONE") {
 
                 $timezones = explode("\n", file_get_contents("lib/timezones.txt"));
 
                 print_select($pref_name, $value, $timezones, 'dojoType="dijit.form.FilteringSelect"');
-            } else if ($pref_name == "USER_STYLESHEET") {
+            } elseif ($pref_name == "USER_STYLESHEET") {
 
                 print "<button dojoType=\"dijit.form.Button\"
 					onclick=\"customizeCSS()\">" . __('Customize') . "</button>";
 
-            } else if ($pref_name == "USER_CSS_THEME") {
+            } elseif ($pref_name == "USER_CSS_THEME") {
 
                 $themes = array_map("basename", glob("themes/*.css"));
 
@@ -581,7 +581,7 @@ class Pref_Prefs extends ProtectedHandler {
                              'dojoType="dijit.form.Select"');
 
 
-            } else if ($pref_name == "DEFAULT_UPDATE_INTERVAL") {
+            } elseif ($pref_name == "DEFAULT_UPDATE_INTERVAL") {
                 print_select_hash(
                     $pref_name,
                     $value,
@@ -589,7 +589,7 @@ class Pref_Prefs extends ProtectedHandler {
                     'dojoType="dijit.form.Select"'
                 );
 
-            } else if ($type_name == "bool") {
+            } elseif ($type_name == "bool") {
 
                 array_push($listed_boolean_prefs, $pref_name);
 
@@ -605,7 +605,7 @@ class Pref_Prefs extends ProtectedHandler {
                 print "<input type='checkbox' name='$pref_name' $checked $disabled
 					dojoType='dijit.form.CheckBox' id='CB_$pref_name' value='1'>";
 
-            } else if (array_search($pref_name, array('FRESH_ARTICLE_MAX_AGE',
+            } elseif (array_search($pref_name, array('FRESH_ARTICLE_MAX_AGE',
                                                       'PURGE_OLD_DAYS', 'LONG_DATE_FORMAT', 'SHORT_DATE_FORMAT')) !== false) {
 
                 $regexp = ($type_name == 'integer') ? 'regexp="^\d*$"' : '';
@@ -621,7 +621,7 @@ class Pref_Prefs extends ProtectedHandler {
 					required=\"1\" $regexp $disabled
 					name=\"$pref_name\" value=\"$value\">";
 
-            } else if ($pref_name == "SSL_CERT_SERIAL") {
+            } elseif ($pref_name == "SSL_CERT_SERIAL") {
 
                 print "<input dojoType=\"dijit.form.ValidationTextBox\"
 					id=\"SSL_CERT_SERIAL\" readonly=\"1\"
@@ -638,7 +638,7 @@ class Pref_Prefs extends ProtectedHandler {
 					onclick=\"insertSSLserial('')\">" .
                     __('Clear') . "</button>";
 
-            } else if ($pref_name == 'DIGEST_PREFERRED_TIME') {
+            } elseif ($pref_name == 'DIGEST_PREFERRED_TIME') {
                 print "<input dojoType=\"dijit.form.ValidationTextBox\"
 					id=\"$pref_name\" regexp=\"[012]?\d:\d\d\" placeHolder=\"12:00\"
 					name=\"$pref_name\" value=\"$value\"><div class=\"insensitive\">".
@@ -813,7 +813,7 @@ class Pref_Prefs extends ProtectedHandler {
                     $checked = "checked='1'";
                     $disabled = "disabled='1'";
                     $rowclass = '';
-                } else if (in_array($name, $user_enabled)) {
+                } elseif (in_array($name, $user_enabled)) {
                     $checked = "checked='1'";
                     $disabled = "";
                     $rowclass = "Selected";

@@ -26,7 +26,7 @@ class Af_PennyArcade extends \SmallSmallRSS\Plugin {
                 }
 
                 $doc = new DOMDocument();
-                $doc->loadHTML(fetch_file_contents($article["link"]));
+                $doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
 
                 $basenode = false;
 
@@ -43,7 +43,7 @@ class Af_PennyArcade extends \SmallSmallRSS\Plugin {
                         $article["plugin_data"] = "pennyarcade,$owner_uid:" . $article["plugin_data"];
                     }
                 }
-            } else if (isset($article["stored"]["content"])) {
+            } elseif (isset($article["stored"]["content"])) {
                 $article["content"] = $article["stored"]["content"];
             }
         }
@@ -54,7 +54,7 @@ class Af_PennyArcade extends \SmallSmallRSS\Plugin {
                     _debug("af_pennyarcade: Processing news post");
                 }
                 $doc = new DOMDocument();
-                $doc->loadHTML(fetch_file_contents($article["link"]));
+                $doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
 
                 if ($doc) {
                     $xpath = new DOMXPath($doc);
@@ -71,12 +71,12 @@ class Af_PennyArcade extends \SmallSmallRSS\Plugin {
                         $i->parentNode->removeChild($i);
                     }
 
-                    if ($basenode){
+                    if ($basenode) {
                         $article["content"] = $doc->saveXML($basenode);
                         $article["plugin_data"] = "pennyarcade,$owner_uid:" . $article["plugin_data"];
                     }
                 }
-            } else if (isset($article["stored"]["content"])) {
+            } elseif (isset($article["stored"]["content"])) {
                 $article["content"] = $article["stored"]["content"];
             }
         }

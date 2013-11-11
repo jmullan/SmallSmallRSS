@@ -64,7 +64,7 @@ class Pref_Feeds extends ProtectedHandler {
 
             $cat = array();
             $cat['id'] = 'CAT:' . $line['id'];
-            $cat['bare_id'] = (int)$line['id'];
+            $cat['bare_id'] = (int) $line['id'];
             $cat['name'] = $line['title'];
             $cat['items'] = array();
             $cat['checkbox'] = false;
@@ -92,7 +92,7 @@ class Pref_Feeds extends ProtectedHandler {
         while ($feed_line = $this->dbh->fetch_assoc($feed_result)) {
             $feed = array();
             $feed['id'] = 'FEED:' . $feed_line['id'];
-            $feed['bare_id'] = (int)$feed_line['id'];
+            $feed['bare_id'] = (int) $feed_line['id'];
             $feed['auxcounter'] = 0;
             $feed['name'] = $feed_line['title'];
             $feed['checkbox'] = false;
@@ -156,7 +156,7 @@ class Pref_Feeds extends ProtectedHandler {
 
                     $item = array();
                     $item['id'] = 'FEED:' . $feed_id;
-                    $item['bare_id'] = (int)$feed_id;
+                    $item['bare_id'] = (int) $feed_id;
                     $item['auxcounter'] = 0;
                     $item['name'] = $feed['title'];
                     $item['checkbox'] = false;
@@ -218,7 +218,7 @@ class Pref_Feeds extends ProtectedHandler {
             while ($line = $this->dbh->fetch_assoc($result)) {
                 $cat = array();
                 $cat['id'] = 'CAT:' . $line['id'];
-                $cat['bare_id'] = (int)$line['id'];
+                $cat['bare_id'] = (int) $line['id'];
                 $cat['auxcounter'] = 0;
                 $cat['name'] = $line['title'];
                 $cat['items'] = array();
@@ -260,7 +260,7 @@ class Pref_Feeds extends ProtectedHandler {
             while ($feed_line = $this->dbh->fetch_assoc($feed_result)) {
                 $feed = array();
                 $feed['id'] = 'FEED:' . $feed_line['id'];
-                $feed['bare_id'] = (int)$feed_line['id'];
+                $feed['bare_id'] = (int) $feed_line['id'];
                 $feed['auxcounter'] = 0;
                 $feed['name'] = $feed_line['title'];
                 $feed['checkbox'] = false;
@@ -292,7 +292,7 @@ class Pref_Feeds extends ProtectedHandler {
             while ($feed_line = $this->dbh->fetch_assoc($feed_result)) {
                 $feed = array();
                 $feed['id'] = 'FEED:' . $feed_line['id'];
-                $feed['bare_id'] = (int)$feed_line['id'];
+                $feed['bare_id'] = (int) $feed_line['id'];
                 $feed['auxcounter'] = 0;
                 $feed['name'] = $feed_line['title'];
                 $feed['checkbox'] = false;
@@ -384,7 +384,7 @@ class Pref_Feeds extends ProtectedHandler {
 							WHERE id = '$bare_id' AND
 								owner_uid = " . $_SESSION["uid"]);
 
-                    } else if (strpos($id, "CAT:") === 0) {
+                    } elseif (strpos($id, "CAT:") === 0) {
                         $this->process_category_order($data_map, $item['_reference'], $item_id,
                                                       $nest_level+1);
 
@@ -1180,7 +1180,7 @@ class Pref_Feeds extends ProtectedHandler {
                     $this->dbh->query("UPDATE ttrss_user_entries SET score = '$s',
 						marked = true WHERE
 						ref_id IN (" . join(',', $scores[$s]) . ")");
-                } else if ($s < -500) {
+                } elseif ($s < -500) {
                     $this->dbh->query("UPDATE ttrss_user_entries SET score = '$s',
 						unread = false WHERE
 						ref_id IN (" . join(',', $scores[$s]) . ")");
@@ -1553,7 +1553,7 @@ class Pref_Feeds extends ProtectedHandler {
 
         if ($cat_id > 0) {
             $cat_unread = \SmallSmallRSS\CounterCache::find($cat_id, $_SESSION["uid"], true);
-        } else if ($cat_id == 0 || $cat_id == -2) {
+        } elseif ($cat_id == 0 || $cat_id == -2) {
             $cat_unread = getCategoryUnread($cat_id);
         } else {
             $cat_unread = 0;
@@ -1794,7 +1794,7 @@ class Pref_Feeds extends ProtectedHandler {
 
             if (db_num_rows($result) == 0) {
                 $result = db_query("SELECT MAX(id) AS id FROM ttrss_archived_feeds");
-                $new_feed_id = (int)db_fetch_result($result, 0, "id") + 1;
+                $new_feed_id = (int) db_fetch_result($result, 0, "id") + 1;
 
                 db_query("INSERT INTO ttrss_archived_feeds
 					(id, owner_uid, title, feed_url, site_url)

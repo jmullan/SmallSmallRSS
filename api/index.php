@@ -41,7 +41,7 @@ $handler = new \SmallSmallRSS\Handlers\API($_REQUEST);
 if ($handler->before($method)) {
     if ($method && method_exists($handler, $method)) {
         $handler->$method();
-    } else if (method_exists($handler, 'index')) {
+    } elseif (method_exists($handler, 'index')) {
         $handler->index($method);
     }
     $handler->after();

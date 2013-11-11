@@ -68,7 +68,7 @@ class Mail extends \SmallSmallRSS\Plugin {
 
             $tpl->setVariable('ARTICLE_TITLE', strip_tags($line["title"]));
             $tnote = strip_tags($line["note"]);
-            if( $tnote != ''){
+            if ($tnote != '') {
                 $tpl->setVariable('ARTICLE_NOTE', $tnote, true);
                 $tpl->addBlock('note');
             }
@@ -138,7 +138,7 @@ class Mail extends \SmallSmallRSS\Plugin {
         $mail->FromName = strip_tags($_REQUEST['from_name']);
         //$mail->AddAddress($_REQUEST['destination']);
         $addresses = explode(';', $_REQUEST['destination']);
-        foreach($addresses as $nextaddr)
+        foreach ($addresses as $nextaddr)
             $mail->AddAddress($nextaddr);
 
         $mail->IsHTML(false);
@@ -148,7 +148,7 @@ class Mail extends \SmallSmallRSS\Plugin {
         $rc = $mail->Send();
 
         if (!$rc) {
-            $reply['error'] =  $mail->ErrorInfo;
+            $reply['error'] = $mail->ErrorInfo;
         } else {
             save_email_address(db_escape_string($destination));
             $reply['message'] = "UPDATE_COUNTERS";

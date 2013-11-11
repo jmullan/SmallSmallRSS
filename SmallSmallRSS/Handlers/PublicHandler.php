@@ -8,7 +8,7 @@ class PublicHandler extends Handler {
 
         require_once "lib/MiniTemplator.class.php";
 
-        $note_style = 	"background-color : #fff7d5;
+        $note_style = "background-color : #fff7d5;
 			border-width : 1px; ".
             "padding : 5px; border-style : dashed; border-color : #e7d796;".
             "margin-bottom : 1em; color : #9a8c59;";
@@ -19,7 +19,7 @@ class PublicHandler extends Handler {
 
         if ($feed == -2)
             $date_sort_field = "last_published DESC";
-        else if ($feed == -1)
+        elseif ($feed == -1)
             $date_sort_field = "last_marked DESC";
 
         switch ($order) {
@@ -44,7 +44,7 @@ class PublicHandler extends Handler {
         if ($this->dbh->num_rows($result) != 0) {
             $ts = strtotime($this->dbh->fetch_result($result, 0, "date_entered"));
 
-            if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
+            if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && 
                 strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $ts) {
                 header('HTTP/1.0 304 Not Modified');
                 return;
@@ -148,7 +148,7 @@ class PublicHandler extends Handler {
             }
 
             print $tmp;
-        } else if ($format == 'json') {
+        } elseif ($format == 'json') {
 
             $feed = array();
 
@@ -168,7 +168,7 @@ class PublicHandler extends Handler {
                 $article = array();
 
                 $article['id'] = $line['link'];
-                $article['link']	= $line['link'];
+                $article['link'] = $line['link'];
                 $article['title'] = $line['title'];
                 $article['excerpt'] = truncate_string(strip_tags($line["content_preview"]), 100, '...');
                 $article['content'] = sanitize($line["content_preview"], false, $owner_uid);
@@ -284,7 +284,7 @@ class PublicHandler extends Handler {
                     print $_REQUEST['hub_challenge'];
                     return;
 
-                } else if ($mode == "unsubscribe") {
+                } elseif ($mode == "unsubscribe") {
 
                     $this->dbh->query("UPDATE ttrss_feeds SET pubsub_state = 0
 						WHERE id = '$feed_id'");
@@ -292,7 +292,7 @@ class PublicHandler extends Handler {
                     print $_REQUEST['hub_challenge'];
                     return;
 
-                } else if (!$mode) {
+                } elseif (!$mode) {
 
                     // Received update ping, schedule feed update.
                     //update_rss_feed($feed_id, true, true);
@@ -344,8 +344,8 @@ class PublicHandler extends Handler {
         $feed = $this->dbh->escape_string($_REQUEST["id"]);
         $key = $this->dbh->escape_string($_REQUEST["key"]);
         $is_cat = $_REQUEST["is_cat"] != false;
-        $limit = (int)$this->dbh->escape_string($_REQUEST["limit"]);
-        $offset = (int)$this->dbh->escape_string($_REQUEST["offset"]);
+        $limit = (int) $this->dbh->escape_string($_REQUEST["limit"]);
+        $offset = (int) $this->dbh->escape_string($_REQUEST["offset"]);
 
         $search = $this->dbh->escape_string($_REQUEST["q"]);
         $search_mode = $this->dbh->escape_string($_REQUEST["smode"]);
@@ -628,7 +628,7 @@ class PublicHandler extends Handler {
             $tp_uri = get_self_url_prefix() . "/prefs.php";
             $tt_uri = get_self_url_prefix();
 
-            if ($rc['code'] <= 2){
+            if ($rc['code'] <= 2) {
                 $result = $this->dbh->query("SELECT id FROM ttrss_feeds WHERE
 					feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]);
 
@@ -692,7 +692,7 @@ class PublicHandler extends Handler {
                 break;
             case 4:
                 \SmallSmallRSS\Renderers\Messages::print_notice(__("Multiple feed URLs found."));
-                $contents = @fetch_file_contents($url, false, $auth_login, $auth_pass);
+                $contents = @\SmallSmallRSS\Fetcher::fetch($url, false, $auth_login, $auth_pass);
                 if (is_html($contents)) {
                     $feed_urls = get_feeds_from_html($url, $contents);
                 }
@@ -724,7 +724,7 @@ class PublicHandler extends Handler {
         $tp_uri = get_self_url_prefix() . "/prefs.php";
         $tt_uri = get_self_url_prefix();
 
-        if ($rc <= 2){
+        if ($rc <= 2) {
             $result = $this->dbh->query("SELECT id FROM ttrss_feeds WHERE
 				feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]);
 
@@ -802,7 +802,7 @@ class PublicHandler extends Handler {
             print "<button type='submit'>".__("Reset password")."</button>";
 
             print "</form>";
-        } else if ($method == 'do') {
+        } elseif ($method == 'do') {
 
             $login = $this->dbh->escape_string($_POST["login"]);
             $email = $this->dbh->escape_string($_POST["email"]);

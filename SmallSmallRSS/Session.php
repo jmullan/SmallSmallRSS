@@ -72,7 +72,7 @@ class Session {
         };
 
         if ($check_ip && strpos($_SERVER['REMOTE_ADDR'], $check_ip) !== 0) {
-            $_SESSION["login_error_msg"] =
+            $_SESSION["login_error_msg"] = 
                 __("Session failed to validate (incorrect IP)");
             return false;
         }

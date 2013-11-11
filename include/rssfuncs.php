@@ -243,10 +243,10 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
 
     $force_refetch = isset($_REQUEST["force_refetch"]);
     $feed_data = '';
-    if (file_exists($cache_filename) &&
-        is_readable($cache_filename) &&
-        !$auth_login && !$auth_pass &&
-        filemtime($cache_filename) > time() - 30) {
+    if (file_exists($cache_filename)
+        && is_readable($cache_filename)
+        && !$auth_login && !$auth_pass
+        && filemtime($cache_filename) > time() - 30) {
 
         _debug("using local cache.", $debug_enabled);
 
@@ -269,7 +269,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
         if (!$feed_data) {
             _debug("fetching [$fetch_url]...", $debug_enabled);
             _debug("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $last_article_timestamp), $debug_enabled);
-            $fetcher = new \SmallSmallRSS\Fetch();
+            $fetcher = \SmallSmallRSS\Fetcher();
             $feed_data = $fetcher->get_file_contents(
                 $fetch_url, false,
                 $auth_login, $auth_pass, false,
@@ -280,9 +280,6 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
             $feed_data = trim($feed_data);
 
             _debug("fetch done.", $debug_enabled);
-        }
-
-        if (!$feed_data) {
             $fetch_last_error = $fetcher->last_error;
             $fetch_last_error_code = $fetcher->last_error_code;
             _debug("unable to fetch: $fetch_last_error [$fetch_last_error_code]", $debug_enabled);
@@ -1098,7 +1095,7 @@ function cache_images($html, $site_url, $debug) {
             if ($debug) _debug("cache_images: downloading: $src to $local_filename");
 
             if (!file_exists($local_filename)) {
-                $file_content = fetch_file_contents($src);
+                $file_content = \SmallSmallRSS\Fetcher::fetch($src);
 
                 if ($file_content && strlen($file_content) > 1024) {
                     file_put_contents($local_filename, $file_content);

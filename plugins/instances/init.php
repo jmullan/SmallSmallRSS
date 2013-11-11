@@ -3,10 +3,10 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     private $host;
 
     private $status_codes = array(
-        0 	=> "Connection failed",
-        1 	=> "Success",
-        2 	=> "Invalid object received",
-        16	=> "Access denied" );
+        0 => "Connection failed",
+        1 => "Success",
+        2 => "Invalid object received",
+        16 => "Access denied");
 
     function about() {
         return array(1.0,
@@ -60,12 +60,12 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
             $fetch_url = $line['access_url'] . '/public.php?op=fbexport';
             $post_query = 'key=' . $line['access_key'];
 
-            $feeds = fetch_file_contents($fetch_url, false, false, false, $post_query);
+            $feeds = \SmallSmallRSS\Fetcher::fetch($fetch_url, false, false, false, $post_query);
 
             // try doing it the old way
             if (!$feeds) {
                 $fetch_url = $line['access_url'] . '/backend.php?op=fbexport';
-                $feeds = fetch_file_contents($fetch_url, false, false, false, $post_query);
+                $feeds = \SmallSmallRSS\Fetcher::fetch($fetch_url, false, false, false, $post_query);
             }
 
             if ($feeds) {

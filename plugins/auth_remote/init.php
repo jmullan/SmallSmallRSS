@@ -54,17 +54,17 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
                 $_SESSION["hide_logout"] = true;
 
                 // LemonLDAP can send user informations via HTTP HEADER
-                if (defined('AUTH_AUTO_CREATE') && AUTH_AUTO_CREATE){
+                if (defined('AUTH_AUTO_CREATE') && AUTH_AUTO_CREATE) {
                     // update user name
                     $fullname = $_SERVER['HTTP_USER_NAME'] ? $_SERVER['HTTP_USER_NAME'] : $_SERVER['AUTHENTICATE_CN'];
-                    if ($fullname){
+                    if ($fullname) {
                         $fullname = db_escape_string($fullname);
                         db_query("UPDATE ttrss_users SET full_name = '$fullname' WHERE id = " .
                                  $user_id);
                     }
                     // update user mail
                     $email = $_SERVER['HTTP_USER_MAIL'] ? $_SERVER['HTTP_USER_MAIL'] : $_SERVER['AUTHENTICATE_MAIL'];
-                    if ($email){
+                    if ($email) {
                         $email = db_escape_string($email);
                         db_query("UPDATE ttrss_users SET email = '$email' WHERE id = " .
                                  $user_id);

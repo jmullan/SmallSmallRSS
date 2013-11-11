@@ -20,7 +20,7 @@ class Af_Whomp extends \SmallSmallRSS\Plugin {
 		if (strpos($article["guid"], "whompcomic.com") !== FALSE) {
 			if (strpos($article["plugin_data"], "whomp,$owner_uid:") === FALSE) {
 				$doc = new DOMDocument();
-				@$doc->loadHTML(fetch_file_contents($article["link"]));
+				@$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
 
 				$basenode = false;
 
@@ -45,7 +45,7 @@ class Af_Whomp extends \SmallSmallRSS\Plugin {
 						$article["plugin_data"] = "whomp,$owner_uid:" . $article["plugin_data"];
 					}
 				}
-			} else if (isset($article["stored"]["content"])) {
+			} elseif (isset($article["stored"]["content"])) {
 				$article["content"] = $article["stored"]["content"];
 			}
 		}

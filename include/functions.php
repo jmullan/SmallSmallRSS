@@ -134,7 +134,7 @@ $schema_version = false;
  * @param string $msg The debug message.
  * @return void
  */
-function _debug($msg, $show=true, $is_debug=true) {
+function _debug($msg, $show = true, $is_debug = true) {
     if (!$is_debug) {
         return;
     }
@@ -304,11 +304,6 @@ function get_feed_update_interval($feed_id) {
     }
 }
 
-function fetch_file_contents($url, $type=false, $login=false, $pass=false, $post_query=false, $timeout=false, $timestamp=0) {
-    $fetcher = new \SmallSmallRSS\Fetch();
-    return $fetcher->get_file_contents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
-}
-
 /**
  * Try to determine the favicon URL for a feed.
  * adapted from wordpress favicon plugin by Jeff Minard (http://thecodepro.com/)
@@ -320,7 +315,7 @@ function fetch_file_contents($url, $type=false, $login=false, $pass=false, $post
  */
 function get_favicon_url($url) {
     $favicon_url = false;
-    if ($html = @fetch_file_contents($url)) {
+    if ($html = @\SmallSmallRSS\Fetcher::fetch($url)) {
         libxml_use_internal_errors(true);
 
         $doc = new DOMDocument();
@@ -358,7 +353,7 @@ function check_feed_favicon($site_url, $feed) {
 
         if ($favicon_url) {
             // Limiting to "image" type misses those served with text/plain
-            $contents = fetch_file_contents($favicon_url); // , "image");
+            $contents = \SmallSmallRSS\Fetcher::fetch($favicon_url); // , "image");
 
             if ($contents) {
                 // Crude image type matching.
@@ -705,7 +700,7 @@ function convert_timestamp($timestamp, $source_tz, $dest_tz) {
     return $dt->format('U') + $dest_tz->getOffset($dt);
 }
 
-function make_local_datetime($timestamp, $long, $owner_uid=false, $no_smart_dt=false) {
+function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt = false) {
     static $utc_tz = null;
     if (is_null($utc_tz)) {
         $utc_tz = new DateTimeZone('UTC');
@@ -748,7 +743,7 @@ function make_local_datetime($timestamp, $long, $owner_uid=false, $no_smart_dt=f
     }
 }
 
-function smart_date_time($timestamp, $tz_offset=0, $owner_uid=false) {
+function smart_date_time($timestamp, $tz_offset = 0, $owner_uid = false) {
     if (!$owner_uid) {
         $owner_uid = $_SESSION['uid'];
     }
@@ -1458,7 +1453,7 @@ function subscribe_to_feed($url, $cat_id = 0,
         return array("code" => 2);
     }
 
-    $fetcher = new \SmallSmallRSS\Fetch();
+    $fetcher = new \SmallSmallRSS\Fetcher();
     $contents = $fetcher->get_file_contents($url, false, $auth_login, $auth_pass);
     $fetch_last_error = $fetcher->last_error;
 
@@ -3422,7 +3417,7 @@ function is_html($content) {
 }
 
 function url_is_html($url, $login = false, $pass = false) {
-    return is_html(fetch_file_contents($url, false, $login, $pass));
+    return is_html(\SmallSmallRSS\Fetcher::fetch($url, false, $login, $pass));
 }
 
 function print_label_select($name, $value, $attributes = "") {

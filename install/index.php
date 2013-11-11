@@ -80,7 +80,7 @@ function db_connect($host, $user, $pass, $db, $type, $port = false) {
         }
         $link = pg_connect($string);
         return $link;
-    } else if ($type == "mysql") {
+    } elseif ($type == "mysql") {
         if (function_exists("mysqli_connect")) {
             if ($port) {
                 return mysqli_connect($host, $user, $pass, $db, $port);
@@ -115,21 +115,21 @@ function make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS,
     foreach ($data as $line) {
         if (preg_match("/define\('DB_TYPE'/", $line)) {
             $rv .= "\tdefine('DB_TYPE', '$DB_TYPE');\n";
-        } else if (preg_match("/define\('DB_HOST'/", $line)) {
+        } elseif (preg_match("/define\('DB_HOST'/", $line)) {
             $rv .= "\tdefine('DB_HOST', '$DB_HOST');\n";
-        } else if (preg_match("/define\('DB_USER'/", $line)) {
+        } elseif (preg_match("/define\('DB_USER'/", $line)) {
             $rv .= "\tdefine('DB_USER', '$DB_USER');\n";
-        } else if (preg_match("/define\('DB_NAME'/", $line)) {
+        } elseif (preg_match("/define\('DB_NAME'/", $line)) {
             $rv .= "\tdefine('DB_NAME', '$DB_NAME');\n";
-        } else if (preg_match("/define\('DB_PASS'/", $line)) {
+        } elseif (preg_match("/define\('DB_PASS'/", $line)) {
             $rv .= "\tdefine('DB_PASS', '$DB_PASS');\n";
-        } else if (preg_match("/define\('DB_PORT'/", $line)) {
+        } elseif (preg_match("/define\('DB_PORT'/", $line)) {
             $rv .= "\tdefine('DB_PORT', '$DB_PORT');\n";
-        } else if (preg_match("/define\('SELF_URL_PATH'/", $line)) {
+        } elseif (preg_match("/define\('SELF_URL_PATH'/", $line)) {
             $rv .= "\tdefine('SELF_URL_PATH', '$SELF_URL_PATH');\n";
-        } else if (preg_match("/define\('FEED_CRYPT_KEY'/", $line)) {
+        } elseif (preg_match("/define\('FEED_CRYPT_KEY'/", $line)) {
             $rv .= "\tdefine('FEED_CRYPT_KEY', '$crypt_key');\n";
-        } else if (!$finished) {
+        } elseif (!$finished) {
             $rv .= "$line\n";
         }
 
@@ -151,7 +151,7 @@ function db_query($link, $query, $type, $die_on_error = true) {
             }
         }
         return $result;
-    } else if ($type == "mysql") {
+    } elseif ($type == "mysql") {
 
         if (function_exists("mysqli_connect")) {
             $result = mysqli_query($link, $query);
@@ -389,7 +389,7 @@ if ($op == 'testconfig') {
 </table>
 
 <?php
-} else if ($op == 'installschema' || $op == 'skipschema') {
+} elseif ($op == 'installschema' || $op == 'skipschema') {
 
     $link = db_connect($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_TYPE, $DB_PORT);
 
@@ -450,9 +450,9 @@ echo make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS, $DB_PORT, $SE
     "You can generate the file again by changing the form above.");
 ?>
 </form>
-<?Php
+<?php Php
 
-} else if ($op == "saveconfig") {
+} elseif ($op == "saveconfig") {
 
     print "<h2>Saving configuration file to parent directory...</h2>";
 

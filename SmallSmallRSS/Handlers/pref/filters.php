@@ -64,7 +64,7 @@ class Pref_Filters extends ProtectedHandler {
         }
 
         $rctr = 0;
-        foreach ($_REQUEST["rule"] AS $r) {
+        foreach ($_REQUEST["rule"] as $r) {
             $rule = json_decode($r, true);
 
             if ($rule && $rctr < 5) {
@@ -298,7 +298,7 @@ class Pref_Filters extends ProtectedHandler {
 
         while ($line = $this->dbh->fetch_assoc($rules_result)) {
             if (sql_bool_to_bool($line["cat_filter"])) {
-                $line["feed_id"] = "CAT:" . (int)$line["cat_id"];
+                $line["feed_id"] = "CAT:" . (int) $line["cat_id"];
             }
 
             unset($line["cat_filter"]);
@@ -421,13 +421,13 @@ class Pref_Filters extends ProtectedHandler {
             $feed_id = (int) $feed_id;
 
             if ($rule["feed_id"])
-                $feed = getFeedTitle((int)$rule["feed_id"]);
+                $feed = getFeedTitle((int) $rule["feed_id"]);
             else
                 $feed = __("All feeds");
         }
 
         $result = $this->dbh->query("SELECT description FROM ttrss_filter_types
-			WHERE id = ".(int)$rule["filter_type"]);
+			WHERE id = ". (int) $rule["filter_type"]);
         $filter_type = $this->dbh->fetch_result($result, 0, "description");
 
         return T_sprintf("%s on %s in %s %s", strip_tags($rule["reg_exp"]),
@@ -440,11 +440,11 @@ class Pref_Filters extends ProtectedHandler {
 
     private function getActionName($action) {
         $result = $this->dbh->query("SELECT description FROM
-			ttrss_filter_actions WHERE id = " .(int)$action["action_id"]);
+			ttrss_filter_actions WHERE id = " . (int) $action["action_id"]);
 
         $title = __($this->dbh->fetch_result($result, 0, "description"));
 
-        if ($action["action_id"] == 4 || $action["action_id"] == 6 ||
+        if ($action["action_id"] == 4 || $action["action_id"] == 6 || 
             $action["action_id"] == 7)
             $title .= ": " . $action["action_param"];
 
@@ -887,7 +887,7 @@ class Pref_Filters extends ProtectedHandler {
 
         if ($action) {
             $action_param = $this->dbh->escape_string($action["action_param"]);
-            $action_id = (int)$action["action_id"];
+            $action_id = (int) $action["action_id"];
         } else {
             $action_param = "";
             $action_id = 0;

@@ -101,7 +101,7 @@ class Pref_Users extends ProtectedHandler {
     }
 
     function edit() {
-        $access_level_names =  \SmallSmallRSS\Constants::access_level_names();
+        $access_level_names = \SmallSmallRSS\Constants::access_level_names();
 
         $id = $this->dbh->escape_string($_REQUEST["id"]);
         print "<form id=\"user_edit_form\" onsubmit='return false' dojoType=\"dijit.form.Form\">";
@@ -307,7 +307,7 @@ class Pref_Users extends ProtectedHandler {
 
     function index() {
 
-        $access_level_names =  \SmallSmallRSS\Constants::access_level_names();
+        $access_level_names = \SmallSmallRSS\Constants::access_level_names();
 
         print "<div id=\"pref-user-wrap\" dojoType=\"dijit.layout.BorderContainer\" gutters=\"false\">";
         print "<div id=\"pref-user-header\" dojoType=\"dijit.layout.ContentPane\" region=\"top\">";

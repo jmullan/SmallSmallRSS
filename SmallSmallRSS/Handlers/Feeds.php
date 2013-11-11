@@ -186,7 +186,7 @@ class Feeds extends ProtectedHandler {
 
                 if (!$cache_images && time() - $last_updated > 120 || isset($_REQUEST['DevForceUpdate'])) {
                     include "rssfuncs.php";
-                    update_rss_feed($feed, true, true);
+                    update_rss_feed($feed, true);
                 } else {
                     $this->dbh->query("UPDATE ttrss_feeds SET last_updated = '1970-01-01', last_update_started = '1970-01-01'
 							WHERE id = '$feed'");

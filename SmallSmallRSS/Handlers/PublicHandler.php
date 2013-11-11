@@ -44,7 +44,7 @@ class PublicHandler extends Handler {
         if ($this->dbh->num_rows($result) != 0) {
             $ts = strtotime($this->dbh->fetch_result($result, 0, "date_entered"));
 
-            if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && 
+            if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
                 strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $ts) {
                 header('HTTP/1.0 304 Not Modified');
                 return;
@@ -293,10 +293,6 @@ class PublicHandler extends Handler {
                     return;
 
                 } elseif (!$mode) {
-
-                    // Received update ping, schedule feed update.
-                    //update_rss_feed($feed_id, true, true);
-
                     $this->dbh->query("UPDATE ttrss_feeds SET
 						last_update_started = '1970-01-01',
 						last_updated = '1970-01-01' WHERE id = '$feed_id'");

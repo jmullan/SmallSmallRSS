@@ -211,7 +211,7 @@ class API extends Handler {
             $include_attachments = $this->request_sql_bool("include_attachments");
             $since_id = (int) $this->escape_from_request("since_id");
             $include_nested = $this->request_sql_bool("include_nested");
-            $sanitize_content = !isset($_REQUEST["sanitize"]) || 
+            $sanitize_content = !isset($_REQUEST["sanitize"]) ||
                 $this->request_sql_bool("sanitize");
 
             $override_order = false;
@@ -394,11 +394,8 @@ class API extends Handler {
 
     function updateFeed() {
         require_once "include/rssfuncs.php";
-
         $feed_id = (int) $this->escape_from_request("feed_id");
-
-        update_rss_feed($feed_id, true);
-
+        update_rss_feed($feed_id);
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
@@ -661,7 +658,7 @@ class API extends Handler {
         $headlines = array();
 
         while ($line = db_fetch_assoc($result)) {
-            $is_updated = ($line["last_read"] == "" && 
+            $is_updated = ($line["last_read"] == "" &&
                            ($line["unread"] != "t" && $line["unread"] != "1"));
 
             $tags = explode(",", $line["tag_cache"]);
@@ -775,7 +772,7 @@ class API extends Handler {
             $data = $pf->makefeedtree();
             $this->wrap(self::STATUS_OK, array("categories" => $data));
         } else {
-            $this->wrap(self::STATUS_ERR, array("error" => 
+            $this->wrap(self::STATUS_ERR, array("error" =>
                                                 'UNABLE_TO_INSTANTIATE_OBJECT'));
         }
 

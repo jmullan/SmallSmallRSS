@@ -390,7 +390,7 @@ class RPC extends ProtectedHandler {
 
         require_once "feedbrowser.php";
 
-        print json_encode(array("content" => 
+        print json_encode(array("content" =>
                                 make_feed_browser($search, $limit, $mode),
 				"mode" => $mode));
     }
@@ -543,7 +543,7 @@ class RPC extends ProtectedHandler {
             $feed_id = $line["id"];
 
             if (time() - $tstart < ini_get("max_execution_time") * 0.7) {
-                update_rss_feed($feed_id, true);
+                update_rss_feed($feed_id);
                 ++$num_updated;
             } else {
                 break;

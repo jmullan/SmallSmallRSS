@@ -1504,11 +1504,9 @@ function subscribe_to_feed($url, $cat_id = 0,
 					AND owner_uid = " . $_SESSION["uid"]);
 
         $feed_id = db_fetch_result($result, 0, "id");
-
         if ($feed_id) {
-            update_rss_feed($feed_id, true);
+            update_rss_feed($feed_id);
         }
-
         return array("code" => 1);
     } else {
         return array("code" => 0);

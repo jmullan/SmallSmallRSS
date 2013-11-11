@@ -292,17 +292,14 @@ class RPC extends ProtectedHandler {
         if (!empty($_REQUEST["last_article_id"])) {
             $last_article_id = (int) $_REQUEST["last_article_id"];
         }
-
         $reply = array();
-
-        if (!empty($_REQUEST['seq'])) $reply['seq'] = (int) $_REQUEST['seq'];
-
+        if (!empty($_REQUEST['seq'])) {
+            $reply['seq'] = (int) $_REQUEST['seq'];
+        }
         if ($last_article_id != getLastArticleId()) {
             $reply['counters'] = getAllCounters();
         }
-
         $reply['runtime-info'] = make_runtime_info();
-
         print json_encode($reply);
     }
 
@@ -310,27 +307,21 @@ class RPC extends ProtectedHandler {
     function catchupSelected() {
         $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
         $cmode = sprintf("%d", $_REQUEST["cmode"]);
-
         catchupArticlesById($ids, $cmode);
-
         print json_encode(array("message" => "UPDATE_COUNTERS", "ids" => $ids));
     }
 
     function markSelected() {
         $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
         $cmode = sprintf("%d", $_REQUEST["cmode"]);
-
         $this->markArticlesById($ids, $cmode);
-
         print json_encode(array("message" => "UPDATE_COUNTERS"));
     }
 
     function publishSelected() {
         $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
         $cmode = sprintf("%d", $_REQUEST["cmode"]);
-
         $this->publishArticlesById($ids, $cmode);
-
         print json_encode(array("message" => "UPDATE_COUNTERS"));
     }
 

@@ -695,17 +695,12 @@ function toggleUnread(id, cmode, effect) {
 
             var query = "?op=rpc&method=catchupSelected" +
                 "&cmode=" + param_escape(cmode) + "&ids=" + param_escape(id);
-
-            //                      notify_progress("Loading, please wait...");
-
             new Ajax.Request("backend.php", {
-                                 parameters: query,
-                                 onComplete: function(transport) {
-                                     handle_rpc_json(transport);
-                                 } });
-
+                    parameters: query,
+                    onComplete: function(transport) {
+                        handle_rpc_json(transport);
+                    }});
         }
-
     } catch (e) {
         exception_error("toggleUnread", e);
     }
@@ -1637,7 +1632,6 @@ function getVisibleArticleIds() {
 
 function cdmClicked(event, id) {
     try {
-        //var shift_key = event.shiftKey;
 
         if (!event.ctrlKey) {
 
@@ -1647,12 +1641,14 @@ function cdmClicked(event, id) {
 
                 var elem = $("RROW-" + getActiveArticleId());
 
-                if (elem) elem.removeClassName("active");
+                if (elem) {
+                    elem.removeClassName("active");
+                }
 
                 selectArticles("none");
                 toggleSelected(id);
 
-                var elem = $("RROW-" + id);
+                elem = $("RROW-" + id);
                 var article_is_unread = elem.hasClassName("Unread");
 
                 elem.removeClassName("Unread");
@@ -1668,26 +1664,21 @@ function cdmClicked(event, id) {
                     "&cmode=0&ids=" + param_escape(id);
 
                 new Ajax.Request("backend.php", {
-                                     parameters: query,
-                                     onComplete: function(transport) {
-                                         handle_rpc_json(transport);
-                                     } });
-
+                        parameters: query,
+                        onComplete: function(transport) {
+                            handle_rpc_json(transport);
+                        }});
                 return !event.shiftKey;
             }
 
         } else {
             toggleSelected(id, true);
-
             var elem = $("RROW-" + id);
             var article_is_unread = elem.hasClassName("Unread");
-
             if (article_is_unread) {
                 decrementFeedCounter(getActiveFeedId(), activeFeedIsCat());
             }
-
             toggleUnread(id, 0, false);
-
             openArticleInNewWindow(id);
         }
 

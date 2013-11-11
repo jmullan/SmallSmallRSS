@@ -37,11 +37,7 @@ $script_started = microtime(true);
 if (!init_plugins()) {
     return;
 }
-header("Content-Type: text/json; charset=utf-8");
-
-if (ENABLE_GZIP_OUTPUT && function_exists("ob_gzhandler")) {
-    ob_start("ob_gzhandler");
-}
+header("Content-Type: application/json; charset=utf-8");
 
 if (SINGLE_USER_MODE) {
     authenticate_user("admin", null);
@@ -68,6 +64,7 @@ if (isset($legacy_ops[$op])) {
 }
 $handler = '\\SmallSmallRSS\\Handlers\\' . $op;
 $override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler($op, $method);
+$start = time();
 $error_code = 7;
 if (class_exists($handler) || $override) {
     if ($override) {
@@ -99,3 +96,5 @@ if (class_exists($handler) || $override) {
 }
 $renderer = new \SmallSmallRSS\Renderers\JSONError($error_code);
 $renderer->render();
+$end = time();
+\SmallSmallRSS\Logger::log(array($op, $method, $end - $start));

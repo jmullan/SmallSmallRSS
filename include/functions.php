@@ -1019,7 +1019,6 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
 
 function getAllCounters() {
     $data = getGlobalCounters();
-
     $data = array_merge($data, getVirtCounters());
     $data = array_merge($data, getLabelCounters());
     $data = array_merge($data, getFeedCounters());
@@ -1978,7 +1977,7 @@ function make_runtime_info() {
     $data['last_article_id'] = getLastArticleId();
     $data['cdm_expanded'] = get_pref('CDM_EXPANDED');
 
-    $data['dep_ts'] = calculate_dep_timestamp();
+    $data['dependency_timestamp'] = calculate_dep_timestamp();
     $data['reload_on_ts_change'] = !defined('_NO_RELOAD_ON_TS_CHANGE');
 
     if (file_exists(LOCK_DIRECTORY . "/update_daemon.lock")) {
@@ -3912,13 +3911,12 @@ function javascript_tag($filename) {
 
 function calculate_dep_timestamp() {
     $files = array_merge(glob("js/*.js"), glob("css/*.css"));
-
     $max_ts = -1;
-
     foreach ($files as $file) {
-        if (filemtime($file) > $max_ts) $max_ts = filemtime($file);
+        if (filemtime($file) > $max_ts) {
+            $max_ts = filemtime($file);
+        }
     }
-
     return $max_ts;
 }
 

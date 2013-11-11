@@ -1,5 +1,5 @@
 <?php
-class Instances extends \SmallSmallRSS\Plugin implements IHandler {
+class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers\IHandler {
     private $host;
 
     private $status_codes = array(

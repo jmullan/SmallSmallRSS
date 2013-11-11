@@ -112,22 +112,16 @@ function updateFeedList() {
 }
 
 function catchupAllFeeds() {
-
     var str = __("Mark all articles as read?");
-
     if (getInitParam("confirm_feed_catchup") != 1 || confirm(str)) {
-
         var query_str = "backend.php?op=feeds&method=catchupAll";
-
         notify_progress("Marking all feeds as read...");
-
         new Ajax.Request("backend.php", {
-                             parameters: query_str,
-                             onComplete: function(transport) {
-                                 request_counters(true);
-                                 viewCurrentFeed();
-                             } });
-
+                parameters: query_str,
+                onComplete: function(transport) {
+                    request_counters(true);
+                    viewCurrentFeed();
+                }});
         global_unread = 0;
         updateTitle("");
     }
@@ -719,12 +713,11 @@ function toggleDispRead() {
 }
 
 function parse_runtime_info(data) {
-
     for (k in data) {
         var v = data[k];
-
-        if (k == "dep_ts" && parseInt(getInitParam("dep_ts")) > 0) {
+        if (k == "dependency_timestamp" && parseInt(getInitParam("dependency_timestamp")) > 0) {
             if (parseInt(getInitParam("dep_ts")) < parseInt(v) && getInitParam("reload_on_ts_change")) {
+                console.log('ts change, reloading window');
                 window.location.reload();
             }
         }
@@ -944,7 +937,7 @@ function handle_rpc_json(transport, scheduled_call) {
             var message = reply['message'];
             if (message) {
                 if (message == "UPDATE_COUNTERS") {
-                    console.log("need to refresh counters...");
+                    console.log("Received UPDATE_COUNTERS, need to refresh counters.");
                     setInitParam("last_article_id", -1);
                     request_counters(true);
                 }
@@ -1016,12 +1009,10 @@ function switchPanelMode(wide) {
         if (article_id) view(article_id);
 
         new Ajax.Request("backend.php", {
-                             parameters: "op=rpc&method=setpanelmode&wide=" + (wide ? 1 : 0),
-                             onComplete: function(transport) {
-                                 console.log(transport.responseText);
-                             } });
-
-
+                parameters: "op=rpc&method=setpanelmode&wide=" + (wide ? 1 : 0),
+                onComplete: function(transport) {
+                    console.log(transport.responseText);
+                }});
     } catch (e) {
         exception_error("switchPanelMode", e);
     }
@@ -1030,11 +1021,11 @@ function switchPanelMode(wide) {
 function update_random_feed() {
     try {
         new Ajax.Request("backend.php", {
-                             parameters: "op=rpc&method=updateRandomFeed",
-                             onComplete: function(transport) {
-                                 handle_rpc_json(transport, true);
-                                 window.setTimeout("update_random_feed()", 30*1000);
-                             } });
+                parameters: "op=rpc&method=updateRandomFeed",
+                onComplete: function(transport) {
+                    handle_rpc_json(transport, true);
+                    window.setTimeout("update_random_feed()", 30 * 1000);
+                }});
 
     } catch (e) {
         exception_error("update_random_feed", e);

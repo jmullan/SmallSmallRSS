@@ -310,32 +310,27 @@ class Article extends ProtectedHandler {
 
     private function labelops($assign) {
         $reply = array();
-
         $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
         $label_id = $this->dbh->escape_string($_REQUEST["lid"]);
-
-        $label = $this->dbh->escape_string(label_find_caption($label_id,
-                                                              $_SESSION["uid"]));
-
+        $label = $this->dbh->escape_string(label_find_caption($label_id, $_SESSION["uid"]));
         $reply["info-for-headlines"] = array();
-
         if ($label) {
-
             foreach ($ids as $id) {
-
-                if ($assign)
+                if ($assign) {
                     label_add_article($id, $label, $_SESSION["uid"]);
-                else
+                } else {
                     label_remove_article($id, $label, $_SESSION["uid"]);
-
+                }
                 $labels = get_article_labels($id, $_SESSION["uid"]);
-
-                array_push($reply["info-for-headlines"],
-                           array("id" => $id, "labels" => format_article_labels($labels, $id)));
-
+                array_push(
+                    $reply["info-for-headlines"],
+                    array(
+                        "id" => $id,
+                        "labels" => format_article_labels($labels, $id)
+                    )
+                );
             }
         }
-
         $reply["message"] = "UPDATE_COUNTERS";
         print json_encode($reply);
     }

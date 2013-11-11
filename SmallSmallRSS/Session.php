@@ -72,7 +72,7 @@ class Session {
         };
 
         if ($check_ip && strpos($_SERVER['REMOTE_ADDR'], $check_ip) !== 0) {
-            $_SESSION["login_error_msg"] = 
+            $_SESSION["login_error_msg"] =
                 __("Session failed to validate (incorrect IP)");
             return false;
         }
@@ -85,14 +85,14 @@ class Session {
             return false;
         }
         if ($_SESSION["uid"]) {
-            $result = \Db::get()->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT pwd_hash FROM ttrss_users WHERE id = '".$_SESSION["uid"]."'");
 
             // user not found
-            if (\Db::get()->num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
                 return false;
             } else {
-                $pwd_hash = \Db::get()->fetch_result($result, 0, "pwd_hash");
+                $pwd_hash = \SmallSmallRSS\Database::fetch_result($result, 0, "pwd_hash");
 
                 if ($pwd_hash != $_SESSION["pwd_hash"]) {
                     return false;
@@ -109,18 +109,18 @@ class Session {
     }
 
     function read($id) {
-        $res = \Db::get()->query("SELECT data FROM ttrss_sessions WHERE id='$id'");
+        $res = \SmallSmallRSS\Database::query("SELECT data FROM ttrss_sessions WHERE id='$id'");
 
-        if (\Db::get()->num_rows($res) != 1) {
+        if (\SmallSmallRSS\Database::num_rows($res) != 1) {
 
             $expire = time() + \SmallSmallRSS\Session::$session_expire;
 
-            \Db::get()->query("INSERT INTO ttrss_sessions (id, data, expire)
+            \SmallSmallRSS\Database::query("INSERT INTO ttrss_sessions (id, data, expire)
 					VALUES ('$id', '', '$expire')");
 
             return "";
         } else {
-            return base64_decode(\Db::get()->fetch_result($res, 0, "data"));
+            return base64_decode(\SmallSmallRSS\Database::fetch_result($res, 0, "data"));
         }
 
     }
@@ -128,7 +128,7 @@ class Session {
     function write($id, $data) {
         $data = base64_encode($data);
         $expire = time() + \SmallSmallRSS\Session::$session_expire;
-        \Db::get()->query("UPDATE ttrss_sessions SET data='$data', expire='$expire' WHERE id='$id'");
+        \SmallSmallRSS\Database::query("UPDATE ttrss_sessions SET data='$data', expire='$expire' WHERE id='$id'");
         return true;
     }
 
@@ -137,13 +137,13 @@ class Session {
     }
 
     function destroy($id) {
-        \Db::get()->query("DELETE FROM ttrss_sessions WHERE id = '$id'");
+        \SmallSmallRSS\Database::query("DELETE FROM ttrss_sessions WHERE id = '$id'");
 
         return true;
     }
 
     function gc($expire) {
-        \Db::get()->query("DELETE FROM ttrss_sessions WHERE expire < " . time());
+        \SmallSmallRSS\Database::query("DELETE FROM ttrss_sessions WHERE expire < " . time());
     }
 
 }

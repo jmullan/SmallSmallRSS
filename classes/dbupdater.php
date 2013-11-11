@@ -1,19 +1,16 @@
 <?php
 class DbUpdater {
-
-    private $dbh;
     private $db_type;
     private $need_version;
 
-    function __construct($dbh, $db_type, $need_version) {
-        $this->dbh = $dbh;
+    function __construct($db_type, $need_version) {
         $this->db_type = $db_type;
         $this->need_version = (int) $need_version;
     }
 
     function getSchemaVersion() {
-        $result = db_query("SELECT schema_version FROM ttrss_version");
-        return (int) db_fetch_result($result, 0, "schema_version");
+        $result = \SmallSmallRSS\Database::query("SELECT schema_version FROM ttrss_version");
+        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, "schema_version");
     }
 
     function isUpdateRequired() {
@@ -21,7 +18,7 @@ class DbUpdater {
     }
 
     function getSchemaLines($version) {
-        $filename = "schema/versions/".$this->db_type."/$version.sql";
+        $filename = "schema/versions/" . $this->db_type . "/$version.sql";
 
         if (file_exists($filename)) {
             return explode(";", preg_replace("/[\r\n]/", "", file_get_contents($filename)));
@@ -37,21 +34,21 @@ class DbUpdater {
 
             if (is_array($lines)) {
 
-                db_query("BEGIN");
+                \SmallSmallRSS\Database::query("BEGIN");
 
                 foreach ($lines as $line) {
                     if (strpos($line, "--") !== 0 && $line) {
-                        db_query($line);
+                        \SmallSmallRSS\Database::query($line);
                     }
                 }
 
                 $db_version = $this->getSchemaVersion();
 
                 if ($db_version == $version) {
-                    db_query("COMMIT");
+                    \SmallSmallRSS\Database::query("COMMIT");
                     return true;
                 } else {
-                    db_query("ROLLBACK");
+                    \SmallSmallRSS\Database::query("ROLLBACK");
                     return false;
                 }
             } else {

@@ -1,5 +1,5 @@
 <?php
-namespace SmallSmallRSS\FeedItem;
+namespace SmallSmallRSS;
 class FeedItem_Atom extends FeedItem_Common {
     function get_id() {
         $id = $this->elem->getElementsByTagName("id")->item(0);
@@ -108,7 +108,7 @@ class FeedItem_Atom extends FeedItem_Common {
         foreach ($links as $link) {
             if ($link && $link->hasAttribute("href") && $link->hasAttribute("rel")) {
                 if ($link->getAttribute("rel") == "enclosure") {
-                    $enc = new FeedEnclosure();
+                    $enc = new \SmallSmallRSS\FeedEnclosure();
 
                     $enc->type = $link->getAttribute("type");
                     $enc->link = $link->getAttribute("href");
@@ -122,7 +122,7 @@ class FeedItem_Atom extends FeedItem_Common {
         $enclosures = $this->xpath->query("media:content", $this->elem);
 
         foreach ($enclosures as $enclosure) {
-            $enc = new FeedEnclosure();
+            $enc = new \SmallSmallRSS\FeedEnclosure();
 
             $enc->type = $enclosure->getAttribute("type");
             $enc->link = $enclosure->getAttribute("url");

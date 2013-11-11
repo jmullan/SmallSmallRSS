@@ -105,7 +105,7 @@ class FeedItem_RSS extends FeedItem_Common {
         $encs = array();
 
         foreach ($enclosures as $enclosure) {
-            $enc = new FeedEnclosure();
+            $enc = new \SmallSmallRSS\FeedEnclosure();
 
             $enc->type = $enclosure->getAttribute("type");
             $enc->link = $enclosure->getAttribute("url");
@@ -117,7 +117,7 @@ class FeedItem_RSS extends FeedItem_Common {
         $enclosures = $this->xpath->query("media:content", $this->elem);
 
         foreach ($enclosures as $enclosure) {
-            $enc = new FeedEnclosure();
+            $enc = new \SmallSmallRSS\FeedEnclosure();
 
             $enc->type = $enclosure->getAttribute("type");
             $enc->link = $enclosure->getAttribute("url");

@@ -74,12 +74,12 @@ class API extends Handler {
             $uid = $this->dbh->fetch_result($result, 0, "id");
         }
         if (!$uid) {
-            \Logger::get()->log("Could not find user: '$login'");
+            \SmallSmallRss\Logger::log("Could not find user: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "LOGIN_ERROR"));
             return;
         }
         if (!get_pref("ENABLE_API_ACCESS", $uid)) {
-            \Logger::get()->log("Api access disabled for: '$login'");
+            \SmallSmallRss\Logger::log("Api access disabled for: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "API_DISABLED"));
             return;
         }
@@ -94,7 +94,7 @@ class API extends Handler {
             $this->wrap(self::STATUS_OK, array("session_id" => session_id(),
                                                "api_level" => self::API_LEVEL));
         } else {
-            \Logger::get()->log("Could not log in: '$login'");
+            \SmallSmallRss\Logger::log("Could not log in: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "LOGIN_ERROR"));
         }
     }

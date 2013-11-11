@@ -1,8 +1,7 @@
 <?php
+namespace SmallSmallRSS;
 class Logger_Syslog {
-
     function log_error($errno, $errstr, $file, $line, $context) {
-
         switch ($errno) {
             case E_ERROR:
             case E_PARSE:
@@ -20,9 +19,7 @@ class Logger_Syslog {
             default:
                 $priority = LOG_INFO;
         }
-
-        $errname = Logger::$errornames[$errno] . " ($errno)";
-
+        $errname = \SmallSmallRSS\Logger::$errornames[$errno] . " ($errno)";
         syslog($priority, "[tt-rss] $errname ($file:$line) $errstr");
 
     }

@@ -1,4 +1,5 @@
 <?php
+namespace SmallSmallRSS;
 class Logger {
     private static $instance;
     private $adapter;
@@ -24,24 +25,15 @@ class Logger {
 
     public static $level = -1;
 
-    function log_error($errno, $errstr, $file, $line, $context) {
+    public static function log_error($errno, $errstr, $file, $line, $context) {
         if (!$errno & self::$level) {
             return false;
         }
-
-        if ($this->adapter) {
-            return $this->adapter->log_error($errno, $errstr, $file, $line, $context);
-        } else {
-            return false;
-        }
+        return self::get()->adapter->log_error($errno, $errstr, $file, $line, $context);
     }
 
-    function log($string) {
-        if ($this->adapter) {
-            return $this->adapter->log($string);
-        } else {
-            return false;
-        }
+    public static function log($string) {
+        return self::get()->adapter->log($string);
     }
 
     private function __clone() {}
@@ -55,7 +47,7 @@ class Logger {
                 $this->adapter = new Logger_Syslog();
                 break;
             default:
-                $this->adapter = false;
+                $this->adapter = new Logger_Dummy();
         }
     }
 

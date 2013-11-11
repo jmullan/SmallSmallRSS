@@ -58,7 +58,9 @@ class Pref_System extends ProtectedHandler {
                     $line[$k] = htmlspecialchars($v);
                 }
 
-                print "<td class='errno'>" . \Logger::$errornames[$line["errno"]] . " (" . $line["errno"] . ")</td>";
+                print "<td class='errno'>";
+                print \SmallSmallRSS\Logger::$errornames[$line["errno"]];
+                print " (" . $line["errno"] . ")</td>";
                 print "<td class='filename'>" . $line["filename"] . ":" . $line["lineno"] . "</td>";
                 print "<td class='errstr'>" . $line["errstr"] . "</td>";
                 print "<td class='login'>" . $line["login"] . "</td>";

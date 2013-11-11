@@ -31,7 +31,7 @@ require_once "db-prefs.php";
 
 
 if (!init_plugins()) {
-    Logger::get()->log('Error initializing plugins');
+    Logger::log('Error initializing plugins');
     return;
 }
 

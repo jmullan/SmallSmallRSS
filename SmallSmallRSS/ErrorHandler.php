@@ -6,7 +6,7 @@ class ErrorHandler {
             return false;
         }
         $file = substr(str_replace(dirname(dirname(__FILE__)), "", $file), 1);
-        return \Logger::get()->log_error($errno, $errstr, $file, $line, $context);
+        return \SmallSmallRSS\Logger::log_error($errno, $errstr, $file, $line, $context);
     }
 
     static public function shutdown_function() {
@@ -22,14 +22,15 @@ class ErrorHandler {
             $context = debug_backtrace();
 
             $file = substr(str_replace(dirname(dirname(__FILE__)), "", $file), 1);
-            return \Logger::get()->log_error($errno, $errstr, $file, $line, $context);
+            return \SmallSmallRSS\Logger::log_error($errno, $errstr, $file, $line, $context);
         }
         return false;
     }
 
     static public function register() {
-        static $singleton = False;
+        static $singleton = false;
         if (!$singleton) {
+            $singleton = true;
             register_shutdown_function('\SmallSmallRSS\ErrorHandler::shutdown_function');
             set_error_handler('\SmallSmallRSS\ErrorHandler::handle_error');
         }

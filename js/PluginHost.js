@@ -18,7 +18,6 @@ var PluginHost = {
     this.hooks[name].push(callback);
   },
   run: function (name, args) {
-    console.warn('PluginHost::run ' + name);
     if (typeof(this.hooks[name]) != 'undefined') {
       for (i = 0; i < this.hooks[name].length; i++) {
         if (!this.hooks[name][i](args)) {

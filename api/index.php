@@ -37,7 +37,7 @@ if (!init_plugins()) {
 
 $method = strtolower(isset($_REQUEST['op']) ? $_REQUEST["op"] : '');
 
-$handler = new API($_REQUEST);
+$handler = new \SmallSmallRSS\Handlers\API($_REQUEST);
 if ($handler->before($method)) {
     if ($method && method_exists($handler, $method)) {
         $handler->$method();

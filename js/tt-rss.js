@@ -86,9 +86,8 @@ function updateFeedList() {
 
 
         var tmph = dojo.connect(dijit.byId('feedMenu'), '_openMyself', function (event) {
-                       console.log(dijit.getEnclosingWidget(event.target));
-                               dojo.disconnect(tmph);
-                                });
+            dojo.disconnect(tmph);
+        });
 
         $("feeds-holder").appendChild(tree.domNode);
 
@@ -122,8 +121,6 @@ function catchupAllFeeds() {
 
         notify_progress("Marking all feeds as read...");
 
-        //console.log("catchupAllFeeds Q=" + query_str);
-
         new Ajax.Request("backend.php", {
                              parameters: query_str,
                              onComplete: function(transport) {
@@ -137,8 +134,6 @@ function catchupAllFeeds() {
 }
 
 function viewCurrentFeed(method) {
-    console.log("viewCurrentFeed");
-
     if (getActiveFeedId() != undefined) {
         viewfeed(getActiveFeedId(), method, activeFeedIsCat());
     }
@@ -725,12 +720,8 @@ function toggleDispRead() {
 
 function parse_runtime_info(data) {
 
-    //console.log("parsing runtime info...");
-
     for (k in data) {
         var v = data[k];
-
-        //              console.log("RI: " + k + " => " + v);
 
         if (k == "dep_ts" && parseInt(getInitParam("dep_ts")) > 0) {
             if (parseInt(getInitParam("dep_ts")) < parseInt(v) && getInitParam("reload_on_ts_change")) {
@@ -931,25 +922,18 @@ function reverseHeadlineOrder() {
 function handle_rpc_json(transport, scheduled_call) {
     try {
         var reply = JSON.parse(transport.responseText);
-
         if (reply) {
-
             var error = reply['error'];
-
             if (error) {
                 var code = error['code'];
                 var msg = error['msg'];
-
                 console.warn("[handle_rpc_json] received fatal error " + code + "/" + msg);
-
                 if (code != 0) {
                     fatalError(code, msg);
                     return false;
                 }
             }
-
             var seq = reply['seq'];
-
             if (seq) {
                 if (get_seq() != seq) {
                     console.log("[handle_rpc_json] sequence mismatch: " + seq +
@@ -957,9 +941,7 @@ function handle_rpc_json(transport, scheduled_call) {
                     return true;
                 }
             }
-
             var message = reply['message'];
-
             if (message) {
                 if (message == "UPDATE_COUNTERS") {
                     console.log("need to refresh counters...");
@@ -967,29 +949,27 @@ function handle_rpc_json(transport, scheduled_call) {
                     request_counters(true);
                 }
             }
-
             var counters = reply['counters'];
-
-            if (counters)
+            if (counters) {
                 parse_counters(counters, scheduled_call);
+            }
 
             var runtime_info = reply['runtime-info'];
 
-            if (runtime_info)
+            if (runtime_info) {
                 parse_runtime_info(runtime_info);
+            }
 
             Element.hide(dijit.byId("net-alert").domNode);
 
         } else {
-            //notify_error("Error communicating with server.");
             Element.show(dijit.byId("net-alert").domNode);
         }
 
     } catch (e) {
         Element.show(dijit.byId("net-alert").domNode);
-        //notify_error("Error communicating with server.");
+        console.log('Exception when handling rpc json');
         console.log(e);
-        //exception_error("handle_rpc_json", e, transport);
     }
 
     return true;
@@ -1049,8 +1029,6 @@ function switchPanelMode(wide) {
 
 function update_random_feed() {
     try {
-        console.log("in update_random_feed");
-
         new Ajax.Request("backend.php", {
                              parameters: "op=rpc&method=updateRandomFeed",
                              onComplete: function(transport) {

@@ -93,7 +93,7 @@ function startup_gettext() {
     }
 
     if (!empty($_SESSION["uid"])
-        && SmallSmallRSS\Sanity::get_schema_version() >= 120) {
+        && \SmallSmallRSS\Sanity::get_schema_version() >= 120) {
         $pref_lang = get_pref("USER_LANGUAGE", $_SESSION["uid"]);
 
         if ($pref_lang && $pref_lang != 'auto') {
@@ -457,7 +457,7 @@ function initialize_user_prefs($uid, $profile = false) {
         $profile_qpart = "AND profile = '$profile'";
     }
 
-    if (SmallSmallRSS\Sanity::get_schema_version() < 63) {
+    if (\SmallSmallRSS\Sanity::get_schema_version() < 63) {
         $profile_qpart = "";
     }
 
@@ -481,7 +481,7 @@ function initialize_user_prefs($uid, $profile = false) {
             $line["def_value"] = db_escape_string($line["def_value"]);
             $line["pref_name"] = db_escape_string($line["pref_name"]);
 
-            if (SmallSmallRSS\Sanity::get_schema_version() < 63) {
+            if (\SmallSmallRSS\Sanity::get_schema_version() < 63) {
                 db_query("INSERT INTO ttrss_user_prefs
 			  (owner_uid,pref_name,value) VALUES
 			  ('$uid', '".$line["pref_name"]."','".$line["def_value"]."')");
@@ -514,6 +514,9 @@ function authenticate_user($login, $password, $check_only = false) {
     if (!SINGLE_USER_MODE) {
         $user_id = false;
         $plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_AUTH_USER);
+        if (!$plugins) {
+            \SmallSmallRSS\Logger::log('No authentication plugins!');
+        }
         foreach ($plugins as $plugin) {
             $user_id = (int) $plugin->authenticate($login, $password);
             if ($user_id) {
@@ -618,7 +621,7 @@ function load_user_plugins($owner_uid) {
 
         \SmallSmallRSS\PluginHost::getInstance()->load($plugins, \SmallSmallRSS\PluginHost::KIND_USER, $owner_uid);
 
-        if (SmallSmallRSS\Sanity::get_schema_version() > 100) {
+        if (\SmallSmallRSS\Sanity::get_schema_version() > 100) {
             \SmallSmallRSS\PluginHost::getInstance()->load_data();
         }
     }
@@ -634,7 +637,7 @@ function login_sequence() {
         if (!$_SESSION["uid"]) {
 
             if (AUTH_AUTO_LOGIN && authenticate_user(null, null)) {
-                $_SESSION["ref_schema_version"] = SmallSmallRSS\Sanity::get_schema_version(true);
+                $_SESSION["ref_schema_version"] = \SmallSmallRSS\Sanity::get_schema_version(true);
             } else {
                 authenticate_user(null, null, true);
             }
@@ -778,9 +781,9 @@ function bool_to_sql_bool($s) {
 
 function sanity_check() {
     $error_code = 0;
-    $schema_version = SmallSmallRSS\Sanity::get_schema_version(true);
+    $schema_version = \SmallSmallRSS\Sanity::get_schema_version(true);
 
-    if (!SmallSmallRSS\Sanity::is_schema_correct()) {
+    if (!\SmallSmallRSS\Sanity::is_schema_correct()) {
         $error_code = 5;
     }
 
@@ -3185,8 +3188,8 @@ function feed_has_icon($id) {
 }
 
 function init_plugins() {
-    \SmallSmallRSS\PluginHost::getInstance()->load(PLUGINS, \SmallSmallRSS\PluginHost::KIND_ALL);
-
+    \SmallSmallRSS\PluginHost::getInstance()->load(
+        PLUGINS, \SmallSmallRSS\PluginHost::KIND_ALL);
     return true;
 }
 

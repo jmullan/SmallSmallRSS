@@ -36,7 +36,7 @@ class Db_Prefs {
             $profile_qpart = "profile IS NULL AND";
         }
 
-        if (SmallSmallRSS\Sanity::get_schema_version() < 63) $profile_qpart = "";
+        if (\SmallSmallRSS\Sanity::get_schema_version() < 63) $profile_qpart = "";
 
         $result = db_query("SELECT
 			value,ttrss_prefs_types.type_name as type_name,ttrss_prefs.pref_name AS pref_name
@@ -82,7 +82,7 @@ class Db_Prefs {
             $profile_qpart = "profile IS NULL AND";
         }
 
-        if (SmallSmallRSS\Sanity::get_schema_version() < 63) $profile_qpart = "";
+        if (\SmallSmallRSS\Sanity::get_schema_version() < 63) $profile_qpart = "";
 
         $result = db_query("SELECT
 			value,ttrss_prefs_types.type_name as type_name
@@ -140,7 +140,7 @@ class Db_Prefs {
             $profile_qpart = "AND profile IS NULL";
         }
 
-        if (SmallSmallRSS\Sanity::get_schema_version() < 63) {
+        if (\SmallSmallRSS\Sanity::get_schema_version() < 63) {
             $profile_qpart = "";
         }
 

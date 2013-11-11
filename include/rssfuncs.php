@@ -53,7 +53,7 @@ function update_feedbrowser_cache() {
  */
 function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $debug = true) {
     // Process all other feeds using last_updated and interval parameters
-    SmallSmallRSS\Sanity::schema_or_die();
+    \SmallSmallRSS\Sanity::schema_or_die();
 
     define('PREFS_NO_CACHE', true);
 

@@ -121,57 +121,59 @@ class PluginHost {
 
     function load($classlist, $kind, $owner_uid = false) {
         $plugins = explode(",", $classlist);
-
         $this->owner_uid = (int) $owner_uid;
-
         foreach ($plugins as $class) {
             $class = trim($class);
             $class_file = strtolower(basename($class));
-
-            if (!is_dir(__DIR__ . "/../plugins/$class_file")) {
+            $class_dir = __DIR__ . "/../plugins/$class_file";
+            if (!is_dir($class_dir)) {
+                Logger::log("Missing class dir $class_dir");
                 continue;
             }
 
-            $file = __DIR__ . "/../plugins/$class_file/init.php";
+            $file = "$class_dir/init.php";
+            Logger::log("Checking $class in $file");
 
             if (!isset($this->plugins[$class])) {
                 if (file_exists($file)) {
                     require_once $file;
                 }
-
-                if (class_exists($class) && is_subclass_of($class, Plugin)) {
-                    $plugin = new $class($this);
-
-                    $plugin_api = $plugin->api_version();
-
-                    if ($plugin_api < \SmallSmallRSS\PluginHost::API_VERSION) {
-                        user_error(
-                            "Plugin $class is not compatible with current API version (need: "
-                            . \SmallSmallRSS\PluginHost::API_VERSION
-                            . ", got: $plugin_api)", E_USER_WARNING);
-                        continue;
-                    }
-
-                    $this->last_registered = $class;
-
-                    switch ($kind) {
-                        case $this::KIND_SYSTEM:
-                            if ($this->is_system($plugin)) {
-                                $plugin->init($this);
-                                $this->register_plugin($class, $plugin);
-                            }
-                            break;
-                        case $this::KIND_USER:
-                            if (!$this->is_system($plugin)) {
-                                $plugin->init($this);
-                                $this->register_plugin($class, $plugin);
-                            }
-                            break;
-                        case $this::KIND_ALL:
+                if (!class_exists($class)) {
+                    Logger::log("Missing class $class from $file");
+                    continue;
+                }
+                if (!is_subclass_of($class, '\SmallSmallRSS\Plugin')) {
+                    $subclassing = var_export(class_parents($class), true);
+                    Logger::log("Wrong class type $class: $subclassing");
+                    continue;
+                }
+                $plugin = new $class($this);
+                $plugin_api = $plugin->api_version();
+                if ($plugin_api < \SmallSmallRSS\PluginHost::API_VERSION) {
+                    user_error(
+                        "Plugin $class is not compatible with current API version (need: "
+                        . \SmallSmallRSS\PluginHost::API_VERSION
+                        . ", got: $plugin_api)", E_USER_WARNING);
+                    continue;
+                }
+                $this->last_registered = $class;
+                switch ($kind) {
+                    case $this::KIND_SYSTEM:
+                        if ($this->is_system($plugin)) {
                             $plugin->init($this);
                             $this->register_plugin($class, $plugin);
-                            break;
-                    }
+                        }
+                        break;
+                    case $this::KIND_USER:
+                        if (!$this->is_system($plugin)) {
+                            $plugin->init($this);
+                            $this->register_plugin($class, $plugin);
+                        }
+                        break;
+                    case $this::KIND_ALL:
+                        $plugin->init($this);
+                        $this->register_plugin($class, $plugin);
+                        break;
                 }
             }
         }

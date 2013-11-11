@@ -529,7 +529,7 @@ class PublicHandler extends Handler {
                     $_SESSION["language"] = get_pref("USER_LANGUAGE", $_SESSION["uid"]);
                 }
 
-                $_SESSION["ref_schema_version"] = SmallSmallRSS\Sanity::get_schema_version(true);
+                $_SESSION["ref_schema_version"] = \SmallSmallRSS\Sanity::get_schema_version(true);
                 $_SESSION["bw_limit"] = !empty($_POST["bw_limit"]);
 
                 if (!empty($_POST["profile"])) {
@@ -891,18 +891,18 @@ class PublicHandler extends Handler {
 <?php
                                   @$op = $_REQUEST["subop"];
                                   $updater = new DbUpdater(
-                                      \Db::get(), DB_TYPE, SmallSmallRSS\Constants::SCHEMA_VERSION);
+                                      \Db::get(), DB_TYPE, \SmallSmallRSS\Constants::SCHEMA_VERSION);
 
                                   if ($op == "performupdate") {
                                       if ($updater->isUpdateRequired()) {
 
                                           print "<h2>Performing updates</h2>";
 
-                                          print "<h3>Updating to schema version " . SmallSmallRSS\Constants::SCHEMA_VERSION . "</h3>";
+                                          print "<h3>Updating to schema version " . \SmallSmallRSS\Constants::SCHEMA_VERSION . "</h3>";
 
                                           print "<ul>";
 
-                                          for ($i = $updater->getSchemaVersion() + 1; $i <= SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
+                                          for ($i = $updater->getSchemaVersion() + 1; $i <= \SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
                                               print "<li>Performing update up to version $i...";
 
                                               $result = $updater->performUpdateTo($i);
@@ -945,7 +945,7 @@ class PublicHandler extends Handler {
 
                                           print "<h3>";
                                           printf("Your Tiny Tiny RSS database needs update to the latest version: %d to %d.",
-                                                 $updater->getSchemaVersion(), SmallSmallRSS\Constants::SCHEMA_VERSION);
+                                                 $updater->getSchemaVersion(), \SmallSmallRSS\Constants::SCHEMA_VERSION);
                                           print "</h3>";
 
                                           \SmallSmallRSS\Renderers\Messages::print_warning(

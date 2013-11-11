@@ -152,7 +152,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements IHandler {
 
             if ($offset == 0) {
                 $fp = fopen(CACHE_DIR . "/export/$exportname.xml", "w");
-                fputs($fp, "<articles schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">");
+                fputs($fp, '<articles schema-version="' . \SmallSmallRSS\Constants::SCHEMA_VERSION . '">');
             } else {
                 $fp = fopen(CACHE_DIR . "/export/$exportname.xml", "a");
             }
@@ -216,7 +216,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements IHandler {
             if ($container && $container->hasAttribute('schema-version')) {
                 $schema_version = $container->getAttribute('schema-version');
 
-                if ($schema_version != SmallSmallRSS\Constants::SCHEMA_VERSION) {
+                if ($schema_version != \SmallSmallRSS\Constants::SCHEMA_VERSION) {
                     print "<p>" .__("Could not import: incorrect schema version.") . "</p>";
                     return;
                 }

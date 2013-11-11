@@ -295,17 +295,17 @@ if (isset($options["convert-filters"])) {
 if (isset($options["update-schema"])) {
     _debug("checking for updates (" . DB_TYPE . ")...");
 
-    $updater = new DbUpdater(Db::get(), DB_TYPE, SmallSmallRSS\Constants::SCHEMA_VERSION);
+    $updater = new DbUpdater(Db::get(), DB_TYPE, \SmallSmallRSS\Constants::SCHEMA_VERSION);
 
     if ($updater->isUpdateRequired()) {
-        _debug("schema update required, version " . $updater->getSchemaVersion() . " to " . SmallSmallRSS\Constants::SCHEMA_VERSION);
+        _debug("schema update required, version " . $updater->getSchemaVersion() . " to " . \SmallSmallRSS\Constants::SCHEMA_VERSION);
         _debug("WARNING: please backup your database before continuing.");
         _debug("Type 'yes' to continue.");
 
         if (read_stdin() != 'yes')
             exit;
 
-        for ($i = $updater->getSchemaVersion() + 1; $i <= SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
+        for ($i = $updater->getSchemaVersion() + 1; $i <= \SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
             _debug("performing update up to version $i...");
 
             $result = $updater->performUpdateTo($i);

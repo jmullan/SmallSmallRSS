@@ -2,7 +2,7 @@
 namespace SmallSmallRSS;
 class Logger_SQL extends Logger_Abstract implements Logger_Interface {
     function log_error($errno, $errstr, $file, $line, $context) {
-        if (\Db::get() && SmallSmallRSS\Sanity::get_schema_version() > 117) {
+        if (\Db::get() && \SmallSmallRSS\Sanity::get_schema_version() > 117) {
 
             $errno = \Db::get()->escape_string($errno);
             $errstr = \Db::get()->escape_string($errstr);

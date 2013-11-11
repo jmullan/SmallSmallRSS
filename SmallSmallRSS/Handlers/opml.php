@@ -130,7 +130,7 @@ class Opml extends ProtectedHandler {
         # export tt-rss settings
 
         if ($include_settings) {
-            $out .= "<outline text=\"tt-rss-prefs\" schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
+            $out .= "<outline text=\"tt-rss-prefs\" schema-version=\"".\SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
             $result = $this->dbh->query("SELECT pref_name, value FROM ttrss_user_prefs WHERE
 			   profile IS NULL AND owner_uid = " . $_SESSION["uid"] . " ORDER BY pref_name");
@@ -144,7 +144,7 @@ class Opml extends ProtectedHandler {
 
             $out .= "</outline>";
 
-            $out .= "<outline text=\"tt-rss-labels\" schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
+            $out .= "<outline text=\"tt-rss-labels\" schema-version=\"".\SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
             $result = $this->dbh->query("SELECT * FROM ttrss_labels2 WHERE
 				owner_uid = " . $_SESSION['uid']);
@@ -160,7 +160,7 @@ class Opml extends ProtectedHandler {
 
             $out .= "</outline>";
 
-            $out .= "<outline text=\"tt-rss-filters\" schema-version=\"".SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
+            $out .= "<outline text=\"tt-rss-filters\" schema-version=\"".\SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
             $result = $this->dbh->query("SELECT * FROM ttrss_filters2
 				WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY id");

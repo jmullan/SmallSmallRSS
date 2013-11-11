@@ -57,7 +57,11 @@ if ($_SESSION["uid"]) {
 }
 $op = str_replace("-", "_", $op);
 $legacy_ops = array(
+    'api' => 'API',
     'rpc' => 'RPC',
+    'dlg' => 'Dlg',
+    'feed' => 'Feed',
+
 );
 if (isset($legacy_ops[$op])) {
     $op = $legacy_ops[$op];

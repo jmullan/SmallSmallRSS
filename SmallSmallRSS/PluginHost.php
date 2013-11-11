@@ -132,7 +132,6 @@ class PluginHost {
             }
 
             $file = "$class_dir/init.php";
-            Logger::log("Checking $class in $file");
 
             if (!isset($this->plugins[$class])) {
                 if (file_exists($file)) {
@@ -189,13 +188,11 @@ class PluginHost {
     function add_handler($handler, $method, $sender) {
         $handler = str_replace("-", "_", strtolower($handler));
         $method = strtolower($method);
-
         if ($this->is_system($sender)) {
             if (!isset($this->handlers[$handler])
                 || !is_array($this->handlers[$handler])) {
                 $this->handlers[$handler] = array();
             }
-
             $this->handlers[$handler][$method] = $sender;
         }
     }

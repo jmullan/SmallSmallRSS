@@ -60,7 +60,7 @@ $legacy_ops = array(
     'api' => 'API',
     'rpc' => 'RPC',
     'dlg' => 'Dlg',
-    'feed' => 'Feed',
+    'feeds' => 'Feeds',
 
 );
 if (isset($legacy_ops[$op])) {

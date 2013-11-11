@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS;
+
 class Logger {
     private static $instance;
     private $adapter;

@@ -1,5 +1,5 @@
 <?php
-namespace \SmallSmallRSS;
+namespace SmallSmallRSS;
 
 class Logger_Dummy extends Logger_Abstract implements Logger_Interface{
     function log_error($errno, $errstr, $file, $line, $context) {

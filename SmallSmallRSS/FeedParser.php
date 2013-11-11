@@ -1,4 +1,6 @@
 <?php
+namespace SmallSmallRSS;
+
 class FeedParser {
     private $doc;
     private $error;
@@ -15,7 +17,7 @@ class FeedParser {
     function __construct($data) {
         libxml_use_internal_errors(true);
         libxml_clear_errors();
-        $this->doc = new DOMDocument();
+        $this->doc = new \DOMDocument();
         $this->doc->loadXML($data);
 
         $error = libxml_get_last_error();
@@ -26,7 +28,7 @@ class FeedParser {
             // we might want to try guessing input encoding here too
             $data = iconv("UTF-8", "UTF-8//IGNORE", $data);
 
-            $this->doc = new DOMDocument();
+            $this->doc = new \DOMDocument();
             $this->doc->loadXML($data);
 
             $error = libxml_get_last_error();
@@ -40,7 +42,7 @@ class FeedParser {
 
     function init() {
         $root = $this->doc->firstChild;
-        $xpath = new DOMXPath($this->doc);
+        $xpath = new \DOMXPath($this->doc);
         $xpath->registerNamespace('atom', 'http://www.w3.org/2005/Atom');
         $xpath->registerNamespace('atom03', 'http://purl.org/atom/ns#');
         $xpath->registerNamespace('media', 'http://search.yahoo.com/mrss/');
@@ -165,9 +167,10 @@ class FeedParser {
 
     function format_error($error) {
         if ($error) {
-            return sprintf("LibXML error %s at line %d (column %d): %s",
-                           $error->code, $error->line, $error->column,
-                           $error->message);
+            return sprintf(
+                "LibXML error %s at line %d (column %d): %s",
+                $error->code, $error->line, $error->column,
+                $error->message);
         } else {
             return "";
         }

@@ -310,7 +310,7 @@ function update_rss_feed($feed, $ignore_daemon = false, $no_cache = false) {
     //db_query("UPDATE ttrss_feeds SET last_updated = NOW() WHERE id = '$feed'");
 
     if (!$rss) {
-        $rss = new FeedParser($feed_data);
+        $rss = new \SmallSmallRSS\FeedParser($feed_data);
         $rss->init();
     }
 

@@ -513,22 +513,21 @@ function get_ssl_certificate_id() {
 function authenticate_user($login, $password, $check_only = false) {
     if (!SINGLE_USER_MODE) {
         $user_id = false;
-        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_AUTH_USER) as $plugin) {
+        $plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_AUTH_USER);
+        foreach ($plugins as $plugin) {
             $user_id = (int) $plugin->authenticate($login, $password);
             if ($user_id) {
-                $auth_module = strtolower(get_class($plugin));
+                $auth_module = get_class($plugin);
                 break;
             }
         }
 
         if ($user_id && !$check_only) {
             $_SESSION["auth_module"] = $auth_module;
-
             $_SESSION["uid"] = $user_id;
             $_SESSION["version"] = \SmallSmallRSS\Constants::VERSION;
 
-            $result = db_query("SELECT login,access_level,pwd_hash FROM ttrss_users
-					WHERE id = '$user_id'");
+            $result = db_query("SELECT login,access_level,pwd_hash FROM ttrss_users WHERE id = '$user_id'");
 
             $_SESSION["name"] = db_fetch_result($result, 0, "login");
             $_SESSION["access_level"] = db_fetch_result($result, 0, "access_level");
@@ -543,7 +542,6 @@ function authenticate_user($login, $password, $check_only = false) {
             $_SESSION["last_version_check"] = time();
 
             initialize_user_prefs($_SESSION["uid"]);
-
             return true;
         }
         return false;
@@ -645,7 +643,8 @@ function login_sequence() {
                 @session_destroy();
                 setcookie(session_name(), '', time()-42000, '/');
 
-                \SmallSmallRSS\Renderers\LoginPage\render_login_form();
+                $renderer = new \SmallSmallRSS\Renderers\LoginPage();
+                $renderer->render();
                 exit;
             }
 

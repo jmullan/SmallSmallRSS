@@ -24,10 +24,10 @@ $override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler("public", $
 if ($override) {
     $handler = $override;
 } else {
-    $handler = new Handler_Public($_REQUEST);
+    $handler = new \SmallSmallRSS\Handlers\PublicHandler($_REQUEST);
 }
 
-if (implements_interface($handler, "IHandler") && $handler->before($method)) {
+if ($handler instanceof \SmallSmallRSS\Handlers\IHandler && $handler->before($method)) {
     if ($method && method_exists($handler, $method)) {
         $handler->$method();
     } elseif (method_exists($handler, 'index')) {

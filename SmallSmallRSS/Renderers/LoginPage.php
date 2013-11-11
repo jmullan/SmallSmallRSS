@@ -8,8 +8,3 @@ class LoginPage extends \SmallSmallRSS\Renderers\Base {
         exit;
     }
 }
-
-function render_login_form() {
-    $login_page = new \SmallSmallRSS\Renderers\LoginPage();
-    $login_page->render();
-}

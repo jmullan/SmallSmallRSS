@@ -1,6 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Handler_Public extends Handler {
+class PublicHandler extends Handler {
 
     private function generate_syndicated_feed($owner_uid, $feed, $is_cat,
                                               $limit, $offset, $search, $search_mode,
@@ -655,7 +655,8 @@ class Handler_Public extends Handler {
             print "</div></body></html>";
 
         } else {
-            \SmallSmallRSS\Renderers\LoginPage\render_login_form();
+            $renderer = new \SmallSmallRSS\Renderers\LoginPage();
+            $renderer->render();
         }
     }
 
@@ -859,7 +860,8 @@ class Handler_Public extends Handler {
 
         if (!SINGLE_USER_MODE && $_SESSION["access_level"] < 10) {
             $_SESSION["login_error_msg"] = __("Your access level is insufficient to run this script.");
-            \SmallSmallRSS\Renderers\LoginPage\render_login_form();
+            $renderer = new \SmallSmallRSS\Renderers\LoginPage();
+            $renderer->render();
             exit;
         }
 

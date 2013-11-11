@@ -29,13 +29,10 @@ class Digest {
 
             if (@get_pref('DIGEST_ENABLE', $line['id'], false)) {
                 $preferred_ts = strtotime(get_pref('DIGEST_PREFERRED_TIME', $line['id'], '00:00'));
-
+                $since = time() - $preferred_ts;
                 // try to send digests within 2 hours of preferred time
-                if ($preferred_ts && time() >= $preferred_ts &&
-                    time() - $preferred_ts <= 7200) {
-
+                if ($preferred_ts && $since >= 0 && $since < 7200) {
                     _debug("Sending digest for UID:" . $line['id'] . " - " . $line["email"], true, $debug);
-
                     $do_catchup = get_pref('DIGEST_CATCHUP', $line['id'], false);
                     $tuple = prepare_headlines_digest($line["id"], 1, $limit);
                     $digest = $tuple[0];

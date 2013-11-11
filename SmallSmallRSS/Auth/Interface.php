@@ -1,4 +1,6 @@
 <?php
-interface IAuthModule {
+namespace SmallSmallRSS;
+
+interface Auth_Interface {
     function authenticate($login, $password);
 }

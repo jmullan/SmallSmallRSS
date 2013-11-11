@@ -1,5 +1,7 @@
 <?php
-class Auth_Base {
+namespace SmallSmallRSS;
+
+class Auth_Base implements Auth_Interface {
     private $dbh;
 
     function __construct() {
@@ -28,8 +30,8 @@ class Auth_Base {
                 $pwd_hash = encrypt_password($password, $salt, true);
 
                 $query = "INSERT INTO ttrss_users
-						(login,access_level,last_login,created,pwd_hash,salt)
-						VALUES ('$login', 0, null, NOW(), '$pwd_hash','$salt')";
+			  (login,access_level,last_login,created,pwd_hash,salt)
+			  VALUES ('$login', 0, null, NOW(), '$pwd_hash','$salt')";
 
                 $this->dbh->query($query);
 

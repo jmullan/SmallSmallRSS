@@ -3,14 +3,12 @@ require_once __DIR__ . "/../../lib/otphp/vendor/base32.php";
 require_once __DIR__ . "/../../lib/otphp/lib/otp.php";
 require_once __DIR__ . "/../../lib/otphp/lib/totp.php";
 
-class Auth_Internal extends \SmallSmallRSS\Plugin implements IAuthModule {
+class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_Interface {
     private $host;
 
     function about() {
-        return array(1.0,
-                     "Authenticates against internal tt-rss database",
-                     "fox",
-                     true);
+        return array(
+            1.0, "Authenticates against internal tt-rss database", "fox", true);
     }
 
     function init($host) {

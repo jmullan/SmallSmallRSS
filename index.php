@@ -28,13 +28,16 @@ if (!init_plugins()) {
 }
 
 if (empty($_REQUEST['mobile'])) {
-    if ($mobile->isTablet() && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("digest")) {
+    if ($mobile->isTablet()
+        && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("digest")) {
         header('Location: backend.php?op=digest');
         exit;
-    } elseif ($mobile->isMobile() && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("mobile")) {
+    } elseif ($mobile->isMobile()
+              && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("mobile")) {
         header('Location: backend.php?op=mobile');
         exit;
-    } elseif ($mobile->isMobile() && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("digest")) {
+    } elseif ($mobile->isMobile()
+              && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("digest")) {
         header('Location: backend.php?op=digest');
         exit;
     }
@@ -57,9 +60,11 @@ if ($_SESSION["uid"]) {
     }
 }
 $toolbar_plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-    \SmallSmallRSS\PluginHost::HOOK_TOOLBAR_BUTTON);
+    \SmallSmallRSS\PluginHost::HOOK_TOOLBAR_BUTTON
+);
 $action_items = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-    \SmallSmallRSS\PluginHost::HOOK_ACTION_ITEM);
+    \SmallSmallRSS\PluginHost::HOOK_ACTION_ITEM
+);
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">

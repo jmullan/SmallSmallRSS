@@ -102,7 +102,7 @@ class Article extends ProtectedHandler {
         if (!$title) $title = $url;
         if (!$title && !$url) return false;
 
-        if (filter_var($url, FILTER_VALIDATE_URL) === FALSE) return false;
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) return false;
 
         db_query("BEGIN");
 

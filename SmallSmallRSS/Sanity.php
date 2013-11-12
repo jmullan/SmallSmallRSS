@@ -1,7 +1,10 @@
 <?php
 namespace SmallSmallRss;
-class Sanity {
-    public static function get_schema_version($nocache = false) {
+
+class Sanity
+{
+    public static function get_schema_version($nocache = false)
+    {
         // Session caching removed due to causing wrong redirects to upgrade
         // script when get_schema_version() is called on an obsolete session
         // created on a previous schema version.
@@ -15,12 +18,14 @@ class Sanity {
         }
         return $schema_version;
     }
-    public static function is_schema_correct() {
+    public static function is_schema_correct()
+    {
         $schema_version = self::get_schema_version(true);
         $expected_version = \SmallSmallRSS\Constants::SCHEMA_VERSION;
         return $schema_version == $expected_version;
     }
-    public static function schema_or_die() {
+    public static function schema_or_die()
+    {
         $schema_version = self::get_schema_version();
         $expected_version = \SmallSmallRSS\Constants::SCHEMA_VERSION;
         if ($schema_version != $expected_version) {
@@ -29,7 +34,8 @@ class Sanity {
         }
     }
 
-    function make_self_url_path() {
+    function make_self_url_path()
+    {
         $url_path = (
             ($_SERVER['HTTPS'] != "on" ? 'http://' : 'https://')
             . $_SERVER["HTTP_HOST"]
@@ -38,7 +44,8 @@ class Sanity {
         return $url_path;
     }
 
-    function initial_check() {
+    function initial_check()
+    {
         $errors = array();
 
         if (!file_exists("config.php")) {
@@ -49,7 +56,7 @@ class Sanity {
                 array_push($errors, "Please copy config.php-dist to config.php or run the installer in install/");
             }
 
-            if (strpos(PLUGINS, "auth_") === FALSE) {
+            if (strpos(PLUGINS, "auth_") === false) {
                 array_push($errors, "Please enable at least one authentication module via PLUGINS constant in config.php");
             }
 

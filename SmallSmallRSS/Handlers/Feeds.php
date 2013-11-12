@@ -261,7 +261,7 @@ class Feeds extends ProtectedHandler {
         $feed_title = $qfh_ret[1];
         $feed_site_url = $qfh_ret[2];
         $last_error = $qfh_ret[3];
-        $last_updated = strpos($qfh_ret[4], '1970-') === FALSE ?
+        $last_updated = strpos($qfh_ret[4], '1970-') === false ?
             make_local_datetime($qfh_ret[4], false) : __("Never");
 
         $vgroup_last_feed = $vgr_last_feed;

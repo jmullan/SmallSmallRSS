@@ -1,6 +1,6 @@
 <?php
 define_default('DAEMON_UPDATE_LOGIN_LIMIT', 30);
-define_default('DAEMON_FEED_LIMIT', 500);
+define_default('DAEMON_FEED_LIMIT', 50);
 define_default('DAEMON_SLEEP_INTERVAL', 120);
 
 function update_feedbrowser_cache()
@@ -107,13 +107,22 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
                 OR last_updated = '1970-01-01 00:00:00'
             )";
     } else {
-        $update_limit_qpart = "AND ((
+        $update_limit_qpart = "
+            AND
+            (
+                (
                     ttrss_feeds.update_interval = 0
                     AND ttrss_user_prefs.value != '-1'
-                    AND ttrss_feeds.last_updated < DATE_SUB(NOW(), INTERVAL CONVERT(ttrss_user_prefs.value, SIGNED INTEGER) MINUTE)
+                    AND ttrss_feeds.last_updated < DATE_SUB(
+                        NOW(),
+                        INTERVAL CONVERT(ttrss_user_prefs.value, SIGNED INTEGER) MINUTE
+                    )
                 ) OR (
                     ttrss_feeds.update_interval > 0
-                    AND ttrss_feeds.last_updated < DATE_SUB(NOW(), INTERVAL ttrss_feeds.update_interval MINUTE)
+                    AND ttrss_feeds.last_updated < DATE_SUB(
+                        NOW(),
+                        INTERVAL ttrss_feeds.update_interval MINUTE
+                    )
                 ) OR ttrss_feeds.last_updated IS NULL
                 OR last_updated = '1970-01-01 00:00:00')";
     }
@@ -135,7 +144,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 
     // Test if there is a limit to number of updated feeds
     $query_limit = "";
-    if ($limit) {
+    if ($limit > 0) {
         $query_limit = sprintf("LIMIT %d", $limit);
     }
 
@@ -149,7 +158,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
                   $updstart_thresh_qpart
               ORDER BY last_updated
               $query_limit";
-
+    _debug($query);
     // We search for feed needing update.
     $result = db_query($query);
 
@@ -172,7 +181,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
         }
         db_query(sprintf(
             "UPDATE ttrss_feeds SET last_update_started = NOW()
-                WHERE feed_url IN (%s)", implode(',', $feeds_quoted)
+             WHERE feed_url IN (%s)", implode(',', $feeds_quoted)
         ));
     }
 

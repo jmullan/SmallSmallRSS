@@ -1,8 +1,11 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Feeds extends ProtectedHandler {
 
-    function escape_from_request($key) {
+class Feeds extends ProtectedHandler
+{
+
+    public function escape_from_request($key)
+    {
         $value = '';
         if (isset($_REQUEST[$key])) {
             $value = $this->dbh->escape_string($_REQUEST[$key]);
@@ -10,15 +13,24 @@ class Feeds extends ProtectedHandler {
         return $value;
     }
 
-    function csrf_ignore($method) {
+    public function csrf_ignore($method)
+    {
         $csrf_ignored = array("index", "feedbrowser", "quickaddfeed", "search");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    private function format_headline_subtoolbar($feed_site_url, $feed_title,
-                                                $feed_id, $is_cat, $search,
-                                                $search_mode, $view_mode, $error, $feed_last_updated) {
+    private function format_headline_subtoolbar(
+        $feed_site_url,
+        $feed_title,
+        $feed_id,
+        $is_cat,
+        $search,
+        $search_mode,
+        $view_mode,
+        $error,
+        $feed_last_updated
+    ) {
         $reply = '';
         $page_prev_link = "viewFeedGoPage(-1)";
         $page_next_link = "viewFeedGoPage(1)";
@@ -54,8 +66,10 @@ class Feeds extends ProtectedHandler {
             $search_q = "";
         }
 
-        $rss_link = htmlspecialchars(get_self_url_prefix() .
-                                     "/public.php?op=rss&id=$feed_id$cat_q$search_q");
+        $rss_link = htmlspecialchars(
+            get_self_url_prefix()
+            . "/public.php?op=rss&id=$feed_id$cat_q$search_q"
+        );
 
         // right part
 
@@ -64,12 +78,11 @@ class Feeds extends ProtectedHandler {
         $reply .= "<span id='feed_title'>";
 
         if ($feed_site_url) {
-            $last_updated = T_sprintf("Last updated: %s",
-                                      $feed_last_updated);
+            $last_updated = T_sprintf("Last updated: %s", $feed_last_updated);
 
             $target = "target=\"_blank\"";
             $reply .= "<a title=\"$last_updated\" $target href=\"$feed_site_url\">".
-                truncate_string($feed_title, 30)."</a>";
+                truncate_string($feed_title, 30) . "</a>";
 
             if ($error) {
                 $reply .= " (<span class=\"error\" title=\"$error\">Error</span>)";
@@ -78,36 +91,33 @@ class Feeds extends ProtectedHandler {
         } else {
             $reply .= $feed_title;
         }
-
         $reply .= "</span>";
-
-        $reply .= "
-			<a href=\"#\"
-				title=\"".__("View as RSS feed")."\"
-				onclick=\"displayDlg('".__("View as RSS")."','generatedFeed', '$feed_id:$is_cat:$rss_link')\">
-				<img class=\"noborder\" style=\"vertical-align : middle\" src=\"images/pub_set.svg\"></a>";
+        $reply .= "<a href=\"#\"
+           title=\"".__("View as RSS feed")."\"
+           onclick=\"displayDlg('".__("View as RSS")."','generatedFeed', '$feed_id:$is_cat:$rss_link')\">
+           <img class=\"noborder\" style=\"vertical-align : middle\" src=\"images/pub_set.svg\"></a>";
 
         $reply .= "</span>";
 
         // left part
 
         $reply .= __('Select:')."
-			<a href=\"#\" onclick=\"$sel_all_link\">".__('All')."</a>,
-			<a href=\"#\" onclick=\"$sel_unread_link\">".__('Unread')."</a>,
-			<a href=\"#\" onclick=\"$sel_inv_link\">".__('Invert')."</a>,
-			<a href=\"#\" onclick=\"$sel_none_link\">".__('None')."</a></li>";
+            <a href=\"#\" onclick=\"$sel_all_link\">".__('All')."</a>,
+            <a href=\"#\" onclick=\"$sel_unread_link\">".__('Unread')."</a>,
+            <a href=\"#\" onclick=\"$sel_inv_link\">".__('Invert')."</a>,
+            <a href=\"#\" onclick=\"$sel_none_link\">".__('None')."</a></li>";
 
         $reply .= " ";
 
         $reply .= "<select dojoType=\"dijit.form.Select\"
-			onchange=\"headlineActionsChange(this)\">";
+            onchange=\"headlineActionsChange(this)\">";
         $reply .= "<option value=\"false\">".__('More...')."</option>";
 
         $reply .= "<option value=\"0\" disabled=\"1\">".__('Selection toggle:')."</option>";
 
         $reply .= "<option value=\"$tog_unread_link\">".__('Unread')."</option>
-			<option value=\"$tog_marked_link\">".__('Starred')."</option>
-			<option value=\"$tog_published_link\">".__('Published')."</option>";
+            <option value=\"$tog_marked_link\">".__('Starred')."</option>
+            <option value=\"$tog_published_link\">".__('Published')."</option>";
 
         $reply .= "<option value=\"0\" disabled=\"1\">".__('Selection:')."</option>";
 
@@ -133,31 +143,35 @@ class Feeds extends ProtectedHandler {
         }
 
         $reply .= "<option value=\"0\" disabled=\"1\">".__('Feed:')."</option>";
-
-        //$reply .= "<option value=\"catchupPage()\">".__('Mark as read')."</option>";
-
-        $reply .= "<option value=\"displayDlg('".__("View as RSS")."','generatedFeed', '$feed_id:$is_cat:$rss_link')\">".__('View as RSS')."</option>";
+        $reply .= "<option value=\"displayDlg('".__("View as RSS");
+        $reply .= "','generatedFeed', '$feed_id:$is_cat:$rss_link')\">".__('View as RSS')."</option>";
 
         $reply .= "</select>";
-
-        //$reply .= "</div>";
-
-        //$reply .= "</h2";
-
-        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_HEADLINE_TOOLBAR_BUTTON) as $p) {
+        $toolbar_button_plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_HEADLINE_TOOLBAR_BUTTON
+        );
+        foreach ($toolbar_button_plugins as $p) {
             echo $p->hook_headline_toolbar_button($feed_id, $is_cat);
         }
-
         return $reply;
     }
 
-    private function format_headlines_list($feed, $method, $view_mode, $limit, $cat_view,
-                                           $next_unread_feed, $offset, $vgr_last_feed = false,
-                                           $override_order = false, $include_children = false) {
+    private function format_headlines_list(
+        $feed,
+        $method,
+        $view_mode,
+        $limit,
+        $cat_view,
+        $next_unread_feed,
+        $offset,
+        $vgr_last_feed = false,
+        $override_order = false,
+        $include_children = false
+    ) {
 
-        if (isset($_REQUEST["DevForceUpdate"]))
+        if (isset($_REQUEST["DevForceUpdate"])) {
             header("Content-Type: text/plain");
-
+        }
         $disable_cache = false;
 
         $reply = array('content' => '');
@@ -178,7 +192,7 @@ class Feeds extends ProtectedHandler {
 
             $result = $this->dbh->query(
                 "SELECT cache_images,".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
-					FROM ttrss_feeds WHERE id = '$feed'");
+                    FROM ttrss_feeds WHERE id = '$feed'");
 
             if ($this->dbh->num_rows($result) != 0) {
                 $last_updated = strtotime($this->dbh->fetch_result($result, 0, "last_updated"));
@@ -188,8 +202,10 @@ class Feeds extends ProtectedHandler {
                     include "rssfuncs.php";
                     update_rss_feed($feed, true);
                 } else {
-                    $this->dbh->query("UPDATE ttrss_feeds SET last_updated = '1970-01-01', last_update_started = '1970-01-01'
-							WHERE id = '$feed'");
+                    $this->dbh->query(
+                        'UPDATE ttrss_feeds'
+                        . "SET last_updated = '1970-01-01', last_update_started = '1970-01-01' WHERE id = '$feed'"
+                    );
                 }
             }
         }
@@ -199,7 +215,6 @@ class Feeds extends ProtectedHandler {
         }
 
         // FIXME: might break tag display?
-
         if (is_numeric($feed) && $feed > 0 && !$cat_view) {
             $result = $this->dbh->query(
                 "SELECT id FROM ttrss_feeds WHERE id = '$feed' LIMIT 1");
@@ -219,17 +234,14 @@ class Feeds extends ProtectedHandler {
 
         if (!empty($_REQUEST["debug"])) $timing_info = print_checkpoint("H0", $timing_info);
 
-        //		error_log("format_headlines_list: [" . $feed . "] method [" . $method . "]");
         if ($search_mode == '' && $method != '') {
             $search_mode = $method;
         }
-        //		error_log("search_mode: " . $search_mode);
 
         if (!$cat_view && is_numeric($feed) && $feed < PLUGIN_FEED_BASE_INDEX && $feed > LABEL_BASE_INDEX) {
             $handler = \SmallSmallRSS\PluginHost::getInstance()->get_feed_handler(
-                \SmallSmallRSS\PluginHost::feed_to_pfeed_id($feed));
-
-            //	function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $search_mode, $override_order = false, $offset = 0, $owner_uid = 0, $filter = false, $since_id = 0, $include_children = false, $ignore_vfeed_group = false) {
+                \SmallSmallRSS\PluginHost::feed_to_pfeed_id($feed)
+            );
 
             if ($handler) {
                 $options = array(
@@ -243,16 +255,30 @@ class Feeds extends ProtectedHandler {
                     "owner_uid" => $_SESSION["uid"],
                     "filter" => false,
                     "since_id" => 0,
-                    "include_children" => $include_children);
+                    "include_children" => $include_children
+                );
 
-                $qfh_ret = $handler->get_headlines(\SmallSmallRSS\PluginHost::feed_to_pfeed_id($feed),
-                                                   $options);
+                $qfh_ret = $handler->get_headlines(
+                    \SmallSmallRSS\PluginHost::feed_to_pfeed_id($feed),
+                    $options
+                );
             }
 
         } else {
-            $qfh_ret = queryFeedHeadlines($feed, $limit, $view_mode, $cat_view,
-                                          $search, $search_mode, $override_order, $offset, 0,
-                                          false, 0, $include_children);
+            $qfh_ret = queryFeedHeadlines(
+                $feed,
+                $limit,
+                $view_mode,
+                $cat_view,
+                $search,
+                $search_mode,
+                $override_order,
+                $offset,
+                0,
+                false,
+                0,
+                $include_children
+            );
         }
 
         if (!empty($_REQUEST["debug"])) $timing_info = print_checkpoint("H1", $timing_info);
@@ -261,40 +287,35 @@ class Feeds extends ProtectedHandler {
         $feed_title = $qfh_ret[1];
         $feed_site_url = $qfh_ret[2];
         $last_error = $qfh_ret[3];
-        $last_updated = strpos($qfh_ret[4], '1970-') === false ?
-            make_local_datetime($qfh_ret[4], false) : __("Never");
+        $last_updated = (
+            (strpos($qfh_ret[4], '1970-') === false)
+            ? make_local_datetime($qfh_ret[4], false)
+            : __("Never")
+        );
 
         $vgroup_last_feed = $vgr_last_feed;
 
-        $reply['toolbar'] = $this->format_headline_subtoolbar($feed_site_url,
-                                                              $feed_title,
-                                                              $feed, $cat_view, $search, $search_mode, $view_mode,
-                                                              $last_error, $last_updated);
+        $reply['toolbar'] = $this->format_headline_subtoolbar(
+            $feed_site_url,
+            $feed_title,
+            $feed,
+            $cat_view,
+            $search,
+            $search_mode,
+            $view_mode,
+            $last_error,
+            $last_updated
+        );
 
         $headlines_count = $this->dbh->num_rows($result);
-
-        /* if (get_pref('COMBINED_DISPLAY_MODE')) {
-           $button_plugins = array();
-           foreach (explode(",", ARTICLE_BUTTON_PLUGINS) as $p) {
-           $pclass = "button_" . trim($p);
-
-           if (class_exists($pclass)) {
-           $plugin = new $pclass();
-           array_push($button_plugins, $plugin);
-           }
-           }
-           } */
-
         if ($this->dbh->num_rows($result) > 0) {
-
             $lnum = $offset;
-
             $num_unread = 0;
             $cur_feed_title = '';
-
             $fresh_intl = get_pref("FRESH_ARTICLE_MAX_AGE") * 60 * 60;
-
-            if (!empty($_REQUEST["debug"])) $timing_info = print_checkpoint("PS", $timing_info);
+            if (!empty($_REQUEST["debug"])) {
+                $timing_info = print_checkpoint("PS", $timing_info);
+            }
 
             $expand_cdm = get_pref('CDM_EXPANDED');
 
@@ -334,58 +355,46 @@ class Feeds extends ProtectedHandler {
 
                 if (sql_bool_to_bool($line["marked"])) {
                     $marked_pic = "<img
-						src=\"images/mark_set.svg\"
-						class=\"markedPic\" alt=\"Unstar article\"
-						onclick='toggleMark($id)'>";
+                        src=\"images/mark_set.svg\"
+                        class=\"markedPic\" alt=\"Unstar article\"
+                        onclick='toggleMark($id)'>";
                     $class .= " marked";
                 } else {
                     $marked_pic = "<img
-						src=\"images/mark_unset.svg\"
-						class=\"markedPic\" alt=\"Star article\"
-						onclick='toggleMark($id)'>";
+                        src=\"images/mark_unset.svg\"
+                        class=\"markedPic\" alt=\"Star article\"
+                        onclick='toggleMark($id)'>";
                 }
 
                 if (sql_bool_to_bool($line["published"])) {
                     $published_pic = "<img src=\"images/pub_set.svg\"
-						class=\"pubPic\"
-							alt=\"Unpublish article\" onclick='togglePub($id)'>";
+                        class=\"pubPic\"
+                            alt=\"Unpublish article\" onclick='togglePub($id)'>";
                     $class .= " published";
                 } else {
                     $published_pic = "<img src=\"images/pub_unset.svg\"
-						class=\"pubPic\"
-						alt=\"Publish article\" onclick='togglePub($id)'>";
+                        class=\"pubPic\"
+                        alt=\"Publish article\" onclick='togglePub($id)'>";
                 }
-
-                #				$content_link = "<a target=\"_blank\" href=\"".$line["link"]."\">" .
-                #					$line["title"] . "</a>";
-
-                #				$content_link = "<a
-                #					href=\"" . htmlspecialchars($line["link"]) . "\"
-                #					onclick=\"view($id,$feed_id);\">" .
-                #					$line["title"] . "</a>";
-
-                #				$content_link = "<a href=\"javascript:viewContentUrl('".$line["link"]."');\">" .
-                #					$line["title"] . "</a>";
-
                 $updated_fmt = make_local_datetime($line["updated"], false);
-                $date_entered_fmt = T_sprintf("Imported at %s",
-                                              make_local_datetime($line["date_entered"], false));
+                $date_entered_fmt = T_sprintf(
+                    "Imported at %s",
+                    make_local_datetime($line["date_entered"], false)
+                );
 
                 if (get_pref('SHOW_CONTENT_PREVIEW')) {
-                    $content_preview = truncate_string(strip_tags($line["content_preview"]),
-                                                       250);
+                    $content_preview = truncate_string(
+                        strip_tags($line["content_preview"]),
+                        250
+                    );
                 }
 
                 $score = $line["score"];
 
                 $score_pic = "images/" . get_score_pic($score);
 
-                /*				$score_title = __("(Click to change)");
-                                                $score_pic = "<img class='hlScorePic' src=\"images/$score_pic\"
-                                                onclick=\"adjustArticleScore($id, $score)\" title=\"$score $score_title\">"; */
-
                 $score_pic = "<img class='hlScorePic' score='$score' onclick='changeScore($id, this)' src=\"$score_pic\"
-					title=\"$score\">";
+                    title=\"$score\">";
 
                 if ($score > 500) {
                     $hlc_suffix = "H";
@@ -430,7 +439,10 @@ class Feeds extends ProtectedHandler {
 
                             $cur_feed_title = htmlspecialchars($cur_feed_title);
 
-                            $vf_catchup_link = "(<a class='catchup' onclick='catchupFeedInGroup($feed_id);' href='#'>".__('Mark as read')."</a>)";
+                            $vf_catchup_link = (
+                                "(<a class='catchup' onclick='catchupFeedInGroup($feed_id);' href='#'>"
+                                . __('Mark as read')."</a>)"
+                            );
 
                             $reply['content'] .= "<div class='cdmFeedTitle'>".
                                 "<div style=\"float : right\">$feed_icon_img</div>".
@@ -441,15 +453,15 @@ class Feeds extends ProtectedHandler {
                     }
 
                     $mouseover_attrs = "onmouseover='postMouseIn(event, $id)'
-						onmouseout='postMouseOut($id)'";
+                        onmouseout='postMouseOut($id)'";
 
                     $reply['content'] .= "<div class='hl $class' id='RROW-$id' $mouseover_attrs>";
 
                     $reply['content'] .= "<div class='hlLeft'>";
 
                     $reply['content'] .= "<input dojoType=\"dijit.form.CheckBox\"
-							type=\"checkbox\" onclick=\"toggleSelectRow2(this)\"
-							class='rchk'>";
+                            type=\"checkbox\" onclick=\"toggleSelectRow2(this)\"
+                            class='rchk'>";
 
                     $reply['content'] .= "$marked_pic";
                     $reply['content'] .= "$published_pic";
@@ -457,10 +469,10 @@ class Feeds extends ProtectedHandler {
                     $reply['content'] .= "</div>";
 
                     $reply['content'] .= "<div onclick='return hlClicked(event, $id)'
-						class=\"hlTitle\"><span class='hlContent$hlc_suffix'>";
+                        class=\"hlTitle\"><span class='hlContent$hlc_suffix'>";
                     $reply['content'] .= "<a id=\"RTITLE-$id\" class=\"title\"
-						href=\"" . htmlspecialchars($line["link"]) . "\"
-						onclick=\"\">" .
+                        href=\"" . htmlspecialchars($line["link"]) . "\"
+                        onclick=\"\">" .
                         truncate_string($line["title"], 200);
 
                     if (get_pref('SHOW_CONTENT_PREVIEW')) {
@@ -487,7 +499,7 @@ class Feeds extends ProtectedHandler {
                     }
 
                     $reply['content'] .= "<div title='$date_entered_fmt'>$updated_fmt</div>
-						</span>";
+                        </span>";
 
                     $reply['content'] .= "<div class=\"hlRight\">";
 
@@ -496,9 +508,9 @@ class Feeds extends ProtectedHandler {
                     if ($line["feed_title"] && !get_pref('VFEED_GROUP_BY_FEED')) {
 
                         $reply['content'] .= "<span onclick=\"viewfeed($feed_id)\"
-							style=\"cursor : pointer\"
-							title=\"".htmlspecialchars($line['feed_title'])."\">
-							$feed_icon_img<span>";
+                            style=\"cursor : pointer\"
+                            title=\"".htmlspecialchars($line['feed_title'])."\">
+                            $feed_icon_img<span>";
                     }
 
                     $reply['content'] .= "</div>";
@@ -544,19 +556,19 @@ class Feeds extends ProtectedHandler {
                     }
 
                     $mouseover_attrs = "onmouseover='postMouseIn(event, $id)'
-						onmouseout='postMouseOut($id)'";
+                        onmouseout='postMouseOut($id)'";
 
                     $expanded_class = $expand_cdm ? "expanded" : "expandable";
 
                     $reply['content'] .= "<div class=\"cdm $expanded_class $class\"
-						id=\"RROW-$id\" $mouseover_attrs>";
+                        id=\"RROW-$id\" $mouseover_attrs>";
 
                     $reply['content'] .= "<div class=\"cdmHeader\">";
                     $reply['content'] .= "<div style=\"vertical-align : middle\">";
 
                     $reply['content'] .= "<input dojoType=\"dijit.form.CheckBox\"
-							type=\"checkbox\" onclick=\"toggleSelectRow2(this, false, true)\"
-							class='rchk'>";
+                            type=\"checkbox\" onclick=\"toggleSelectRow2(this, false, true)\"
+                            class='rchk'>";
 
                     $reply['content'] .= "$marked_pic";
                     $reply['content'] .= "$published_pic";
@@ -564,10 +576,10 @@ class Feeds extends ProtectedHandler {
                     $reply['content'] .= "</div>";
 
                     $reply['content'] .= "<span id=\"RTITLE-$id\"
-						onclick=\"return cdmClicked(event, $id);\"
-						class=\"titleWrap$hlc_suffix\">
-						<a class=\"title\"
-						target=\"_blank\" href=\"".
+                        onclick=\"return cdmClicked(event, $id);\"
+                        class=\"titleWrap$hlc_suffix\">
+                        <a class=\"title\"
+                        target=\"_blank\" href=\"".
                         htmlspecialchars($line["link"])."\">".
                         $line["title"] .
                         "</a> <span class=\"author\">$entry_author</span>";
@@ -575,8 +587,8 @@ class Feeds extends ProtectedHandler {
                     $reply['content'] .= $labels_str;
 
                     $reply['content'] .= "<span class='collapseBtn' style='display : none'>
-						<img src=\"images/collapse.png\" onclick=\"cdmCollapseArticle(event, $id)\"
-						title=\"".__("Collapse article")."\"/></span>";
+                        <img src=\"images/collapse.png\" onclick=\"cdmCollapseArticle(event, $id)\"
+                        title=\"".__("Collapse article")."\"/></span>";
 
                     if (!$expand_cdm) {
                         $content_hidden = "style=\"display : none\"";
@@ -587,7 +599,7 @@ class Feeds extends ProtectedHandler {
                     }
 
                     $reply['content'] .= "<span $excerpt_hidden
-						id=\"CEXC-$id\" class=\"cdmExcerpt\"> - $content_preview</span>";
+                        id=\"CEXC-$id\" class=\"cdmExcerpt\"> - $content_preview</span>";
                     $reply['content'] .= "</span>";
 
                     if (!get_pref('VFEED_GROUP_BY_FEED')) {
@@ -595,31 +607,31 @@ class Feeds extends ProtectedHandler {
                             $rgba = @$rgba_cache[$feed_id];
 
                             $reply['content'] .= "<div class=\"hlFeed\">
-								<a href=\"#\" style=\"background-color: rgba($rgba,0.3)\"
-								onclick=\"viewfeed($feed_id)\">".
+                                <a href=\"#\" style=\"background-color: rgba($rgba,0.3)\"
+                                onclick=\"viewfeed($feed_id)\">".
                                 truncate_string($line["feed_title"], 30)."</a>
-							</div>";
+                            </div>";
                         }
                     }
 
                     $reply['content'] .= "<span class='updated' title='$date_entered_fmt'>
-						$updated_fmt</span>";
+                        $updated_fmt</span>";
 
                     $reply['content'] .= "<div class='scoreWrap' style=\"vertical-align : middle\">";
                     $reply['content'] .= "$score_pic";
 
                     if (!get_pref("VFEED_GROUP_BY_FEED") && $line["feed_title"]) {
                         $reply['content'] .= "<span style=\"cursor : pointer\"
-							title=\"".htmlspecialchars($line["feed_title"])."\"
-							onclick=\"viewfeed($feed_id)\">$feed_icon_img</span>";
+                            title=\"".htmlspecialchars($line["feed_title"])."\"
+                            onclick=\"viewfeed($feed_id)\">$feed_icon_img</span>";
                     }
                     $reply['content'] .= "</div>";
 
                     $reply['content'] .= "</div>";
 
                     $reply['content'] .= "<div class=\"cdmContent\" $content_hidden
-						onclick=\"return cdmClicked(event, $id);\"
-						id=\"CICD-$id\">";
+                        onclick=\"return cdmClicked(event, $id);\"
+                        id=\"CICD-$id\">";
 
                     $reply['content'] .= "<div id=\"POSTNOTE-$id\">";
                     if ($line['note']) {
@@ -632,7 +644,7 @@ class Feeds extends ProtectedHandler {
                     if ($line["orig_feed_id"]) {
 
                         $tmp_result = $this->dbh->query("SELECT * FROM ttrss_archived_feeds
-					WHERE id = ".$line["orig_feed_id"]);
+                    WHERE id = ".$line["orig_feed_id"]);
 
                         if ($this->dbh->num_rows($tmp_result) != 0) {
 
@@ -644,7 +656,7 @@ class Feeds extends ProtectedHandler {
                             $tmp_line = $this->dbh->fetch_assoc($tmp_result);
 
                             $reply['content'] .= "<a target='_blank'
-								href=' " . htmlspecialchars($tmp_line['site_url']) . "'>" .
+                                href=' " . htmlspecialchars($tmp_line['site_url']) . "'>" .
                                 $tmp_line['title'] . "</a>";
 
                             $reply['content'] .= "&nbsp;";
@@ -658,14 +670,14 @@ class Feeds extends ProtectedHandler {
 
                     $reply['content'] .= "<span id=\"CWRAP-$id\">";
 
-                    //					if (!$expand_cdm) {
+                    //                    if (!$expand_cdm) {
                     $reply['content'] .= "<span id=\"CENCW-$id\" style=\"display : none\">";
                     $reply['content'] .= htmlspecialchars($line["content"]);
                     $reply['content'] .= "</span.";
 
-                    //					} else {
-                    //						$reply['content'] .= $line["content"];
-                    //					}
+                    //                    } else {
+                    //                        $reply['content'] .= $line["content"];
+                    //                    }
 
                     $reply['content'] .= "</span>";
 
@@ -684,9 +696,9 @@ class Feeds extends ProtectedHandler {
                     $tags_str = format_tags_string($tags, $id);
 
                     $reply['content'] .= "<img src='images/tag.png' alt='Tags' title='Tags'>
-						<span id=\"ATSTR-$id\">$tags_str</span>
-						<a title=\"".__('Edit tags for this article')."\"
-						href=\"#\" onclick=\"editArticleTags($id)\">(+)</a>";
+                        <span id=\"ATSTR-$id\">$tags_str</span>
+                        <a title=\"".__('Edit tags for this article')."\"
+                        href=\"#\" onclick=\"editArticleTags($id)\">(+)</a>";
 
                     $num_comments = $line["num_comments"];
                     $entry_comments = "";
@@ -708,8 +720,8 @@ class Feeds extends ProtectedHandler {
 
                     $reply['content'] .= "<div style=\"float : right\">";
 
-                    //					$reply['content'] .= "$marked_pic";
-                    //					$reply['content'] .= "$published_pic";
+                    //                    $reply['content'] .= "$marked_pic";
+                    //                    $reply['content'] .= "$published_pic";
 
                     foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON) as $p) {
                         $reply['content'] .= $p->hook_article_button($line);
@@ -756,7 +768,7 @@ class Feeds extends ProtectedHandler {
                 $reply['content'] .= "<p><span class=\"insensitive\">";
 
                 $result = $this->dbh->query("SELECT ".SUBSTRING_FOR_DATE."(MAX(last_updated), 1, 19) AS last_updated FROM ttrss_feeds
-					WHERE owner_uid = " . $_SESSION['uid']);
+                    WHERE owner_uid = " . $_SESSION['uid']);
 
                 $last_updated = $this->dbh->fetch_result($result, 0, "last_updated");
                 $last_updated = make_local_datetime($last_updated, false);
@@ -764,7 +776,7 @@ class Feeds extends ProtectedHandler {
                 $reply['content'] .= sprintf(__("Feeds last updated at %s"), $last_updated);
 
                 $result = $this->dbh->query("SELECT COUNT(id) AS num_errors
-					FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]);
+                    FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]);
 
                 $num_errors = $this->dbh->fetch_result($result, 0, "num_errors");
 
@@ -783,13 +795,15 @@ class Feeds extends ProtectedHandler {
                      $vgroup_last_feed, $reply);
     }
 
-    function catchupAll() {
+    public function catchupAll()
+    {
         $this->dbh->query("UPDATE ttrss_user_entries SET
-						last_read = NOW(), unread = false WHERE unread = true AND owner_uid = " . $_SESSION["uid"]);
+                        last_read = NOW(), unread = false WHERE unread = true AND owner_uid = " . $_SESSION["uid"]);
         \SmallSmallRSS\CounterCache::zero_all($_SESSION["uid"]);
     }
 
-    function view() {
+    public function view()
+    {
         $timing_info = microtime(true);
 
         $reply = array('content' => '');
@@ -822,13 +836,13 @@ class Feeds extends ProtectedHandler {
         if ($feed < LABEL_BASE_INDEX) {
             $label_feed = feed_to_label_id($feed);
             $result = $this->dbh->query("SELECT id FROM ttrss_labels2 WHERE
-							id = '$label_feed' AND owner_uid = " . $_SESSION['uid']);
+                            id = '$label_feed' AND owner_uid = " . $_SESSION['uid']);
         } elseif (!$cat_view && is_numeric($feed) && $feed > 0) {
             $result = $this->dbh->query("SELECT id FROM ttrss_feeds WHERE
-							id = '$feed' AND owner_uid = " . $_SESSION['uid']);
+                            id = '$feed' AND owner_uid = " . $_SESSION['uid']);
         } elseif ($cat_view && is_numeric($feed) && $feed > 0) {
             $result = $this->dbh->query("SELECT id FROM ttrss_feed_categories WHERE
-							id = '$feed' AND owner_uid = " . $_SESSION['uid']);
+                            id = '$feed' AND owner_uid = " . $_SESSION['uid']);
         }
 
         if ($result && $this->dbh->num_rows($result) == 0) {
@@ -855,7 +869,7 @@ class Feeds extends ProtectedHandler {
 
         if (!$cat_view && is_numeric($feed) && $feed > 0) {
             $this->dbh->query("UPDATE ttrss_feeds SET last_viewed = NOW()
-							WHERE id = '$feed' AND owner_uid = ".$_SESSION["uid"]);
+                            WHERE id = '$feed' AND owner_uid = ".$_SESSION["uid"]);
         }
 
         $reply['headlines'] = array();
@@ -916,7 +930,8 @@ class Feeds extends ProtectedHandler {
 
     }
 
-    private function generate_dashboard_feed() {
+    private function generate_dashboard_feed()
+    {
         $reply = array();
 
         $reply['headlines']['id'] = -5;
@@ -928,7 +943,7 @@ class Feeds extends ProtectedHandler {
         $reply['headlines']['content'] .= "<p><span class=\"insensitive\">";
 
         $result = $this->dbh->query("SELECT ".SUBSTRING_FOR_DATE."(MAX(last_updated), 1, 19) AS last_updated FROM ttrss_feeds
-			WHERE owner_uid = " . $_SESSION['uid']);
+            WHERE owner_uid = " . $_SESSION['uid']);
 
         $last_updated = $this->dbh->fetch_result($result, 0, "last_updated");
         $last_updated = make_local_datetime($last_updated, false);
@@ -936,7 +951,7 @@ class Feeds extends ProtectedHandler {
         $reply['headlines']['content'] .= sprintf(__("Feeds last updated at %s"), $last_updated);
 
         $result = $this->dbh->query("SELECT COUNT(id) AS num_errors
-			FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]);
+            FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]);
 
         $num_errors = $this->dbh->fetch_result($result, 0, "num_errors");
 
@@ -955,7 +970,8 @@ class Feeds extends ProtectedHandler {
         return $reply;
     }
 
-    private function generate_error_feed($error) {
+    private function generate_error_feed($error)
+    {
         $reply = array();
 
         $reply['headlines']['id'] = -6;
@@ -972,7 +988,8 @@ class Feeds extends ProtectedHandler {
         return $reply;
     }
 
-    function quickAddFeed() {
+    public function quickAddFeed()
+    {
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"rpc\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"addfeed\">";
 
@@ -980,12 +997,12 @@ class Feeds extends ProtectedHandler {
         print "<div class=\"dlgSecCont\">";
 
         print "<div style='float : right'>
-			<img style='display : none'
-				id='feed_add_spinner' src='images/indicator_white.gif'></div>";
+            <img style='display : none'
+                id='feed_add_spinner' src='images/indicator_white.gif'></div>";
 
         print "<input style=\"font-size : 16px; width : 20em;\"
-			placeHolder=\"".__("Feed or site URL")."\"
-			dojoType=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"feed\" id=\"feedDlg_feedUrl\">";
+            placeHolder=\"".__("Feed or site URL")."\"
+            dojoType=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"feed\" id=\"feedDlg_feedUrl\">";
 
         print "<hr/>";
 
@@ -998,53 +1015,54 @@ class Feeds extends ProtectedHandler {
 
         print '<div id="feedDlg_feedsContainer" style="display : none">
 
-				<div class="dlgSec">' . __('Available feeds') . '</div>
-				<div class="dlgSecCont">'.
+                <div class="dlgSec">' . __('Available feeds') . '</div>
+                <div class="dlgSecCont">'.
             '<select id="feedDlg_feedContainerSelect"
-					dojoType="dijit.form.Select" size="3">
-					<script type="dojo/method" event="onChange" args="value">
-						dijit.byId("feedDlg_feedUrl").attr("value", value);
-					</script>
-				</select>'.
+                    dojoType="dijit.form.Select" size="3">
+                    <script type="dojo/method" event="onChange" args="value">
+                        dijit.byId("feedDlg_feedUrl").attr("value", value);
+                    </script>
+                </select>'.
             '</div></div>';
 
         print "<div id='feedDlg_loginContainer' style='display : none'>
 
-				<div class=\"dlgSec\">".__("Authentication")."</div>
-				<div class=\"dlgSecCont\">".
+                <div class=\"dlgSec\">".__("Authentication")."</div>
+                <div class=\"dlgSecCont\">".
 
             " <input dojoType=\"dijit.form.TextBox\" name='login'\"
-					placeHolder=\"".__("Login")."\"
-					style=\"width : 10em;\"> ".
+                    placeHolder=\"".__("Login")."\"
+                    style=\"width : 10em;\"> ".
             " <input
-					placeHolder=\"".__("Password")."\"
-					dojoType=\"dijit.form.TextBox\" type='password'
-					style=\"width : 10em;\" name='pass'\">
-			</div></div>";
+                    placeHolder=\"".__("Password")."\"
+                    dojoType=\"dijit.form.TextBox\" type='password'
+                    style=\"width : 10em;\" name='pass'\">
+            </div></div>";
 
 
         print "<div style=\"clear : both\">
-			<input type=\"checkbox\" name=\"need_auth\" dojoType=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"
-					onclick='checkboxToggleElement(this, \"feedDlg_loginContainer\")'>
-				<label for=\"feedDlg_loginCheck\">".
+            <input type=\"checkbox\" name=\"need_auth\" dojoType=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"
+                    onclick='checkboxToggleElement(this, \"feedDlg_loginContainer\")'>
+                <label for=\"feedDlg_loginCheck\">".
             __('This feed requires authentication.')."</div>";
 
         print "</form>";
 
         print "<div class=\"dlgButtons\">
-			<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedAddDlg').execute()\">".__('Subscribe')."</button>";
+            <button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedAddDlg').execute()\">".__('Subscribe')."</button>";
 
         if (!(defined('_DISABLE_FEED_BROWSER') && _DISABLE_FEED_BROWSER)) {
             print "<button dojoType=\"dijit.form.Button\" onclick=\"return feedBrowser()\">".__('More feeds')."</button>";
         }
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedAddDlg').hide()\">".__('Cancel')."</button>
-			</div>";
+            </div>";
 
         //return;
     }
 
-    function feedBrowser() {
+    public function feedBrowser()
+    {
         if (defined('_DISABLE_FEED_BROWSER') && _DISABLE_FEED_BROWSER) return;
 
         $browser_search = $this->escape_from_request("search");
@@ -1053,18 +1071,18 @@ class Feeds extends ProtectedHandler {
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"updateFeedBrowser\">";
 
         print "<div dojoType=\"dijit.Toolbar\">
-			<div style='float : right'>
-			<img style='display : none'
-				id='feed_browser_spinner' src='images/indicator_white.gif'>
-			<input name=\"search\" dojoType=\"dijit.form.TextBox\" size=\"20\" type=\"search\"
-				onchange=\"dijit.byId('feedBrowserDlg').update()\" value=\"$browser_search\">
-			<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').update()\">".__('Search')."</button>
-		</div>";
+            <div style='float : right'>
+            <img style='display : none'
+                id='feed_browser_spinner' src='images/indicator_white.gif'>
+            <input name=\"search\" dojoType=\"dijit.form.TextBox\" size=\"20\" type=\"search\"
+                onchange=\"dijit.byId('feedBrowserDlg').update()\" value=\"$browser_search\">
+            <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').update()\">".__('Search')."</button>
+        </div>";
 
         print " <select name=\"mode\" dojoType=\"dijit.form.Select\" onchange=\"dijit.byId('feedBrowserDlg').update()\">
-			<option value='1'>" . __('Popular feeds') . "</option>
-			<option value='2'>" . __('Feed archive') . "</option>
-			</select> ";
+            <option value='1'>" . __('Popular feeds') . "</option>
+            <option value='2'>" . __('Feed archive') . "</option>
+            </select> ";
 
         print __("limit:");
 
@@ -1088,33 +1106,26 @@ class Feeds extends ProtectedHandler {
         print "</ul>";
 
         print "<div align='center'>
-			<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').execute()\">".__('Subscribe')."</button>
-			<button dojoType=\"dijit.form.Button\" style='display : none' id='feed_archive_remove' onclick=\"dijit.byId('feedBrowserDlg').removeFromArchive()\">".__('Remove')."</button>
-			<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').hide()\" >".__('Cancel')."</button></div>";
+            <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').execute()\">".__('Subscribe')."</button>
+            <button dojoType=\"dijit.form.Button\" style='display : none' id='feed_archive_remove' onclick=\"dijit.byId('feedBrowserDlg').removeFromArchive()\">".__('Remove')."</button>
+            <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').hide()\" >".__('Cancel')."</button></div>";
 
     }
 
-    function search() {
+    public function search()
+    {
         $this->params = explode(":", $this->escape_from_request("param"), 2);
-
         $active_feed_id = sprintf("%d", $this->params[0]);
         $is_cat = $this->params[1] != "false";
-
         print "<div class=\"dlgSec\">".__('Look for')."</div>";
-
         print "<div class=\"dlgSecCont\">";
-
         print "<input dojoType=\"dijit.form.ValidationTextBox\"
-			style=\"font-size : 16px; width : 20em;\"
-			required=\"1\" name=\"query\" type=\"search\" value=''>";
-
+            style=\"font-size : 16px; width : 20em;\"
+            required=\"1\" name=\"query\" type=\"search\" value=''>";
         print "<hr/>".__('Limit search to:')." ";
-
         print "<select name=\"search_mode\" dojoType=\"dijit.form.Select\">
-			<option value=\"all_feeds\">".__('All feeds')."</option>";
-
+            <option value=\"all_feeds\">".__('All feeds')."</option>";
         $feed_title = getFeedTitle($active_feed_id);
-
         if (!$is_cat) {
             $feed_cat_title = getFeedCatTitle($active_feed_id);
         } else {
@@ -1145,14 +1156,12 @@ class Feeds extends ProtectedHandler {
 
         if (!SPHINX_ENABLED) {
             print "<div style=\"float : left\">
-				<a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/wiki/SearchSyntax\">Search syntax</a>
-				</div>";
+                <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/wiki/SearchSyntax\">Search syntax</a>
+                </div>";
         }
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').execute()\">".__('Search')."</button>
-		<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').hide()\">".__('Cancel')."</button>
-		</div>";
+        <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').hide()\">".__('Cancel')."</button>
+        </div>";
     }
-
-
 }

@@ -1,6 +1,8 @@
 <?php
 namespace SmallSmallRSS;
-class FeedEnclosure {
+
+class FeedEnclosure
+{
     public $link;
     public $type;
     public $length;

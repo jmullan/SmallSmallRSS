@@ -1,6 +1,7 @@
 <?php
 namespace SmallSmallRSS;
-class FeedItem_Atom extends FeedItem_Common {
+
+class FeedItem_Atom extends FeedItem_Abstract {
     function get_id() {
         $id = $this->elem->getElementsByTagName("id")->item(0);
 

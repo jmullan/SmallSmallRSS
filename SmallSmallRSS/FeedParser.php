@@ -1,7 +1,8 @@
 <?php
 namespace SmallSmallRSS;
 
-class FeedParser {
+class FeedParser
+{
     private $doc;
     private $error;
     private $items;
@@ -14,7 +15,8 @@ class FeedParser {
     const FEED_RSS = 1;
     const FEED_ATOM = 2;
 
-    function __construct($data) {
+    public function __construct($data)
+    {
         libxml_use_internal_errors(true);
         libxml_clear_errors();
         $this->doc = new \DOMDocument();
@@ -40,7 +42,8 @@ class FeedParser {
         $this->items = array();
     }
 
-    function init() {
+    public function init()
+    {
         $root = $this->doc->firstChild;
         $xpath = new \DOMXPath($this->doc);
         $xpath->registerNamespace('atom', 'http://www.w3.org/2005/Atom');
@@ -82,9 +85,9 @@ class FeedParser {
 
                     $title = $xpath->query("//atom:feed/atom:title")->item(0);
 
-                    if (!$title)
+                    if (!$title) {
                         $title = $xpath->query("//atom03:feed/atom03:title")->item(0);
-
+                    }
 
                     if ($title) {
                         $this->title = $title->nodeValue;
@@ -92,9 +95,9 @@ class FeedParser {
 
                     $link = $xpath->query("//atom:feed/atom:link[not(@rel)]")->item(0);
 
-                    if (!$link)
+                    if (!$link) {
                         $link = $xpath->query("//atom03:feed/atom03:link[not(@rel)]")->item(0);
-
+                    }
 
                     if ($link && $link->hasAttributes()) {
                         $this->link = $link->getAttribute("href");
@@ -102,9 +105,9 @@ class FeedParser {
 
                     $articles = $xpath->query("//atom:entry");
 
-                    if (!$articles || $articles->length == 0)
+                    if (!$articles || $articles->length == 0) {
                         $articles = $xpath->query("//atom03:entry");
-
+                    }
                     foreach ($articles as $article) {
                         array_push($this->items, new \SmallSmallRSS\FeedItem_Atom($article, $this->doc, $this->xpath));
                     }
@@ -120,10 +123,11 @@ class FeedParser {
                     $link = $xpath->query("//channel/link")->item(0);
 
                     if ($link) {
-                        if ($link->getAttribute("href"))
+                        if ($link->getAttribute("href")) {
                             $this->link = $link->getAttribute("href");
-                        elseif ($link->nodeValue)
+                        } elseif ($link->nodeValue) {
                             $this->link = $link->nodeValue;
+                        }
                     }
 
                     $articles = $xpath->query("//channel/item");
@@ -165,34 +169,43 @@ class FeedParser {
         }
     }
 
-    function format_error($error) {
+    public function format_error($error)
+    {
         if ($error) {
             return sprintf(
                 "LibXML error %s at line %d (column %d): %s",
-                $error->code, $error->line, $error->column,
-                $error->message);
+                $error->code,
+                $error->line,
+                $error->column,
+                $error->message
+            );
         } else {
             return "";
         }
     }
 
-    function error() {
+    public function error()
+    {
         return $this->error;
     }
 
-    function get_link() {
+    public function get_link()
+    {
         return $this->link;
     }
 
-    function get_title() {
+    public function get_title()
+    {
         return $this->title;
     }
 
-    function get_items() {
+    public function get_items()
+    {
         return $this->items;
     }
 
-    function get_links($rel) {
+    public function get_links($rel)
+    {
         $rv = array();
 
         switch ($this->type) {

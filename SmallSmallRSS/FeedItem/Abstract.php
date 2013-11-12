@@ -1,4 +1,6 @@
 <?php
+namespace SmallSmallRSS;
+
 abstract class FeedItem_Abstract extends FeedItem {
     protected $elem;
     protected $xpath;

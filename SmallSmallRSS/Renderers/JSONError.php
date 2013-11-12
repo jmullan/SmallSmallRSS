@@ -2,7 +2,7 @@
 namespace SmallSmallRSS\Renderers;
 class JSONError extends \SmallSmallRSS\Renderers\Base {
 
-    static public $error_code;
+    public static $error_code;
 
     public function __construct($error_code) {
         $this->error_code = $error_code;

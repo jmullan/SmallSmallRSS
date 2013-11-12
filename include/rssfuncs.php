@@ -146,9 +146,6 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 
     // For each feed, we call the feed update function.
     foreach ($feeds_to_update as $feed) {
-        _debug("Base feed: $feed", $debug);
-        // since we have the data cached, we can deal with other feeds with the same url
-
         $tmp_result = db_query("SELECT DISTINCT ttrss_feeds.id,last_updated,ttrss_feeds.owner_uid
 			FROM ttrss_feeds, ttrss_users, ttrss_user_prefs WHERE
 				ttrss_user_prefs.owner_uid = ttrss_feeds.owner_uid AND
@@ -168,20 +165,14 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
             }
         }
     }
-
-    // Send feed digests by email if needed.
     \SmallSmallRSS\Digest::send_headlines($debug);
     return $nf;
 
-} // function update_daemon_common
+}
 
-// ignore_daemon is not used
 function update_rss_feed($feed, $no_cache = false) {
-
     $debug_enabled = defined('DAEMON_EXTENDED_DEBUG') || !empty($_REQUEST['xdebug']);
-
     _debug("start", $debug_enabled);
-
     $result = db_query("SELECT id,update_interval,auth_login,
 			feed_url,auth_pass,cache_images,last_updated,
 			mark_unread_on_update, owner_uid,

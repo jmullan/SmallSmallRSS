@@ -166,7 +166,7 @@ class Colors {
     }
 
     ### Helper function for self::hsl2rgb().
-    static public function hue2rgb($m1, $m2, $h) {
+    public static function hue2rgb($m1, $m2, $h) {
         $h = ($h < 0) ? $h + 1 : (($h > 1) ? $h - 1 : $h);
         if ($h * 6 < 1) return $m1 + ($m2 - $m1) * $h * 6;
         if ($h * 2 < 1) return $m2;
@@ -175,7 +175,7 @@ class Colors {
     }
 
     ### Convert a hex color into an RGB triplet.
-    static public function unpack($hex, $normalize = false) {
+    public static function unpack($hex, $normalize = false) {
         $out = array();
         if (strpos($hex, '#') !== 0)
             $hex = _resolve_htmlcolor($hex);
@@ -190,7 +190,7 @@ class Colors {
     }
 
     ### Convert an RGB triplet to a hex color.
-    static public function pack($rgb, $normalize = false) {
+    public static function pack($rgb, $normalize = false) {
         $out = 0;
         foreach ($rgb as $k => $v) {
             $out |= (($v * ($normalize ? 255 : 1)) << (16 - $k * 8));
@@ -199,7 +199,7 @@ class Colors {
     }
 
     ### RGB >> HSL
-    static public function rgb2hsl($rgb) {
+    public static function rgb2hsl($rgb) {
         $r = $rgb[0];
         $g = $rgb[1];
         $b = $rgb[2];
@@ -218,7 +218,7 @@ class Colors {
         return array($h, $s, $l);
     }
 
-    static public function rgb2hsv($arr) {
+    public static function rgb2hsv($arr) {
         $r = $arr[0];
         $g = $arr[1];
         $b = $arr[2];
@@ -263,7 +263,7 @@ class Colors {
     }
 
     ### HSL >> RGB
-    static public function hsl2rgb($hsl) {
+    public static function hsl2rgb($hsl) {
         $h = $hsl[0]; $s = $hsl[1]; $l = $hsl[2];
         $m2 = ($l <= 0.5) ? $l * ($s + 1) : $l + $s - $l*$s;
         $m1 = $l * 2 - $m2;

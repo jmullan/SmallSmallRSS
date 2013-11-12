@@ -3,7 +3,7 @@ namespace SmallSmallRSS;
 
 class Crypt {
 
-    static public function de($str) {
+    public static function de($str) {
         $key = hash('SHA256', FEED_CRYPT_KEY, true);
         $pair = explode(":", $str);
         if (count($pair) == 2) {
@@ -20,7 +20,7 @@ class Crypt {
 
         return false;
     }
-    static public function en($str) {
+    public static function en($str) {
         $key = hash('SHA256', FEED_CRYPT_KEY, true);
 
         $iv = mcrypt_create_iv(

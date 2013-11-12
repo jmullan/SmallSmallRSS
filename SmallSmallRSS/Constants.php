@@ -10,7 +10,7 @@ class Constants {
     # one year in seconds
     const COOKIE_LIFETIME_LONG = 31536000;
 
-    static public function purge_intervals() {
+    public static function purge_intervals() {
         return array(
             0 => __("Use default"),
             -1 => __("Never purge"),
@@ -22,7 +22,7 @@ class Constants {
         );
     }
 
-    static public function update_intervals() {
+    public static function update_intervals() {
         return array(
             0 => __("Default interval"),
             -1 => __("Disable updates"),
@@ -35,7 +35,7 @@ class Constants {
             10080 => __("Weekly")
         );
     }
-    static public function update_intervals_nodefault() {
+    public static function update_intervals_nodefault() {
         return array(
             -1 => __("Disable updates"),
             15 => __("Each 15 minutes"),
@@ -47,14 +47,14 @@ class Constants {
             10080 => __("Weekly")
         );
     }
-    static public function access_level_names() {
+    public static function access_level_names() {
         return array(
             0 => __("User"),
             5 => __("Power User"),
             10 => __("Administrator")
         );
     }
-    static public function errors() {
+    public static function errors() {
         $ERRORS = array(
             0 => "",
             1 => __("This program requires XmlHttpRequest"
@@ -78,7 +78,7 @@ class Constants {
         );
         return $ERRORS;
     }
-    static public function error_description($error_code) {
+    public static function error_description($error_code) {
         $errors = self::errors();
         return $errors[$error_code];
     }

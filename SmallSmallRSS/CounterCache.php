@@ -4,14 +4,14 @@ namespace SmallSmallRSS;
 require_once __DIR__ . '/../include/db.php';
 
 class CounterCache {
-    static public function zero_all($owner_uid) {
+    public static function zero_all($owner_uid) {
         db_query("UPDATE ttrss_counters_cache SET
 			value = 0 WHERE owner_uid = '$owner_uid'");
 
         db_query("UPDATE ttrss_cat_counters_cache SET
 			value = 0 WHERE owner_uid = '$owner_uid'");
     }
-    static public function remove($feed_id, $owner_uid, $is_cat = false) {
+    public static function remove($feed_id, $owner_uid, $is_cat = false) {
 
         if (!$is_cat) {
             $table = "ttrss_counters_cache";
@@ -24,7 +24,7 @@ class CounterCache {
 
     }
 
-    static public function update_all($owner_uid) {
+    public static function update_all($owner_uid) {
 
         if (get_pref('ENABLE_FEED_CATS', $owner_uid)) {
 
@@ -51,7 +51,7 @@ class CounterCache {
         }
     }
 
-    static public function find($feed_id, $owner_uid, $is_cat = false,
+    public static function find($feed_id, $owner_uid, $is_cat = false,
                          $no_update = false) {
 
         if (!is_numeric($feed_id)) return;
@@ -84,7 +84,7 @@ class CounterCache {
 
     }
 
-    static public function update($feed_id, $owner_uid, $is_cat = false,
+    public static function update($feed_id, $owner_uid, $is_cat = false,
                            $update_pcat = true) {
 
         if (!is_numeric($feed_id)) {

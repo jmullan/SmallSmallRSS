@@ -12,7 +12,7 @@ class Session {
     static $session_expire = 86400;
     static $session_name = 'ttrss_sid';
 
-    static public function init() {
+    public static function init() {
         self::$session_expire = max(SESSION_COOKIE_LIFETIME, 86400);
         if (defined('TTRSS_SESSION_NAME')) {
             self::$session_name = TTRSS_SESSION_NAME;

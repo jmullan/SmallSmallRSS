@@ -1,23 +1,28 @@
 <?php
-class DbUpdater {
+class DbUpdater
+{
     private $db_type;
     private $need_version;
 
-    function __construct($db_type, $need_version) {
+    function __construct($db_type, $need_version)
+    {
         $this->db_type = $db_type;
         $this->need_version = (int) $need_version;
     }
 
-    function getSchemaVersion() {
+    function getSchemaVersion()
+    {
         $result = \SmallSmallRSS\Database::query("SELECT schema_version FROM ttrss_version");
         return (int) \SmallSmallRSS\Database::fetch_result($result, 0, "schema_version");
     }
 
-    function isUpdateRequired() {
+    function isUpdateRequired()
+    {
         return $this->getSchemaVersion() < $this->need_version;
     }
 
-    function getSchemaLines($version) {
+    function getSchemaLines($version)
+    {
         $filename = "schema/versions/" . $this->db_type . "/$version.sql";
 
         if (file_exists($filename)) {
@@ -27,7 +32,8 @@ class DbUpdater {
         }
     }
 
-    function performUpdateTo($version) {
+    function performUpdateTo($version)
+    {
         if ($this->getSchemaVersion() == $version - 1) {
 
             $lines = $this->getSchemaLines($version);

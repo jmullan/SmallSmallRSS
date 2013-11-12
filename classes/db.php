@@ -1,10 +1,12 @@
 <?php
-class Db implements IDb {
+class Db implements IDb
+{
     private static $instance;
     private $adapter;
     private $link;
 
-    private function __construct() {
+    private function __construct()
+    {
 
         $er = error_reporting(E_ALL);
 
@@ -27,7 +29,8 @@ class Db implements IDb {
             }
         }
 
-        if (!$this->adapter) die("Error initializing database adapter for " . DB_TYPE);
+        if (!$this->adapter) {  die("Error initializing database adapter for " . DB_TYPE);
+        }
 
         $this->link = $this->adapter->connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, defined('DB_PORT') ? DB_PORT : "");
 
@@ -38,60 +41,72 @@ class Db implements IDb {
         error_reporting($er);
     }
 
-    private function __clone() {
+    private function __clone()
+    {
         //
     }
 
-    public static function get() {
+    public static function get()
+    {
         if (self::$instance == null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    static function quote($str) {
+    static function quote($str)
+    {
         return ("'$str'");
     }
 
-    function reconnect() {
+    function reconnect()
+    {
         $this->link = $this->adapter->connect(DB_HOST, DB_USER, DB_PASS, DB_NAME, defined('DB_PORT') ? DB_PORT : "");
     }
 
-    function connect($host, $user, $pass, $db, $port) {
+    function connect($host, $user, $pass, $db, $port)
+    {
         //return $this->adapter->connect($host, $user, $pass, $db, $port);
         return;
     }
 
-    function escape_string($s, $strip_tags = true) {
+    function escape_string($s, $strip_tags = true)
+    {
         return $this->adapter->escape_string($s, $strip_tags);
     }
 
-    function query($query, $die_on_error = true) {
+    function query($query, $die_on_error = true)
+    {
         return $this->adapter->query($query, $die_on_error);
     }
 
-    function fetch_assoc($result) {
+    function fetch_assoc($result)
+    {
         return $this->adapter->fetch_assoc($result);
     }
 
-    function num_rows($result) {
+    function num_rows($result)
+    {
         return $this->adapter->num_rows($result);
     }
 
-    function fetch_result($result, $row, $param) {
+    function fetch_result($result, $row, $param)
+    {
         return $this->adapter->fetch_result($result, $row, $param);
     }
 
-    function close() {
+    function close()
+    {
         return $this->adapter->close();
     }
 
-    function affected_rows($result) {
+    function affected_rows($result)
+    {
         return $this->adapter->affected_rows($result);
     }
 
-    function last_error() {
+    function last_error()
+    {
         return $this->adapter->last_error();
     }
-
 }

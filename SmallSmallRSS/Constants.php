@@ -1,6 +1,7 @@
 <?php
 namespace SmallSmallRSS;
-class Constants {
+class Constants
+{
     const VERSION = '1.8';
     const EXPECTED_CONFIG_VERSION = 26;
     const SCHEMA_VERSION = 121;
@@ -10,7 +11,8 @@ class Constants {
     # one year in seconds
     const COOKIE_LIFETIME_LONG = 31536000;
 
-    public static function purge_intervals() {
+    public static function purge_intervals()
+    {
         return array(
             0 => __("Use default"),
             -1 => __("Never purge"),
@@ -22,7 +24,8 @@ class Constants {
         );
     }
 
-    public static function update_intervals() {
+    public static function update_intervals()
+    {
         return array(
             0 => __("Default interval"),
             -1 => __("Disable updates"),
@@ -35,7 +38,8 @@ class Constants {
             10080 => __("Weekly")
         );
     }
-    public static function update_intervals_nodefault() {
+    public static function update_intervals_nodefault()
+    {
         return array(
             -1 => __("Disable updates"),
             15 => __("Each 15 minutes"),
@@ -47,38 +51,51 @@ class Constants {
             10080 => __("Weekly")
         );
     }
-    public static function access_level_names() {
+    public static function access_level_names()
+    {
         return array(
             0 => __("User"),
             5 => __("Power User"),
             10 => __("Administrator")
         );
     }
-    public static function errors() {
+    public static function errors()
+    {
         $ERRORS = array(
             0 => "",
-            1 => __("This program requires XmlHttpRequest"
-                    . " to function properly. Your browser doesn't seem to support it."),
-            2 => __("This program requires cookies"
-                    . " to function properly. Your browser doesn't seem to support them."),
+            1 => __(
+                "This program requires XmlHttpRequest"
+                . " to function properly. Your browser doesn't seem to support it."
+            ),
+            2 => __(
+                "This program requires cookies"
+                . " to function properly. Your browser doesn't seem to support them."
+            ),
             3 => __("Backend sanity check failed."),
             4 => __("Frontend sanity check failed."),
-            5 => __("Incorrect database schema version. &lt,a href='db-updater.php'&gt,"
-                    . " Please update&lt,/a&gt,."),
+            5 => __(
+                "Incorrect database schema version. &lt,a href='db-updater.php'&gt,"
+                . " Please update&lt,/a&gt,."
+            ),
             6 => __("Request not authorized."),
             7 => __("No operation to perform."),
-            8 => __("Could not display feed: query failed. Please check label match syntax"
-                    . " or local configuration."),
+            8 => __(
+                "Could not display feed: query failed. Please check label match syntax"
+                . " or local configuration."
+            ),
             8 => __("Denied. Your access level is insufficient to access this page."),
             9 => __("Configuration check failed"),
-            10 => __("Your version of MySQL is not currently supported. Please see official"
-                     . " site for more information."),
+            10 => __(
+                "Your version of MySQL is not currently supported. Please see official"
+                . " site for more information."
+            ),
             11 => "[This error is not returned by server]",
             12 => __("SQL escaping test failed, check your database and PHP configuration")
         );
         return $ERRORS;
     }
-    public static function error_description($error_code) {
+    public static function error_description($error_code)
+    {
         $errors = self::errors();
         return $errors[$error_code];
     }

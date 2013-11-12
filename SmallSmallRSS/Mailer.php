@@ -9,7 +9,8 @@ require_once 'lib/phpmailer/class.phpmailer.php';
  *	@author Derek Murawsky
  *	@version .1 (alpha)
  */
-class Mailer extends PHPMailer {
+class Mailer extends PHPMailer
+{
     //define all items that we want to override with defaults in PHPMailer
     public $From = SMTP_FROM_ADDRESS;
     public $FromName = SMTP_FROM_NAME;
@@ -17,7 +18,8 @@ class Mailer extends PHPMailer {
     public $PluginDir = "lib/phpmailer/";
     public $ContentType = "text/html"; //default email type is HTML
 
-    function __construct() {
+    function __construct()
+    {
         $this->SetLanguage("en", "lib/phpmailer/language/");
 
         if (SMTP_SERVER) {
@@ -42,8 +44,9 @@ class Mailer extends PHPMailer {
             $this->Username = SMTP_LOGIN;
             $this->Password = SMTP_PASSWORD;
         }
-        if (SMTP_SECURE)
+        if (SMTP_SECURE) {
             $this->SMTPSecure = SMTP_SECURE;
+        }
     }
     /**
      *  A simple mail function to send email using the defaults
@@ -53,7 +56,8 @@ class Mailer extends PHPMailer {
      *	@param $subject A string with the emails subject
      *	@param $body A string containing the body of the email
      */
-    public function quickMail($toAddress, $toName, $subject, $body, $altbody = "") {
+    public function quickMail($toAddress, $toName, $subject, $body, $altbody = "")
+    {
         $this->addAddress($toAddress, $toName);
         $this->Subject = $subject;
         $this->Body = $body;

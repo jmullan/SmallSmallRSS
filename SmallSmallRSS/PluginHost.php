@@ -1,6 +1,7 @@
 <?php
 namespace SmallSmallRSS;
-class PluginHost {
+class PluginHost
+{
     private $dbh;
     private $hooks = array();
     private $plugins = array();
@@ -44,39 +45,48 @@ class PluginHost {
     const KIND_SYSTEM = 2;
     const KIND_USER = 3;
 
-    function __construct() {
+    function __construct()
+    {
         $this->dbh = \Db::get();
 
         $this->storage = array();
     }
 
-    private function __clone() {}
+    private function __clone()
+    {
+    }
 
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance == null) {
             self::$instance = new self();
         }
         return self::$instance;
     }
 
-    private function register_plugin($name, $plugin) {
+    private function register_plugin($name, $plugin)
+    {
         $this->plugins[$name] = $plugin;
     }
 
     // needed for compatibility with API 1
-    function get_link() {
+    function get_link()
+    {
         return false;
     }
 
-    function get_dbh() {
+    function get_dbh()
+    {
         return $this->dbh;
     }
 
-    function get_plugins() {
+    function get_plugins()
+    {
         return $this->plugins;
     }
 
-    function get_plugin($name) {
+    function get_plugin($name)
+    {
         if (isset($this->plugins[$name])) {
             return $this->plugins[$name];
         } else {
@@ -84,13 +94,15 @@ class PluginHost {
         }
     }
 
-    function run_hooks($type, $method, $args) {
+    function run_hooks($type, $method, $args)
+    {
         foreach ($this->get_hooks($type) as $hook) {
             $hook->$method($args);
         }
     }
 
-    function add_hook($type, $sender) {
+    function add_hook($type, $sender)
+    {
         if (!isset($this->hooks[$type]) || !is_array($this->hooks[$type])) {
             $this->hooks[$type] = array();
         }
@@ -98,7 +110,8 @@ class PluginHost {
         array_push($this->hooks[$type], $sender);
     }
 
-    function del_hook($type, $sender) {
+    function del_hook($type, $sender)
+    {
         if (is_array($this->hooks[$type])) {
             $key = array_Search($this->hooks[$type], $sender);
             if ($key !== false) {
@@ -107,19 +120,22 @@ class PluginHost {
         }
     }
 
-    function get_hooks($type) {
+    function get_hooks($type)
+    {
         if (isset($this->hooks[$type])) {
             return $this->hooks[$type];
         } else {
             return array();
         }
     }
-    function load_all($kind, $owner_uid = false) {
+    function load_all($kind, $owner_uid = false)
+    {
         $plugins = array_map("basename", glob("plugins/*"));
         $this->load(join(",", $plugins), $kind, $owner_uid);
     }
 
-    function load($classlist, $kind, $owner_uid = false) {
+    function load($classlist, $kind, $owner_uid = false)
+    {
         $plugins = explode(",", $classlist);
         $this->owner_uid = (int) $owner_uid;
         foreach ($plugins as $class) {
@@ -152,7 +168,8 @@ class PluginHost {
                     user_error(
                         "Plugin $class is not compatible with current API version (need: "
                         . \SmallSmallRSS\PluginHost::API_VERSION
-                        . ", got: $plugin_api)", E_USER_WARNING);
+                        . ", got: $plugin_api)", E_USER_WARNING
+                    );
                     continue;
                 }
                 $this->last_registered = $class;
@@ -178,14 +195,16 @@ class PluginHost {
         }
     }
 
-    function is_system($plugin) {
+    function is_system($plugin)
+    {
         $about = $plugin->about();
 
         return @$about[3];
     }
 
     // only system plugins are allowed to modify routing
-    function add_handler($handler, $method, $sender) {
+    function add_handler($handler, $method, $sender)
+    {
         $handler = str_replace("-", "_", strtolower($handler));
         $method = strtolower($method);
         if ($this->is_system($sender)) {
@@ -197,7 +216,8 @@ class PluginHost {
         }
     }
 
-    function del_handler($handler, $method, $sender) {
+    function del_handler($handler, $method, $sender)
+    {
         $handler = str_replace("-", "_", strtolower($handler));
         $method = strtolower($method);
 
@@ -206,7 +226,8 @@ class PluginHost {
         }
     }
 
-    function lookup_handler($handler, $method) {
+    function lookup_handler($handler, $method)
+    {
         $handler = str_replace("-", "_", strtolower($handler));
         $method = strtolower($method);
 
@@ -221,7 +242,8 @@ class PluginHost {
         return false;
     }
 
-    function add_command($command, $description, $sender, $suffix = "", $arghelp = "") {
+    function add_command($command, $description, $sender, $suffix = "", $arghelp = "")
+    {
         $command = str_replace("-", "_", strtolower($command));
 
         $this->commands[$command] = array("description" => $description,
@@ -230,13 +252,15 @@ class PluginHost {
                                           "class" => $sender);
     }
 
-    function del_command($command) {
+    function del_command($command)
+    {
         $command = "-" . strtolower($command);
 
         unset($this->commands[$command]);
     }
 
-    function lookup_command($command) {
+    function lookup_command($command)
+    {
         $command = "-" . strtolower($command);
 
         if (is_array($this->commands[$command])) {
@@ -248,11 +272,13 @@ class PluginHost {
         return false;
     }
 
-    function get_commands() {
+    function get_commands()
+    {
         return $this->commands;
     }
 
-    function run_commands($args) {
+    function run_commands($args)
+    {
         foreach ($this->get_commands() as $command => $data) {
             if (isset($args[$command])) {
                 $command = str_replace("-", "", $command);
@@ -261,10 +287,13 @@ class PluginHost {
         }
     }
 
-    function load_data($force = false) {
+    function load_data($force = false)
+    {
         if ($this->owner_uid)  {
-            $result = $this->dbh->query("SELECT name, content FROM ttrss_plugin_storage
-				WHERE owner_uid = '".$this->owner_uid."'");
+            $result = $this->dbh->query(
+                "SELECT name, content FROM ttrss_plugin_storage
+				WHERE owner_uid = '".$this->owner_uid."'"
+            );
 
             while ($line = $this->dbh->fetch_assoc($result)) {
                 $this->storage[$line["name"]] = unserialize($line["content"]);
@@ -272,47 +301,61 @@ class PluginHost {
         }
     }
 
-    private function save_data($plugin) {
+    private function save_data($plugin)
+    {
         if ($this->owner_uid) {
             $plugin = $this->dbh->escape_string($plugin);
 
             $this->dbh->query("BEGIN");
 
-            $result = $this->dbh->query("SELECT id FROM ttrss_plugin_storage WHERE
-				owner_uid= '".$this->owner_uid."' AND name = '$plugin'");
+            $result = $this->dbh->query(
+                "SELECT id FROM ttrss_plugin_storage WHERE
+				owner_uid= '".$this->owner_uid."' AND name = '$plugin'"
+            );
 
-            if (!isset($this->storage[$plugin]))
+            if (!isset($this->storage[$plugin])) {
                 $this->storage[$plugin] = array();
+            }
 
-            $content = $this->dbh->escape_string(serialize($this->storage[$plugin]),
-                                                 false);
+            $content = $this->dbh->escape_string(
+                serialize($this->storage[$plugin]),
+                false
+            );
 
             if ($this->dbh->num_rows($result) != 0) {
-                $this->dbh->query("UPDATE ttrss_plugin_storage SET content = '$content'
-					WHERE owner_uid= '".$this->owner_uid."' AND name = '$plugin'");
+                $this->dbh->query(
+                    "UPDATE ttrss_plugin_storage SET content = '$content'
+					WHERE owner_uid= '".$this->owner_uid."' AND name = '$plugin'"
+                );
 
             } else {
-                $this->dbh->query("INSERT INTO ttrss_plugin_storage
+                $this->dbh->query(
+                    "INSERT INTO ttrss_plugin_storage
 					(name,owner_uid,content) VALUES
-					('$plugin','".$this->owner_uid."','$content')");
+					('$plugin','".$this->owner_uid."','$content')"
+                );
             }
 
             $this->dbh->query("COMMIT");
         }
     }
 
-    function set($sender, $name, $value, $sync = true) {
+    function set($sender, $name, $value, $sync = true)
+    {
         $idx = get_class($sender);
 
-        if (!isset($this->storage[$idx]))
+        if (!isset($this->storage[$idx])) {
             $this->storage[$idx] = array();
+        }
 
         $this->storage[$idx][$name] = $value;
 
-        if ($sync) $this->save_data(get_class($sender));
+        if ($sync) {  $this->save_data(get_class($sender));
+        }
     }
 
-    function get($sender, $name, $default_value = false) {
+    function get($sender, $name, $default_value = false)
+    {
         $idx = get_class($sender);
 
         if (isset($this->storage[$idx][$name])) {
@@ -322,7 +365,8 @@ class PluginHost {
         }
     }
 
-    function get_all($sender) {
+    function get_all($sender)
+    {
         $idx = get_class($sender);
         if (isset($this->storage[$idx])) {
             return $this->storage[$idx];
@@ -330,42 +374,51 @@ class PluginHost {
         return null;
     }
 
-    function clear_data($sender) {
+    function clear_data($sender)
+    {
         if ($this->owner_uid) {
             $idx = get_class($sender);
 
             unset($this->storage[$idx]);
 
-            $this->dbh->query("DELETE FROM ttrss_plugin_storage WHERE name = '$idx'
-				AND owner_uid = " . $this->owner_uid);
+            $this->dbh->query(
+                "DELETE FROM ttrss_plugin_storage WHERE name = '$idx'
+				AND owner_uid = " . $this->owner_uid
+            );
         }
     }
 
-    function set_debug($debug) {
+    function set_debug($debug)
+    {
         $this->debug = $debug;
     }
 
-    function get_debug() {
+    function get_debug()
+    {
         return $this->debug;
     }
 
     // Plugin feed functions are *EXPERIMENTAL*!
 
     // cat_id: only -1 is supported (Special)
-    function add_feed($cat_id, $title, $icon, $sender) {
+    function add_feed($cat_id, $title, $icon, $sender)
+    {
         if (!isset($this->feeds[$cat_id])) {
             $this->feeds[$cat_id] = array();
         }
 
         $id = count($this->feeds[$cat_id]);
 
-        array_push($this->feeds[$cat_id],
-                   array('id' => $id, 'title' => $title, 'sender' => $sender, 'icon' => $icon));
+        array_push(
+            $this->feeds[$cat_id],
+            array('id' => $id, 'title' => $title, 'sender' => $sender, 'icon' => $icon)
+        );
 
         return $id;
     }
 
-    function get_feeds($cat_id) {
+    function get_feeds($cat_id)
+    {
         if (!isset($this->feeds[$cat_id])) {
             $this->feeds[$cat_id] = array();
         }
@@ -373,7 +426,8 @@ class PluginHost {
     }
 
     // convert feed_id (e.g. -129) to pfeed_id first
-    function get_feed_handler($pfeed_id) {
+    function get_feed_handler($pfeed_id)
+    {
         foreach ($this->feeds as $cat) {
             foreach ($cat as $feed) {
                 if ($feed['id'] == $pfeed_id) {
@@ -383,21 +437,25 @@ class PluginHost {
         }
     }
 
-    static function pfeed_to_feed_id($label) {
+    static function pfeed_to_feed_id($label)
+    {
         return PLUGIN_FEED_BASE_INDEX - 1 - abs($label);
     }
 
-    static function feed_to_pfeed_id($feed) {
+    static function feed_to_pfeed_id($feed)
+    {
         return PLUGIN_FEED_BASE_INDEX - 1 + abs($feed);
     }
 
-    function add_api_method($name, $sender) {
+    function add_api_method($name, $sender)
+    {
         if ($this->is_system($sender)) {
             $this->api_methods[strtolower($name)] = $sender;
         }
     }
 
-    function get_api_method($name) {
+    function get_api_method($name)
+    {
         $name = strtolower($name);
         if (isset($this->api_methods[$name])) {
             return $this->api_methods[$name];

@@ -1,13 +1,16 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Backend extends Handler {
-    function loading() {
+class Backend extends Handler
+{
+    function loading()
+    {
         header("Content-type: text/html");
         print __("Loading, please wait...") . " " .
             "<img src='images/indicator_tiny.gif'>";
     }
 
-    function digestTest() {
+    function digestTest()
+    {
         header("Content-type: text/html");
         $rv = \SmallSmallRSS\Digest::prepare_headlines($_SESSION['uid'], 1, 1000);
 
@@ -16,13 +19,15 @@ class Backend extends Handler {
         print_r($rv);
     }
 
-    private function display_main_help() {
+    private function display_main_help()
+    {
         $info = get_hotkeys_info();
         $imap = get_hotkeys_map();
         $omap = array();
 
         foreach ($imap[1] as $sequence => $action) {
-            if (!isset($omap[$action])) $omap[$action] = array();
+            if (!isset($omap[$action])) {  $omap[$action] = array();
+            }
 
             array_push($omap[$action], $sequence);
         }
@@ -30,7 +35,8 @@ class Backend extends Handler {
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             "<a target=\"_blank\" href=\"http://tt-rss.org/wiki/InterfaceTips\">"
             . __("Other interface tips are available in the Tiny Tiny RSS wiki.")
-            . "</a>");
+            . "</a>"
+        );
 
         print "<ul class='helpKbList' id='helpKbList'>";
 
@@ -45,9 +51,11 @@ class Backend extends Handler {
                 if (is_array($omap[$action])) {
                     foreach ($omap[$action] as $sequence) {
                         if (strpos($sequence, "|") !== false) {
-                            $sequence = substr($sequence,
-                                               strpos($sequence, "|")+1,
-                                               strlen($sequence));
+                            $sequence = substr(
+                                $sequence,
+                                strpos($sequence, "|")+1,
+                                strlen($sequence)
+                            );
                         } else {
                             $keys = explode(" ", $sequence);
 
@@ -84,7 +92,8 @@ class Backend extends Handler {
         print "</ul>";
     }
 
-    function help() {
+    function help()
+    {
         $topic = basename($_REQUEST["topic"]);
 
         switch ($topic) {

@@ -1,6 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class PublicHandler extends Handler {
+class PublicHandler extends Handler
+{
 
     private function generate_syndicated_feed($owner_uid, $feed, $is_cat,
                                               $limit, $offset, $search, $search_mode,
@@ -13,12 +14,14 @@ class PublicHandler extends Handler {
             "padding : 5px; border-style : dashed; border-color : #e7d796;".
             "margin-bottom : 1em; color : #9a8c59;";
 
-        if (!$limit) $limit = 60;
+        if (!$limit) {  $limit = 60;
+        }
 
         $date_sort_field = "date_entered DESC, updated DESC";
 
-        if ($feed == -2)
+        if ($feed == -2) {
             $date_sort_field = "last_published DESC";
+        }
         elseif ($feed == -1)
             $date_sort_field = "last_marked DESC";
 
@@ -34,10 +37,12 @@ class PublicHandler extends Handler {
                 break;
         }
 
-        $qfh_ret = queryFeedHeadlines($feed,
-                                      1, $view_mode, $is_cat, $search, $search_mode,
-                                      $date_sort_field, $offset, $owner_uid,
-                                      false, 0, false, true);
+        $qfh_ret = queryFeedHeadlines(
+            $feed,
+            1, $view_mode, $is_cat, $search, $search_mode,
+            $date_sort_field, $offset, $owner_uid,
+            false, 0, false, true
+        );
 
         $result = $qfh_ret[0];
 
@@ -54,10 +59,12 @@ class PublicHandler extends Handler {
             header("Last-Modified: $last_modified", true);
         }
 
-        $qfh_ret = queryFeedHeadlines($feed,
-                                      $limit, $view_mode, $is_cat, $search, $search_mode,
-                                      $date_sort_field, $offset, $owner_uid,
-                                      false, 0, false, true);
+        $qfh_ret = queryFeedHeadlines(
+            $feed,
+            $limit, $view_mode, $is_cat, $search, $search_mode,
+            $date_sort_field, $offset, $owner_uid,
+            false, 0, false, true
+        );
 
 
         $result = $qfh_ret[0];
@@ -69,7 +76,8 @@ class PublicHandler extends Handler {
             "/public.php?op=rss&id=-2&key=" .
             get_feed_access_key(-2, false, $owner_uid);
 
-        if (!$feed_site_url) $feed_site_url = get_self_url_prefix();
+        if (!$feed_site_url) {  $feed_site_url = get_self_url_prefix();
+        }
 
         if ($format == 'atom') {
             $tpl = new MiniTemplator;
@@ -92,8 +100,10 @@ class PublicHandler extends Handler {
                 $tpl->setVariable('ARTICLE_ID', htmlspecialchars($line['link']), true);
                 $tpl->setVariable('ARTICLE_LINK', htmlspecialchars($line['link']), true);
                 $tpl->setVariable('ARTICLE_TITLE', htmlspecialchars($line['title']), true);
-                $tpl->setVariable('ARTICLE_EXCERPT',
-                                  truncate_string(strip_tags($line["content_preview"]), 100, '...'), true);
+                $tpl->setVariable(
+                    'ARTICLE_EXCERPT',
+                    truncate_string(strip_tags($line["content_preview"]), 100, '...'), true
+                );
 
                 $content = sanitize($line["content_preview"], false, $owner_uid);
 
@@ -105,10 +115,14 @@ class PublicHandler extends Handler {
 
                 $tpl->setVariable('ARTICLE_CONTENT', $content, true);
 
-                $tpl->setVariable('ARTICLE_UPDATED_ATOM',
-                                  date('c', strtotime($line["updated"])), true);
-                $tpl->setVariable('ARTICLE_UPDATED_RFC822',
-                                  date(DATE_RFC822, strtotime($line["updated"])), true);
+                $tpl->setVariable(
+                    'ARTICLE_UPDATED_ATOM',
+                    date('c', strtotime($line["updated"])), true
+                );
+                $tpl->setVariable(
+                    'ARTICLE_UPDATED_RFC822',
+                    date(DATE_RFC822, strtotime($line["updated"])), true
+                );
 
                 $tpl->setVariable('ARTICLE_AUTHOR', htmlspecialchars($line['author']), true);
 
@@ -174,8 +188,10 @@ class PublicHandler extends Handler {
                 $article['content'] = sanitize($line["content_preview"], false, $owner_uid);
                 $article['updated'] = date('c', strtotime($line["updated"]));
 
-                if ($line['note']) $article['note'] = $line['note'];
-                if ($article['author']) $article['author'] = $line['author'];
+                if ($line['note']) {  $article['note'] = $line['note'];
+                }
+                if ($article['author']) {  $article['author'] = $line['author'];
+                }
 
                 $tags = get_article_tags($line["id"], $owner_uid);
 
@@ -213,7 +229,8 @@ class PublicHandler extends Handler {
         }
     }
 
-    function getUnread() {
+    function getUnread()
+    {
         $login = $this->dbh->escape_string($_REQUEST["login"]);
         $fresh = $_REQUEST["fresh"] == "1";
 
@@ -235,11 +252,14 @@ class PublicHandler extends Handler {
 
     }
 
-    function getProfiles() {
+    function getProfiles()
+    {
         $login = $this->dbh->escape_string($_REQUEST["login"]);
 
-        $result = $this->dbh->query("SELECT ttrss_settings_profiles.* FROM ttrss_settings_profiles,ttrss_users
-			WHERE ttrss_users.id = ttrss_settings_profiles.owner_uid AND login = '$login' ORDER BY title");
+        $result = $this->dbh->query(
+            "SELECT ttrss_settings_profiles.* FROM ttrss_settings_profiles,ttrss_users
+			WHERE ttrss_users.id = ttrss_settings_profiles.owner_uid AND login = '$login' ORDER BY title"
+        );
 
         print "<select dojoType='dijit.form.Select' style='width : 220px; margin : 0px' name='profile'>";
 
@@ -255,7 +275,8 @@ class PublicHandler extends Handler {
         print "</select>";
     }
 
-    function pubsub() {
+    function pubsub()
+    {
         $mode = $this->dbh->escape_string($_REQUEST['hub_mode']);
         $feed_id = (int) $this->dbh->escape_string($_REQUEST['id']);
         $feed_url = $this->dbh->escape_string($_REQUEST['hub_topic']);
@@ -268,8 +289,10 @@ class PublicHandler extends Handler {
 
         // TODO: implement hub_verifytoken checking
 
-        $result = $this->dbh->query("SELECT feed_url FROM ttrss_feeds
-			WHERE id = '$feed_id'");
+        $result = $this->dbh->query(
+            "SELECT feed_url FROM ttrss_feeds
+			WHERE id = '$feed_id'"
+        );
 
         if ($this->dbh->num_rows($result) != 0) {
 
@@ -278,24 +301,30 @@ class PublicHandler extends Handler {
             if ($check_feed_url && ($check_feed_url == $feed_url || !$feed_url)) {
                 if ($mode == "subscribe") {
 
-                    $this->dbh->query("UPDATE ttrss_feeds SET pubsub_state = 2
-						WHERE id = '$feed_id'");
+                    $this->dbh->query(
+                        "UPDATE ttrss_feeds SET pubsub_state = 2
+						WHERE id = '$feed_id'"
+                    );
 
                     print $_REQUEST['hub_challenge'];
                     return;
 
                 } elseif ($mode == "unsubscribe") {
 
-                    $this->dbh->query("UPDATE ttrss_feeds SET pubsub_state = 0
-						WHERE id = '$feed_id'");
+                    $this->dbh->query(
+                        "UPDATE ttrss_feeds SET pubsub_state = 0
+						WHERE id = '$feed_id'"
+                    );
 
                     print $_REQUEST['hub_challenge'];
                     return;
 
                 } elseif (!$mode) {
-                    $this->dbh->query("UPDATE ttrss_feeds SET
+                    $this->dbh->query(
+                        "UPDATE ttrss_feeds SET
 						last_update_started = '1970-01-01',
-						last_updated = '1970-01-01' WHERE id = '$feed_id'");
+						last_updated = '1970-01-01' WHERE id = '$feed_id'"
+                    );
 
                 }
             } else {
@@ -309,16 +338,20 @@ class PublicHandler extends Handler {
 
     }
 
-    function logout() {
+    function logout()
+    {
         logout_user();
         header("Location: index.php");
     }
 
-    function share() {
+    function share()
+    {
         $uuid = $this->dbh->escape_string($_REQUEST["key"]);
 
-        $result = $this->dbh->query("SELECT ref_id, owner_uid FROM ttrss_user_entries WHERE
-			uuid = '$uuid'");
+        $result = $this->dbh->query(
+            "SELECT ref_id, owner_uid FROM ttrss_user_entries WHERE
+			uuid = '$uuid'"
+        );
 
         if ($this->dbh->num_rows($result) != 0) {
             header("Content-Type: text/html");
@@ -336,7 +369,8 @@ class PublicHandler extends Handler {
 
     }
 
-    function rss() {
+    function rss()
+    {
         $feed = $this->dbh->escape_string($_REQUEST["id"]);
         $key = $this->dbh->escape_string($_REQUEST["key"]);
         $is_cat = $_REQUEST["is_cat"] != false;
@@ -350,7 +384,8 @@ class PublicHandler extends Handler {
 
         $format = $this->dbh->escape_string($_REQUEST['format']);
 
-        if (!$format) $format = 'atom';
+        if (!$format) {  $format = 'atom';
+        }
 
         if (SINGLE_USER_MODE) {
             authenticate_user("admin", null);
@@ -359,22 +394,28 @@ class PublicHandler extends Handler {
         $owner_id = false;
 
         if ($key) {
-            $result = $this->dbh->query("SELECT owner_uid FROM
-				ttrss_access_keys WHERE access_key = '$key' AND feed_id = '$feed'");
+            $result = $this->dbh->query(
+                "SELECT owner_uid FROM
+				ttrss_access_keys WHERE access_key = '$key' AND feed_id = '$feed'"
+            );
 
-            if ($this->dbh->num_rows($result) == 1)
+            if ($this->dbh->num_rows($result) == 1) {
                 $owner_id = $this->dbh->fetch_result($result, 0, "owner_uid");
+            }
         }
 
         if ($owner_id) {
-            $this->generate_syndicated_feed($owner_id, $feed, $is_cat, $limit,
-                                            $offset, $search, $search_mode, $view_mode, $format, $order);
+            $this->generate_syndicated_feed(
+                $owner_id, $feed, $is_cat, $limit,
+                $offset, $search, $search_mode, $view_mode, $format, $order
+            );
         } else {
             header('HTTP/1.1 403 Forbidden');
         }
     }
 
-    function globalUpdateFeeds() {
+    function globalUpdateFeeds()
+    {
         include "rssfuncs.php";
         // Update all feeds needing a update.
         update_daemon_common(0, true, false);
@@ -384,7 +425,8 @@ class PublicHandler extends Handler {
 
     }
 
-    function sharepopup() {
+    function sharepopup()
+    {
         if (SINGLE_USER_MODE) {
             login_sequence();
         }
@@ -409,8 +451,10 @@ class PublicHandler extends Handler {
                 $content = $this->dbh->escape_string(strip_tags($_REQUEST["content"]));
                 $labels = $this->dbh->escape_string(strip_tags($_REQUEST["labels"]));
 
-                Article::create_published_article($title, $url, $content, $labels,
-                                                  $_SESSION["uid"]);
+                Article::create_published_article(
+                    $title, $url, $content, $labels,
+                    $_SESSION["uid"]
+                );
 
                 print "<script type='text/javascript'>";
                 print "window.close();";
@@ -420,7 +464,7 @@ class PublicHandler extends Handler {
                 $title = htmlspecialchars($_REQUEST["title"]);
                 $url = htmlspecialchars($_REQUEST["url"]);
 
-?>
+                ?>
 
                 <table height='100%' width='100%'><tr><td colspan='2'>
                      <h1><?php echo __("Share with Tiny Tiny RSS") ?></h1>
@@ -456,7 +500,7 @@ class PublicHandler extends Handler {
 
                       <tr><td colspan='2'>
                       <div style='float : right' class='insensitive-small'>
-<?php echo __("Shared article will appear in the Published feed.") ?>
+                <?php echo __("Shared article will appear in the Published feed.") ?>
                       </div>
                       <button type="submit"><?php echo __('Share') ?></button>
                       <button onclick="return window.close()"><?php echo __('Cancel') ?></button>
@@ -465,14 +509,14 @@ class PublicHandler extends Handler {
                       </form>
                       </td></tr></table>
                       </body></html>
-<?php
+                <?php
 
-                      }
+            }
 
         } else {
 
             $return = urlencode($_SERVER["REQUEST_URI"])
-?>
+            ?>
 
                 <form action="public.php?return=<?php echo $return ?>"
                 method="POST" id="loginForm" name="loginForm">
@@ -490,19 +534,20 @@ class PublicHandler extends Handler {
                 value="<?php echo $_SESSION["fake_password"] ?>"></td></tr>
                 <tr><td colspan='2'>
                 <button type="submit">
-<?php echo __('Log in') ?></button>
+            <?php echo __('Log in') ?></button>
 
                 <button onclick="return window.close()">
-<?php echo __('Cancel') ?></button>
+            <?php echo __('Cancel') ?></button>
                 </td></tr>
                 </table>
 
                 </form>
-<?php
-		}
+            <?php
+        }
     }
 
-    function login() {
+    function login()
+    {
         $login = $this->dbh->escape_string($_POST["login"]);
         $password = $_POST["password"];
         $remember_me = !empty($_POST["remember_me"]);
@@ -532,8 +577,10 @@ class PublicHandler extends Handler {
 
                     $profile = $this->dbh->escape_string($_POST["profile"]);
 
-                    $result = $this->dbh->query("SELECT id FROM ttrss_settings_profiles
-                                                 WHERE id = '$profile' AND owner_uid = " . $_SESSION["uid"]);
+                    $result = $this->dbh->query(
+                        "SELECT id FROM ttrss_settings_profiles
+                                                 WHERE id = '$profile' AND owner_uid = " . $_SESSION["uid"]
+                    );
 
                     if ($this->dbh->num_rows($result) != 0) {
                         $_SESSION["profile"] = $profile;
@@ -551,7 +598,8 @@ class PublicHandler extends Handler {
         }
     }
 
-    function subscribe() {
+    function subscribe()
+    {
         if (SINGLE_USER_MODE) {
             login_sequence();
         }
@@ -577,19 +625,23 @@ class PublicHandler extends Handler {
             switch ($rc['code']) {
                 case 0:
                     \SmallSmallRSS\Renderers\Messages::renderWarning(
-                        T_sprintf("Already subscribed to <b>%s</b>.", $feed_url));
+                        T_sprintf("Already subscribed to <b>%s</b>.", $feed_url)
+                    );
                     break;
                 case 1:
                     \SmallSmallRSS\Renderers\Messages::renderNotice(
-                        T_sprintf("Subscribed to <b>%s</b>.", $feed_url));
+                        T_sprintf("Subscribed to <b>%s</b>.", $feed_url)
+                    );
                     break;
                 case 2:
                     \SmallSmallRSS\Renderers\Messages::renderError(
-                        T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url));
+                        T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url)
+                    );
                     break;
                 case 3:
                     \SmallSmallRSS\Renderers\Messages::renderError(
-                        T_sprintf("No feeds found in <b>%s</b>.", $feed_url));
+                        T_sprintf("No feeds found in <b>%s</b>.", $feed_url)
+                    );
                     break;
                 case 4:
                     \SmallSmallRSS\Renderers\Messages::renderNotice(__("Multiple feed URLs found."));
@@ -597,7 +649,8 @@ class PublicHandler extends Handler {
                     break;
                 case 5:
                     \SmallSmallRSS\Renderers\Messages::renderError(
-                        T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url));
+                        T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url)
+                    );
                     break;
             }
 
@@ -625,8 +678,10 @@ class PublicHandler extends Handler {
             $tt_uri = get_self_url_prefix();
 
             if ($rc['code'] <= 2) {
-                $result = $this->dbh->query("SELECT id FROM ttrss_feeds WHERE
-					feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]);
+                $result = $this->dbh->query(
+                    "SELECT id FROM ttrss_feeds WHERE
+					feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
+                );
 
                 $feed_id = $this->dbh->fetch_result($result, 0, "id");
             } else {
@@ -656,7 +711,8 @@ class PublicHandler extends Handler {
         }
     }
 
-    function subscribe2() {
+    function subscribe2()
+    {
         $feed_url = $this->dbh->escape_string(trim($_REQUEST["feed_url"]));
         $cat_id = $this->dbh->escape_string($_REQUEST["cat_id"]);
         $from = $this->dbh->escape_string($_REQUEST["from"]);
@@ -672,19 +728,23 @@ class PublicHandler extends Handler {
         switch ($rc) {
             case 1:
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
-                    T_sprintf("Subscribed to <b>%s</b>.", $feed_url));
+                    T_sprintf("Subscribed to <b>%s</b>.", $feed_url)
+                );
                 break;
             case 2:
                 \SmallSmallRSS\Renderers\Messages::renderError(
-                    T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url));
+                    T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url)
+                );
                 break;
             case 3:
                 \SmallSmallRSS\Renderers\Messages::renderError(
-                    T_sprintf("No feeds found in <b>%s</b>.", $feed_url));
+                    T_sprintf("No feeds found in <b>%s</b>.", $feed_url)
+                );
                 break;
             case 0:
                 \SmallSmallRSS\Renderers\Messages::renderWarning(
-                    T_sprintf("Already subscribed to <b>%s</b>.", $feed_url));
+                    T_sprintf("Already subscribed to <b>%s</b>.", $feed_url)
+                );
                 break;
             case 4:
                 \SmallSmallRSS\Renderers\Messages::renderNotice(__("Multiple feed URLs found."));
@@ -695,7 +755,8 @@ class PublicHandler extends Handler {
                 break;
             case 5:
                 \SmallSmallRSS\Renderers\Messages::renderError(
-                    T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url));
+                    T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url)
+                );
                 break;
         }
 
@@ -721,8 +782,10 @@ class PublicHandler extends Handler {
         $tt_uri = get_self_url_prefix();
 
         if ($rc <= 2) {
-            $result = $this->dbh->query("SELECT id FROM ttrss_feeds WHERE
-				feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]);
+            $result = $this->dbh->query(
+                "SELECT id FROM ttrss_feeds WHERE
+				feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
+            );
 
             $feed_id = $this->dbh->fetch_result($result, 0, "id");
         } else {
@@ -748,12 +811,14 @@ class PublicHandler extends Handler {
         print "</body></html>";
     }
 
-    function index() {
+    function index()
+    {
         $renderer = new \SmallSmallRSS\Renderers\JSONError(7);
         $renderer->render();
     }
 
-    function forgotpass() {
+    function forgotpass()
+    {
         startup_gettext();
 
         header('Content-Type: text/html; charset=utf-8');
@@ -773,7 +838,8 @@ class PublicHandler extends Handler {
 
         if (!$method) {
             \SmallSmallRSS\Renderers\Messages::renderNotice(
-                __("You will need to provide valid account name and email. New password will be sent on your email address."));
+                __("You will need to provide valid account name and email. New password will be sent on your email address.")
+            );
 
             print "<form method='POST' action='public.php'>";
             print "<input type='hidden' name='method' value='do'>";
@@ -806,7 +872,8 @@ class PublicHandler extends Handler {
 
             if (($test != 4 && $test != 'four') || !$email || !$login) {
                  \SmallSmallRSS\Renderers\Messages::renderError(
-                     __('Some of the required form parameters are missing or incorrect.'));
+                     __('Some of the required form parameters are missing or incorrect.')
+                 );
 
                 print "<form method=\"GET\" action=\"public.php\">
 					<input type=\"hidden\" name=\"op\" value=\"forgotpass\">
@@ -815,8 +882,10 @@ class PublicHandler extends Handler {
 
             } else {
 
-                $result = $this->dbh->query("SELECT id FROM ttrss_users
-					WHERE login = '$login' AND email = '$email'");
+                $result = $this->dbh->query(
+                    "SELECT id FROM ttrss_users
+					WHERE login = '$login' AND email = '$email'"
+                );
 
                 if ($this->dbh->num_rows($result) != 0) {
                     $id = $this->dbh->fetch_result($result, 0, "id");
@@ -833,7 +902,8 @@ class PublicHandler extends Handler {
 
                 } else {
                      \SmallSmallRSS\Renderers\Messages::renderError(
-                         __("Sorry, login and email combination not found."));
+                         __("Sorry, login and email combination not found.")
+                     );
 
                     print "<form method=\"GET\" action=\"public.php\">
 						<input type=\"hidden\" name=\"op\" value=\"forgotpass\">
@@ -851,7 +921,8 @@ class PublicHandler extends Handler {
 
     }
 
-    function dbupdate() {
+    function dbupdate()
+    {
         startup_gettext();
 
         if (!SINGLE_USER_MODE && $_SESSION["access_level"] < 10) {
@@ -861,7 +932,7 @@ class PublicHandler extends Handler {
             exit;
         }
 
-?><html>
+        ?><html>
         <head>
              <title>Database Updater</title>
              <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -884,90 +955,74 @@ class PublicHandler extends Handler {
 
                                   <div class="content">
 
-<?php
+        <?php
                                   @$op = $_REQUEST["subop"];
                                   $updater = new DbUpdater(
-                                      \Db::get(), DB_TYPE, \SmallSmallRSS\Constants::SCHEMA_VERSION);
+                                      \Db::get(), DB_TYPE, \SmallSmallRSS\Constants::SCHEMA_VERSION
+                                  );
 
-                                  if ($op == "performupdate") {
-                                      if ($updater->isUpdateRequired()) {
-
-                                          print "<h2>Performing updates</h2>";
-
-                                          print "<h3>Updating to schema version " . \SmallSmallRSS\Constants::SCHEMA_VERSION . "</h3>";
-
-                                          print "<ul>";
-
-                                          for ($i = $updater->getSchemaVersion() + 1; $i <= \SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
-                                              print "<li>Performing update up to version $i...";
-
-                                              $result = $updater->performUpdateTo($i);
-
-                                              if (!$result) {
-                                                  print "<span class='err'>FAILED!</span></li></ul>";
-
-                                                  \SmallSmallRSS\Renderers\Messages::renderWarning(
-                                                      "One of the updates failed. Either retry the process or perform updates manually.");
-                                                  print "<p><form method=\"GET\" action=\"index.php\">
+        if ($op == "performupdate") {
+            if ($updater->isUpdateRequired()) {
+                print "<h2>Performing updates</h2>";
+                print "<h3>Updating to schema version " . \SmallSmallRSS\Constants::SCHEMA_VERSION . "</h3>";
+                print "<ul>";
+                for ($i = $updater->getSchemaVersion() + 1; $i <= \SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
+                    print "<li>Performing update up to version $i...";
+                    $result = $updater->performUpdateTo($i);
+                    if (!$result) {
+                        print "<span class='err'>FAILED!</span></li></ul>";
+                        \SmallSmallRSS\Renderers\Messages::renderWarning(
+                            "One of the updates failed. Either retry the process or perform updates manually."
+                        );
+                        print "<p><form method=\"GET\" action=\"index.php\">
 								<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 								</form>";
-
-                                                  break;
-                                              } else {
-                                                  print "<span class='ok'>OK!</span></li>";
-                                              }
-                                          }
-
-                                          print "</ul>";
-
-                                          \SmallSmallRSS\Renderers\Messages::renderNotice(
-                                              "Your Tiny Tiny RSS database is now updated to the latest version.");
-
-                                          print "<p><form method=\"GET\" action=\"index.php\">
+                        break;
+                    } else {
+                        print "<span class='ok'>OK!</span></li>";
+                    }
+                }
+                print "</ul>";
+                \SmallSmallRSS\Renderers\Messages::renderNotice(
+                    "Your Tiny Tiny RSS database is now updated to the latest version."
+                );
+                print "<p><form method=\"GET\" action=\"index.php\">
 						<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 						</form>";
-
-                                      } else {
-                                          print "<h2>Your database is up to date.</h2>";
-
-                                          print "<p><form method=\"GET\" action=\"index.php\">
+            } else {
+                print "<h2>Your database is up to date.</h2>";
+                print "<p><form method=\"GET\" action=\"index.php\">
 						<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 						</form>";
-                                      }
-                                  } else {
-                                      if ($updater->isUpdateRequired()) {
-
-                                          print "<h2>Database update required</h2>";
-
-                                          print "<h3>";
-                                          printf("Your Tiny Tiny RSS database needs update to the latest version: %d to %d.",
-                                                 $updater->getSchemaVersion(), \SmallSmallRSS\Constants::SCHEMA_VERSION);
-                                          print "</h3>";
-
-                                          \SmallSmallRSS\Renderers\Messages::renderWarning(
-                                              "Please backup your database before proceeding.");
-
-                                          print "<form method='POST'>
+            }
+        } else {
+            if ($updater->isUpdateRequired()) {
+                print "<h2>Database update required</h2>";
+                print "<h3>";
+                printf(
+                    "Your Tiny Tiny RSS database needs update to the latest version: %d to %d.",
+                    $updater->getSchemaVersion(), \SmallSmallRSS\Constants::SCHEMA_VERSION
+                );
+                print "</h3>";
+                \SmallSmallRSS\Renderers\Messages::renderWarning(
+                    "Please backup your database before proceeding."
+                );
+                print "<form method='POST'>
 							<input type='hidden' name='subop' value='performupdate'>
 							<input type='submit' onclick='return confirmOP()' value='".__("Perform updates")."'>
 						</form>";
-
-                                      } else {
-
-                                          \SmallSmallRSS\Renderers\Messages::renderNotice("Tiny Tiny RSS database is up to date.");
-
-                                          print "<p><form method=\"GET\" action=\"index.php\">
+            } else {
+                \SmallSmallRSS\Renderers\Messages::renderNotice("Tiny Tiny RSS database is up to date.");
+                print "<p><form method=\"GET\" action=\"index.php\">
 							<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 						</form>";
-
-                                      }
-                                  }
-?>
+            }
+        }
+        ?>
 
                                   </div>
                                   </body>
                                   </html>
-<?php
-                       }
-
-        }
+        <?php
+    }
+}

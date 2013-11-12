@@ -1,6 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class API extends Handler {
+class API extends Handler
+{
 
     const API_LEVEL = 7;
 
@@ -9,7 +10,8 @@ class API extends Handler {
 
     private $seq;
 
-    function request_sql_bool($key) {
+    function request_sql_bool($key)
+    {
         $value = '';
         if (isset($_REQUEST[$key])) {
             $value = $_REQUEST[$key];
@@ -17,7 +19,8 @@ class API extends Handler {
         return sql_bool_to_bool($value);
     }
 
-    function escape_from_request($key) {
+    function escape_from_request($key)
+    {
         $value = '';
         if (isset($_REQUEST[$key])) {
             $value = $this->dbh->escape_string($_REQUEST[$key]);
@@ -25,7 +28,8 @@ class API extends Handler {
         return $value;
     }
 
-    function before($method) {
+    function before($method)
+    {
         if (parent::before($method)) {
             header("Content-Type: application/json");
             if (empty($_SESSION['uid']) && $method != "login" && $method != "isloggedin") {
@@ -45,23 +49,27 @@ class API extends Handler {
         return false;
     }
 
-    function wrap($status, $reply) {
+    function wrap($status, $reply)
+    {
         print json_encode(array("seq" => $this->seq,
                                 "status" => $status,
                                 "content" => $reply));
     }
 
-    function getVersion() {
+    function getVersion()
+    {
         $rv = array("version" => VERSION);
         $this->wrap(self::STATUS_OK, $rv);
     }
 
-    function getApiLevel() {
+    function getApiLevel()
+    {
         $rv = array("level" => self::API_LEVEL);
         $this->wrap(self::STATUS_OK, $rv);
     }
 
-    function login() {
+    function login()
+    {
         $login = $this->escape_from_request("user");
         $password = $_REQUEST["password"];
         $password_base64 = base64_decode($password);
@@ -99,16 +107,19 @@ class API extends Handler {
         }
     }
 
-    function logout() {
+    function logout()
+    {
         logout_user();
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
-    function isLoggedIn() {
+    function isLoggedIn()
+    {
         $this->wrap(self::STATUS_OK, array("status" => $_SESSION["uid"] != ''));
     }
 
-    function getUnread() {
+    function getUnread()
+    {
         $feed_id = $this->escape_from_request("feed_id");
         $is_cat = $this->escape_from_request("is_cat");
 
@@ -120,11 +131,13 @@ class API extends Handler {
     }
 
     /* Method added for ttrss-reader for Android */
-    function getCounters() {
+    function getCounters()
+    {
         $this->wrap(self::STATUS_OK, getAllCounters());
     }
 
-    function getFeeds() {
+    function getFeeds()
+    {
         $cat_id = $this->escape_from_request("cat_id");
         $unread_only = $this->request_sql_bool("unread_only");
         $limit = (int) $this->escape_from_request("limit");
@@ -136,19 +149,23 @@ class API extends Handler {
         $this->wrap(self::STATUS_OK, $feeds);
     }
 
-    function getCategories() {
+    function getCategories()
+    {
         $unread_only = $this->request_sql_bool("unread_only");
         $enable_nested = $this->request_sql_bool("enable_nested");
         $include_empty = $this->request_sql_bool('include_empty');
 
         // TODO do not return empty categories, return Uncategorized and standard virtual cats
 
-        if ($enable_nested)
+        if ($enable_nested) {
             $nested_qpart = "parent_cat IS NULL";
-        else
+        }
+        else {
             $nested_qpart = "true";
+        }
 
-        $result = $this->dbh->query("SELECT
+        $result = $this->dbh->query(
+            "SELECT
 				id, title, order_id, (SELECT COUNT(id) FROM
 				ttrss_feeds WHERE
 				ttrss_feed_categories.id IS NOT NULL AND cat_id = ttrss_feed_categories.id) AS num_feeds,
@@ -157,7 +174,8 @@ class API extends Handler {
 				c2.parent_cat = ttrss_feed_categories.id) AS num_cats
 			FROM ttrss_feed_categories
 			WHERE $nested_qpart AND owner_uid = " .
-                                    $_SESSION["uid"]);
+            $_SESSION["uid"]
+        );
 
         $cats = array();
 
@@ -165,8 +183,9 @@ class API extends Handler {
             if ($include_empty || $line["num_feeds"] > 0 || $line["num_cats"] > 0) {
                 $unread = getFeedUnread($line["id"], true);
 
-                if ($enable_nested)
+                if ($enable_nested) {
                     $unread += getCategoryChildrenUnread($line["id"]);
+                }
 
                 if ($unread || !$unread_only) {
                     array_push($cats, array("id" => $line["id"],
@@ -193,13 +212,15 @@ class API extends Handler {
         $this->wrap(self::STATUS_OK, $cats);
     }
 
-    function getHeadlines() {
+    function getHeadlines()
+    {
         $feed_id = $this->escape_from_request("feed_id");
         if ($feed_id != "") {
 
             $limit = (int) $this->escape_from_request("limit");
 
-            if (!$limit || $limit >= 200) $limit = 200;
+            if (!$limit || $limit >= 200) {  $limit = 200;
+            }
 
             $offset = (int) $this->escape_from_request("skip");
             $filter = $this->escape_from_request("filter");
@@ -229,10 +250,12 @@ class API extends Handler {
             $search = $this->escape_from_request("search");
             $search_mode = $this->escape_from_request("search_mode");
 
-            $headlines = $this->api_get_headlines($feed_id, $limit, $offset,
-                                                  $filter, $is_cat, $show_excerpt, $show_content, $view_mode, $override_order,
-                                                  $include_attachments, $since_id, $search, $search_mode,
-                                                  $include_nested, $sanitize_content);
+            $headlines = $this->api_get_headlines(
+                $feed_id, $limit, $offset,
+                $filter, $is_cat, $show_excerpt, $show_content, $view_mode, $override_order,
+                $include_attachments, $since_id, $search, $search_mode,
+                $include_nested, $sanitize_content
+            );
 
             $this->wrap(self::STATUS_OK, $headlines);
         } else {
@@ -240,7 +263,8 @@ class API extends Handler {
         }
     }
 
-    function updateArticle() {
+    function updateArticle()
+    {
         $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
         $mode = (int) $this->escape_from_request("mode");
         $data = $this->escape_from_request("data");
@@ -278,7 +302,8 @@ class API extends Handler {
                 break;
         }
 
-        if ($field == "note") $set_to = "'$data'";
+        if ($field == "note") {  $set_to = "'$data'";
+        }
 
         if ($field && $set_to && count($article_ids) > 0) {
 
@@ -289,8 +314,10 @@ class API extends Handler {
             $num_updated = $this->dbh->affected_rows($result);
 
             if ($num_updated > 0 && $field == "unread") {
-                $result = $this->dbh->query("SELECT DISTINCT feed_id FROM ttrss_user_entries
-					WHERE ref_id IN ($article_ids)");
+                $result = $this->dbh->query(
+                    "SELECT DISTINCT feed_id FROM ttrss_user_entries
+					WHERE ref_id IN ($article_ids)"
+                );
 
                 while ($line = $this->dbh->fetch_assoc($result)) {
                     \SmallSmallRSS\CounterCache::update($line["feed_id"], $_SESSION["uid"]);
@@ -317,7 +344,8 @@ class API extends Handler {
 
     }
 
-    function getArticle() {
+    function getArticle()
+    {
 
         $article_id = join(",", array_filter(explode(",", $this->escape_from_request("article_id")), 'is_numeric'));
 
@@ -375,15 +403,18 @@ class API extends Handler {
         }
     }
 
-    function getConfig() {
+    function getConfig()
+    {
         $config = array(
             "icons_dir" => ICONS_DIR,
             "icons_url" => ICONS_URL);
 
         $config["daemon_is_running"] = file_is_locked("update_daemon.lock");
 
-        $result = $this->dbh->query("SELECT COUNT(*) AS cf FROM
-			ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]);
+        $result = $this->dbh->query(
+            "SELECT COUNT(*) AS cf FROM
+			ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]
+        );
 
         $num_feeds = $this->dbh->fetch_result($result, 0, "cf");
 
@@ -392,14 +423,16 @@ class API extends Handler {
         $this->wrap(self::STATUS_OK, $config);
     }
 
-    function updateFeed() {
+    function updateFeed()
+    {
         require_once "include/rssfuncs.php";
         $feed_id = (int) $this->escape_from_request("feed_id");
         update_rss_feed($feed_id);
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
-    function catchupFeed() {
+    function catchupFeed()
+    {
         $feed_id = $this->escape_from_request("feed_id");
         $is_cat = $this->escape_from_request("is_cat");
 
@@ -408,25 +441,31 @@ class API extends Handler {
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
-    function getPref() {
+    function getPref()
+    {
         $pref_name = $this->escape_from_request("pref_name");
 
         $this->wrap(self::STATUS_OK, array("value" => get_pref($pref_name)));
     }
 
-    function getLabels() {
+    function getLabels()
+    {
         $article_id = (int) $_REQUEST['article_id'];
 
         $rv = array();
 
-        $result = $this->dbh->query("SELECT id, caption, fg_color, bg_color
+        $result = $this->dbh->query(
+            "SELECT id, caption, fg_color, bg_color
 			FROM ttrss_labels2
-			WHERE owner_uid = '".$_SESSION['uid']."' ORDER BY caption");
+			WHERE owner_uid = '".$_SESSION['uid']."' ORDER BY caption"
+        );
 
-        if ($article_id)
+        if ($article_id) {
             $article_labels = get_article_labels($article_id);
-        else
+        }
+        else {
             $article_labels = array();
+        }
 
         while ($line = $this->dbh->fetch_assoc($result)) {
 
@@ -449,14 +488,16 @@ class API extends Handler {
         $this->wrap(self::STATUS_OK, $rv);
     }
 
-    function setArticleLabel() {
+    function setArticleLabel()
+    {
 
         $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
         $label_id = (int) $this->escape_from_request('label_id');
         $assign = (bool) $this->escape_from_request('assign') == "true";
 
         $label = $this->dbh->escape_string(label_find_caption(
-                                               $label_id, $_SESSION["uid"]));
+            $label_id, $_SESSION["uid"]
+        ));
 
         $num_updated = 0;
 
@@ -464,10 +505,12 @@ class API extends Handler {
 
             foreach ($article_ids as $id) {
 
-                if ($assign)
+                if ($assign) {
                     label_add_article($id, $label, $_SESSION["uid"]);
-                else
+                }
+                else {
                     label_remove_article($id, $label, $_SESSION["uid"]);
+                }
 
                 $num_updated += 1;
 
@@ -479,7 +522,8 @@ class API extends Handler {
 
     }
 
-    function index($method) {
+    function index($method)
+    {
         $plugin = \SmallSmallRSS\PluginHost::getInstance()->get_api_method(strtolower($method));
         if ($plugin && method_exists($plugin, $method)) {
             $reply = $plugin->$method();
@@ -503,7 +547,8 @@ class API extends Handler {
         }
     }
 
-    function shareToPublished() {
+    function shareToPublished()
+    {
         $title = $this->dbh->escape_string(strip_tags($_REQUEST["title"]));
         $url = $this->dbh->escape_string(strip_tags($_REQUEST["url"]));
         $content = $this->dbh->escape_string(strip_tags($_REQUEST["content"]));
@@ -515,7 +560,8 @@ class API extends Handler {
         }
     }
 
-    static function api_get_feeds($cat_id, $unread_only, $limit, $offset, $include_nested = false) {
+    static function api_get_feeds($cat_id, $unread_only, $limit, $offset, $include_nested = false)
+    {
 
         $feeds = array();
 
@@ -566,10 +612,12 @@ class API extends Handler {
         /* Child cats */
 
         if ($include_nested && $cat_id) {
-            $result = db_query("SELECT
+            $result = db_query(
+                "SELECT
 					id, title FROM ttrss_feed_categories
 					WHERE parent_cat = '$cat_id' AND owner_uid = " . $_SESSION["uid"] .
-                               " ORDER BY id, title");
+                " ORDER BY id, title"
+            );
 
             while ($line = db_fetch_assoc($result)) {
                 $unread = getFeedUnread($line["id"], true) +
@@ -596,24 +644,30 @@ class API extends Handler {
         }
 
         if ($cat_id == -4 || $cat_id == -3) {
-            $result = db_query("SELECT
+            $result = db_query(
+                "SELECT
 					id, feed_url, cat_id, title, order_id, ".
-                               SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
 						FROM ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"] .
-                               " ORDER BY cat_id, title " . $limit_qpart);
+                " ORDER BY cat_id, title " . $limit_qpart
+            );
         } else {
 
-            if ($cat_id)
+            if ($cat_id) {
                 $cat_qpart = "cat_id = '$cat_id'";
-            else
+            }
+            else {
                 $cat_qpart = "cat_id IS NULL";
+            }
 
-            $result = db_query("SELECT
+            $result = db_query(
+                "SELECT
 					id, feed_url, cat_id, title, order_id, ".
-                               SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
 						FROM ttrss_feeds WHERE
 						$cat_qpart AND owner_uid = " . $_SESSION["uid"] .
-                               " ORDER BY cat_id, title " . $limit_qpart);
+                " ORDER BY cat_id, title " . $limit_qpart
+            );
         }
 
         while ($line = db_fetch_assoc($result)) {
@@ -648,9 +702,11 @@ class API extends Handler {
                                       $search = "", $search_mode = "",
                                       $include_nested = false, $sanitize_content = true) {
 
-        $qfh_ret = queryFeedHeadlines($feed_id, $limit,
-                                      $view_mode, $is_cat, $search, $search_mode,
-                                      $order, $offset, 0, false, $since_id, $include_nested);
+        $qfh_ret = queryFeedHeadlines(
+            $feed_id, $limit,
+            $view_mode, $is_cat, $search, $search_mode,
+            $order, $offset, 0, false, $since_id, $include_nested
+        );
 
         $result = $qfh_ret[0];
         $feed_title = $qfh_ret[1];
@@ -680,9 +736,11 @@ class API extends Handler {
                 "tags" => $tags,
             );
 
-            if ($include_attachments)
+            if ($include_attachments) {
                 $headline_row['attachments'] = get_article_enclosures(
-                    $line['id']);
+                    $line['id']
+                );
+            }
 
             if ($show_excerpt) {
                 $excerpt = truncate_string(strip_tags($line["content_preview"]), 100);
@@ -699,14 +757,16 @@ class API extends Handler {
                     $headline_row["content"] = sanitize(
                         $line["content_preview"],
                         sql_bool_to_bool($line['hide_images']),
-                        false, $line["site_url"]);
+                        false, $line["site_url"]
+                    );
                 } else {
                     $headline_row["content"] = $line["content_preview"];
                 }
             }
 
             // unify label output to ease parsing
-            if ($labels["no-labels"] == 1) $labels = array();
+            if ($labels["no-labels"] == 1) {  $labels = array();
+            }
 
             $headline_row["labels"] = $labels;
 
@@ -731,11 +791,14 @@ class API extends Handler {
         return $headlines;
     }
 
-    function unsubscribeFeed() {
+    function unsubscribeFeed()
+    {
         $feed_id = (int) $this->escape_from_request("feed_id");
 
-        $result = $this->dbh->query("SELECT id FROM ttrss_feeds WHERE
-			id = '$feed_id' AND owner_uid = ".$_SESSION["uid"]);
+        $result = $this->dbh->query(
+            "SELECT id FROM ttrss_feeds WHERE
+			id = '$feed_id' AND owner_uid = ".$_SESSION["uid"]
+        );
 
         if ($this->dbh->num_rows($result) != 0) {
             Pref_Feeds::remove_feed($feed_id, $_SESSION["uid"]);
@@ -745,7 +808,8 @@ class API extends Handler {
         }
     }
 
-    function subscribeToFeed() {
+    function subscribeToFeed()
+    {
         $feed_url = $this->escape_from_request("feed_url");
         $category_id = (int) $this->escape_from_request("category_id");
         $login = $this->escape_from_request("login");
@@ -760,7 +824,8 @@ class API extends Handler {
         }
     }
 
-    function getFeedTree() {
+    function getFeedTree()
+    {
         $include_empty = $this->request_sql_bool('include_empty');
 
         $pf = new Pref_Feeds($_REQUEST);
@@ -779,17 +844,22 @@ class API extends Handler {
     }
 
     // only works for labels or uncategorized for the time being
-    private function isCategoryEmpty($id) {
+    private function isCategoryEmpty($id)
+    {
 
         if ($id == -2) {
-            $result = $this->dbh->query("SELECT COUNT(*) AS count FROM ttrss_labels2
-				WHERE owner_uid = " . $_SESSION["uid"]);
+            $result = $this->dbh->query(
+                "SELECT COUNT(*) AS count FROM ttrss_labels2
+				WHERE owner_uid = " . $_SESSION["uid"]
+            );
 
             return $this->dbh->fetch_result($result, 0, "count") == 0;
 
         } elseif ($id == 0) {
-            $result = $this->dbh->query("SELECT COUNT(*) AS count FROM ttrss_feeds
-				WHERE cat_id IS NULL AND owner_uid = " . $_SESSION["uid"]);
+            $result = $this->dbh->query(
+                "SELECT COUNT(*) AS count FROM ttrss_feeds
+				WHERE cat_id IS NULL AND owner_uid = " . $_SESSION["uid"]
+            );
 
             return $this->dbh->fetch_result($result, 0, "count") == 0;
 
@@ -797,6 +867,4 @@ class API extends Handler {
 
         return false;
     }
-
-
 }

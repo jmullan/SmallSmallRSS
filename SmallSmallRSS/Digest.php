@@ -1,7 +1,8 @@
 <?php
 namespace SmallSmallRSS;
 
-class Digest {
+class Digest
+{
     /**
      * Send by mail a digest of last articles.
      *
@@ -9,7 +10,8 @@ class Digest {
      * @param integer $limit The maximum number of articles by digest.
      * @return boolean Return false if digests are not enabled.
      */
-    function send_headlines($debug = false) {
+    function send_headlines($debug = false)
+    {
 
         $user_limit = 15; // amount of users to process (e.g. emails to send out)
         $limit = 1000; // maximum amount of headlines to include
@@ -22,8 +24,10 @@ class Digest {
             $interval_query = "last_digest_sent < DATE_SUB(NOW(), INTERVAL 1 DAY)";
         }
 
-        $result = db_query("SELECT id,email FROM ttrss_users
-				WHERE email != '' AND (last_digest_sent IS NULL OR $interval_query)");
+        $result = db_query(
+            "SELECT id,email FROM ttrss_users
+				WHERE email != '' AND (last_digest_sent IS NULL OR $interval_query)"
+        );
 
         while ($line = db_fetch_assoc($result)) {
 
@@ -58,8 +62,10 @@ class Digest {
                     } else {
                         _debug("No headlines", true, $debug);
                     }
-                    db_query("UPDATE ttrss_users SET last_digest_sent = NOW()
-						WHERE id = " . $line["id"]);
+                    db_query(
+                        "UPDATE ttrss_users SET last_digest_sent = NOW()
+						WHERE id = " . $line["id"]
+                    );
 
                 }
             }
@@ -68,7 +74,8 @@ class Digest {
 
     }
 
-    function prepare_headlines($user_id, $days = 1, $limit = 1000) {
+    function prepare_headlines($user_id, $days = 1, $limit = 1000)
+    {
 
         require_once "lib/MiniTemplator.class.php";
 
@@ -95,7 +102,8 @@ class Digest {
             $interval_query = "ttrss_entries.date_updated > DATE_SUB(NOW(), INTERVAL $days DAY)";
         }
 
-        $result = db_query("SELECT ttrss_entries.title,
+        $result = db_query(
+            "SELECT ttrss_entries.title,
 				ttrss_feeds.title AS feed_title,
 				COALESCE(ttrss_feed_categories.title, '".__('Uncategorized')."') AS cat_title,
 				date_updated,
@@ -116,7 +124,8 @@ class Digest {
 				AND unread = true
 				AND score >= 0
 			ORDER BY ttrss_feed_categories.title, ttrss_feeds.title, score DESC, date_updated DESC
-			LIMIT $limit");
+			LIMIT $limit"
+        );
 
         $cur_feed_title = "";
 
@@ -134,8 +143,10 @@ class Digest {
 
             array_push($affected_ids, $line["ref_id"]);
 
-            $updated = make_local_datetime($line['last_updated'], false,
-                                           $user_id);
+            $updated = make_local_datetime(
+                $line['last_updated'], false,
+                $user_id
+            );
 
             /*			if ($line["score"] != 0) {
 				if ($line["score"] > 0) $line["score"] = '+' . $line["score"];
@@ -151,8 +162,10 @@ class Digest {
             $tpl->setVariable('ARTICLE_TITLE', $line["title"]);
             $tpl->setVariable('ARTICLE_LINK', $line["link"]);
             $tpl->setVariable('ARTICLE_UPDATED', $updated);
-            $tpl->setVariable('ARTICLE_EXCERPT',
-                              truncate_string(strip_tags($line["content"]), 300));
+            $tpl->setVariable(
+                'ARTICLE_EXCERPT',
+                truncate_string(strip_tags($line["content"]), 300)
+            );
             //			$tpl->setVariable('ARTICLE_CONTENT',
             //				strip_tags($article_content));
 
@@ -182,5 +195,4 @@ class Digest {
 
         return array($tmp, $headlines_count, $affected_ids, $tmp_t);
     }
-
 }

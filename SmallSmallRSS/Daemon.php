@@ -1,10 +1,12 @@
 <?php
 namespace SmallSmallRSS;
-class Daemon {
+class Daemon
+{
     public static $children = array();
     public static $ctimes = array();
 
-    public static function reap_children() {
+    public static function reap_children()
+    {
         $tmp = array();
         foreach (self::$children as $pid) {
             if (pcntl_waitpid($pid, $status, WNOHANG) != $pid) {
@@ -23,7 +25,8 @@ class Daemon {
         return count($tmp);
     }
 
-    public static function kill_stuck_children() {
+    public static function kill_stuck_children()
+    {
         foreach (array_keys(self::$ctimes) as $pid) {
             $started = self::$ctimes[$pid];
             if (time() - $started > MAX_CHILD_RUNTIME) {
@@ -33,11 +36,13 @@ class Daemon {
         }
     }
 
-    public static function running_jobs() {
+    public static function running_jobs()
+    {
         return count(self::$children);
     }
 
-    public static function track_pid() {
+    public static function track_pid()
+    {
         array_push(self::$children, $pid);
         self::$ctimes[$pid] = time();
     }

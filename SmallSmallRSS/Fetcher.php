@@ -1,20 +1,24 @@
 <?php
 namespace SmallSmallRSS;
-class Fetcher {
+class Fetcher
+{
 
-    function __construct() {
+    function __construct()
+    {
         $this->fetch_curl_used = false;
         $this->fetch_last_error = false;
         $this->fetch_last_error_code = false;
         $this->fetch_last_content_code = false;
     }
 
-    function fetch($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0) {
+    function fetch($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0)
+    {
         $fetcher = new self();
         return $fetcher->get_file_contents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
     }
 
-    function get_file_contents($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0) {
+    function get_file_contents($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0)
+    {
         $url = str_replace(' ', '%20', $url);
         if (!defined('NO_CURL') && function_exists('curl_init')) {
             $this->fetch_curl_used = true;
@@ -29,8 +33,10 @@ class Fetcher {
                 $ch = curl_init($url);
             }
             if ($timestamp && !$post_query) {
-                curl_setopt($ch, CURLOPT_HTTPHEADER,
-                            array("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $timestamp)));
+                curl_setopt(
+                    $ch, CURLOPT_HTTPHEADER,
+                    array("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $timestamp))
+                );
             }
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout ? $timeout : FILE_FETCH_CONNECT_TIMEOUT);
             curl_setopt($ch, CURLOPT_TIMEOUT, $timeout ? $timeout : FILE_FETCH_TIMEOUT);
@@ -105,7 +111,7 @@ class Fetcher {
                                                          'header' => "If-Modified-Since: ".gmdate("D, d M Y H:i:s \\G\\M\\T\r\n", $timestamp)
                                                      )));
             } else {
-                $context = NULL;
+                $context = null;
             }
 
             $old_error = error_get_last();
@@ -144,9 +150,11 @@ class Fetcher {
         }
     }
 
-    public function curl_resolve_url($url) {
-        if (!function_exists('curl_init'))
+    public function curl_resolve_url($url)
+    {
+        if (!function_exists('curl_init')) {
             return user_error('CURL Must be installed for geturl function to work. Ask your host to enable it or uncomment extension=php_curl.dll in php.ini', E_USER_ERROR);
+        }
 
         $curl = curl_init();
         $header[0] = "Accept: text/xml,application/xml,application/xhtml+xml,";
@@ -198,5 +206,4 @@ class Fetcher {
         curl_close($curl);
         return $url;
     }
-
 }

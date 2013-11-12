@@ -1,12 +1,14 @@
 <?php
 namespace SmallSmallRSS;
 
-abstract class FeedItem_Abstract extends FeedItem {
+abstract class FeedItem_Abstract extends FeedItem
+{
     protected $elem;
     protected $xpath;
     protected $doc;
 
-    function __construct($elem, $doc, $xpath) {
+    function __construct($elem, $doc, $xpath)
+    {
         $this->elem = $elem;
         $this->xpath = $xpath;
         $this->doc = $doc;
@@ -22,7 +24,8 @@ abstract class FeedItem_Abstract extends FeedItem {
     abstract function get_categories();
     abstract function get_enclosures();
 
-    function get_author() {
+    function get_author()
+    {
         $author = $this->elem->getElementsByTagName("author")->item(0);
         if ($author) {
             $name = $author->getElementsByTagName("name")->item(0);
@@ -42,7 +45,8 @@ abstract class FeedItem_Abstract extends FeedItem {
             return $author->nodeValue;
         }
     }
-    function get_comments_count() {
+    function get_comments_count()
+    {
         $comments = $this->xpath->query("slash:comments", $this->elem)->item(0);
         if ($comments) {
             return $comments->nodeValue;

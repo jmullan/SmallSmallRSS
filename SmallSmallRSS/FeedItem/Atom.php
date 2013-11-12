@@ -1,8 +1,10 @@
 <?php
 namespace SmallSmallRSS;
 
-class FeedItem_Atom extends FeedItem_Abstract {
-    function get_id() {
+class FeedItem_Atom extends FeedItem_Abstract
+{
+    function get_id()
+    {
         $id = $this->elem->getElementsByTagName("id")->item(0);
 
         if ($id) {
@@ -12,7 +14,8 @@ class FeedItem_Atom extends FeedItem_Abstract {
         }
     }
 
-    function get_date() {
+    function get_date()
+    {
         $updated = $this->elem->getElementsByTagName("updated")->item(0);
 
         if ($updated) {
@@ -32,7 +35,8 @@ class FeedItem_Atom extends FeedItem_Abstract {
         }
     }
 
-    function get_link() {
+    function get_link()
+    {
         $links = $this->elem->getElementsByTagName("link");
 
         foreach ($links as $link) {
@@ -46,7 +50,8 @@ class FeedItem_Atom extends FeedItem_Abstract {
         }
     }
 
-    function get_title() {
+    function get_title()
+    {
         $title = $this->elem->getElementsByTagName("title")->item(0);
 
         if ($title) {
@@ -54,7 +59,8 @@ class FeedItem_Atom extends FeedItem_Abstract {
         }
     }
 
-    function get_content() {
+    function get_content()
+    {
         $content = $this->elem->getElementsByTagName("content")->item(0);
 
         if ($content) {
@@ -68,7 +74,8 @@ class FeedItem_Atom extends FeedItem_Abstract {
         }
     }
 
-    function get_description() {
+    function get_description()
+    {
         $content = $this->elem->getElementsByTagName("summary")->item(0);
 
         if ($content) {
@@ -83,13 +90,15 @@ class FeedItem_Atom extends FeedItem_Abstract {
 
     }
 
-    function get_categories() {
+    function get_categories()
+    {
         $categories = $this->elem->getElementsByTagName("category");
         $cats = array();
 
         foreach ($categories as $cat) {
-            if ($cat->hasAttribute("term"))
+            if ($cat->hasAttribute("term")) {
                 array_push($cats, $cat->getAttribute("term"));
+            }
         }
 
         $categories = $this->xpath->query("dc:subject", $this->elem);
@@ -101,7 +110,8 @@ class FeedItem_Atom extends FeedItem_Abstract {
         return $cats;
     }
 
-    function get_enclosures() {
+    function get_enclosures()
+    {
         $links = $this->elem->getElementsByTagName("link");
 
         $encs = array();

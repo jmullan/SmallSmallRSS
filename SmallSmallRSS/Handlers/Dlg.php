@@ -1,9 +1,11 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Dlg extends ProtectedHandler {
+class Dlg extends ProtectedHandler
+{
     private $param;
 
-    function before($method) {
+    function before($method)
+    {
         if (parent::before($method)) {
             header("Content-Type: text/html"); # required for iframe
 
@@ -13,7 +15,8 @@ class Dlg extends ProtectedHandler {
         return false;
     }
 
-    function importOpml() {
+    function importOpml()
+    {
         print __("If you have imported labels and/or filters, you might need to reload preferences to see your new data.") . "</p>";
 
         print "<div class=\"prefFeedOPMLHolder\">";
@@ -43,7 +46,8 @@ class Dlg extends ProtectedHandler {
         //return;
     }
 
-    function pubOPMLUrl() {
+    function pubOPMLUrl()
+    {
         $url_path = Opml::opml_publish_url();
 
         print __("Your Public OPML URL is:");
@@ -65,7 +69,8 @@ class Dlg extends ProtectedHandler {
         //return;
     }
 
-    function explainError() {
+    function explainError()
+    {
         print "<div class=\"errorExplained\">";
 
         if ($this->param == 1) {
@@ -98,7 +103,8 @@ class Dlg extends ProtectedHandler {
         //return;
     }
 
-    function printTagCloud() {
+    function printTagCloud()
+    {
         print "<div class=\"tagCloudContainer\">";
 
         // from here: http://www.roscripts.com/Create_tag_cloud-71.html
@@ -115,7 +121,8 @@ class Dlg extends ProtectedHandler {
             $tags[$line["tag_name"]] = $line["count"];
         }
 
-        if (count($tags) == 0) { return; }
+        if (count($tags) == 0) { return;
+        }
 
         ksort($tags);
 
@@ -162,7 +169,8 @@ class Dlg extends ProtectedHandler {
 
     }
 
-    function printTagSelect() {
+    function printTagSelect()
+    {
 
         print __("Match:"). "&nbsp;" .
             "<input class=\"noborder\" dojoType=\"dijit.form.RadioButton\" type=\"radio\" checked value=\"any\" name=\"tag_mode\" id=\"tag_mode_any\">";
@@ -172,8 +180,10 @@ class Dlg extends ProtectedHandler {
         print "<label for=\"tag_mode_all\">".__("All tags.")."</input>";
 
         print "<select id=\"all_tags\" name=\"all_tags\" title=\"" . __('Which Tags?') . "\" multiple=\"multiple\" size=\"10\" style=\"width : 100%\">";
-        $result = $this->dbh->query("SELECT DISTINCT tag_name FROM ttrss_tags WHERE owner_uid = ".$_SESSION['uid']."
-			AND LENGTH(tag_name) <= 30 ORDER BY tag_name ASC");
+        $result = $this->dbh->query(
+            "SELECT DISTINCT tag_name FROM ttrss_tags WHERE owner_uid = ".$_SESSION['uid']."
+			AND LENGTH(tag_name) <= 30 ORDER BY tag_name ASC"
+        );
 
         while ($row = $this->dbh->fetch_assoc($result)) {
             $tmp = htmlspecialchars($row["tag_name"]);
@@ -193,7 +203,8 @@ class Dlg extends ProtectedHandler {
 
     }
 
-    function generatedFeed() {
+    function generatedFeed()
+    {
 
         $this->params = explode(":", $this->param, 3);
         $feed_id = $this->dbh->escape_string($this->params[0]);

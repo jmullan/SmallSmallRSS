@@ -1,8 +1,10 @@
 <?php
 namespace SmallSmallRSS;
 
-class FeedItem_RSS extends FeedItem_Abstract {
-    function get_id() {
+class FeedItem_RSS extends FeedItem_Abstract
+{
+    function get_id()
+    {
         $id = $this->elem->getElementsByTagName("guid")->item(0);
 
         if ($id) {
@@ -12,7 +14,8 @@ class FeedItem_RSS extends FeedItem_Abstract {
         }
     }
 
-    function get_date() {
+    function get_date()
+    {
         $pubDate = $this->elem->getElementsByTagName("pubDate")->item(0);
 
         if ($pubDate) {
@@ -26,7 +29,8 @@ class FeedItem_RSS extends FeedItem_Abstract {
         }
     }
 
-    function get_link() {
+    function get_link()
+    {
         $links = $this->xpath->query("atom:link", $this->elem);
 
         foreach ($links as $link) {
@@ -52,7 +56,8 @@ class FeedItem_RSS extends FeedItem_Abstract {
         }
     }
 
-    function get_title() {
+    function get_title()
+    {
         $title = $this->elem->getElementsByTagName("title")->item(0);
 
         if ($title) {
@@ -60,7 +65,8 @@ class FeedItem_RSS extends FeedItem_Abstract {
         }
     }
 
-    function get_content() {
+    function get_content()
+    {
         $content = $this->xpath->query("content:encoded", $this->elem)->item(0);
 
         if ($content) {
@@ -74,7 +80,8 @@ class FeedItem_RSS extends FeedItem_Abstract {
         }
     }
 
-    function get_description() {
+    function get_description()
+    {
         $summary = $this->elem->getElementsByTagName("description")->item(0);
 
         if ($summary) {
@@ -82,7 +89,8 @@ class FeedItem_RSS extends FeedItem_Abstract {
         }
     }
 
-    function get_categories() {
+    function get_categories()
+    {
         $categories = $this->elem->getElementsByTagName("category");
         $cats = array();
 
@@ -99,7 +107,8 @@ class FeedItem_RSS extends FeedItem_Abstract {
         return $cats;
     }
 
-    function get_enclosures() {
+    function get_enclosures()
+    {
         $enclosures = $this->elem->getElementsByTagName("enclosure");
 
         $encs = array();

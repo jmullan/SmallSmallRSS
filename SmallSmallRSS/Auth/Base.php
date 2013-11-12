@@ -1,22 +1,27 @@
 <?php
 namespace SmallSmallRSS;
 
-class Auth_Base implements Auth_Interface {
-    function check_password($owner_uid, $password) {
+class Auth_Base implements Auth_Interface
+{
+    function check_password($owner_uid, $password)
+    {
         return false;
     }
 
-    function authenticate($login, $password) {
+    function authenticate($login, $password)
+    {
         return false;
     }
 
     // Auto-creates specified user if allowed by system configuration
     // Can be used instead of find_user_by_login() by external auth modules
-    function auto_create_user($login, $password = false) {
+    function auto_create_user($login, $password = false)
+    {
         if ($login && defined('AUTH_AUTO_CREATE') && AUTH_AUTO_CREATE) {
             $user_id = $this->find_user_by_login($login);
 
-            if (!$password) $password = make_password();
+            if (!$password) {  $password = make_password();
+            }
 
             if (!$user_id) {
                 $login = \SmallSmallRSS\Database::escape_string($login);
@@ -39,11 +44,14 @@ class Auth_Base implements Auth_Interface {
         return $this->find_user_by_login($login);
     }
 
-    function find_user_by_login($login) {
+    function find_user_by_login($login)
+    {
         $login = \SmallSmallRSS\Database::escape_string($login);
 
-        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE
-			login = '$login'");
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id FROM ttrss_users WHERE
+			login = '$login'"
+        );
 
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
             return \SmallSmallRSS\Database::fetch_result($result, 0, "id");

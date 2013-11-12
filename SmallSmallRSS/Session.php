@@ -81,7 +81,7 @@ class Session
             return false;
         }
 
-        if ($_SESSION["ref_schema_version"] != \SmallSmallRSS\Sanity::get_schema_version(true)) {
+        if ($_SESSION["ref_schema_version"] != \SmallSmallRSS\Sanity::getSchemaVersion(true)) {
             return false;
         }
 

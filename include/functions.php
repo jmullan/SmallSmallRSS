@@ -94,7 +94,7 @@ function startup_gettext()
     }
 
     if (!empty($_SESSION["uid"])
-        && \SmallSmallRSS\Sanity::get_schema_version() >= 120) {
+        && \SmallSmallRSS\Sanity::getSchemaVersion() >= 120) {
         $pref_lang = get_pref("USER_LANGUAGE", $_SESSION["uid"]);
 
         if ($pref_lang && $pref_lang != 'auto') {
@@ -286,7 +286,8 @@ function feed_purge_interval($feed_id)
     }
 }
 
-function purge_orphans($do_output = false) {
+function purge_orphans($do_output = false)
+{
     // purge orphaned posts in main content table
     $result = db_query(
         "DELETE FROM ttrss_entries
@@ -301,7 +302,8 @@ function purge_orphans($do_output = false) {
     }
 }
 
-function get_feed_update_interval($feed_id) {
+function get_feed_update_interval($feed_id)
+{
     $result = db_query(
         "SELECT owner_uid, update_interval
          FROM ttrss_feeds WHERE id = '$feed_id'"
@@ -329,7 +331,8 @@ function get_feed_update_interval($feed_id) {
  * @access public
  * @return mixed The favicon URL, or false if none was found.
  */
-function get_favicon_url($url) {
+function get_favicon_url($url)
+{
     $favicon_url = false;
     if ($html = @\SmallSmallRSS\Fetcher::fetch($url)) {
         libxml_use_internal_errors(true);
@@ -358,9 +361,8 @@ function get_favicon_url($url) {
     return $favicon_url;
 }
 
-function check_feed_favicon($site_url, $feed) {
-    #        print "FAVICON [$site_url]: $favicon_url\n";
-
+function check_feed_favicon($site_url, $feed)
+{
     $icon_file = ICONS_DIR . "/$feed.ico";
 
     if (!file_exists($icon_file)) {
@@ -405,7 +407,8 @@ function check_feed_favicon($site_url, $feed) {
     }
 }
 
-function print_select($id, $default, $values, $attributes = "") {
+function print_select($id, $default, $values, $attributes = "")
+{
     print "<select name=\"$id\" id=\"$id\" $attributes>";
     foreach ($values as $v) {
         if ($v == $default)
@@ -420,7 +423,8 @@ function print_select($id, $default, $values, $attributes = "") {
     print "</select>";
 }
 
-function print_select_hash($id, $default, $values, $attributes = "") {
+function print_select_hash($id, $default, $values, $attributes = "")
+{
     print "<select name=\"$id\" id='$id' $attributes>";
     foreach (array_keys($values) as $v) {
         if ($v == $default)
@@ -436,9 +440,9 @@ function print_select_hash($id, $default, $values, $attributes = "") {
     print "</select>";
 }
 
-function print_radio($id, $default, $true_is, $values, $attributes = "") {
+function print_radio($id, $default, $true_is, $values, $attributes = "")
+{
     foreach ($values as $v) {
-
         if ($v == $default)
             $sel = "checked";
         else
@@ -456,8 +460,8 @@ function print_radio($id, $default, $true_is, $values, $attributes = "") {
     }
 }
 
-function initialize_user_prefs($uid, $profile = false) {
-
+function initialize_user_prefs($uid, $profile = false)
+{
     $uid = db_escape_string($uid);
 
     if (!$profile) {
@@ -467,7 +471,7 @@ function initialize_user_prefs($uid, $profile = false) {
         $profile_qpart = "AND profile = '$profile'";
     }
 
-    if (\SmallSmallRSS\Sanity::get_schema_version() < 63) {
+    if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
         $profile_qpart = "";
     }
 
@@ -491,7 +495,7 @@ function initialize_user_prefs($uid, $profile = false) {
             $line["def_value"] = db_escape_string($line["def_value"]);
             $line["pref_name"] = db_escape_string($line["pref_name"]);
 
-            if (\SmallSmallRSS\Sanity::get_schema_version() < 63) {
+            if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
                 db_query("INSERT INTO ttrss_user_prefs
               (owner_uid,pref_name,value) VALUES
               ('$uid', '".$line["pref_name"]."','".$line["def_value"]."')");
@@ -509,7 +513,8 @@ function initialize_user_prefs($uid, $profile = false) {
 
 }
 
-function get_ssl_certificate_id() {
+function get_ssl_certificate_id()
+{
 
     if (!empty($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"])) {
         return sha1($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"] .
@@ -520,7 +525,8 @@ function get_ssl_certificate_id() {
     return "";
 }
 
-function authenticate_user($login, $password, $check_only = false) {
+function authenticate_user($login, $password, $check_only = false)
+{
     if (!SINGLE_USER_MODE) {
         $user_id = false;
         $plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_AUTH_USER);
@@ -580,7 +586,8 @@ function authenticate_user($login, $password, $check_only = false) {
     }
 }
 
-function make_password($length = 8) {
+function make_password($length = 8)
+{
 
     $password = "";
     $possible = "0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ";
@@ -603,7 +610,8 @@ function make_password($length = 8) {
 
 // user preferences are checked on every login, not here
 
-function initialize_user($uid) {
+function initialize_user($uid)
+{
 
     db_query("insert into ttrss_feeds (owner_uid,title,feed_url)
             values ('$uid', 'Tiny Tiny RSS: New Releases',
@@ -614,30 +622,34 @@ function initialize_user($uid) {
                 'http://tt-rss.org/forum/rss.php')");
 }
 
-function logout_user() {
+function logout_user()
+{
     session_destroy();
     if (isset($_COOKIE[session_name()])) {
         setcookie(session_name(), '', time()-42000, '/');
     }
 }
 
-function validate_csrf($csrf_token) {
+function validate_csrf($csrf_token)
+{
     return $csrf_token == $_SESSION['csrf_token'];
 }
 
-function load_user_plugins($owner_uid) {
+function load_user_plugins($owner_uid)
+{
     if ($owner_uid) {
         $plugins = get_pref("_ENABLED_PLUGINS", $owner_uid);
 
         \SmallSmallRSS\PluginHost::getInstance()->load($plugins, \SmallSmallRSS\PluginHost::KIND_USER, $owner_uid);
 
-        if (\SmallSmallRSS\Sanity::get_schema_version() > 100) {
+        if (\SmallSmallRSS\Sanity::getSchemaVersion() > 100) {
             \SmallSmallRSS\PluginHost::getInstance()->load_data();
         }
     }
 }
 
-function login_sequence() {
+function login_sequence()
+{
     if (SINGLE_USER_MODE) {
         authenticate_user("admin", null);
         load_user_plugins($_SESSION["uid"]);
@@ -647,7 +659,7 @@ function login_sequence() {
         if (!$_SESSION["uid"]) {
 
             if (AUTH_AUTO_LOGIN && authenticate_user(null, null)) {
-                $_SESSION["ref_schema_version"] = \SmallSmallRSS\Sanity::get_schema_version(true);
+                $_SESSION["ref_schema_version"] = \SmallSmallRSS\Sanity::getSchemaVersion(true);
             } else {
                 authenticate_user(null, null, true);
             }
@@ -715,7 +727,8 @@ function convert_timestamp($timestamp, $source_tz, $dest_tz)
     return $dt->format('U') + $dest_tz->getOffset($dt);
 }
 
-function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt = false) {
+function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt = false)
+{
     static $utc_tz = null;
     if (is_null($utc_tz)) {
         $utc_tz = new DateTimeZone('UTC');
@@ -758,7 +771,8 @@ function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt
     }
 }
 
-function smart_date_time($timestamp, $tz_offset = 0, $owner_uid = false) {
+function smart_date_time($timestamp, $tz_offset = 0, $owner_uid = false)
+{
     if (!$owner_uid) {
         $owner_uid = $_SESSION['uid'];
     }
@@ -773,7 +787,8 @@ function smart_date_time($timestamp, $tz_offset = 0, $owner_uid = false) {
     }
 }
 
-function sql_bool_to_bool($s) {
+function sql_bool_to_bool($s)
+{
     if ($s == "t" || $s == "1" || strtolower($s) == "true") {
         return true;
     } else {
@@ -781,7 +796,8 @@ function sql_bool_to_bool($s) {
     }
 }
 
-function bool_to_sql_bool($s) {
+function bool_to_sql_bool($s)
+{
     if ($s) {
         return "true";
     } else {
@@ -789,11 +805,12 @@ function bool_to_sql_bool($s) {
     }
 }
 
-function sanity_check() {
+function sanity_check()
+{
     $error_code = 0;
-    $schema_version = \SmallSmallRSS\Sanity::get_schema_version(true);
+    $schema_version = \SmallSmallRSS\Sanity::getSchemaVersion(true);
 
-    if (!\SmallSmallRSS\Sanity::is_schema_correct()) {
+    if (!\SmallSmallRSS\Sanity::isSchemaCorrect()) {
         $error_code = 5;
     }
 
@@ -814,7 +831,8 @@ function sanity_check() {
     );
 }
 
-function file_is_locked($filename) {
+function file_is_locked($filename)
+{
     if (file_exists(LOCK_DIRECTORY . "/$filename")) {
         if (function_exists('flock')) {
             $fp = @fopen(LOCK_DIRECTORY . "/$filename", "r");
@@ -837,7 +855,8 @@ function file_is_locked($filename) {
 }
 
 
-function make_lockfile($filename) {
+function make_lockfile($filename)
+{
     $fp = fopen(LOCK_DIRECTORY . "/$filename", "w");
 
     if ($fp && flock($fp, LOCK_EX | LOCK_NB)) {
@@ -861,7 +880,8 @@ function make_lockfile($filename) {
     }
 }
 
-function make_stampfile($filename) {
+function make_stampfile($filename)
+{
     $fp = fopen(LOCK_DIRECTORY . "/$filename", "w");
 
     if (flock($fp, LOCK_EX | LOCK_NB)) {
@@ -882,7 +902,8 @@ function sql_random_function() {
     }
 }
 
-function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mode = 'all') {
+function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mode = 'all')
+{
 
     if (!$owner_uid) $owner_uid = $_SESSION['uid'];
 
@@ -1027,17 +1048,18 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
     }
 }
 
-function getAllCounters() {
+function getAllCounters()
+{
     $data = getGlobalCounters();
     $data = array_merge($data, getVirtCounters());
     $data = array_merge($data, getLabelCounters());
     $data = array_merge($data, getFeedCounters());
     $data = array_merge($data, getCategoryCounters());
-
     return $data;
 }
 
-function getCategoryTitle($cat_id) {
+function getCategoryTitle($cat_id)
+{
 
     if ($cat_id == -1) {
         return __("Special");
@@ -1057,7 +1079,8 @@ function getCategoryTitle($cat_id) {
 }
 
 
-function getCategoryCounters() {
+function getCategoryCounters()
+{
     $ret_arr = array();
 
     /* Labels category */
@@ -1101,9 +1124,11 @@ function getCategoryCounters() {
 }
 
 // only accepts real cats (>= 0)
-function getCategoryChildrenUnread($cat, $owner_uid = false) {
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
-
+function getCategoryChildrenUnread($cat, $owner_uid = false)
+{
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
     $result = db_query("SELECT id FROM ttrss_feed_categories WHERE parent_cat = '$cat'
                 AND owner_uid = $owner_uid");
 
@@ -1117,21 +1142,24 @@ function getCategoryChildrenUnread($cat, $owner_uid = false) {
     return $unread;
 }
 
-function getCategoryUnread($cat, $owner_uid = false) {
-
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
-
+function getCategoryUnread($cat, $owner_uid = false)
+{
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
     if ($cat >= 0) {
-
         if ($cat != 0) {
             $cat_query = "cat_id = '$cat'";
         } else {
             $cat_query = "cat_id IS NULL";
         }
-
-        $result = db_query("SELECT id FROM ttrss_feeds WHERE $cat_query
-                    AND owner_uid = " . $owner_uid);
-
+        $result = db_query(
+            "SELECT id
+             FROM ttrss_feeds
+             WHERE
+                 $cat_query
+                 AND owner_uid = " . $owner_uid
+        );
         $cat_feeds = array();
         while ($line = db_fetch_assoc($result)) {
             array_push($cat_feeds, "feed_id = " . $line["id"]);
@@ -1171,11 +1199,13 @@ function getCategoryUnread($cat, $owner_uid = false) {
     }
 }
 
-function getFeedUnread($feed, $is_cat = false) {
+function getFeedUnread($feed, $is_cat = false)
+{
     return getFeedArticles($feed, $is_cat, true, $_SESSION["uid"]);
 }
 
-function getLabelUnread($label_id, $owner_uid = false) {
+function getLabelUnread($label_id, $owner_uid = false)
+{
     if (!$owner_uid) $owner_uid = $_SESSION["uid"];
 
     $result = db_query("SELECT COUNT(ref_id) AS unread FROM ttrss_user_entries, ttrss_user_labels2
@@ -1188,8 +1218,8 @@ function getLabelUnread($label_id, $owner_uid = false) {
     }
 }
 
-function getFeedArticles($feed, $is_cat = false, $unread_only = false,
-                         $owner_uid = false) {
+function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_uid = false)
+{
 
     $n_feed = (int) $feed;
     $need_entries = false;
@@ -1282,8 +1312,8 @@ function getFeedArticles($feed, $is_cat = false, $unread_only = false,
     return $unread;
 }
 
-function getGlobalUnread($user_id = false) {
-
+function getGlobalUnread($user_id = false)
+{
     if (!$user_id) {
         $user_id = $_SESSION["uid"];
     }
@@ -1296,7 +1326,8 @@ function getGlobalUnread($user_id = false) {
     return $c_id;
 }
 
-function getGlobalCounters($global_unread = -1) {
+function getGlobalCounters($global_unread = -1)
+{
     $ret_arr = array();
 
     if ($global_unread == -1) {
@@ -1321,26 +1352,18 @@ function getGlobalCounters($global_unread = -1) {
     return $ret_arr;
 }
 
-function getVirtCounters() {
-
+function getVirtCounters()
+{
     $ret_arr = array();
-
     for ($i = 0; $i >= -4; $i--) {
-
         $count = getFeedUnread($i);
-
         if ($i == 0 || $i == -1 || $i == -2)
             $auxctr = getFeedArticles($i, false);
         else
             $auxctr = 0;
-
         $cv = array("id" => $i,
                     "counter" => (int) $count,
                     "auxcounter" => $auxctr);
-
-        //            if (get_pref('EXTENDED_FEEDLIST'))
-        //                $cv["xmsg"] = getFeedArticles($i)." ".__("total");
-
         array_push($ret_arr, $cv);
     }
 
@@ -1357,51 +1380,58 @@ function getVirtCounters() {
     return $ret_arr;
 }
 
-function getLabelCounters($descriptions = false) {
-
+function getLabelCounters($descriptions = false)
+{
     $ret_arr = array();
-
     $owner_uid = $_SESSION["uid"];
-
-    $result = db_query("SELECT id,caption,COUNT(u1.unread) AS unread,COUNT(u2.unread) AS total
-            FROM ttrss_labels2 LEFT JOIN ttrss_user_labels2 ON
+    $result = db_query(
+        "SELECT
+             id,
+             caption,
+             COUNT(u1.unread) AS unread,
+             COUNT(u2.unread) AS total
+         FROM
+             ttrss_labels2
+             LEFT JOIN ttrss_user_labels2 ON
                 (ttrss_labels2.id = label_id)
-                LEFT JOIN ttrss_user_entries AS u1 ON (u1.ref_id = article_id AND u1.unread = true
-                    AND u1.owner_uid = $owner_uid)
-                LEFT JOIN ttrss_user_entries AS u2 ON (u2.ref_id = article_id AND u2.unread = false
-                    AND u2.owner_uid = $owner_uid)
-                WHERE ttrss_labels2.owner_uid = $owner_uid GROUP BY ttrss_labels2.id,
-                    ttrss_labels2.caption");
-
+             LEFT JOIN ttrss_user_entries AS u1
+             ON (u1.ref_id = article_id AND u1.unread = true AND u1.owner_uid = $owner_uid)
+             LEFT JOIN ttrss_user_entries AS u2
+             ON (u2.ref_id = article_id AND u2.unread = false AND u2.owner_uid = $owner_uid)
+         WHERE ttrss_labels2.owner_uid = $owner_uid
+         GROUP BY
+             ttrss_labels2.id, ttrss_labels2.caption"
+    );
     while ($line = db_fetch_assoc($result)) {
-
         $id = label_to_feed_id($line["id"]);
-
-        $cv = array("id" => $id,
-                    "counter" => (int) $line["unread"],
-                    "auxcounter" => (int) $line["total"]);
-
-        if ($descriptions)
+        $cv = array(
+            "id" => $id,
+            "counter" => (int) $line["unread"],
+            "auxcounter" => (int) $line["total"]
+        );
+        if ($descriptions) {
             $cv["description"] = $line["caption"];
-
+        }
         array_push($ret_arr, $cv);
     }
-
     return $ret_arr;
 }
 
-function getFeedCounters($active_feed = false) {
-
+function getFeedCounters($active_feed = false)
+{
     $ret_arr = array();
-
-    $query = "SELECT ttrss_feeds.id,
-                ttrss_feeds.title,
-                ".SUBSTRING_FOR_DATE."(ttrss_feeds.last_updated,1,19) AS last_updated,
-                last_error, value AS count
-            FROM ttrss_feeds, ttrss_counters_cache
-            WHERE ttrss_feeds.owner_uid = ".$_SESSION["uid"]."
-                AND ttrss_counters_cache.owner_uid = ttrss_feeds.owner_uid
-                AND ttrss_counters_cache.feed_id = id";
+    $query = "
+        SELECT
+            ttrss_feeds.id,
+            ttrss_feeds.title,
+            ".SUBSTRING_FOR_DATE."(ttrss_feeds.last_updated,1,19) AS last_updated,
+            last_error,
+            value AS count
+        FROM ttrss_feeds, ttrss_counters_cache
+        WHERE
+            ttrss_feeds.owner_uid = ".$_SESSION["uid"]."
+            AND ttrss_counters_cache.owner_uid = ttrss_feeds.owner_uid
+            AND ttrss_counters_cache.feed_id = id";
 
     $result = db_query($query);
     $fctrs_modified = false;
@@ -1440,7 +1470,8 @@ function getFeedCounters($active_feed = false) {
     return $ret_arr;
 }
 
-function get_pgsql_version() {
+function get_pgsql_version()
+{
     $result = db_query("SELECT version() AS version");
     $version = explode(" ", db_fetch_result($result, 0, "version"));
     return $version[1];
@@ -1459,10 +1490,9 @@ function get_pgsql_version() {
  *                 5 - Couldn't download the URL content.
  *                 6 - Content is an invalid XML.
  */
-function subscribe_to_feed($url, $cat_id = 0,
-                           $auth_login = '', $auth_pass = '') {
+function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
+{
     require_once __DIR__ . "/rssfuncs.php";
-
     $url = fix_url($url);
     if (!$url || !validate_feed_url($url)) {
         return array("code" => 2);
@@ -1528,9 +1558,11 @@ function subscribe_to_feed($url, $cat_id = 0,
     }
 }
 
-function print_feed_select($id, $default_id = "",
-                           $attributes = "", $include_all_feeds = true,
-                           $root_id = false, $nest_level = 0) {
+function print_feed_select(
+    $id, $default_id = "",
+    $attributes = "", $include_all_feeds = true,
+    $root_id = false, $nest_level = 0
+) {
 
     if (!$root_id) {
         print "<select id=\"$id\" name=\"$id\" $attributes>";
@@ -1624,8 +1656,10 @@ function print_feed_select($id, $default_id = "",
     }
 }
 
-function print_feed_cat_select($id, $default_id,
-                               $attributes, $include_all_cats = true, $root_id = false, $nest_level = 0) {
+function print_feed_cat_select(
+    $id, $default_id,
+    $attributes, $include_all_cats = true, $root_id = false, $nest_level = 0
+) {
 
     if (!$root_id) {
         print "<select id=\"$id\" name=\"$id\" default=\"$default_id\" onchange=\"catSelectOnChange(this)\" $attributes>";
@@ -1679,11 +1713,13 @@ function print_feed_cat_select($id, $default_id,
     }
 }
 
-function checkbox_to_sql_bool($val) {
+function checkbox_to_sql_bool($val)
+{
     return ($val == "on") ? "true" : "false";
 }
 
-function getFeedCatTitle($id) {
+function getFeedCatTitle($id)
+{
     if ($id == -1) {
         return __("Special");
     } elseif ($id < LABEL_BASE_INDEX) {
@@ -1703,7 +1739,8 @@ function getFeedCatTitle($id) {
 
 }
 
-function getFeedIcon($id) {
+function getFeedIcon($id)
+{
     switch ($id) {
         case 0:
             return "images/archive.png";
@@ -1736,7 +1773,8 @@ function getFeedIcon($id) {
     return false;
 }
 
-function getFeedTitle($id, $cat = false) {
+function getFeedTitle($id, $cat = false)
+{
     if ($cat) {
         return getCategoryTitle($id);
     } elseif ($id == -1) {
@@ -1772,7 +1810,8 @@ function getFeedTitle($id, $cat = false) {
     }
 }
 
-function make_init_params() {
+function make_init_params()
+{
     $params = array();
 
     foreach (array("ON_CATCHUP_SHOW_NEXT_FEED", "HIDE_READ_FEEDS",
@@ -1814,7 +1853,8 @@ function make_init_params() {
     return $params;
 }
 
-function get_hotkeys_info() {
+function get_hotkeys_info()
+{
     $hotkeys = array(
         __("Navigation") => array(
             "next_feed" => __("Open next feed"),
@@ -1876,8 +1916,10 @@ function get_hotkeys_info() {
             "collapse_sidebar" => __("Un/collapse sidebar"),
             "help_dialog" => __("Show help dialog"))
     );
-
-    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_HOTKEY_INFO) as $plugin) {
+    $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+        \SmallSmallRSS\PluginHost::HOOK_HOTKEY_INFO
+    );
+    foreach ($hotkey_hooks as $plugin) {
         $hotkeys = $plugin->hook_hotkey_info($hotkeys);
     }
 
@@ -1953,7 +1995,10 @@ function get_hotkeys_map() {
         $hotkeys["^(40)|Ctrl-down"] = "next_article_noscroll";
     }
 
-    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP) as $plugin) {
+    $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+        \SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP
+    );
+    foreach ($hotkey_hooks as $plugin) {
         $hotkeys = $plugin->hook_hotkey_map($hotkeys);
     }
 
@@ -1961,16 +2006,15 @@ function get_hotkeys_map() {
 
     foreach (array_keys($hotkeys) as $hotkey) {
         $pair = explode(" ", $hotkey, 2);
-
         if (count($pair) > 1 && !in_array($pair[0], $prefixes)) {
             array_push($prefixes, $pair[0]);
         }
     }
-
     return array($prefixes, $hotkeys);
 }
 
-function make_runtime_info() {
+function make_runtime_info()
+{
     $data = array();
 
     $result = db_query("SELECT MAX(id) AS mid, COUNT(*) AS nf FROM
@@ -1989,37 +2033,28 @@ function make_runtime_info() {
     $data['reload_on_ts_change'] = !defined('_NO_RELOAD_ON_TS_CHANGE');
 
     if (file_exists(LOCK_DIRECTORY . "/update_daemon.lock")) {
-
         $data['daemon_is_running'] = (int) file_is_locked("update_daemon.lock");
-
         if (time() - $_SESSION["daemon_stamp_check"] > 30) {
-
             $stamp = (int) @file_get_contents(LOCK_DIRECTORY . "/update_daemon.stamp");
-
             if ($stamp) {
                 $stamp_delta = time() - $stamp;
-
                 if ($stamp_delta > 1800) {
                     $stamp_check = 0;
                 } else {
                     $stamp_check = 1;
                     $_SESSION["daemon_stamp_check"] = time();
                 }
-
                 $data['daemon_stamp_ok'] = $stamp_check;
-
                 $stamp_fmt = date("Y.m.d, G:i", $stamp);
-
                 $data['daemon_stamp'] = $stamp_fmt;
             }
         }
     }
-
     return $data;
 }
 
-function search_to_sql($search) {
-
+function search_to_sql($search)
+{
     $search_query_part = "";
 
     $keywords = explode(" ", $search);

@@ -1,8 +1,9 @@
 <?php
 namespace SmallSmallRSS;
+
 class Logger_Syslog
 {
-    function log_error($errno, $errstr, $file, $line, $context)
+    public static function logError($errno, $errstr, $file, $line, $context)
     {
         switch ($errno) {
             case E_ERROR:
@@ -26,7 +27,7 @@ class Logger_Syslog
 
     }
 
-    function log($string, $priority = LOG_ERR)
+    public static function log($string, $priority = LOG_ERR)
     {
         if (!is_string($string)) {
             $string = var_export($string, true);

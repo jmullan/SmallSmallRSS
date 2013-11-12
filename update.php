@@ -3,21 +3,20 @@
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
-                 get_include_path());
+set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR . get_include_path());
 
 define('DISABLE_SESSIONS', true);
 
 chdir(dirname(__FILE__));
 
 require_once "rssfuncs.php";
-\SmallSmallRSS\Sanity::initial_check();
+\SmallSmallRSS\Sanity::initialCheck();
 require_once "db.php";
 require_once "db-prefs.php";
 
-if (!defined('PHP_EXECUTABLE'))
+if (!defined('PHP_EXECUTABLE')) {
     define('PHP_EXECUTABLE', '/usr/bin/php');
-
+}
 init_plugins();
 
 $longopts = array(
@@ -45,23 +44,9 @@ foreach (\SmallSmallRSS\PluginHost::getInstance()->get_commands() as $command =>
 $options = getopt("", $longopts);
 
 if (count($options) == 0 && !defined('STDIN')) {
-?> <html>
-    <head>
-        <title>Tiny Tiny RSS data update script.</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <link rel="stylesheet" type="text/css" href="css/utility.css">
-        </head>
-
-        <body>
-        <div class="floatingLogo"><img src="images/logo_small.png"></div>
-        <h1><?php echo __("Tiny Tiny RSS data update script.") ?></h1>
-
-<?php  \SmallSmallRSS\Renderers\Messages::renderError(
-        "Please run this script from the command line. Use option \"-help\" to display command help if this error is displayed erroneously."); ?>
-
-        </body></html>
-<?php
-        exit;
+    $updater = new \SmallSmallRSS\Renderers\Updater();
+    $updater->render();
+    exit;
 }
 
 if (count($options) == 0 || isset($options["help"])) {
@@ -95,7 +80,7 @@ if (!isset($options['daemon'])) {
 }
 
 if (!isset($options['update-schema'])) {
-    \SmallSmallRSS\Sanity::schema_or_die();
+    \SmallSmallRSS\Sanity::schemaOrDie();
 }
 
 define('QUIET', isset($options['quiet']));
@@ -135,22 +120,31 @@ if (isset($options["task"]) && isset($options["pidlock"])) {
 
 // Try to lock a file in order to avoid concurrent update.
 if (!$lock_handle) {
-    die("error: Can't create lockfile ($lock_filename). ".
-        "Maybe another update process is already running.\n");
+    die(
+        "error: Can't create lockfile ($lock_filename)."
+        . "Maybe another update process is already running.\n"
+    );
 }
 
 if (isset($options["force-update"])) {
     _debug("marking all feeds as needing update...");
 
-    db_query("UPDATE ttrss_feeds SET last_update_started = '1970-01-01',
-				last_updated = '1970-01-01'");
+    db_query(
+        "UPDATE ttrss_feeds
+         SET
+             last_update_started = '1970-01-01',
+             last_updated = '1970-01-01'"
+    );
 }
 
 if (isset($options["feeds"])) {
     update_daemon_common();
     housekeeping_common(true);
-
-    \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
+    \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+        \SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK,
+        "hook_update_task",
+        $op
+    );
 }
 
 if (isset($options["feedbrowser"])) {
@@ -161,7 +155,6 @@ if (isset($options["feedbrowser"])) {
 if (isset($options["daemon"])) {
     while (true) {
         $quiet = (isset($options["quiet"])) ? "--quiet" : "";
-
         passthru(PHP_EXECUTABLE . " " . $argv[0] ." --daemon-loop $quiet");
         _debug("Sleeping for " . DAEMON_SLEEP_INTERVAL . " seconds...");
         sleep(DAEMON_SLEEP_INTERVAL);
@@ -175,10 +168,14 @@ if (isset($options["daemon-loop"])) {
 
     update_daemon_common(isset($options["pidlock"]) ? 50 : DAEMON_FEED_LIMIT);
 
-    if (!isset($options["pidlock"]) || $options["task"] == 0)
+    if (!isset($options["pidlock"]) || $options["task"] == 0) {
         housekeeping_common(true);
-
-    \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
+    }
+    \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+        \SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK,
+        "hook_update_task",
+        $op
+    );
 }
 
 if (isset($options["cleanup-tags"])) {
@@ -190,19 +187,26 @@ if (isset($options["indexes"])) {
     _debug("PLEASE BACKUP YOUR DATABASE BEFORE PROCEEDING!");
     _debug("Type 'yes' to continue.");
 
-    if (read_stdin() != 'yes')
+    if (read_stdin() != 'yes') {
         exit;
-
+    }
     _debug("clearing existing indexes...");
 
     if (DB_TYPE == "pgsql") {
-        $result = db_query("SELECT relname FROM
-				pg_catalog.pg_class WHERE relname LIKE 'ttrss_%'
-					AND relname NOT LIKE '%_pkey'
-				AND relkind = 'i'");
+        $result = db_query(
+            "SELECT relname
+             FROM pg_catalog.pg_class
+             WHERE
+                 relname LIKE 'ttrss_%'
+                 AND relname NOT LIKE '%_pkey'
+                 AND relkind = 'i'"
+        );
     } else {
-        $result = db_query("SELECT index_name,table_name FROM
-				information_schema.statistics WHERE index_name LIKE 'ttrss_%'");
+        $result = db_query(
+            "SELECT index_name,table_name
+             FROM information_schema.statistics
+             WHERE index_name LIKE 'ttrss_%'"
+        );
     }
 
     while ($line = db_fetch_assoc($result)) {
@@ -210,8 +214,7 @@ if (isset($options["indexes"])) {
             $statement = "DROP INDEX " . $line["relname"];
             _debug($statement);
         } else {
-            $statement = "ALTER TABLE ".
-                $line['table_name']." DROP INDEX ".$line['index_name'];
+            $statement = "ALTER TABLE " . $line['table_name'] . " DROP INDEX ".$line['index_name'];
             _debug($statement);
         }
         db_query($statement, false);
@@ -245,9 +248,9 @@ if (isset($options["convert-filters"])) {
     _debug("WARNING: this will remove all existing type2 filters.");
     _debug("Type 'yes' to continue.");
 
-    if (read_stdin() != 'yes')
+    if (read_stdin() != 'yes') {
         exit;
-
+    }
     _debug("converting filters...");
 
     db_query("DELETE FROM ttrss_filters2");
@@ -298,49 +301,51 @@ if (isset($options["update-schema"])) {
     $updater = new DbUpdater(Db::get(), DB_TYPE, \SmallSmallRSS\Constants::SCHEMA_VERSION);
 
     if ($updater->isUpdateRequired()) {
-        _debug("schema update required, version " . $updater->getSchemaVersion() . " to " . \SmallSmallRSS\Constants::SCHEMA_VERSION);
+        _debug(
+            "schema update required, version " . $updater->getSchemaVersion()
+            . " to " . \SmallSmallRSS\Constants::SCHEMA_VERSION
+        );
         _debug("WARNING: please backup your database before continuing.");
         _debug("Type 'yes' to continue.");
 
-        if (read_stdin() != 'yes')
+        if (read_stdin() != 'yes') {
             exit;
-
+        }
         for ($i = $updater->getSchemaVersion() + 1; $i <= \SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
             _debug("performing update up to version $i...");
-
             $result = $updater->performUpdateTo($i);
-
             _debug($result ? "OK!" : "FAILED!");
-
-            if (!$result) return;
+            if (!$result) {
+                return;
+            }
 
         }
     } else {
         _debug("update not required.");
     }
-
 }
 
 if (isset($options["list-plugins"])) {
     $tmppluginhost = new \SmallSmallRSS\PluginHost();
     $tmppluginhost->load_all($tmppluginhost::KIND_ALL);
     $enabled = array_map("trim", explode(",", PLUGINS));
-
     echo "List of all available plugins:\n";
-
     foreach ($tmppluginhost->get_plugins() as $name => $plugin) {
         $about = $plugin->about();
-
         $status = $about[3] ? "system" : "user";
-
-        if (in_array($name, $enabled)) $name .= "*";
-
-        printf("%-50s %-10s v%.2f (by %s)\n%s\n\n",
-               $name, $status, $about[0], $about[2], $about[1]);
+        if (in_array($name, $enabled)) {
+            $name .= "*";
+        }
+        printf(
+            "%-50s %-10s v%.2f (by %s)\n%s\n\n",
+            $name,
+            $status,
+            $about[0],
+            $about[2],
+            $about[1]
+        );
     }
-
     echo "Plugins marked by * are currently enabled for all users.\n";
-
 }
 
 \SmallSmallRSS\PluginHost::getInstance()->run_commands($options);

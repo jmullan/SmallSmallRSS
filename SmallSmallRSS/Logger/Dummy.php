@@ -3,12 +3,12 @@ namespace SmallSmallRSS;
 
 class Logger_Dummy extends Logger_Abstract implements Logger_Interface
 {
-    function log_error($errno, $errstr, $file, $line, $context)
+    public static function logError($errno, $errstr, $file, $line, $context)
     {
         return false;
     }
 
-    function log($string, $priority = LOG_ERR)
+    public static function log($string, $priority = LOG_ERR)
     {
         return false;
     }

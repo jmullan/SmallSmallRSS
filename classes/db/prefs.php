@@ -5,7 +5,7 @@ class Db_Prefs
     private static $instance;
     private $cache;
 
-    function __construct()
+    public function __construct()
     {
         $this->dbh = Db::get();
         $this->cache = array();
@@ -28,7 +28,7 @@ class Db_Prefs
         return self::$instance;
     }
 
-    function cache()
+    public function cache()
     {
         $profile = false;
 
@@ -41,20 +41,21 @@ class Db_Prefs
             $profile_qpart = "profile IS NULL AND";
         }
 
-        if (\SmallSmallRSS\Sanity::get_schema_version() < 63) {  $profile_qpart = "";
+        if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
+            $profile_qpart = "";
         }
 
         $result = db_query(
             "SELECT
-			value,ttrss_prefs_types.type_name as type_name,ttrss_prefs.pref_name AS pref_name
-			FROM
-				ttrss_user_prefs,ttrss_prefs,ttrss_prefs_types
-			WHERE
-				$profile_qpart
-				ttrss_prefs.pref_name NOT LIKE '_MOBILE%' AND
-				ttrss_prefs_types.id = type_id AND
-				owner_uid = '$user_id' AND
-				ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
+                 value,ttrss_prefs_types.type_name as type_name,ttrss_prefs.pref_name AS pref_name
+             FROM
+                 ttrss_user_prefs,ttrss_prefs,ttrss_prefs_types
+             WHERE
+                 $profile_qpart
+                 ttrss_prefs.pref_name NOT LIKE '_MOBILE%' AND
+                 ttrss_prefs_types.id = type_id AND
+                 owner_uid = '$user_id' AND
+                 ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
         );
 
         while ($line = db_fetch_assoc($result)) {
@@ -67,7 +68,7 @@ class Db_Prefs
         }
     }
 
-    function read($pref_name, $user_id = false, $die_on_error = false)
+    public function read($pref_name, $user_id = false, $die_on_error = false)
     {
 
         $pref_name = db_escape_string($pref_name);
@@ -91,20 +92,21 @@ class Db_Prefs
             $profile_qpart = "profile IS NULL AND";
         }
 
-        if (\SmallSmallRSS\Sanity::get_schema_version() < 63) {  $profile_qpart = "";
+        if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
+            $profile_qpart = "";
         }
 
         $result = db_query(
             "SELECT
-			value,ttrss_prefs_types.type_name as type_name
-			FROM
-				ttrss_user_prefs,ttrss_prefs,ttrss_prefs_types
-			WHERE
-				$profile_qpart
-				ttrss_user_prefs.pref_name = '$pref_name' AND
-				ttrss_prefs_types.id = type_id AND
-				owner_uid = '$user_id' AND
-				ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
+             value,ttrss_prefs_types.type_name as type_name
+             FROM
+                 ttrss_user_prefs,ttrss_prefs,ttrss_prefs_types
+             WHERE
+                 $profile_qpart
+                 ttrss_user_prefs.pref_name = '$pref_name'
+                 AND ttrss_prefs_types.id = type_id
+                 AND owner_uid = '$user_id'
+                 AND ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
         );
 
         if (db_num_rows($result) > 0) {
@@ -119,12 +121,15 @@ class Db_Prefs
             return $this->convert($value, $type_name);
 
         } else {
-            user_error("Fatal error, unknown preferences key: $pref_name (owner: $user_id)", $die_on_error ? E_USER_ERROR : E_USER_WARNING);
+            user_error(
+                "Fatal error, unknown preferences key: $pref_name (owner: $user_id)",
+                $die_on_error ? E_USER_ERROR : E_USER_WARNING
+            );
             return null;
         }
     }
 
-    function convert($value, $type_name)
+    public function convert($value, $type_name)
     {
         if ($type_name == "bool") {
             return $value == "true";
@@ -135,7 +140,7 @@ class Db_Prefs
         }
     }
 
-    function write($pref_name, $value, $user_id = false, $strip_tags = true)
+    public function write($pref_name, $value, $user_id = false, $strip_tags = true)
     {
         $pref_name = db_escape_string($pref_name);
         $value = db_escape_string($value, $strip_tags);
@@ -154,7 +159,7 @@ class Db_Prefs
             $profile_qpart = "AND profile IS NULL";
         }
 
-        if (\SmallSmallRSS\Sanity::get_schema_version() < 63) {
+        if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
             $profile_qpart = "";
         }
 
@@ -169,8 +174,10 @@ class Db_Prefs
         if (!$type_name) {
             $result = db_query(
                 "SELECT type_name
-				FROM ttrss_prefs,ttrss_prefs_types
-				WHERE pref_name = '$pref_name' AND type_id = ttrss_prefs_types.id"
+                 FROM ttrss_prefs,ttrss_prefs_types
+                 WHERE
+                     pref_name = '$pref_name'
+                     AND type_id = ttrss_prefs_types.id"
             );
 
             if (db_num_rows($result) > 0) {
@@ -196,10 +203,12 @@ class Db_Prefs
             }
 
             db_query(
-                "UPDATE ttrss_user_prefs SET
-				value = '$value' WHERE pref_name = '$pref_name'
-					$profile_qpart
-					AND owner_uid = " . $_SESSION["uid"]
+                "UPDATE ttrss_user_prefs
+                 SET value = '$value'
+                 WHERE
+                     pref_name = '$pref_name'
+                     $profile_qpart
+                     AND owner_uid = " . $_SESSION["uid"]
             );
 
             if ($user_id == $_SESSION["uid"]) {

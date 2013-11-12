@@ -6,7 +6,7 @@ set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
                  get_include_path());
 
 \SmallSmallRSS\Session::init();
-\SmallSmallRSS\Sanity::initial_check();
+\SmallSmallRSS\Sanity::initialCheck();
 require_once "db.php";
 require_once "db-prefs.php";
 

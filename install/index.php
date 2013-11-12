@@ -168,7 +168,7 @@ function db_query($link, $query, $type, $die_on_error = true) {
     }
 }
 
-function make_self_url_path() {
+function makeSelfURLPath() {
     $url_path = (
         (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != "on") ? 'http://' :  'https://')
         . $_SERVER["HTTP_HOST"] . parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
@@ -202,7 +202,7 @@ if (file_exists("../config.php")) {
 @$SELF_URL_PATH = strip_tags($_POST['SELF_URL_PATH']);
 
 if (!$SELF_URL_PATH) {
-    $SELF_URL_PATH = preg_replace("/\/install\/$/", "/", make_self_url_path());
+    $SELF_URL_PATH = preg_replace("/\/install\/$/", "/", makeSelfURLPath());
 }
 
 $issel_pgsql = $DB_TYPE == "pgsql" ? "selected" : "";

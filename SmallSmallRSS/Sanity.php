@@ -3,10 +3,10 @@ namespace SmallSmallRss;
 
 class Sanity
 {
-    public static function get_schema_version($nocache = false)
+    public static function getSchemaVersion($nocache = false)
     {
         // Session caching removed due to causing wrong redirects to upgrade
-        // script when get_schema_version() is called on an obsolete session
+        // script when getSchemaVersion() is called on an obsolete session
         // created on a previous schema version.
         static $schema_version = null;
 
@@ -22,15 +22,15 @@ class Sanity
         }
         return $schema_version;
     }
-    public static function is_schema_correct()
+    public static function isSchemaCorrect()
     {
-        $schema_version = self::get_schema_version(true);
+        $schema_version = self::getSchemaVersion(true);
         $expected_version = \SmallSmallRSS\Constants::SCHEMA_VERSION;
         return $schema_version == $expected_version;
     }
-    public static function schema_or_die()
+    public static function schemaOrDie()
     {
-        $schema_version = self::get_schema_version();
+        $schema_version = self::getSchemaVersion();
         $expected_version = \SmallSmallRSS\Constants::SCHEMA_VERSION;
         if ($schema_version != $expected_version) {
             echo "Schema version is wrong, please upgrade the database: $schema_version / $expected_version\n";
@@ -38,7 +38,7 @@ class Sanity
         }
     }
 
-    public static function make_self_url_path()
+    public static function makeSelfURLPath()
     {
         $url_path = (
             ($_SERVER['HTTPS'] != "on" ? 'http://' : 'https://')
@@ -48,14 +48,15 @@ class Sanity
         return $url_path;
     }
 
-    public static function initial_check()
+    public static function initialCheck()
     {
         $errors = array();
 
         if (!file_exists("config.php")) {
             array_push(
                 $errors,
-                "Configuration file not found. Looks like you forgot to copy config.php-dist to config.php and edit it."
+                "Configuration file not found."
+                . " Looks like you forgot to copy config.php-dist to config.php and edit it."
             );
         } else {
 
@@ -67,7 +68,10 @@ class Sanity
             }
 
             if (strpos(PLUGINS, "auth_") === false) {
-                array_push($errors, "Please enable at least one authentication module via PLUGINS constant in config.php");
+                array_push(
+                    $errors,
+                    "Please enable at least one authentication module via PLUGINS constant in config.php"
+                );
             }
 
             if (function_exists('posix_getuid') && posix_getuid() == 0) {
@@ -79,7 +83,11 @@ class Sanity
             }
 
             if (CONFIG_VERSION != EXPECTED_CONFIG_VERSION) {
-                array_push($errors, "Configuration file (config.php) has incorrect version. Update it with new options from config.php-dist and set CONFIG_VERSION to the correct value.");
+                array_push(
+                    $errors,
+                    "Configuration file (config.php) has incorrect version."
+                    . " Update it with new options from config.php-dist and set CONFIG_VERSION to the correct value."
+                );
             }
 
             if (!is_writable(CACHE_DIR . "/images")) {
@@ -110,12 +118,15 @@ class Sanity
                 $result = db_query("SELECT id FROM ttrss_users WHERE id = 1");
 
                 if (db_num_rows($result) != 1) {
-                    array_push($errors, "SINGLE_USER_MODE is enabled in config.php but default admin account is not found.");
+                    array_push(
+                        $errors,
+                        "SINGLE_USER_MODE is enabled in config.php but default admin account is not found."
+                    );
                 }
             }
 
             if (SELF_URL_PATH == "http://yourserver/tt-rss/") {
-                $urlpath = preg_replace("/\w+\.php$/", "", self::make_self_url_path());
+                $urlpath = preg_replace("/\w+\.php$/", "", self::makeSelfURLPath());
 
                 array_push(
                     $errors,
@@ -124,15 +135,25 @@ class Sanity
             }
 
             if (!is_writable(ICONS_DIR)) {
-                array_push($errors, "ICONS_DIR defined in config.php is not writable (chmod -R 777 ".ICONS_DIR.").\n");
+                array_push(
+                    $errors,
+                    "ICONS_DIR defined in config.php is not writable (chmod -R 777 ".ICONS_DIR.").\n"
+                );
             }
 
             if (!is_writable(LOCK_DIRECTORY)) {
-                array_push($errors, "LOCK_DIRECTORY defined in config.php is not writable (chmod -R 777 ".LOCK_DIRECTORY.").\n");
+                array_push(
+                    $errors,
+                    "LOCK_DIRECTORY defined in config.php is not writable (chmod -R 777 ".LOCK_DIRECTORY.").\n"
+                );
             }
 
             if (!function_exists("curl_init") && !ini_get("allow_url_fopen")) {
-                array_push($errors, "PHP configuration option allow_url_fopen is disabled, and CURL functions are not present. Either enable allow_url_fopen or install PHP extension for CURL.");
+                array_push(
+                    $errors,
+                    "PHP configuration option allow_url_fopen is disabled, and CURL functions are not present."
+                    . " Either enable allow_url_fopen or install PHP extension for CURL."
+                );
             }
 
             if (!function_exists("json_encode")) {
@@ -163,9 +184,9 @@ class Sanity
                 array_push($errors, "PHP support for iconv is required to handle multiple charsets.");
             }
 
-            /* if (ini_get("safe_mode")) {
-               array_push($errors, "PHP safe mode setting is not supported.");
-               } */
+            if (ini_get("safe_mode")) {
+                array_push($errors, "PHP safe mode setting is not supported.");
+            }
 
             if ((PUBSUBHUBBUB_HUB || PUBSUBHUBBUB_ENABLED) && !function_exists("curl_init")) {
                 array_push($errors, "PHP support for CURL is required for PubSubHubbub.");
@@ -176,39 +197,13 @@ class Sanity
             }
         }
 
-        if (count($errors) > 0 && $_SERVER['REQUEST_URI']) { ?>
-            <html>
-                <head>
-                <title>Startup failed</title>
-                <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-                <link rel="stylesheet" type="text/css" href="css/utility.css">
-                </head>
-                <body>
-                <div class="floatingLogo"><img src="images/logo_small.png"></div>
-                <div class="content">
+        if (count($errors) > 0 && $_SERVER['REQUEST_URI']) {
+            $insane = \SmallSmallRSS\Renderers\Insane($errors);
 
-                <h1>Startup failed</h1>
-
-                <p>Tiny Tiny RSS was unable to start properly. This usually means a misconfiguration or an incomplete upgrade. Please fix
-                errors indicated by the following messages:</p>
-
-            <?php
-            foreach ($errors as $error) {
-                \SmallSmallRSS\Renderers\Messages::renderError($error);
-            } ?>
-
-                <p>You might want to check tt-rss <a href="http://tt-rss.org/wiki">wiki</a> or the
-                <a href="http://tt-rss.org/forum">forums</a> for more information. Please search the forums before creating new topic
-                                                                          for your question.</p>
-
-                                                                                       </div>
-                                                                                       </body>
-                                                                                       </html>
-
-            <?php
-                                                                                       die;
+            exit;
         } elseif (count($errors) > 0) {
-            echo "Tiny Tiny RSS was unable to start properly. This usually means a misconfiguration or an incomplete upgrade.\n";
+            echo "Tiny Tiny RSS was unable to start properly. This usually means a misconfiguration";
+            echo " or an incomplete upgrade.\n";
             echo "Please fix errors indicated by the following messages:\n\n";
 
             foreach ($errors as $error) {
@@ -217,7 +212,6 @@ class Sanity
 
             echo "\nYou might want to check tt-rss wiki or the forums for more information.\n";
             echo "Please search the forums before creating new topic for your question.\n";
-
             exit(-1);
         }
     }

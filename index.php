@@ -17,7 +17,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 \SmallSmallRSS\Session::init();
-\SmallSmallRSS\Sanity::initial_check();
+\SmallSmallRSS\Sanity::initialCheck();
 require_once "db-prefs.php";
 require_once "lib/Mobile_Detect.php";
 

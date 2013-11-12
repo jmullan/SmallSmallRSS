@@ -20,7 +20,7 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
         $pwd_hash1 = encrypt_password($password);
         $pwd_hash2 = encrypt_password($password, $login);
         $login = db_escape_string($login);
-        if (!empty($_REQUEST["otp"]) && \SmallSmallRSS\Sanity::get_schema_version() > 96) {
+        if (!empty($_REQUEST["otp"]) && \SmallSmallRSS\Sanity::getSchemaVersion() > 96) {
             $otp = db_escape_string($_REQUEST["otp"]);
             if (!defined('AUTH_DISABLE_OTP') || !AUTH_DISABLE_OTP) {
                 $result = db_query("SELECT otp_enabled,salt FROM ttrss_users WHERE
@@ -63,7 +63,7 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
             }
         }
 
-        if (\SmallSmallRSS\Sanity::get_schema_version() > 87) {
+        if (\SmallSmallRSS\Sanity::getSchemaVersion() > 87) {
 
             $result = db_query("SELECT salt FROM ttrss_users WHERE
 				login = '$login'");

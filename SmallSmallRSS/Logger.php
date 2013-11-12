@@ -27,12 +27,12 @@ class Logger
 
     public static $level = -1;
 
-    public static function log_error($errno, $errstr, $file, $line, $context)
+    public static function logError($errno, $errstr, $file, $line, $context)
     {
         if (!$errno & self::$level) {
             return false;
         }
-        return self::get()->adapter->log_error($errno, $errstr, $file, $line, $context);
+        return self::get()->adapter->logError($errno, $errstr, $file, $line, $context);
     }
 
     public static function log($string)
@@ -44,7 +44,7 @@ class Logger
     {
     }
 
-    function __construct()
+    public function __construct()
     {
         switch (LOG_DESTINATION) {
             case "sql":

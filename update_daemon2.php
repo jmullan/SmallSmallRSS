@@ -3,8 +3,9 @@
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
-                 get_include_path());
+set_include_path(
+    dirname(__FILE__) ."/include" . PATH_SEPARATOR . get_include_path()
+);
 
 declare (ticks = 1);
 chdir(dirname(__FILE__));
@@ -19,7 +20,7 @@ define_default('MAX_CHILD_RUNTIME', 1800); // seconds
 define_default('MAX_JOBS', 2);
 define_default('SPAWN_INTERVAL', DAEMON_SLEEP_INTERVAL); // seconds
 
-\SmallSmallRSS\Sanity::initial_check();
+\SmallSmallRSS\Sanity::initialCheck();
 require_once "db.php";
 require_once "db-prefs.php";
 
@@ -33,13 +34,15 @@ $master_handlers_installed = false;
 
 $last_checkpoint = -1;
 
-function sigchld_handler($signal) {
+function sigchld_handler($signal)
+{
     $running_jobs = \SmallSmallRSS\Daemon::reap_children();
     _debug("[SIGCHLD] jobs left: $running_jobs");
     pcntl_waitpid(-1, $status, WNOHANG);
 }
 
-function shutdown($caller_pid) {
+function shutdown($caller_pid)
+{
     if ($caller_pid == posix_getpid()) {
         if (file_exists(LOCK_DIRECTORY . "/update_daemon.lock")) {
             _debug("removing lockfile (master)...");
@@ -48,7 +51,8 @@ function shutdown($caller_pid) {
     }
 }
 
-function task_shutdown() {
+function task_shutdown()
+{
     $pid = posix_getpid();
     if (file_exists(LOCK_DIRECTORY . "/update_daemon-$pid.lock")) {
         _debug("removing lockfile ($pid)...");
@@ -56,13 +60,15 @@ function task_shutdown() {
     }
 }
 
-function sigint_handler() {
+function sigint_handler()
+{
     _debug("[MASTER] SIG_INT received.\n");
     shutdown(posix_getpid());
     die;
 }
 
-function task_sigint_handler() {
+function task_sigint_handler()
+{
     _debug("[TASK] SIG_INT received.\n");
     task_shutdown();
     die;
@@ -70,11 +76,7 @@ function task_sigint_handler() {
 
 pcntl_signal(SIGCHLD, 'sigchld_handler');
 
-$longopts = array("log:",
-                  "tasks:",
-                  "interval:",
-                  "quiet",
-                  "help");
+$longopts = array("log:", "tasks:", "interval:", "quiet", "help");
 
 $options = getopt("", $longopts);
 
@@ -123,7 +125,7 @@ if (!$lock_handle) {
     die("error: Can't create lockfile. ".
         "Maybe another daemon is already running.\n");
 }
-\SmallSmallRSS\Sanity::schema_or_die();
+\SmallSmallRSS\Sanity::schemaOrDie();
 
 // Protip: children close shared database handle when terminating, it's a bad idea to
 // do database stuff on main process from now on.

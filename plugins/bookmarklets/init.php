@@ -19,7 +19,7 @@ class Bookmarklets extends \SmallSmallRSS\Plugin {
 
             print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Bookmarklets')."\">";
 
-            \SmallSmallRSS\Renderers\Messages::print_notice(
+            \SmallSmallRSS\Renderers\Messages::renderNotice(
                 __("Drag the link below to your browser toolbar, open the feed you're interested in in your browser and click on the link to subscribe to it."));
 
             $bm_subscribe_url = str_replace('%s', '', add_feed_url());
@@ -32,7 +32,7 @@ class Bookmarklets extends \SmallSmallRSS\Plugin {
             print "<a href=\"$bm_url\" class='bookmarklet'>" . __('Subscribe in Tiny Tiny RSS'). "</a>";
             print "</p>";
 
-            \SmallSmallRSS\Renderers\Messages::print_notice(
+            \SmallSmallRSS\Renderers\Messages::renderNotice(
                 __("Use this bookmarklet to publish arbitrary pages using Tiny Tiny RSS"));
 
             print "<p>";

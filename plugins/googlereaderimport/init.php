@@ -63,7 +63,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
             $owner_uid = $_SESSION["uid"];
 
             if ($_FILES['starred_file']['error'] != 0) {
-                \SmallSmallRSS\Renderers\Messages::print_error(T_sprintf("Upload failed with error code %d",
+                \SmallSmallRSS\Renderers\Messages::renderError(T_sprintf("Upload failed with error code %d",
                                       $_FILES['starred_file']['error']));
                 return;
             }
@@ -77,11 +77,11 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
                                              $tmp_file);
 
                 if (!$result) {
-                    \SmallSmallRSS\Renderers\Messages::print_error(__("Unable to move uploaded file."));
+                    \SmallSmallRSS\Renderers\Messages::renderError(__("Unable to move uploaded file."));
                     return;
                 }
             } else {
-                \SmallSmallRSS\Renderers\Messages::print_error(__('Error: please upload OPML file.'));
+                \SmallSmallRSS\Renderers\Messages::renderError(__('Error: please upload OPML file.'));
                 return;
             }
 
@@ -89,7 +89,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
                 $doc = json_decode(file_get_contents($tmp_file), true);
                 unlink($tmp_file);
             } else {
-                \SmallSmallRSS\Renderers\Messages::print_error(__('No file uploaded.'));
+                \SmallSmallRSS\Renderers\Messages::renderError(__('No file uploaded.'));
                 return;
             }
         } else {
@@ -179,11 +179,11 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
                 }
 
             } else {
-                \SmallSmallRSS\Renderers\Messages::print_error(__('The document has incorrect format.'));
+                \SmallSmallRSS\Renderers\Messages::renderError(__('The document has incorrect format.'));
             }
 
         } else {
-            \SmallSmallRSS\Renderers\Messages::print_error(__('Error while parsing document.'));
+            \SmallSmallRSS\Renderers\Messages::renderError(__('Error while parsing document.'));
         }
 
         if (!$file) {
@@ -352,7 +352,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
 
         print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__("Import starred or shared items from Google Reader")."\">";
 
-        \SmallSmallRSS\Renderers\Messages::print_notice(
+        \SmallSmallRSS\Renderers\Messages::renderNotice(
             "Your imported articles will appear in Starred (in file is named starred.json) and Archived feeds.");
 
         print "<p>".__("Paste your starred.json or shared.json into the form below."). "</p>";

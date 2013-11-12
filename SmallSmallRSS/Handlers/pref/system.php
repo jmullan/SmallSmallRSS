@@ -75,7 +75,7 @@ class Pref_System extends ProtectedHandler {
             print "</table>";
         } else {
 
-            \SmallSmallRSS\Renderers\Messages::print_notice(
+            \SmallSmallRSS\Renderers\Messages::renderNotice(
                 "Please set LOG_DESTINATION to 'sql' in config.php to enable database logging.");
 
         }

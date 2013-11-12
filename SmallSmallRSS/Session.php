@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS;
+
 // Original from http://www.daniweb.com/code/snippet43.html
 require_once __DIR__ . "/../config.php";
 require_once __DIR__ . "/../classes/db.php";
@@ -8,11 +9,13 @@ require_once __DIR__ . "/../lib/gettext/gettext.inc";
 
 \SmallSmallRSS\ErrorHandler::register();
 
-class Session {
-    static $session_expire = 86400;
-    static $session_name = 'ttrss_sid';
+class Session
+{
+    public static $session_expire = 86400;
+    public static $session_name = 'ttrss_sid';
 
-    public static function init() {
+    public static function init()
+    {
         self::$session_expire = max(SESSION_COOKIE_LIFETIME, 86400);
         if (defined('TTRSS_SESSION_NAME')) {
             self::$session_name = TTRSS_SESSION_NAME;
@@ -43,7 +46,8 @@ class Session {
         session_start();
     }
 
-    function validate() {
+    public static function validate()
+    {
         if (SINGLE_USER_MODE) {
             return true;
         }
@@ -86,7 +90,8 @@ class Session {
         }
         if ($_SESSION["uid"]) {
             $result = \SmallSmallRSS\Database::query(
-                "SELECT pwd_hash FROM ttrss_users WHERE id = '".$_SESSION["uid"]."'");
+                "SELECT pwd_hash FROM ttrss_users WHERE id = '" . $_SESSION["uid"] . "'"
+            );
 
             // user not found
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
@@ -104,19 +109,22 @@ class Session {
     }
 
 
-    function open($s, $n) {
+    public static function open($s, $n)
+    {
         return true;
     }
 
-    function read($id) {
+    public static function read($id)
+    {
         $res = \SmallSmallRSS\Database::query("SELECT data FROM ttrss_sessions WHERE id='$id'");
 
         if (\SmallSmallRSS\Database::num_rows($res) != 1) {
 
             $expire = time() + \SmallSmallRSS\Session::$session_expire;
 
-            \SmallSmallRSS\Database::query("INSERT INTO ttrss_sessions (id, data, expire)
-					VALUES ('$id', '', '$expire')");
+            \SmallSmallRSS\Database::query(
+                "INSERT INTO ttrss_sessions (id, data, expire) VALUES ('$id', '', '$expire')"
+            );
 
             return "";
         } else {
@@ -125,25 +133,28 @@ class Session {
 
     }
 
-    function write($id, $data) {
+    public static function write($id, $data)
+    {
         $data = base64_encode($data);
         $expire = time() + \SmallSmallRSS\Session::$session_expire;
         \SmallSmallRSS\Database::query("UPDATE ttrss_sessions SET data='$data', expire='$expire' WHERE id='$id'");
         return true;
     }
 
-    function close() {
+    public static function close()
+    {
         return true;
     }
 
-    function destroy($id) {
+    public static function destroy($id)
+    {
         \SmallSmallRSS\Database::query("DELETE FROM ttrss_sessions WHERE id = '$id'");
 
         return true;
     }
 
-    function gc($expire) {
+    public static function gc($expire)
+    {
         \SmallSmallRSS\Database::query("DELETE FROM ttrss_sessions WHERE expire < " . time());
     }
-
 }

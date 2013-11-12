@@ -188,7 +188,7 @@ function validateRegForm() {
 
 <?php
     if (!ENABLE_REGISTRATION) {
-        \SmallSmallRSS\Renderers\Messages::print_error(
+        \SmallSmallRSS\Renderers\Messages::renderError(
             __("New user registrations are administratively disabled."));
 
         print "<p><form method=\"GET\" action=\"backend.php\">
@@ -249,7 +249,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 		$test = trim(db_escape_string($_REQUEST["turing_test"]));
 
 		if (!$login || !$email || !$test) {
-			\SmallSmallRSS\Renderers\Messages::print_error(
+			\SmallSmallRSS\Renderers\Messages::renderError(
                             __("Your registration information is incomplete."));
 			print "<p><form method=\"GET\" action=\"index.php\">
 				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
@@ -265,7 +265,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 			$is_registered = db_num_rows($result) > 0;
 
 			if ($is_registered) {
-				\SmallSmallRSS\Renderers\Messages::print_error(
+				\SmallSmallRSS\Renderers\Messages::renderError(
                                     __('Sorry, this username is already taken.'));
 				print "<p><form method=\"GET\" action=\"index.php\">
 				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
@@ -285,7 +285,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 					login = '$login' AND pwd_hash = '$pwd_hash'");
 
 				if (db_num_rows($result) != 1) {
-					\SmallSmallRSS\Renderers\Messages::print_error(__('Registration failed.'));
+					\SmallSmallRSS\Renderers\Messages::renderError(__('Registration failed.'));
 					print "<p><form method=\"GET\" action=\"index.php\">
 					<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
 					</form>";
@@ -315,7 +315,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 					$rc = $mail->quickMail($email, "", "Registration information for Tiny Tiny RSS", $reg_text, false);
 
 					if (!$rc) {
-                                            \SmallSmallRSS\Renderers\Messages::print_error($mail->ErrorInfo);
+                                            \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
                                         }
 
 					unset($reg_text);
@@ -333,10 +333,10 @@ $num_users = db_fetch_result($result, 0, "cu");
 					$mail->IsHTML(false);
 					$rc = $mail->quickMail(REG_NOTIFY_ADDRESS, "", "Registration notice for Tiny Tiny RSS", $reg_text, false);
 					if (!$rc) {
-                                            \SmallSmallRSS\Renderers\Messages::print_error($mail->ErrorInfo);
+                                            \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
                                         }
 
-					\SmallSmallRSS\Renderers\Messages::print_notice(
+					\SmallSmallRSS\Renderers\Messages::renderNotice(
                                             __("Account created successfully."));
 
 					print "<p><form method=\"GET\" action=\"index.php\">
@@ -348,7 +348,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 			}
 
                 } else {
-                    \SmallSmallRSS\Renderers\Messages::print_error(
+                    \SmallSmallRSS\Renderers\Messages::renderError(
                         'Plese check the form again, you have failed the robot test.');
                     print "<p><form method=\"GET\" action=\"index.php\">
 				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
@@ -360,7 +360,7 @@ $num_users = db_fetch_result($result, 0, "cu");
 
 <?php } else { ?>
 
-	<?php \SmallSmallRSS\Renderers\Messages::print_notice(__('New user registrations are currently closed.')) ?>
+	<?php \SmallSmallRSS\Renderers\Messages::renderNotice(__('New user registrations are currently closed.')) ?>
 
 	<?php print "<p><form method=\"GET\" action=\"index.php\">
 				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">

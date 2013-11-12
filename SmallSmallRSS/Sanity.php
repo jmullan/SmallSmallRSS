@@ -12,9 +12,13 @@ class Sanity
 
         if (!$schema_version || $nocache) {
             $result = \SmallSmallRSS\Database::query(
-                "SELECT schema_version FROM ttrss_version");
+                "SELECT schema_version FROM ttrss_version"
+            );
             $schema_version = \SmallSmallRSS\Database::fetch_result(
-                $result, 0, "schema_version");
+                $result,
+                0,
+                "schema_version"
+            );
         }
         return $schema_version;
     }
@@ -34,7 +38,7 @@ class Sanity
         }
     }
 
-    function make_self_url_path()
+    public static function make_self_url_path()
     {
         $url_path = (
             ($_SERVER['HTTPS'] != "on" ? 'http://' : 'https://')
@@ -44,16 +48,22 @@ class Sanity
         return $url_path;
     }
 
-    function initial_check()
+    public static function initial_check()
     {
         $errors = array();
 
         if (!file_exists("config.php")) {
-            array_push($errors, "Configuration file not found. Looks like you forgot to copy config.php-dist to config.php and edit it.");
+            array_push(
+                $errors,
+                "Configuration file not found. Looks like you forgot to copy config.php-dist to config.php and edit it."
+            );
         } else {
 
             if (file_exists("install") && !file_exists("config.php")) {
-                array_push($errors, "Please copy config.php-dist to config.php or run the installer in install/");
+                array_push(
+                    $errors,
+                    "Please copy config.php-dist to config.php or run the installer in install/"
+                );
             }
 
             if (strpos(PLUGINS, "auth_") === false) {
@@ -107,8 +117,10 @@ class Sanity
             if (SELF_URL_PATH == "http://yourserver/tt-rss/") {
                 $urlpath = preg_replace("/\w+\.php$/", "", self::make_self_url_path());
 
-                array_push($errors,
-                           "Please set SELF_URL_PATH to the correct value for your server (possible value: <b>$urlpath</b>)");
+                array_push(
+                    $errors,
+                    "Please set SELF_URL_PATH to the correct value for your server (possible value: <b>$urlpath</b>)"
+                );
             }
 
             if (!is_writable(ICONS_DIR)) {
@@ -182,7 +194,7 @@ class Sanity
 
 <?php
 foreach ($errors as $error) {
-     \SmallSmallRSS\Renderers\Messages::print_error($error);
+     \SmallSmallRSS\Renderers\Messages::renderError($error);
 } ?>
 
                 <p>You might want to check tt-rss <a href="http://tt-rss.org/wiki">wiki</a> or the

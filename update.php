@@ -56,7 +56,7 @@ if (count($options) == 0 && !defined('STDIN')) {
         <div class="floatingLogo"><img src="images/logo_small.png"></div>
         <h1><?php echo __("Tiny Tiny RSS data update script.") ?></h1>
 
-<?php  \SmallSmallRSS\Renderers\Messages::print_error(
+<?php  \SmallSmallRSS\Renderers\Messages::renderError(
         "Please run this script from the command line. Use option \"-help\" to display command help if this error is displayed erroneously."); ?>
 
         </body></html>

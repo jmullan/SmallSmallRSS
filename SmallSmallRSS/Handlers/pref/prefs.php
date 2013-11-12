@@ -263,7 +263,7 @@ class Pref_Prefs extends ProtectedHandler {
 				= 'SHA1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'");
 
             if ($this->dbh->num_rows($result) != 0) {
-                \SmallSmallRSS\Renderers\Messages::print_warning(
+                \SmallSmallRSS\Renderers\Messages::renderWarning(
                     __("Your password is at default value, please change it."), "default_pass_warning");
             }
 
@@ -291,7 +291,7 @@ class Pref_Prefs extends ProtectedHandler {
 			</script>";
 
             if ($otp_enabled) {
-                \SmallSmallRSS\Renderers\Messages::print_notice(
+                \SmallSmallRSS\Renderers\Messages::renderNotice(
                     __("Changing your current password will disable OTP."));
             }
 
@@ -325,7 +325,7 @@ class Pref_Prefs extends ProtectedHandler {
 
                 if ($otp_enabled) {
 
-                    \SmallSmallRSS\Renderers\Messages::print_notice(
+                    \SmallSmallRSS\Renderers\Messages::renderNotice(
                         __("One time passwords are currently enabled. Enter your current password below to disable."));
 
                     print "<form dojoType=\"dijit.form.Form\">";
@@ -368,7 +368,7 @@ class Pref_Prefs extends ProtectedHandler {
 
                 } elseif (function_exists("imagecreatefromstring")) {
 
-                    \SmallSmallRSS\Renderers\Messages::print_warning(
+                    \SmallSmallRSS\Renderers\Messages::renderWarning(
                         __("You will need a compatible Authenticator to use this. Changing your password would automatically disable OTP."));
 
                     print "<p>".__("Scan the following code by the Authenticator application:")."</p>";
@@ -428,7 +428,7 @@ class Pref_Prefs extends ProtectedHandler {
 
                 } else {
 
-                    \SmallSmallRSS\Renderers\Messages::print_notice(
+                    \SmallSmallRSS\Renderers\Messages::renderNotice(
                         __("PHP GD functions are required for OTP support."));
 
                 }
@@ -472,7 +472,7 @@ class Pref_Prefs extends ProtectedHandler {
         print '<div dojoType="dijit.layout.ContentPane" region="center" style="overflow-y : auto">';
 
         if (!empty($_SESSION["profile"])) {
-            \SmallSmallRSS\Renderers\Messages::print_notice(
+            \SmallSmallRSS\Renderers\Messages::renderNotice(
                 __("Some preferences are only available in default profile."));
         }
 
@@ -713,7 +713,7 @@ class Pref_Prefs extends ProtectedHandler {
 
         print "<p>" . __("You will need to reload Tiny Tiny RSS for plugin changes to take effect.") . "</p>";
 
-        \SmallSmallRSS\Renderers\Messages::print_notice(
+        \SmallSmallRSS\Renderers\Messages::renderNotice(
             __("Download more plugins at tt-rss.org <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/forum/viewforum.php?f=22\">forums</a> or <a target=\"_blank\" class=\"visibleLink\" href=\"http://tt-rss.org/wiki/Plugins\">wiki</a>."));
 
         print "<form dojoType=\"dijit.form.Form\" id=\"changePluginsForm\">";
@@ -969,7 +969,7 @@ class Pref_Prefs extends ProtectedHandler {
 
         $value = str_replace("<br/>", "\n", $value);
 
-        \SmallSmallRSS\Renderers\Messages::print_notice(
+        \SmallSmallRSS\Renderers\Messages::renderNotice(
             T_sprintf("You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target=\"_blank\" class=\"visibleLink\" href=\"%s\">This file</a> can be used as a baseline.", "css/tt-rss.css"));
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"rpc\">";

@@ -265,7 +265,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         if (!function_exists('curl_init')) {
             print "<div style='padding : 1em'>";
-            \SmallSmallRSS\Renderers\Messages::print_error("This functionality requires CURL functions. Please enable CURL in your PHP configuration (you might also want to disable open_basedir in php.ini) and reload this page.");
+            \SmallSmallRSS\Renderers\Messages::renderError("This functionality requires CURL functions. Please enable CURL in your PHP configuration (you might also want to disable open_basedir in php.ini) and reload this page.");
             print "</div>";
         }
 

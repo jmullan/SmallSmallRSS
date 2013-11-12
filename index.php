@@ -104,7 +104,7 @@ foreach (array("lib/prototype.js",
   <div id="overlay_inner">
     <div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
     <div dojoType="dijit.ProgressBar" places="0" style="width : 300px" id="loading_bar" progress="0" maximum="100"></div>
-    <noscript><br/><?php \SmallSmallRSS\Renderers\Messages::print_error('Javascript is disabled. Please enable it.') ?></noscript>
+    <noscript><br/><?php \SmallSmallRSS\Renderers\Messages::renderError('Javascript is disabled. Please enable it.') ?></noscript>
   </div>
 </div>
 <div id="notify" class="notify" style="display : none"></div>

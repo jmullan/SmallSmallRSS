@@ -167,11 +167,9 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 
     if (count($feeds_to_update) > 0) {
         $feeds_quoted = array();
-
         foreach ($feeds_to_update as $feed) {
             array_push($feeds_quoted, "'" . db_escape_string($feed) . "'");
         }
-
         db_query(sprintf(
             "UPDATE ttrss_feeds SET last_update_started = NOW()
                 WHERE feed_url IN (%s)", implode(',', $feeds_quoted)
@@ -298,11 +296,15 @@ function update_rss_feed($feed, $no_cache = false)
     }
 
     if (!$rss) {
-
-        foreach ($pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FETCH_FEED) as $plugin) {
-            $feed_data = $plugin->hook_fetch_feed($feed_data, $fetch_url, $owner_uid, $feed);
+        $feed_fetching_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FETCH_FEED);
+        if (!$feed_fetching_hooks) {
+            _debug('No feed fetching hooks', $debug_enabled);
         }
-
+        foreach ($feed_fetching_hooks as $plugin) {
+            if (!$feed_data) {
+                $feed_data = $plugin->hook_fetch_feed($feed_data, $fetch_url, $owner_uid, $feed);
+            }
+        }
         if (!$feed_data) {
             _debug("fetching [$fetch_url]...", $debug_enabled);
             _debug("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $last_article_timestamp), $debug_enabled);
@@ -331,30 +333,29 @@ function update_rss_feed($feed, $no_cache = false)
             }
 
             db_query(
-                "UPDATE ttrss_feeds SET last_error = '$error_escaped',
-        last_updated = NOW() WHERE id = '$feed'"
+                "UPDATE ttrss_feeds
+                 SET last_error = '$error_escaped', last_updated = NOW() WHERE id = '$feed'"
             );
             return;
         }
     }
-
-    foreach ($pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_FETCHED) as $plugin) {
+    $fetched_feed_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_FETCHED);
+    if (!$fetched_feed_hooks) {
+        _debug('No fetched feed hooks', $debug_enabled);
+    }
+    foreach ($fetched_feed_hooks as $plugin) {
         $feed_data = $plugin->hook_feed_fetched($feed_data, $fetch_url, $owner_uid, $feed);
     }
 
     // set last update to now so if anything *simplepie* crashes later we won't be
     // continuously failing on the same feed
-    //db_query("UPDATE ttrss_feeds SET last_updated = NOW() WHERE id = '$feed'");
 
     if (!$rss) {
         $rss = new \SmallSmallRSS\FeedParser($feed_data);
         $rss->init();
     }
 
-    //        print_r($rss);
-
     $feed = db_escape_string($feed);
-
     if ($rss->error()) {
         $error_msg = db_escape_string(mb_substr($rss->error(), 0, 245));
         _debug("error fetching feed: $error_msg", $debug_enabled);
@@ -367,13 +368,17 @@ function update_rss_feed($feed, $no_cache = false)
         );
         return;
     }
-    // cache data for later
-    if (!$auth_pass && !$auth_login && is_writable(CACHE_DIR . "/simplepie")) {
-        $new_rss_hash = md5($feed_data);
 
-        if ($new_rss_hash != $rss_hash && count($rss->get_items()) > 0) {
-            _debug("saving $cache_filename", $debug_enabled);
-            @file_put_contents($cache_filename, $feed_data);
+    // cache data for later
+    if (!$auth_pass && !$auth_login) {
+        if (is_writable(CACHE_DIR . "/simplepie")) {
+            $new_rss_hash = md5($feed_data);
+            if ($new_rss_hash != $rss_hash && count($rss->get_items()) > 0) {
+                _debug("saving $cache_filename", $debug_enabled);
+                @file_put_contents($cache_filename, $feed_data);
+            }
+        } else {
+            _debug("$cache_filename is not writable", $debug_enabled);
         }
     }
 
@@ -492,40 +497,25 @@ function update_rss_feed($feed, $no_cache = false)
     }
 
     if ($pubsub_state != 2 && PUBSUBHUBBUB_ENABLED) {
-
         _debug("checking for PUSH hub...", $debug_enabled);
-
         $feed_hub_url = false;
-
         $links = $rss->get_links('hub');
-
         if ($links && is_array($links)) {
             foreach ($links as $l) {
                 $feed_hub_url = $l;
                 break;
             }
         }
-
         _debug("feed hub url: $feed_hub_url", $debug_enabled);
-
-        if ($feed_hub_url && function_exists('curl_init') &&
-            !ini_get("open_basedir")) {
-
+        if ($feed_hub_url && function_exists('curl_init')
+            && !ini_get("open_basedir")) {
             require_once 'lib/pubsubhubbub/subscriber.php';
-
             $callback_url = get_self_url_prefix() .
                 "/public.php?op=pubsub&id=$feed";
-
             $s = new Subscriber($feed_hub_url, $callback_url);
-
             $rc = $s->subscribe($fetch_url);
-
             _debug("feed hub url found, subscribe request sent.", $debug_enabled);
-
-            db_query(
-                "UPDATE ttrss_feeds SET pubsub_state = 1
-                        WHERE id = '$feed'"
-            );
+            db_query("UPDATE ttrss_feeds SET pubsub_state = 1 WHERE id = '$feed'");
         }
     }
 
@@ -1161,36 +1151,23 @@ function update_rss_feed($feed, $no_cache = false)
 function cache_images($html, $site_url, $debug)
 {
     $cache_dir = CACHE_DIR . "/images";
-
     libxml_use_internal_errors(true);
-
-    $charset_hack = '<head>
-            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        </head>';
-
+    $charset_hack = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head>';
     $doc = new DOMDocument();
     $doc->loadHTML($charset_hack . $html);
     $xpath = new DOMXPath($doc);
-
     $entries = $xpath->query('(//img[@src])');
-
     foreach ($entries as $entry) {
         if ($entry->hasAttribute('src')) {
             $src = rewrite_relative_url($site_url, $entry->getAttribute('src'));
-
             $local_filename = CACHE_DIR . "/images/" . sha1($src) . ".png";
-
-            if ($debug) {  _debug("cache_images: downloading: $src to $local_filename");
-            }
-
+            _debug("cache_images: downloading: $src to $local_filename", $debug, $debug);
             if (!file_exists($local_filename)) {
                 $file_content = \SmallSmallRSS\Fetcher::fetch($src);
-
                 if ($file_content && strlen($file_content) > 1024) {
                     file_put_contents($local_filename, $file_content);
                 }
             }
-
             if (file_exists($local_filename)) {
                 $entry->setAttribute(
                     'src', SELF_URL_PATH . '/image.php?url=' .
@@ -1199,9 +1176,7 @@ function cache_images($html, $site_url, $debug)
             }
         }
     }
-
     $node = $doc->getElementsByTagName('body')->item(0);
-
     return $doc->saveXML($node);
 }
 

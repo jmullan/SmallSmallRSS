@@ -1,4 +1,5 @@
 <?php
+
 function stripslashes_deep($value) {
     $value = (
         is_array($value)
@@ -39,10 +40,3 @@ $myLibLoader->register();
 
 set_include_path(dirname(__DIR__) . '/include/' . PATH_SEPARATOR . get_include_path());
 require 'functions.php';
-
-if (false && defined('ENABLE_GZIP_OUTPUT') && ENABLE_GZIP_OUTPUT && function_exists("ob_gzhandler")) {
-
-    ob_start("ob_gzhandler");
-} else {
-    ob_start();
-}

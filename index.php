@@ -189,9 +189,13 @@ foreach ($action_items as $p) {
 }
 ?>
 
-<?php if (empty($_SESSION["hide_logout"])) { ?>
+<?php
+if (empty($_SESSION["hide_logout"])) {
+?>
             <div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcLogout')"><?php echo __('Logout') ?></div>
-<?php } ?>
+<?php
+}
+?>
           </div>
         </div>
       </div>

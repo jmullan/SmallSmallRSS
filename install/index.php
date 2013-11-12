@@ -450,7 +450,7 @@ echo make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS, $DB_PORT, $SE
     "You can generate the file again by changing the form above.");
 ?>
 </form>
-<?php Php
+<?php
 
 } elseif ($op == "saveconfig") {
 

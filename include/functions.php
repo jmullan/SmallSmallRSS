@@ -134,22 +134,30 @@ $schema_version = false;
  * @param string $msg The debug message.
  * @return void
  */
-function _debug($msg, $show = true, $is_debug = true) {
+function _debug($msg, $show=true, $is_debug=true) {
     if (!$is_debug) {
         return;
     }
+
     $ts = strftime("%H:%M:%S", time());
     if (function_exists('posix_getpid')) {
         $ts = "$ts/" . posix_getpid();
     }
-    if ($show && !(defined('QUIET') && QUIET)) {
-        print "[$ts] $msg\n";
+    $rawcalls = debug_backtrace();
+    $message = '';
+    if ('_debug' == $rawcalls[0]['function']) {
+        $file = str_replace(dirname(__DIR__), '', $rawcalls[0]['file']);
+        $message .= ' ' . $file . ':' . $rawcalls[0]['line'] . ' ';
     }
+    $message .= "[$ts] $msg";
+    if ($show && !(defined('QUIET') && QUIET)) {
+        print "$message\n";
+    }
+
     if (defined('LOGFILE'))  {
         $fp = fopen(LOGFILE, 'a+');
-
         if ($fp) {
-            fputs($fp, "[$ts] $msg\n");
+            fputs($fp, "$message\n");
             fclose($fp);
         }
     }

@@ -1,9 +1,10 @@
 <?php
 namespace SmallSmallRSS;
+
 class Fetcher
 {
 
-    function __construct()
+    public function __construct()
     {
         $this->fetch_curl_used = false;
         $this->fetch_last_error = false;
@@ -11,19 +12,33 @@ class Fetcher
         $this->fetch_last_content_code = false;
     }
 
-    function fetch($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0)
-    {
+    public function fetch(
+        $url,
+        $type = false,
+        $login = false,
+        $pass = false,
+        $post_query = false,
+        $timeout = false,
+        $timestamp = 0
+    ) {
         $fetcher = new self();
-        return $fetcher->get_file_contents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
+        return $fetcher->getFileContents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
     }
 
-    function get_file_contents($url, $type = false, $login = false, $pass = false, $post_query = false, $timeout = false, $timestamp = 0)
-    {
+    public function getFileContents(
+        $url,
+        $type = false,
+        $login = false,
+        $pass = false,
+        $post_query = false,
+        $timeout = false,
+        $timestamp = 0
+    ) {
         $url = str_replace(' ', '%20', $url);
         if (!defined('NO_CURL') && function_exists('curl_init')) {
             $this->fetch_curl_used = true;
             if (ini_get("safe_mode") || ini_get("open_basedir")) {
-                $new_url = $this->curl_resolve_url($url);
+                $new_url = $this->curlResolveUrl($url);
                 if (!$new_url) {
                     // geturl has already populated $this->fetch_last_error
                     return false;
@@ -34,7 +49,8 @@ class Fetcher
             }
             if ($timestamp && !$post_query) {
                 curl_setopt(
-                    $ch, CURLOPT_HTTPHEADER,
+                    $ch,
+                    CURLOPT_HTTPHEADER,
                     array("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $timestamp))
                 );
             }
@@ -105,11 +121,14 @@ class Fetcher
             }
 
             if (!$post_query && $timestamp) {
-                $context = stream_context_create(array(
-                                                     'http' => array(
-                                                         'method' => 'GET',
-                                                         'header' => "If-Modified-Since: ".gmdate("D, d M Y H:i:s \\G\\M\\T\r\n", $timestamp)
-                                                     )));
+                $context = stream_context_create(
+                    array(
+                        'http' => array(
+                            'method' => 'GET',
+                            'header' => "If-Modified-Since: " . gmdate("D, d M Y H:i:s \\G\\M\\T\r\n", $timestamp)
+                        )
+                    )
+                );
             } else {
                 $context = null;
             }
@@ -150,10 +169,14 @@ class Fetcher
         }
     }
 
-    public function curl_resolve_url($url)
+    public function curlResolveUrl($url)
     {
         if (!function_exists('curl_init')) {
-            return user_error('CURL Must be installed for geturl function to work. Ask your host to enable it or uncomment extension=php_curl.dll in php.ini', E_USER_ERROR);
+            return user_error(
+                'CURL Must be installed for geturl function to work.'
+                . ' Ask your host to enable it or uncomment extension=php_curl.dll in php.ini',
+                E_USER_ERROR
+            );
         }
 
         $curl = curl_init();
@@ -167,7 +190,11 @@ class Fetcher
         $header[] = "Pragma: ";
 
         curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0 Firefox/5.0');
+        curl_setopt(
+            $curl,
+            CURLOPT_USERAGENT,
+            'Mozilla/5.0 (Windows NT 5.1; rv:5.0) Gecko/20100101 Firefox/5.0 Firefox/5.0'
+        );
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
         curl_setopt($curl, CURLOPT_HEADER, true);
         curl_setopt($curl, CURLOPT_REFERER, $url);

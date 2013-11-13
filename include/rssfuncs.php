@@ -318,7 +318,7 @@ function update_rss_feed($feed, $no_cache = false)
             _debug("fetching [$fetch_url]...", $debug_enabled);
             _debug("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $last_article_timestamp), $debug_enabled);
             $fetcher = new \SmallSmallRSS\Fetcher();
-            $feed_data = $fetcher->get_file_contents(
+            $feed_data = $fetcher->getFileContents(
                 $fetch_url, false,
                 $auth_login, $auth_pass, false,
                 $no_cache ? FEED_FETCH_NO_CACHE_TIMEOUT : FEED_FETCH_TIMEOUT,

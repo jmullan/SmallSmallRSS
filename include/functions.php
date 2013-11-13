@@ -1499,7 +1499,7 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
     }
 
     $fetcher = new \SmallSmallRSS\Fetcher();
-    $contents = $fetcher->get_file_contents($url, false, $auth_login, $auth_pass);
+    $contents = $fetcher->getFileContents($url, false, $auth_login, $auth_pass);
     $fetch_last_error = $fetcher->last_error;
 
     if (!$contents) {

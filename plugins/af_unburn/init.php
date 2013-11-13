@@ -29,7 +29,7 @@ class Af_Unburn extends \SmallSmallRSS\Plugin {
 
                 if (ini_get("safe_mode") || ini_get("open_basedir")) {
                     $fetcher = new \SmallSmallRSS\Fetcher();
-                    $url = $fetcher->curl_resolve_url($article["link"]);
+                    $url = $fetcher->curlResolveUrl($article["link"]);
                 } else {
                     $ch = curl_init($article["link"]);
                 }

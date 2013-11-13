@@ -166,14 +166,14 @@ class API extends Handler
 
         $result = $this->dbh->query(
             "SELECT
-				id, title, order_id, (SELECT COUNT(id) FROM
-				ttrss_feeds WHERE
-				ttrss_feed_categories.id IS NOT NULL AND cat_id = ttrss_feed_categories.id) AS num_feeds,
-			(SELECT COUNT(id) FROM
-				ttrss_feed_categories AS c2 WHERE
-				c2.parent_cat = ttrss_feed_categories.id) AS num_cats
-			FROM ttrss_feed_categories
-			WHERE $nested_qpart AND owner_uid = " .
+                id, title, order_id, (SELECT COUNT(id) FROM
+                ttrss_feeds WHERE
+                ttrss_feed_categories.id IS NOT NULL AND cat_id = ttrss_feed_categories.id) AS num_feeds,
+            (SELECT COUNT(id) FROM
+                ttrss_feed_categories AS c2 WHERE
+                c2.parent_cat = ttrss_feed_categories.id) AS num_cats
+            FROM ttrss_feed_categories
+            WHERE $nested_qpart AND owner_uid = " .
             $_SESSION["uid"]
         );
 
@@ -316,7 +316,7 @@ class API extends Handler
             if ($num_updated > 0 && $field == "unread") {
                 $result = $this->dbh->query(
                     "SELECT DISTINCT feed_id FROM ttrss_user_entries
-					WHERE ref_id IN ($article_ids)"
+                    WHERE ref_id IN ($article_ids)"
                 );
 
                 while ($line = $this->dbh->fetch_assoc($result)) {
@@ -352,11 +352,11 @@ class API extends Handler
         if ($article_id) {
 
             $query = "SELECT id,title,link,content,cached_content,feed_id,comments,int_id,
-				marked,unread,published,score,
-				".SUBSTRING_FOR_DATE."(updated,1,16) as updated,
-				author,(SELECT title FROM ttrss_feeds WHERE id = feed_id) AS feed_title
-				FROM ttrss_entries,ttrss_user_entries
-				WHERE	id IN ($article_id) AND ref_id = id AND owner_uid = " .
+                marked,unread,published,score,
+                ".SUBSTRING_FOR_DATE."(updated,1,16) as updated,
+                author,(SELECT title FROM ttrss_feeds WHERE id = feed_id) AS feed_title
+                FROM ttrss_entries,ttrss_user_entries
+                WHERE    id IN ($article_id) AND ref_id = id AND owner_uid = " .
                 $_SESSION["uid"];
 
             $result = $this->dbh->query($query);
@@ -413,7 +413,7 @@ class API extends Handler
 
         $result = $this->dbh->query(
             "SELECT COUNT(*) AS cf FROM
-			ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]
+            ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]
         );
 
         $num_feeds = $this->dbh->fetch_result($result, 0, "cf");
@@ -456,8 +456,8 @@ class API extends Handler
 
         $result = $this->dbh->query(
             "SELECT id, caption, fg_color, bg_color
-			FROM ttrss_labels2
-			WHERE owner_uid = '".$_SESSION['uid']."' ORDER BY caption"
+            FROM ttrss_labels2
+            WHERE owner_uid = '".$_SESSION['uid']."' ORDER BY caption"
         );
 
         if ($article_id) {
@@ -614,8 +614,8 @@ class API extends Handler
         if ($include_nested && $cat_id) {
             $result = db_query(
                 "SELECT
-					id, title FROM ttrss_feed_categories
-					WHERE parent_cat = '$cat_id' AND owner_uid = " . $_SESSION["uid"] .
+                    id, title FROM ttrss_feed_categories
+                    WHERE parent_cat = '$cat_id' AND owner_uid = " . $_SESSION["uid"] .
                 " ORDER BY id, title"
             );
 
@@ -646,9 +646,9 @@ class API extends Handler
         if ($cat_id == -4 || $cat_id == -3) {
             $result = db_query(
                 "SELECT
-					id, feed_url, cat_id, title, order_id, ".
+                    id, feed_url, cat_id, title, order_id, ".
                 SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
-						FROM ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"] .
+                        FROM ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"] .
                 " ORDER BY cat_id, title " . $limit_qpart
             );
         } else {
@@ -662,10 +662,10 @@ class API extends Handler
 
             $result = db_query(
                 "SELECT
-					id, feed_url, cat_id, title, order_id, ".
+                    id, feed_url, cat_id, title, order_id, ".
                 SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
-						FROM ttrss_feeds WHERE
-						$cat_qpart AND owner_uid = " . $_SESSION["uid"] .
+                        FROM ttrss_feeds WHERE
+                        $cat_qpart AND owner_uid = " . $_SESSION["uid"] .
                 " ORDER BY cat_id, title " . $limit_qpart
             );
         }
@@ -797,7 +797,7 @@ class API extends Handler
 
         $result = $this->dbh->query(
             "SELECT id FROM ttrss_feeds WHERE
-			id = '$feed_id' AND owner_uid = ".$_SESSION["uid"]
+            id = '$feed_id' AND owner_uid = ".$_SESSION["uid"]
         );
 
         if ($this->dbh->num_rows($result) != 0) {
@@ -850,7 +850,7 @@ class API extends Handler
         if ($id == -2) {
             $result = $this->dbh->query(
                 "SELECT COUNT(*) AS count FROM ttrss_labels2
-				WHERE owner_uid = " . $_SESSION["uid"]
+                WHERE owner_uid = " . $_SESSION["uid"]
             );
 
             return $this->dbh->fetch_result($result, 0, "count") == 0;
@@ -858,7 +858,7 @@ class API extends Handler
         } elseif ($id == 0) {
             $result = $this->dbh->query(
                 "SELECT COUNT(*) AS count FROM ttrss_feeds
-				WHERE cat_id IS NULL AND owner_uid = " . $_SESSION["uid"]
+                WHERE cat_id IS NULL AND owner_uid = " . $_SESSION["uid"]
             );
 
             return $this->dbh->fetch_result($result, 0, "count") == 0;

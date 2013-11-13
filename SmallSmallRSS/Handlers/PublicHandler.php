@@ -3,16 +3,18 @@ namespace SmallSmallRSS\Handlers;
 class PublicHandler extends Handler
 {
 
-    private function generate_syndicated_feed($owner_uid, $feed, $is_cat,
-                                              $limit, $offset, $search, $search_mode,
-                                              $view_mode = false, $format = 'atom', $order = false) {
+    private function generate_syndicated_feed(
+        $owner_uid, $feed, $is_cat,
+        $limit, $offset, $search, $search_mode,
+        $view_mode = false, $format = 'atom', $order = false
+    ) {
 
         require_once "lib/MiniTemplator.class.php";
 
-        $note_style = "background-color : #fff7d5;
-			border-width : 1px; ".
-            "padding : 5px; border-style : dashed; border-color : #e7d796;".
-            "margin-bottom : 1em; color : #9a8c59;";
+        $note_style = "background-color: #fff7d5;"
+            . " border-width: 1px;"
+            . " padding: 5px; border-style: dashed; border-color: #e7d796;"
+            . " margin-bottom: 1em; color: #9a8c59;";
 
         if (!$limit) {  $limit = 60;
         }
@@ -257,21 +259,20 @@ class PublicHandler extends Handler
         $login = $this->dbh->escape_string($_REQUEST["login"]);
 
         $result = $this->dbh->query(
-            "SELECT ttrss_settings_profiles.* FROM ttrss_settings_profiles,ttrss_users
-			WHERE ttrss_users.id = ttrss_settings_profiles.owner_uid AND login = '$login' ORDER BY title"
+            "SELECT ttrss_settings_profiles.*
+             FROM ttrss_settings_profiles,ttrss_users
+             WHERE
+                 ttrss_users.id = ttrss_settings_profiles.owner_uid
+                 AND login = '$login'
+             ORDER BY title"
         );
-
         print "<select dojoType='dijit.form.Select' style='width : 220px; margin : 0px' name='profile'>";
-
         print "<option value='0'>" . __("Default profile") . "</option>";
-
         while ($line = $this->dbh->fetch_assoc($result)) {
             $id = $line["id"];
             $title = $line["title"];
-
             print "<option value='$id'>$title</option>";
         }
-
         print "</select>";
     }
 
@@ -289,43 +290,31 @@ class PublicHandler extends Handler
 
         // TODO: implement hub_verifytoken checking
 
-        $result = $this->dbh->query(
-            "SELECT feed_url FROM ttrss_feeds
-			WHERE id = '$feed_id'"
-        );
-
+        $result = $this->dbh->query("SELECT feed_url FROM ttrss_feeds WHERE id = '$feed_id'");
         if ($this->dbh->num_rows($result) != 0) {
-
             $check_feed_url = $this->dbh->fetch_result($result, 0, "feed_url");
-
             if ($check_feed_url && ($check_feed_url == $feed_url || !$feed_url)) {
                 if ($mode == "subscribe") {
-
                     $this->dbh->query(
                         "UPDATE ttrss_feeds SET pubsub_state = 2
-						WHERE id = '$feed_id'"
+                        WHERE id = '$feed_id'"
                     );
-
                     print $_REQUEST['hub_challenge'];
                     return;
-
                 } elseif ($mode == "unsubscribe") {
-
                     $this->dbh->query(
                         "UPDATE ttrss_feeds SET pubsub_state = 0
-						WHERE id = '$feed_id'"
+                         WHERE id = '$feed_id'"
                     );
-
                     print $_REQUEST['hub_challenge'];
                     return;
 
                 } elseif (!$mode) {
                     $this->dbh->query(
                         "UPDATE ttrss_feeds SET
-						last_update_started = '1970-01-01',
-						last_updated = '1970-01-01' WHERE id = '$feed_id'"
+                        last_update_started = '1970-01-01',
+                        last_updated = '1970-01-01' WHERE id = '$feed_id'"
                     );
-
                 }
             } else {
                 header('HTTP/1.0 404 Not Found');
@@ -337,7 +326,6 @@ class PublicHandler extends Handler
         }
 
     }
-
     function logout()
     {
         logout_user();
@@ -347,22 +335,18 @@ class PublicHandler extends Handler
     function share()
     {
         $uuid = $this->dbh->escape_string($_REQUEST["key"]);
-
         $result = $this->dbh->query(
-            "SELECT ref_id, owner_uid FROM ttrss_user_entries WHERE
-			uuid = '$uuid'"
+            "SELECT ref_id, owner_uid
+             FROM ttrss_user_entries
+             WHERE uuid = '$uuid'"
         );
-
         if ($this->dbh->num_rows($result) != 0) {
             header("Content-Type: text/html");
-
             $id = $this->dbh->fetch_result($result, 0, "ref_id");
             $owner_uid = $this->dbh->fetch_result($result, 0, "owner_uid");
 
             $article = format_article($id, false, true, $owner_uid);
-
             print_r($article['content']);
-
         } else {
             print "Article not found.";
         }
@@ -395,8 +379,11 @@ class PublicHandler extends Handler
 
         if ($key) {
             $result = $this->dbh->query(
-                "SELECT owner_uid FROM
-				ttrss_access_keys WHERE access_key = '$key' AND feed_id = '$feed'"
+                "SELECT owner_uid
+                 FROM ttrss_access_keys
+                 WHERE
+                     access_key = '$key'
+                     AND feed_id = '$feed'"
             );
 
             if ($this->dbh->num_rows($result) == 1) {
@@ -438,7 +425,7 @@ class PublicHandler extends Handler
         javascript_tag("lib/prototype.js");
         javascript_tag("lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls");
         print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
-			</head><body id='sharepopup'>";
+            </head><body id='sharepopup'>";
 
         $action = $_REQUEST["action"];
 
@@ -466,9 +453,12 @@ class PublicHandler extends Handler
 
                 ?>
 
-                <table height='100%' width='100%'><tr><td colspan='2'>
-                     <h1><?php echo __("Share with Tiny Tiny RSS") ?></h1>
-                     </td></tr>
+                <table height='100%' width='100%'>
+                  <tr>
+                    <td colspan='2'>
+                      <h1><?php echo __("Share with Tiny Tiny RSS") ?></h1>
+                    </td>
+                  </tr>
 
                      <form id='share_form' name='share_form'>
 
@@ -491,15 +481,13 @@ class PublicHandler extends Handler
                      style="display : block"></div></td></tr>
 
                      <script type='text/javascript'>document.forms[0].title.focus();</script>
-
-                                                                                          <script type='text/javascript'>
-                                                                                          new Ajax.Autocompleter('labels_value', 'labels_choices',
-                                                                                                                 "backend.php?op=rpc&method=completeLabels",
-                                                                                                                 { tokens: ',', paramName: "search" });
-                </script>
-
-                      <tr><td colspan='2'>
-                      <div style='float : right' class='insensitive-small'>
+                     <script type='text/javascript'>
+                       new Ajax.Autocompleter('labels_value', 'labels_choices',
+                                              "backend.php?op=rpc&method=completeLabels",
+                                              { tokens: ',', paramName: "search" });
+                     </script>
+                     <tr><td colspan='2'>
+                     <div style='float : right' class='insensitive-small'>
                 <?php echo __("Shared article will appear in the Published feed.") ?>
                       </div>
                       <button type="submit"><?php echo __('Share') ?></button>
@@ -610,15 +598,15 @@ class PublicHandler extends Handler
 
             header('Content-Type: text/html; charset=utf-8');
             print "<html>
-				<head>
-					<title>Tiny Tiny RSS</title>
-					<link rel=\"stylesheet\" type=\"text/css\" href=\"css/utility.css\">
-					<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
-				</head>
-				<body>
-				<img class=\"floatingLogo\" src=\"images/logo_small.png\"
-			  		alt=\"Tiny Tiny RSS\"/>
-					<h1>".__("Subscribe to feed...")."</h1><div class='content'>";
+                <head>
+                    <title>Tiny Tiny RSS</title>
+                    <link rel=\"stylesheet\" type=\"text/css\" href=\"css/utility.css\">
+                    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
+                </head>
+                <body>
+                <img class=\"floatingLogo\" src=\"images/logo_small.png\"
+                      alt=\"Tiny Tiny RSS\"/>
+                    <h1>".__("Subscribe to feed...")."</h1><div class='content'>";
 
             $rc = subscribe_to_feed($feed_url);
 
@@ -680,7 +668,7 @@ class PublicHandler extends Handler
             if ($rc['code'] <= 2) {
                 $result = $this->dbh->query(
                     "SELECT id FROM ttrss_feeds WHERE
-					feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
+                    feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
                 );
 
                 $feed_id = $this->dbh->fetch_result($result, 0, "id");
@@ -691,17 +679,17 @@ class PublicHandler extends Handler
 
             if ($feed_id) {
                 print "<form method=\"GET\" style='display: inline'
-					action=\"$tp_uri\">
-					<input type=\"hidden\" name=\"tab\" value=\"feedConfig\">
-					<input type=\"hidden\" name=\"method\" value=\"editFeed\">
-					<input type=\"hidden\" name=\"methodparam\" value=\"$feed_id\">
-					<input type=\"submit\" value=\"".__("Edit subscription options")."\">
-					</form>";
+                    action=\"$tp_uri\">
+                    <input type=\"hidden\" name=\"tab\" value=\"feedConfig\">
+                    <input type=\"hidden\" name=\"method\" value=\"editFeed\">
+                    <input type=\"hidden\" name=\"methodparam\" value=\"$feed_id\">
+                    <input type=\"submit\" value=\"".__("Edit subscription options")."\">
+                    </form>";
             }
 
             print "<form style='display: inline' method=\"GET\" action=\"$tt_uri\">
-				<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-				</form></p>";
+                <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
+                </form></p>";
 
             print "</div></body></html>";
 
@@ -784,7 +772,7 @@ class PublicHandler extends Handler
         if ($rc <= 2) {
             $result = $this->dbh->query(
                 "SELECT id FROM ttrss_feeds WHERE
-				feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
+                feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
             );
 
             $feed_id = $this->dbh->fetch_result($result, 0, "id");
@@ -796,17 +784,17 @@ class PublicHandler extends Handler
 
         if ($feed_id) {
             print "<form method=\"GET\" style='display: inline'
-				action=\"$tp_uri\">
-				<input type=\"hidden\" name=\"tab\" value=\"feedConfig\">
-				<input type=\"hidden\" name=\"method\" value=\"editFeed\">
-				<input type=\"hidden\" name=\"methodparam\" value=\"$feed_id\">
-				<input type=\"submit\" value=\"".__("Edit subscription options")."\">
-				</form>";
+                action=\"$tp_uri\">
+                <input type=\"hidden\" name=\"tab\" value=\"feedConfig\">
+                <input type=\"hidden\" name=\"method\" value=\"editFeed\">
+                <input type=\"hidden\" name=\"methodparam\" value=\"$feed_id\">
+                <input type=\"submit\" value=\"".__("Edit subscription options")."\">
+                </form>";
         }
 
         print "<form style='display: inline' method=\"GET\" action=\"$tt_uri\">
-			<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-			</form></p>";
+            <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
+            </form></p>";
 
         print "</body></html>";
     }
@@ -828,7 +816,7 @@ class PublicHandler extends Handler
         javascript_tag("lib/prototype.js");
 
         print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
-			</head><body id='forgotpass'>";
+            </head><body id='forgotpass'>";
 
         print '<div class="floatingLogo"><img src="images/logo_small.png"></div>';
         print "<h1>".__("Password recovery")."</h1>";
@@ -876,15 +864,15 @@ class PublicHandler extends Handler
                  );
 
                 print "<form method=\"GET\" action=\"public.php\">
-					<input type=\"hidden\" name=\"op\" value=\"forgotpass\">
-					<input type=\"submit\" value=\"".__("Go back")."\">
-					</form>";
+                    <input type=\"hidden\" name=\"op\" value=\"forgotpass\">
+                    <input type=\"submit\" value=\"".__("Go back")."\">
+                    </form>";
 
             } else {
 
                 $result = $this->dbh->query(
                     "SELECT id FROM ttrss_users
-					WHERE login = '$login' AND email = '$email'"
+                    WHERE login = '$login' AND email = '$email'"
                 );
 
                 if ($this->dbh->num_rows($result) != 0) {
@@ -897,8 +885,8 @@ class PublicHandler extends Handler
                     print "<p>"."Completed."."</p>";
 
                     print "<form method=\"GET\" action=\"index.php\">
-						<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-						</form>";
+                        <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
+                        </form>";
 
                 } else {
                      \SmallSmallRSS\Renderers\Messages::renderError(
@@ -906,9 +894,9 @@ class PublicHandler extends Handler
                      );
 
                     print "<form method=\"GET\" action=\"public.php\">
-						<input type=\"hidden\" name=\"op\" value=\"forgotpass\">
-						<input type=\"submit\" value=\"".__("Go back")."\">
-						</form>";
+                        <input type=\"hidden\" name=\"op\" value=\"forgotpass\">
+                        <input type=\"submit\" value=\"".__("Go back")."\">
+                        </form>";
 
                 }
             }
@@ -975,8 +963,8 @@ class PublicHandler extends Handler
                             "One of the updates failed. Either retry the process or perform updates manually."
                         );
                         print "<p><form method=\"GET\" action=\"index.php\">
-								<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-								</form>";
+                                <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
+                                </form>";
                         break;
                     } else {
                         print "<span class='ok'>OK!</span></li>";
@@ -987,13 +975,13 @@ class PublicHandler extends Handler
                     "Your Tiny Tiny RSS database is now updated to the latest version."
                 );
                 print "<p><form method=\"GET\" action=\"index.php\">
-						<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-						</form>";
+                        <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
+                        </form>";
             } else {
                 print "<h2>Your database is up to date.</h2>";
                 print "<p><form method=\"GET\" action=\"index.php\">
-						<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-						</form>";
+                        <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
+                        </form>";
             }
         } else {
             if ($updater->isUpdateRequired()) {
@@ -1008,14 +996,14 @@ class PublicHandler extends Handler
                     "Please backup your database before proceeding."
                 );
                 print "<form method='POST'>
-							<input type='hidden' name='subop' value='performupdate'>
-							<input type='submit' onclick='return confirmOP()' value='".__("Perform updates")."'>
-						</form>";
+                            <input type='hidden' name='subop' value='performupdate'>
+                            <input type='submit' onclick='return confirmOP()' value='".__("Perform updates")."'>
+                        </form>";
             } else {
                 \SmallSmallRSS\Renderers\Messages::renderNotice("Tiny Tiny RSS database is up to date.");
                 print "<p><form method=\"GET\" action=\"index.php\">
-							<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-						</form>";
+                            <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
+                        </form>";
             }
         }
         ?>

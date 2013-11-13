@@ -9,12 +9,12 @@ class CounterCache
     {
         db_query(
             "UPDATE ttrss_counters_cache SET
-			value = 0 WHERE owner_uid = '$owner_uid'"
+             value = 0 WHERE owner_uid = '$owner_uid'"
         );
 
         db_query(
             "UPDATE ttrss_cat_counters_cache SET
-			value = 0 WHERE owner_uid = '$owner_uid'"
+             value = 0 WHERE owner_uid = '$owner_uid'"
         );
     }
     public static function remove($feed_id, $owner_uid, $is_cat = false)
@@ -28,7 +28,7 @@ class CounterCache
 
         db_query(
             "DELETE FROM $table WHERE
-			feed_id = '$feed_id' AND owner_uid = '$owner_uid'"
+             feed_id = '$feed_id' AND owner_uid = '$owner_uid'"
         );
 
     }
@@ -40,7 +40,7 @@ class CounterCache
 
             $result = db_query(
                 "SELECT feed_id FROM ttrss_cat_counters_cache
-				WHERE feed_id > 0 AND owner_uid = '$owner_uid'"
+                 WHERE feed_id > 0 AND owner_uid = '$owner_uid'"
             );
 
             while ($line = db_fetch_assoc($result)) {
@@ -54,7 +54,7 @@ class CounterCache
         } else {
             $result = db_query(
                 "SELECT feed_id FROM ttrss_counters_cache
-				WHERE feed_id > 0 AND owner_uid = '$owner_uid'"
+                 WHERE feed_id > 0 AND owner_uid = '$owner_uid'"
             );
 
             while ($line = db_fetch_assoc($result)) {
@@ -85,8 +85,10 @@ class CounterCache
 
         $result = db_query(
             "SELECT value FROM $table
-			WHERE owner_uid = '$owner_uid' AND feed_id = '$feed_id'
-			LIMIT 1"
+             WHERE
+                 owner_uid = '$owner_uid'
+                 AND feed_id = '$feed_id'
+             LIMIT 1"
         );
 
         if (db_num_rows($result) == 1) {
@@ -101,8 +103,12 @@ class CounterCache
 
     }
 
-    public static function update($feed_id, $owner_uid, $is_cat = false,
-                           $update_pcat = true) {
+    public static function update(
+        $feed_id,
+        $owner_uid,
+        $is_cat = false,
+        $update_pcat = true
+    ) {
 
         if (!is_numeric($feed_id)) {
             return;
@@ -134,7 +140,7 @@ class CounterCache
 
             $result = db_query(
                 "SELECT id FROM ttrss_feeds
-						WHERE owner_uid = '$owner_uid' AND $cat_qpart"
+                        WHERE owner_uid = '$owner_uid' AND $cat_qpart"
             );
 
             while ($line = db_fetch_assoc($result)) {
@@ -143,9 +149,9 @@ class CounterCache
 
             $result = db_query(
                 "SELECT SUM(value) AS sv
-				FROM ttrss_counters_cache, ttrss_feeds
-				WHERE id = feed_id AND $cat_qpart AND
-				ttrss_feeds.owner_uid = '$owner_uid'"
+                FROM ttrss_counters_cache, ttrss_feeds
+                WHERE id = feed_id AND $cat_qpart AND
+                ttrss_feeds.owner_uid = '$owner_uid'"
             );
 
             $unread = (int) db_fetch_result($result, 0, "sv");
@@ -155,53 +161,41 @@ class CounterCache
         }
 
         db_query("BEGIN");
-
         $result = db_query(
             "SELECT feed_id FROM $table
-			WHERE owner_uid = '$owner_uid' AND feed_id = '$feed_id' LIMIT 1"
+             WHERE owner_uid = '$owner_uid' AND feed_id = '$feed_id' LIMIT 1"
         );
 
         if (db_num_rows($result) == 1) {
             db_query(
                 "UPDATE $table SET
-				value = '$unread', updated = NOW() WHERE
-				feed_id = '$feed_id' AND owner_uid = '$owner_uid'"
+                 value = '$unread', updated = NOW() WHERE
+                 feed_id = '$feed_id' AND owner_uid = '$owner_uid'"
             );
-
         } else {
             db_query(
                 "INSERT INTO $table
-				(feed_id, value, owner_uid, updated)
-				VALUES
-				($feed_id, $unread, $owner_uid, NOW())"
+                 (feed_id, value, owner_uid, updated)
+                 VALUES
+                 ($feed_id, $unread, $owner_uid, NOW())"
             );
         }
-
         db_query("COMMIT");
-
         if ($feed_id > 0 && $prev_unread != $unread) {
-
             if (!$is_cat) {
-
                 /* Update parent category */
-
                 if ($update_pcat) {
-
                     $result = db_query(
                         "SELECT cat_id FROM ttrss_feeds
-						WHERE owner_uid = '$owner_uid' AND id = '$feed_id'"
+                         WHERE owner_uid = '$owner_uid' AND id = '$feed_id'"
                     );
-
                     $cat_id = (int) db_fetch_result($result, 0, "cat_id");
-
                     self::update($cat_id, $owner_uid, true);
-
                 }
             }
         } elseif ($feed_id < 0) {
             self::update_all($owner_uid);
         }
-
         return $unread;
     }
 }

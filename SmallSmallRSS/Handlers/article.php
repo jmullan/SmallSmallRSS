@@ -16,8 +16,8 @@ class Article extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT link FROM ttrss_entries, ttrss_user_entries
-						WHERE id = '$id' AND id = ref_id AND owner_uid = '".$_SESSION['uid']."'
-						LIMIT 1"
+                        WHERE id = '$id' AND id = ref_id AND owner_uid = '".$_SESSION['uid']."'
+                        LIMIT 1"
         );
 
         if ($this->dbh->num_rows($result) == 1) {
@@ -78,20 +78,20 @@ class Article extends ProtectedHandler
         if ($cmode == 0) {
             $this->dbh->query(
                 "UPDATE ttrss_user_entries SET
-			unread = false,last_read = NOW()
-			WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
+            unread = false,last_read = NOW()
+            WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
             );
         } elseif ($cmode == 1) {
             $this->dbh->query(
                 "UPDATE ttrss_user_entries SET
-			unread = true
-			WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
+            unread = true
+            WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
             );
         } else {
             $this->dbh->query(
                 "UPDATE ttrss_user_entries SET
-			unread = NOT unread,last_read = NOW()
-			WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
+            unread = NOT unread,last_read = NOW()
+            WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
             );
         }
 
@@ -125,7 +125,7 @@ class Article extends ProtectedHandler
         // only check for our user data here, others might have shared this with different content etc
         $result = db_query(
             "SELECT id FROM ttrss_entries, ttrss_user_entries WHERE
-			link = '$url' AND ref_id = id AND owner_uid = '$owner_uid' LIMIT 1"
+            link = '$url' AND ref_id = id AND owner_uid = '$owner_uid' LIMIT 1"
         );
 
         if (db_num_rows($result) != 0) {
@@ -133,7 +133,7 @@ class Article extends ProtectedHandler
 
             $result = db_query(
                 "SELECT int_id FROM ttrss_user_entries WHERE
-				ref_id = '$ref_id' AND owner_uid = '$owner_uid' LIMIT 1"
+                ref_id = '$ref_id' AND owner_uid = '$owner_uid' LIMIT 1"
             );
 
             if (db_num_rows($result) != 0) {
@@ -141,22 +141,22 @@ class Article extends ProtectedHandler
 
                 db_query(
                     "UPDATE ttrss_entries SET
-					content = '$content', content_hash = '$content_hash' WHERE id = '$ref_id'"
+                    content = '$content', content_hash = '$content_hash' WHERE id = '$ref_id'"
                 );
 
                 db_query(
                     "UPDATE ttrss_user_entries SET published = true,
-						last_published = NOW() WHERE
-						int_id = '$int_id' AND owner_uid = '$owner_uid'"
+                        last_published = NOW() WHERE
+                        int_id = '$int_id' AND owner_uid = '$owner_uid'"
                 );
             } else {
 
                 db_query(
                     "INSERT INTO ttrss_user_entries
-					(ref_id, uuid, feed_id, orig_feed_id, owner_uid, published, tag_cache, label_cache,
-						last_read, note, unread, last_published)
-					VALUES
-					('$ref_id', '', NULL, NULL, $owner_uid, true, '', '', NOW(), '', false, NOW())"
+                    (ref_id, uuid, feed_id, orig_feed_id, owner_uid, published, tag_cache, label_cache,
+                        last_read, note, unread, last_published)
+                    VALUES
+                    ('$ref_id', '', NULL, NULL, $owner_uid, true, '', '', NOW(), '', false, NOW())"
                 );
             }
 
@@ -171,9 +171,9 @@ class Article extends ProtectedHandler
         } else {
             $result = db_query(
                 "INSERT INTO ttrss_entries
-				(title, guid, link, updated, content, content_hash, date_entered, date_updated)
-				VALUES
-				('$title', '$guid', '$url', NOW(), '$content', '$content_hash', NOW(), NOW())"
+                (title, guid, link, updated, content, content_hash, date_entered, date_updated)
+                VALUES
+                ('$title', '$guid', '$url', NOW(), '$content', '$content_hash', NOW(), NOW())"
             );
 
             $result = db_query("SELECT id FROM ttrss_entries WHERE guid = '$guid'");
@@ -183,10 +183,10 @@ class Article extends ProtectedHandler
 
                 db_query(
                     "INSERT INTO ttrss_user_entries
-					(ref_id, uuid, feed_id, orig_feed_id, owner_uid, published, tag_cache, label_cache,
-						last_read, note, unread, last_published)
-					VALUES
-					('$ref_id', '', NULL, NULL, $owner_uid, true, '', '', NOW(), '', false, NOW())"
+                    (ref_id, uuid, feed_id, orig_feed_id, owner_uid, published, tag_cache, label_cache,
+                        last_read, note, unread, last_published)
+                    VALUES
+                    ('$ref_id', '', NULL, NULL, $owner_uid, true, '', '', NOW(), '', false, NOW())"
                 );
 
                 if (count($labels) != 0) {
@@ -222,19 +222,19 @@ class Article extends ProtectedHandler
         print "<table width='100%'><tr><td>";
 
         print "<textarea dojoType=\"dijit.form.SimpleTextarea\" rows='4'
-			style='font-size : 12px; width : 100%' id=\"tags_str\"
-			name='tags_str'>$tags_str</textarea>
-		<div class=\"autocomplete\" id=\"tags_choices\"
-				style=\"display:none\"></div>";
+            style='font-size : 12px; width : 100%' id=\"tags_str\"
+            name='tags_str'>$tags_str</textarea>
+        <div class=\"autocomplete\" id=\"tags_choices\"
+                style=\"display:none\"></div>";
 
         print "</td></tr></table>";
 
         print "<div class='dlgButtons'>";
 
         print "<button dojoType=\"dijit.form.Button\"
-			onclick=\"dijit.byId('editTagsDlg').execute()\">".__('Save')."</button> ";
+            onclick=\"dijit.byId('editTagsDlg').execute()\">".__('Save')."</button> ";
         print "<button dojoType=\"dijit.form.Button\"
-			onclick=\"dijit.byId('editTagsDlg').hide()\">".__('Cancel')."</button>";
+            onclick=\"dijit.byId('editTagsDlg').hide()\">".__('Cancel')."</button>";
         print "</div>";
 
     }
@@ -246,7 +246,7 @@ class Article extends ProtectedHandler
 
         $this->dbh->query(
             "UPDATE ttrss_user_entries SET
-			score = '$score' WHERE ref_id IN ($ids) AND owner_uid = " . $_SESSION["uid"]
+            score = '$score' WHERE ref_id IN ($ids) AND owner_uid = " . $_SESSION["uid"]
         );
 
         print json_encode(array("id" => $ids,
@@ -266,7 +266,7 @@ class Article extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT int_id FROM ttrss_user_entries WHERE
-				ref_id = '$id' AND owner_uid = '".$_SESSION["uid"]."' LIMIT 1"
+                ref_id = '$id' AND owner_uid = '".$_SESSION["uid"]."' LIMIT 1"
         );
 
         if ($this->dbh->num_rows($result) == 1) {
@@ -277,7 +277,7 @@ class Article extends ProtectedHandler
 
             $this->dbh->query(
                 "DELETE FROM ttrss_tags WHERE
-				post_int_id = $int_id AND owner_uid = '".$_SESSION["uid"]."'"
+                post_int_id = $int_id AND owner_uid = '".$_SESSION["uid"]."'"
             );
 
             foreach ($tags as $tag) {
@@ -291,12 +291,12 @@ class Article extends ProtectedHandler
                     continue;
                 }
 
-                //					print "<!-- $id : $int_id : $tag -->";
+                //                    print "<!-- $id : $int_id : $tag -->";
 
                 if ($tag != '') {
                     $this->dbh->query(
                         "INSERT INTO ttrss_tags
-								(post_int_id, owner_uid, tag_name) VALUES ('$int_id', '".$_SESSION["uid"]."', '$tag')"
+                                (post_int_id, owner_uid, tag_name) VALUES ('$int_id', '".$_SESSION["uid"]."', '$tag')"
                     );
                 }
 
@@ -310,8 +310,8 @@ class Article extends ProtectedHandler
 
             $this->dbh->query(
                 "UPDATE ttrss_user_entries
-				SET tag_cache = '$tags_str' WHERE ref_id = '$id'
-						AND owner_uid = " . $_SESSION["uid"]
+                SET tag_cache = '$tags_str' WHERE ref_id = '$id'
+                        AND owner_uid = " . $_SESSION["uid"]
             );
         }
 
@@ -335,9 +335,9 @@ class Article extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT DISTINCT tag_name FROM ttrss_tags
-				WHERE owner_uid = '".$_SESSION["uid"]."' AND
-				tag_name LIKE '$search%' ORDER BY tag_name
-				LIMIT 10"
+                WHERE owner_uid = '".$_SESSION["uid"]."' AND
+                tag_name LIKE '$search%' ORDER BY tag_name
+                LIMIT 10"
         );
 
         print "<ul>";

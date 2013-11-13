@@ -29,7 +29,7 @@ class Pref_Feeds extends ProtectedHandler
     function batch_edit_cbox($elem, $label = false)
     {
         print "<input type=\"checkbox\" title=\"".__("Check to enable field")."\"
-			onchange=\"dijit.byId('feedEditDlg').toggleField(this, '$elem', '$label')\">";
+            onchange=\"dijit.byId('feedEditDlg').toggleField(this, '$elem', '$label')\">";
     }
 
     function renamecat()
@@ -40,7 +40,7 @@ class Pref_Feeds extends ProtectedHandler
         if ($title) {
             $this->dbh->query(
                 "UPDATE ttrss_feed_categories SET
-				title = '$title' WHERE id = '$id' AND owner_uid = " . $_SESSION["uid"]
+                title = '$title' WHERE id = '$id' AND owner_uid = " . $_SESSION["uid"]
             );
         }
         return;
@@ -70,7 +70,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT id, title FROM ttrss_feed_categories
-				WHERE owner_uid = " . $_SESSION["uid"] . " AND parent_cat = '$cat_id' ORDER BY order_id, title"
+                WHERE owner_uid = " . $_SESSION["uid"] . " AND parent_cat = '$cat_id' ORDER BY order_id, title"
         );
 
         while ($line = $this->dbh->fetch_assoc($result)) {
@@ -99,9 +99,9 @@ class Pref_Feeds extends ProtectedHandler
 
         $feed_result = $this->dbh->query(
             "SELECT id, title, last_error,
-			".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
-			FROM ttrss_feeds
-			WHERE cat_id = '$cat_id' AND owner_uid = ".$_SESSION["uid"].
+            ".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+            FROM ttrss_feeds
+            WHERE cat_id = '$cat_id' AND owner_uid = ".$_SESSION["uid"].
             "$search_qpart ORDER BY order_id, title"
         );
 
@@ -200,7 +200,7 @@ class Pref_Feeds extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "SELECT * FROM
-				ttrss_labels2 WHERE owner_uid = ".$_SESSION['uid']." ORDER by caption"
+                ttrss_labels2 WHERE owner_uid = ".$_SESSION['uid']." ORDER by caption"
             );
 
             if ($this->dbh->num_rows($result) > 0) {
@@ -237,7 +237,7 @@ class Pref_Feeds extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "SELECT id, title FROM ttrss_feed_categories
-				WHERE owner_uid = " . $_SESSION["uid"] . " AND parent_cat IS NULL ORDER BY order_id, title"
+                WHERE owner_uid = " . $_SESSION["uid"] . " AND parent_cat IS NULL ORDER BY order_id, title"
             );
 
             while ($line = $this->dbh->fetch_assoc($result)) {
@@ -279,9 +279,9 @@ class Pref_Feeds extends ProtectedHandler
 
             $feed_result = $this->dbh->query(
                 "SELECT id, title,last_error,
-				".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
-				FROM ttrss_feeds
-				WHERE cat_id IS NULL AND owner_uid = ".$_SESSION["uid"].
+                ".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                FROM ttrss_feeds
+                WHERE cat_id IS NULL AND owner_uid = ".$_SESSION["uid"].
                 "$search_qpart ORDER BY order_id, title"
             );
 
@@ -315,9 +315,9 @@ class Pref_Feeds extends ProtectedHandler
         } else {
             $feed_result = $this->dbh->query(
                 "SELECT id, title, last_error,
-				".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
-				FROM ttrss_feeds
-				WHERE owner_uid = ".$_SESSION["uid"].
+                ".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                FROM ttrss_feeds
+                WHERE owner_uid = ".$_SESSION["uid"].
                 "$search_qpart ORDER BY order_id, title"
             );
 
@@ -359,7 +359,7 @@ class Pref_Feeds extends ProtectedHandler
     {
         $this->dbh->query(
             "UPDATE ttrss_feed_categories
-				SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
+                SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
         );
         return;
     }
@@ -368,7 +368,7 @@ class Pref_Feeds extends ProtectedHandler
     {
         $this->dbh->query(
             "UPDATE ttrss_feeds
-				SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
+                SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
         );
         return;
     }
@@ -397,8 +397,8 @@ class Pref_Feeds extends ProtectedHandler
 
             $this->dbh->query(
                 "UPDATE ttrss_feed_categories
-				SET parent_cat = $parent_qpart WHERE id = '$bare_item_id' AND
-				owner_uid = " . $_SESSION["uid"]
+                SET parent_cat = $parent_qpart WHERE id = '$bare_item_id' AND
+                owner_uid = " . $_SESSION["uid"]
             );
         }
 
@@ -426,9 +426,9 @@ class Pref_Feeds extends ProtectedHandler
 
                         $this->dbh->query(
                             "UPDATE ttrss_feeds
-							SET order_id = $order_id, $cat_qpart
-							WHERE id = '$bare_id' AND
-								owner_uid = " . $_SESSION["uid"]
+                            SET order_id = $order_id, $cat_qpart
+                            WHERE id = '$bare_id' AND
+                                owner_uid = " . $_SESSION["uid"]
                         );
 
                     } elseif (strpos($id, "CAT:") === 0) {
@@ -445,8 +445,8 @@ class Pref_Feeds extends ProtectedHandler
 
                         $this->dbh->query(
                             "UPDATE ttrss_feed_categories
-								SET order_id = '$order_id' WHERE id = '$bare_id' AND
-								owner_uid = " . $_SESSION["uid"]
+                                SET order_id = '$order_id' WHERE id = '$bare_id' AND
+                                owner_uid = " . $_SESSION["uid"]
                         );
                     }
                 }
@@ -474,7 +474,7 @@ class Pref_Feeds extends ProtectedHandler
 
             foreach ($data['items'] as $item) {
 
-                #				if ($item['id'] != 'root') {
+                #                if ($item['id'] != 'root') {
                 if (is_array($item['items'])) {
                     if (isset($item['items']['_reference'])) {
                         $data_map[$item['id']] = array($item['items']);
@@ -534,7 +534,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT id FROM ttrss_feeds
-			WHERE id = '$feed_id' AND owner_uid = ". $_SESSION["uid"]
+            WHERE id = '$feed_id' AND owner_uid = ". $_SESSION["uid"]
         );
 
         if ($this->dbh->num_rows($result) != 0) {
@@ -542,7 +542,7 @@ class Pref_Feeds extends ProtectedHandler
 
             $this->dbh->query(
                 "UPDATE ttrss_feeds SET favicon_avg_color = NULL
-				where id = '$feed_id'"
+                where id = '$feed_id'"
             );
         }
 
@@ -578,7 +578,7 @@ class Pref_Feeds extends ProtectedHandler
 
                 $result = $this->dbh->query(
                     "SELECT id FROM ttrss_feeds
-					WHERE id = '$feed_id' AND owner_uid = ". $_SESSION["uid"]
+                    WHERE id = '$feed_id' AND owner_uid = ". $_SESSION["uid"]
                 );
 
                 if ($this->dbh->num_rows($result) != 0) {
@@ -586,8 +586,8 @@ class Pref_Feeds extends ProtectedHandler
                     if (rename($icon_file, ICONS_DIR . "/$feed_id.ico")) {
                         $this->dbh->query(
                             "UPDATE ttrss_feeds SET
-							favicon_avg_color = ''
-							WHERE id = '$feed_id'"
+                            favicon_avg_color = ''
+                            WHERE id = '$feed_id'"
                         );
 
                         $rc = 0;
@@ -616,7 +616,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT * FROM ttrss_feeds WHERE id = '$feed_id' AND
-				owner_uid = " . $_SESSION["uid"]
+                owner_uid = " . $_SESSION["uid"]
         );
 
         $auth_pass_encrypted = sql_bool_to_bool($this->dbh->fetch_result(
@@ -639,8 +639,8 @@ class Pref_Feeds extends ProtectedHandler
         /* Title */
 
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
-			placeHolder=\"".__("Feed Title")."\"
-			style=\"font-size : 16px; width: 20em\" name=\"title\" value=\"$title\">";
+            placeHolder=\"".__("Feed Title")."\"
+            style=\"font-size : 16px; width: 20em\" name=\"title\" value=\"$title\">";
 
         /* Feed URL */
 
@@ -654,15 +654,15 @@ class Pref_Feeds extends ProtectedHandler
 
         print __('URL:') . " ";
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
-			placeHolder=\"".__("Feed URL")."\"
-			regExp='^(http|https)://.*' style=\"width : 20em\"
-			name=\"feed_url\" value=\"$feed_url\">";
+            placeHolder=\"".__("Feed URL")."\"
+            regExp='^(http|https)://.*' style=\"width : 20em\"
+            name=\"feed_url\" value=\"$feed_url\">";
 
         $last_error = $this->dbh->fetch_result($result, 0, "last_error");
 
         if ($last_error) {
             print "&nbsp;<span title=\"".htmlspecialchars($last_error)."\"
-				class=\"feed_error\">(error)</span>";
+                class=\"feed_error\">(error)</span>";
 
         }
 
@@ -719,8 +719,8 @@ class Pref_Feeds extends ProtectedHandler
         $auth_login = htmlspecialchars($this->dbh->fetch_result($result, 0, "auth_login"));
 
         print "<input dojoType=\"dijit.form.TextBox\" id=\"feedEditDlg_login\"
-			placeHolder=\"".__("Login")."\"
-			name=\"auth_login\" value=\"$auth_login\"><hr/>";
+            placeHolder=\"".__("Login")."\"
+            name=\"auth_login\" value=\"$auth_login\"><hr/>";
 
         $auth_pass = $this->dbh->fetch_result($result, 0, "auth_pass");
 
@@ -731,12 +731,12 @@ class Pref_Feeds extends ProtectedHandler
         $auth_pass = htmlspecialchars($auth_pass);
 
         print "<input dojoType=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
-			placeHolder=\"".__("Password")."\"
-			value=\"$auth_pass\">";
+            placeHolder=\"".__("Password")."\"
+            value=\"$auth_pass\">";
 
         print "<div dojoType=\"dijit.Tooltip\" connectId=\"feedEditDlg_login\" position=\"below\">
-			".__('<b>Hint:</b> you need to fill in your login information if your feed requires authentication, except for Twitter feeds.')."
-			</div>";
+            ".__('<b>Hint:</b> you need to fill in your login information if your feed requires authentication, except for Twitter feeds.')."
+            </div>";
 
         print "</div>";
         print "<div class=\"dlgSec\">".__("Options")."</div>";
@@ -751,7 +751,7 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         print "<input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"private\" id=\"private\"
-			$checked>&nbsp;<label for=\"private\">".__('Hide from Popular feeds')."</label>";
+            $checked>&nbsp;<label for=\"private\">".__('Hide from Popular feeds')."</label>";
 
         $include_in_digest = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "include_in_digest"));
 
@@ -762,8 +762,8 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"include_in_digest\"
-			name=\"include_in_digest\"
-			$checked>&nbsp;<label for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
+            name=\"include_in_digest\"
+            $checked>&nbsp;<label for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
 
 
         $always_display_enclosures = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "always_display_enclosures"));
@@ -775,8 +775,8 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"always_display_enclosures\"
-			name=\"always_display_enclosures\"
-			$checked>&nbsp;<label for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
+            name=\"always_display_enclosures\"
+            $checked>&nbsp;<label for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
 
         $hide_images = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "hide_images"));
 
@@ -787,8 +787,8 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"hide_images\"
-		name=\"hide_images\"
-			$checked>&nbsp;<label for=\"hide_images\">".
+        name=\"hide_images\"
+            $checked>&nbsp;<label for=\"hide_images\">".
             __('Do not embed images')."</label>";
 
         $cache_images = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "cache_images"));
@@ -800,8 +800,8 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"cache_images\"
-		name=\"cache_images\"
-			$checked>&nbsp;<label for=\"cache_images\">".
+        name=\"cache_images\"
+            $checked>&nbsp;<label for=\"cache_images\">".
             __('Cache images locally')."</label>";
 
         $mark_unread_on_update = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "mark_unread_on_update"));
@@ -813,8 +813,8 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"mark_unread_on_update\"
-			name=\"mark_unread_on_update\"
-			$checked>&nbsp;<label for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
+            name=\"mark_unread_on_update\"
+            $checked>&nbsp;<label for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
 
         print "</div>";
 
@@ -824,20 +824,20 @@ class Pref_Feeds extends ProtectedHandler
         print "<div class=\"dlgSecCont\">";
 
         print "<iframe name=\"icon_upload_iframe\"
-			style=\"width: 400px; height: 100px; display: none;\"></iframe>";
+            style=\"width: 400px; height: 100px; display: none;\"></iframe>";
 
         print "<form style='display : block' target=\"icon_upload_iframe\"
-			enctype=\"multipart/form-data\" method=\"POST\"
-			action=\"backend.php\">
-			<input id=\"icon_file\" size=\"10\" name=\"icon_file\" type=\"file\">
-			<input type=\"hidden\" name=\"op\" value=\"pref-feeds\">
-			<input type=\"hidden\" name=\"feed_id\" value=\"$feed_id\">
-			<input type=\"hidden\" name=\"method\" value=\"uploadicon\">
-			<button dojoType=\"dijit.form.Button\" onclick=\"return uploadFeedIcon();\"
-				type=\"submit\">".__('Replace')."</button>
-			<button dojoType=\"dijit.form.Button\" onclick=\"return removeFeedIcon($feed_id);\"
-				type=\"submit\">".__('Remove')."</button>
-			</form>";
+            enctype=\"multipart/form-data\" method=\"POST\"
+            action=\"backend.php\">
+            <input id=\"icon_file\" size=\"10\" name=\"icon_file\" type=\"file\">
+            <input type=\"hidden\" name=\"op\" value=\"pref-feeds\">
+            <input type=\"hidden\" name=\"feed_id\" value=\"$feed_id\">
+            <input type=\"hidden\" name=\"method\" value=\"uploadicon\">
+            <button dojoType=\"dijit.form.Button\" onclick=\"return uploadFeedIcon();\"
+                type=\"submit\">".__('Replace')."</button>
+            <button dojoType=\"dijit.form.Button\" onclick=\"return removeFeedIcon($feed_id);\"
+                type=\"submit\">".__('Remove')."</button>
+            </form>";
 
         print "</div>";
 
@@ -849,8 +849,8 @@ class Pref_Feeds extends ProtectedHandler
         $title = htmlspecialchars($title, ENT_QUOTES);
 
         print "<div class='dlgButtons'>
-			<div style=\"float : left\">
-			<button dojoType=\"dijit.form.Button\" onclick='return unsubscribeFeed($feed_id, \"$title\")'>".
+            <div style=\"float : left\">
+            <button dojoType=\"dijit.form.Button\" onclick='return unsubscribeFeed($feed_id, \"$title\")'>".
             __('Unsubscribe')."</button>";
 
         if (PUBSUBHUBBUB_ENABLED) {
@@ -858,7 +858,7 @@ class Pref_Feeds extends ProtectedHandler
             $pubsub_btn_disabled = ($pubsub_state == 2) ? "" : "disabled=\"1\"";
 
             print "<button dojoType=\"dijit.form.Button\" id=\"pubsubReset_Btn\" $pubsub_btn_disabled
-					onclick='return resetPubSub($feed_id, \"$title\")'>".__('Resubscribe to push updates').
+                    onclick='return resetPubSub($feed_id, \"$title\")'>".__('Resubscribe to push updates').
                 "</button>";
         }
 
@@ -868,8 +868,8 @@ class Pref_Feeds extends ProtectedHandler
             __('Resets PubSubHubbub subscription status for push-enabled feeds.')."</div>";
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').execute()\">".__('Save')."</button>
-			<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').hide()\">".__('Cancel')."</button>
-		</div>";
+            <button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').hide()\">".__('Cancel')."</button>
+        </div>";
 
         return;
     }
@@ -895,8 +895,8 @@ class Pref_Feeds extends ProtectedHandler
         /* Title */
 
         print "<input dojoType=\"dijit.form.ValidationTextBox\"
-			disabled=\"1\" style=\"font-size : 16px; width : 20em;\" required=\"1\"
-			name=\"title\" value=\"\">";
+            disabled=\"1\" style=\"font-size : 16px; width : 20em;\" required=\"1\"
+            name=\"title\" value=\"\">";
 
         $this->batch_edit_cbox("title");
 
@@ -906,8 +906,8 @@ class Pref_Feeds extends ProtectedHandler
 
         print __('URL:') . " ";
         print "<input dojoType=\"dijit.form.ValidationTextBox\" disabled=\"1\"
-			required=\"1\" regExp='^(http|https)://.*' style=\"width : 20em\"
-			name=\"feed_url\" value=\"\">";
+            required=\"1\" regExp='^(http|https)://.*' style=\"width : 20em\"
+            name=\"feed_url\" value=\"\">";
 
         $this->batch_edit_cbox("feed_url");
 
@@ -967,14 +967,14 @@ class Pref_Feeds extends ProtectedHandler
         print "<div class=\"dlgSecCont\">";
 
         print "<input dojoType=\"dijit.form.TextBox\"
-			placeHolder=\"".__("Login")."\" disabled=\"1\"
-			name=\"auth_login\" value=\"\">";
+            placeHolder=\"".__("Login")."\" disabled=\"1\"
+            name=\"auth_login\" value=\"\">";
 
         $this->batch_edit_cbox("auth_login");
 
         print "<br/><input dojoType=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
-			placeHolder=\"".__("Password")."\" disabled=\"1\"
-			value=\"\">";
+            placeHolder=\"".__("Password")."\" disabled=\"1\"
+            value=\"\">";
 
         $this->batch_edit_cbox("auth_pass");
 
@@ -983,54 +983,54 @@ class Pref_Feeds extends ProtectedHandler
         print "<div class=\"dlgSecCont\">";
 
         print "<input disabled=\"1\" type=\"checkbox\" name=\"private\" id=\"private\"
-			dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"private_l\" class='insensitive' for=\"private\">".__('Hide from Popular feeds')."</label>";
+            dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"private_l\" class='insensitive' for=\"private\">".__('Hide from Popular feeds')."</label>";
 
         print "&nbsp;"; $this->batch_edit_cbox("private", "private_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"include_in_digest\"
-			name=\"include_in_digest\"
-			dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"include_in_digest_l\" class='insensitive' for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
+            name=\"include_in_digest\"
+            dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"include_in_digest_l\" class='insensitive' for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
 
         print "&nbsp;"; $this->batch_edit_cbox("include_in_digest", "include_in_digest_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"always_display_enclosures\"
-			name=\"always_display_enclosures\"
-			dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"always_display_enclosures_l\" class='insensitive' for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
+            name=\"always_display_enclosures\"
+            dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"always_display_enclosures_l\" class='insensitive' for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
 
         print "&nbsp;"; $this->batch_edit_cbox("always_display_enclosures", "always_display_enclosures_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"hide_images\"
-			name=\"hide_images\"
-			dojoType=\"dijit.form.CheckBox\">&nbsp;<label class='insensitive' id=\"hide_images_l\"
-			for=\"hide_images\">".
+            name=\"hide_images\"
+            dojoType=\"dijit.form.CheckBox\">&nbsp;<label class='insensitive' id=\"hide_images_l\"
+            for=\"hide_images\">".
             __('Do not embed images')."</label>";
 
         print "&nbsp;"; $this->batch_edit_cbox("hide_images", "hide_images_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"cache_images\"
-			name=\"cache_images\"
-			dojoType=\"dijit.form.CheckBox\">&nbsp;<label class='insensitive' id=\"cache_images_l\"
-			for=\"cache_images\">".
+            name=\"cache_images\"
+            dojoType=\"dijit.form.CheckBox\">&nbsp;<label class='insensitive' id=\"cache_images_l\"
+            for=\"cache_images\">".
             __('Cache images locally')."</label>";
 
         print "&nbsp;"; $this->batch_edit_cbox("cache_images", "cache_images_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"mark_unread_on_update\"
-			name=\"mark_unread_on_update\"
-			dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"mark_unread_on_update_l\" class='insensitive' for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
+            name=\"mark_unread_on_update\"
+            dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"mark_unread_on_update_l\" class='insensitive' for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
 
         print "&nbsp;"; $this->batch_edit_cbox("mark_unread_on_update", "mark_unread_on_update_l");
 
         print "</div>";
 
         print "<div class='dlgButtons'>
-			<button dojoType=\"dijit.form.Button\"
-				onclick=\"return dijit.byId('feedEditDlg').execute()\">".
+            <button dojoType=\"dijit.form.Button\"
+                onclick=\"return dijit.byId('feedEditDlg').execute()\">".
             __('Save')."</button>
-			<button dojoType=\"dijit.form.Button\"
-			onclick=\"return dijit.byId('feedEditDlg').hide()\">".
+            <button dojoType=\"dijit.form.Button\"
+            onclick=\"return dijit.byId('feedEditDlg').hide()\">".
             __('Cancel')."</button>
-			</div>";
+            </div>";
 
         return;
     }
@@ -1101,20 +1101,20 @@ class Pref_Feeds extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "UPDATE ttrss_feeds SET
-				$category_qpart
-				title = '$feed_title', feed_url = '$feed_link',
-				update_interval = '$upd_intl',
-				purge_interval = '$purge_intl',
-				auth_login = '$auth_login',
-				auth_pass = '$auth_pass',
-				auth_pass_encrypted = $auth_pass_encrypted,
-				private = $private,
-				cache_images = $cache_images,
-				hide_images = $hide_images,
-				include_in_digest = $include_in_digest,
-				always_display_enclosures = $always_display_enclosures,
-				mark_unread_on_update = $mark_unread_on_update
-			WHERE id = '$feed_id' AND owner_uid = " . $_SESSION["uid"]
+                $category_qpart
+                title = '$feed_title', feed_url = '$feed_link',
+                update_interval = '$upd_intl',
+                purge_interval = '$purge_intl',
+                auth_login = '$auth_login',
+                auth_pass = '$auth_pass',
+                auth_pass_encrypted = $auth_pass_encrypted,
+                private = $private,
+                cache_images = $cache_images,
+                hide_images = $hide_images,
+                include_in_digest = $include_in_digest,
+                always_display_enclosures = $always_display_enclosures,
+                mark_unread_on_update = $mark_unread_on_update
+            WHERE id = '$feed_id' AND owner_uid = " . $_SESSION["uid"]
             );
 
             \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
@@ -1160,7 +1160,7 @@ class Pref_Feeds extends ProtectedHandler
 
                     case "auth_pass":
                         $qpart = "auth_pass = '$auth_pass' AND
-							auth_pass_encrypted = $auth_pass_encrypted";
+                            auth_pass_encrypted = $auth_pass_encrypted";
                         break;
 
                     case "private":
@@ -1196,7 +1196,7 @@ class Pref_Feeds extends ProtectedHandler
                 if ($qpart) {
                     $this->dbh->query(
                         "UPDATE ttrss_feeds SET $qpart WHERE id IN ($feed_ids)
-						AND owner_uid = " . $_SESSION["uid"]
+                        AND owner_uid = " . $_SESSION["uid"]
                     );
                     print "<br/>";
                 }
@@ -1214,7 +1214,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $this->dbh->query(
             "UPDATE ttrss_feeds SET pubsub_state = 0 WHERE id IN ($ids)
-			AND owner_uid = " . $_SESSION["uid"]
+            AND owner_uid = " . $_SESSION["uid"]
         );
 
         return;
@@ -1250,13 +1250,13 @@ class Pref_Feeds extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "SELECT
-				title, content, link, ref_id, author,".
+                title, content, link, ref_id, author,".
                 SUBSTRING_FOR_DATE."(updated, 1, 19) AS updated
-			  	FROM
-					ttrss_user_entries, ttrss_entries
-					WHERE ref_id = id AND feed_id = '$id' AND
-						owner_uid = " .$_SESSION['uid']."
-					"
+                  FROM
+                    ttrss_user_entries, ttrss_entries
+                    WHERE ref_id = id AND feed_id = '$id' AND
+                        owner_uid = " .$_SESSION['uid']."
+                    "
             );
 
             $scores = array();
@@ -1283,19 +1283,19 @@ class Pref_Feeds extends ProtectedHandler
                 if ($s > 1000) {
                     $this->dbh->query(
                         "UPDATE ttrss_user_entries SET score = '$s',
-						marked = true WHERE
-						ref_id IN (" . join(',', $scores[$s]) . ")"
+                        marked = true WHERE
+                        ref_id IN (" . join(',', $scores[$s]) . ")"
                     );
                 } elseif ($s < -500) {
                     $this->dbh->query(
                         "UPDATE ttrss_user_entries SET score = '$s',
-						unread = false WHERE
-						ref_id IN (" . join(',', $scores[$s]) . ")"
+                        unread = false WHERE
+                        ref_id IN (" . join(',', $scores[$s]) . ")"
                     );
                 } else {
                     $this->dbh->query(
                         "UPDATE ttrss_user_entries SET score = '$s' WHERE
-						ref_id IN (" . join(',', $scores[$s]) . ")"
+                        ref_id IN (" . join(',', $scores[$s]) . ")"
                     );
                 }
             }
@@ -1320,13 +1320,13 @@ class Pref_Feeds extends ProtectedHandler
 
             $tmp_result = $this->dbh->query(
                 "SELECT
-				title, content, link, ref_id, author,".
+                title, content, link, ref_id, author,".
                 SUBSTRING_FOR_DATE."(updated, 1, 19) AS updated
-					FROM
-					ttrss_user_entries, ttrss_entries
-					WHERE ref_id = id AND feed_id = '$id' AND
-						owner_uid = " .$_SESSION['uid']."
-					"
+                    FROM
+                    ttrss_user_entries, ttrss_entries
+                    WHERE ref_id = id AND feed_id = '$id' AND
+                        owner_uid = " .$_SESSION['uid']."
+                    "
             );
 
             $scores = array();
@@ -1353,13 +1353,13 @@ class Pref_Feeds extends ProtectedHandler
                 if ($s > 1000) {
                     $this->dbh->query(
                         "UPDATE ttrss_user_entries SET score = '$s',
-						marked = true WHERE
-						ref_id IN (" . join(',', $scores[$s]) . ")"
+                        marked = true WHERE
+                        ref_id IN (" . join(',', $scores[$s]) . ")"
                     );
                 } else {
                     $this->dbh->query(
                         "UPDATE ttrss_user_entries SET score = '$s' WHERE
-						ref_id IN (" . join(',', $scores[$s]) . ")"
+                        ref_id IN (" . join(',', $scores[$s]) . ")"
                     );
                 }
             }
@@ -1387,8 +1387,8 @@ class Pref_Feeds extends ProtectedHandler
 
             $this->dbh->query(
                 "UPDATE ttrss_feeds SET cat_id = $cat_id_qpart
-				WHERE id = '$id'
-			  	AND owner_uid = " . $_SESSION["uid"]
+                WHERE id = '$id'
+                  AND owner_uid = " . $_SESSION["uid"]
             );
 
         }
@@ -1419,7 +1419,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT COUNT(id) AS num_errors
-			FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
+            FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
         );
 
         $num_errors = $this->dbh->fetch_result($result, 0, "num_errors");
@@ -1427,7 +1427,7 @@ class Pref_Feeds extends ProtectedHandler
         if ($num_errors > 0) {
 
             $error_button = "<button dojoType=\"dijit.form.Button\"
-			  		onclick=\"showFeedsWithErrors()\" id=\"errorButton\">" .
+                      onclick=\"showFeedsWithErrors()\" id=\"errorButton\">" .
                 __("Feeds with errors") . "</button>";
         }
 
@@ -1439,17 +1439,17 @@ class Pref_Feeds extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT COUNT(*) AS num_inactive FROM ttrss_feeds WHERE
-					(SELECT MAX(updated) FROM ttrss_entries, ttrss_user_entries WHERE
-						ttrss_entries.id = ref_id AND
-							ttrss_user_entries.feed_id = ttrss_feeds.id) < $interval_qpart AND
-			ttrss_feeds.owner_uid = ".$_SESSION["uid"]
+                    (SELECT MAX(updated) FROM ttrss_entries, ttrss_user_entries WHERE
+                        ttrss_entries.id = ref_id AND
+                            ttrss_user_entries.feed_id = ttrss_feeds.id) < $interval_qpart AND
+            ttrss_feeds.owner_uid = ".$_SESSION["uid"]
         );
 
         $num_inactive = $this->dbh->fetch_result($result, 0, "num_inactive");
 
         if ($num_inactive > 0) {
             $inactive_button = "<button dojoType=\"dijit.form.Button\"
-			  		onclick=\"showInactiveFeeds()\">" .
+                      onclick=\"showInactiveFeeds()\">" .
                 __("Inactive feeds") . "</button>";
         }
 
@@ -1466,32 +1466,32 @@ class Pref_Feeds extends ProtectedHandler
         print "<div region='top' dojoType=\"dijit.Toolbar\">"; #toolbar
 
         print "<div style='float : right; padding-right : 4px;'>
-			<input dojoType=\"dijit.form.TextBox\" id=\"feed_search\" size=\"20\" type=\"search\"
-				value=\"$feed_search\">
-			<button dojoType=\"dijit.form.Button\" onclick=\"updateFeedList()\">".
+            <input dojoType=\"dijit.form.TextBox\" id=\"feed_search\" size=\"20\" type=\"search\"
+                value=\"$feed_search\">
+            <button dojoType=\"dijit.form.Button\" onclick=\"updateFeedList()\">".
             __('Search')."</button>
-			</div>";
+            </div>";
 
         print "<div dojoType=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"dijit.byId('feedTree').model.setAllChecked(true)\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"dijit.byId('feedTree').model.setAllChecked(false)\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print "<div dojoType=\"dijit.form.DropDownButton\">".
             "<span>" . __('Feeds')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"quickAddFeed()\"
-			dojoType=\"dijit.MenuItem\">".__('Subscribe to feed')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('Subscribe to feed')."</div>";
         print "<div onclick=\"editSelectedFeed()\"
-			dojoType=\"dijit.MenuItem\">".__('Edit selected feeds')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('Edit selected feeds')."</div>";
         print "<div onclick=\"resetFeedOrder()\"
-			dojoType=\"dijit.MenuItem\">".__('Reset sort order')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('Reset sort order')."</div>";
         print "<div onclick=\"batchSubscribe()\"
-			dojoType=\"dijit.MenuItem\">".__('Batch subscribe')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('Batch subscribe')."</div>";
         print "<div dojoType=\"dijit.MenuItem\" onclick=\"removeSelectedFeeds()\">"
             .__('Unsubscribe')."</div> ";
         print "</div></div>";
@@ -1501,11 +1501,11 @@ class Pref_Feeds extends ProtectedHandler
                 "<span>" . __('Categories')."</span>";
             print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
             print "<div onclick=\"createCategory()\"
-				dojoType=\"dijit.MenuItem\">".__('Add category')."</div>";
+                dojoType=\"dijit.MenuItem\">".__('Add category')."</div>";
             print "<div onclick=\"resetCatOrder()\"
-				dojoType=\"dijit.MenuItem\">".__('Reset sort order')."</div>";
+                dojoType=\"dijit.MenuItem\">".__('Reset sort order')."</div>";
             print "<div onclick=\"removeSelectedCategories()\"
-				dojoType=\"dijit.MenuItem\">".__('Remove selected')."</div>";
+                dojoType=\"dijit.MenuItem\">".__('Remove selected')."</div>";
             print "</div></div>";
 
         }
@@ -1516,7 +1516,7 @@ class Pref_Feeds extends ProtectedHandler
         if (defined('_ENABLE_FEED_DEBUGGING')) {
 
             print "<select id=\"feedActionChooser\" onchange=\"feedActionChange()\">
-				<option value=\"facDefault\" selected>".__('More actions...')."</option>";
+                <option value=\"facDefault\" selected>".__('More actions...')."</option>";
 
             if (FORCE_ARTICLE_PURGE == 0) {
                 print
@@ -1524,8 +1524,8 @@ class Pref_Feeds extends ProtectedHandler
             }
 
             print "
-				<option value=\"facClear\">".__('Clear feed data')."</option>
-				<option value=\"facRescore\">".__('Rescore articles')."</option>";
+                <option value=\"facClear\">".__('Clear feed data')."</option>
+                <option value=\"facRescore\">".__('Rescore articles')."</option>";
 
             print "</select>";
 
@@ -1537,38 +1537,38 @@ class Pref_Feeds extends ProtectedHandler
         print '<div dojoType="dijit.layout.ContentPane" region="center">';
 
         print "<div id=\"feedlistLoading\">
-		<img src='images/indicator_tiny.gif'>".
+        <img src='images/indicator_tiny.gif'>".
             __("Loading, please wait...")."</div>";
 
         print "<div dojoType=\"fox.PrefFeedStore\" jsId=\"feedStore\"
-			url=\"backend.php?op=pref-feeds&method=getfeedtree\">
-		</div>
-		<div dojoType=\"lib.CheckBoxStoreModel\" jsId=\"feedModel\" store=\"feedStore\"
-		query=\"{id:'root'}\" rootId=\"root\" rootLabel=\"Feeds\"
-			childrenAttrs=\"items\" checkboxStrict=\"false\" checkboxAll=\"false\">
-		</div>
-		<div dojoType=\"fox.PrefFeedTree\" id=\"feedTree\"
-			dndController=\"dijit.tree.dndSource\"
-			betweenThreshold=\"5\"
-			model=\"feedModel\" openOnClick=\"false\">
-		<script type=\"dojo/method\" event=\"onClick\" args=\"item\">
-			var id = String(item.id);
-			var bare_id = id.substr(id.indexOf(':')+1);
+            url=\"backend.php?op=pref-feeds&method=getfeedtree\">
+        </div>
+        <div dojoType=\"lib.CheckBoxStoreModel\" jsId=\"feedModel\" store=\"feedStore\"
+        query=\"{id:'root'}\" rootId=\"root\" rootLabel=\"Feeds\"
+            childrenAttrs=\"items\" checkboxStrict=\"false\" checkboxAll=\"false\">
+        </div>
+        <div dojoType=\"fox.PrefFeedTree\" id=\"feedTree\"
+            dndController=\"dijit.tree.dndSource\"
+            betweenThreshold=\"5\"
+            model=\"feedModel\" openOnClick=\"false\">
+        <script type=\"dojo/method\" event=\"onClick\" args=\"item\">
+            var id = String(item.id);
+            var bare_id = id.substr(id.indexOf(':')+1);
 
-			if (id.match('FEED:')) {
-				editFeed(bare_id);
-			} else if (id.match('CAT:')) {
-				editCat(bare_id, item);
-			}
-		</script>
-		<script type=\"dojo/method\" event=\"onLoad\" args=\"item\">
-			Element.hide(\"feedlistLoading\");
-		</script>
-		</div>";
+            if (id.match('FEED:')) {
+                editFeed(bare_id);
+            } else if (id.match('CAT:')) {
+                editCat(bare_id, item);
+            }
+        </script>
+        <script type=\"dojo/method\" event=\"onLoad\" args=\"item\">
+            Element.hide(\"feedlistLoading\");
+        </script>
+        </div>";
 
-        #		print "<div dojoType=\"dijit.Tooltip\" connectId=\"feedTree\" position=\"below\">
-        #			".__('<b>Hint:</b> you can drag feeds and categories around.')."
-        #			</div>";
+        #        print "<div dojoType=\"dijit.Tooltip\" connectId=\"feedTree\" position=\"below\">
+        #            ".__('<b>Hint:</b> you can drag feeds and categories around.')."
+        #            </div>";
 
         print '</div>';
         print '</div>';
@@ -1583,16 +1583,16 @@ class Pref_Feeds extends ProtectedHandler
         );
 
         print "<iframe id=\"upload_iframe\"
-			name=\"upload_iframe\" onload=\"opmlImportComplete(this)\"
-			style=\"width: 400px; height: 100px; display: none;\"></iframe>";
+            name=\"upload_iframe\" onload=\"opmlImportComplete(this)\"
+            style=\"width: 400px; height: 100px; display: none;\"></iframe>";
 
         print "<form  name=\"opml_form\" style='display : block' target=\"upload_iframe\"
-			enctype=\"multipart/form-data\" method=\"POST\"
-			action=\"backend.php\">
-			<input id=\"opml_file\" name=\"opml_file\" type=\"file\">&nbsp;
-			<input type=\"hidden\" name=\"op\" value=\"dlg\">
-			<input type=\"hidden\" name=\"method\" value=\"importOpml\">
-			<button dojoType=\"dijit.form.Button\" onclick=\"return opmlImport();\" type=\"submit\">" .
+            enctype=\"multipart/form-data\" method=\"POST\"
+            action=\"backend.php\">
+            <input id=\"opml_file\" name=\"opml_file\" type=\"file\">&nbsp;
+            <input type=\"hidden\" name=\"op\" value=\"dlg\">
+            <input type=\"hidden\" name=\"method\" value=\"importOpml\">
+            <button dojoType=\"dijit.form.Button\" onclick=\"return opmlImport();\" type=\"submit\">" .
             __('Import my OPML') . "</button>";
 
         print "<hr>";
@@ -1602,7 +1602,7 @@ class Pref_Feeds extends ProtectedHandler
             __('Include settings') . "<input type=\"checkbox\" id=\"settings\" checked=\"1\"/>";
 
         print "</p><button dojoType=\"dijit.form.Button\"
-			onclick=\"gotoExportOpml(document.opml_form.filename.value, document.opml_form.settings.checked)\" >" .
+            onclick=\"gotoExportOpml(document.opml_form.filename.value, document.opml_form.settings.checked)\" >" .
             __('Export OPML') . "</button></p></form>";
 
         print "<hr>";
@@ -1749,16 +1749,16 @@ class Pref_Feeds extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT ttrss_feeds.title, ttrss_feeds.site_url,
-		  		ttrss_feeds.feed_url, ttrss_feeds.id, MAX(updated) AS last_article
-			FROM ttrss_feeds, ttrss_entries, ttrss_user_entries WHERE
-				(SELECT MAX(updated) FROM ttrss_entries, ttrss_user_entries WHERE
-					ttrss_entries.id = ref_id AND
-						ttrss_user_entries.feed_id = ttrss_feeds.id) < $interval_qpart
-			AND ttrss_feeds.owner_uid = ".$_SESSION["uid"]." AND
-				ttrss_user_entries.feed_id = ttrss_feeds.id AND
-				ttrss_entries.id = ref_id
-			GROUP BY ttrss_feeds.title, ttrss_feeds.id, ttrss_feeds.site_url, ttrss_feeds.feed_url
-			ORDER BY last_article"
+                  ttrss_feeds.feed_url, ttrss_feeds.id, MAX(updated) AS last_article
+            FROM ttrss_feeds, ttrss_entries, ttrss_user_entries WHERE
+                (SELECT MAX(updated) FROM ttrss_entries, ttrss_user_entries WHERE
+                    ttrss_entries.id = ref_id AND
+                        ttrss_user_entries.feed_id = ttrss_feeds.id) < $interval_qpart
+            AND ttrss_feeds.owner_uid = ".$_SESSION["uid"]." AND
+                ttrss_user_entries.feed_id = ttrss_feeds.id AND
+                ttrss_entries.id = ref_id
+            GROUP BY ttrss_feeds.title, ttrss_feeds.id, ttrss_feeds.site_url, ttrss_feeds.feed_url
+            ORDER BY last_article"
         );
 
         print "<p" .__("These feeds have not been updated with new content for 3 months (oldest first):") . "</p>";
@@ -1768,9 +1768,9 @@ class Pref_Feeds extends ProtectedHandler
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"selectTableRows('prefInactiveFeedList', 'all')\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"selectTableRows('prefInactiveFeedList', 'none')\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
         print "</div>"; #toolbar
 
@@ -1792,8 +1792,8 @@ class Pref_Feeds extends ProtectedHandler
 
             # id needed for selectTableRows()
             print "<td width='5%' align='center'><input
-				onclick='toggleSelectRow2(this);' dojoType=\"dijit.form.CheckBox\"
-				type=\"checkbox\" id=\"FUPDC-$feed_id\"></td>";
+                onclick='toggleSelectRow2(this);' dojoType=\"dijit.form.CheckBox\"
+                type=\"checkbox\" id=\"FUPDC-$feed_id\"></td>";
             print "<td>";
 
             print "<a class=\"visibleLink\" href=\"#\" ".
@@ -1829,7 +1829,7 @@ class Pref_Feeds extends ProtectedHandler
     {
         $result = $this->dbh->query(
             "SELECT id,title,feed_url,last_error,site_url
-		FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
+        FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
         );
 
         print "<div dojoType=\"dijit.Toolbar\">";
@@ -1837,9 +1837,9 @@ class Pref_Feeds extends ProtectedHandler
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"selectTableRows('prefErrorFeedList', 'all')\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"selectTableRows('prefErrorFeedList', 'none')\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
         print "</div>"; #toolbar
 
@@ -1861,8 +1861,8 @@ class Pref_Feeds extends ProtectedHandler
 
             # id needed for selectTableRows()
             print "<td width='5%' align='center'><input
-				onclick='toggleSelectRow2(this);' dojoType=\"dijit.form.CheckBox\"
-				type=\"checkbox\" id=\"FERDC-$feed_id\"></td>";
+                onclick='toggleSelectRow2(this);' dojoType=\"dijit.form.CheckBox\"
+                type=\"checkbox\" id=\"FERDC-$feed_id\"></td>";
             print "<td>";
 
             print "<a class=\"visibleLink\" href=\"#\" ".
@@ -1908,18 +1908,18 @@ class Pref_Feeds extends ProtectedHandler
         if ($id != 0) {
             $result = $this->dbh->query(
                 "DELETE FROM ttrss_user_entries
-			WHERE feed_id = '$id' AND marked = false AND owner_uid = " . $_SESSION["uid"]
+            WHERE feed_id = '$id' AND marked = false AND owner_uid = " . $_SESSION["uid"]
             );
         } else {
             $result = $this->dbh->query(
                 "DELETE FROM ttrss_user_entries
-			WHERE feed_id IS NULL AND marked = false AND owner_uid = " . $_SESSION["uid"]
+            WHERE feed_id IS NULL AND marked = false AND owner_uid = " . $_SESSION["uid"]
             );
         }
 
         $result = $this->dbh->query(
             "DELETE FROM ttrss_entries WHERE
-			(SELECT COUNT(int_id) FROM ttrss_user_entries WHERE ref_id = id) = 0"
+            (SELECT COUNT(int_id) FROM ttrss_user_entries WHERE ref_id = id) = 0"
         );
 
         \SmallSmallRSS\CounterCache::update($id, $_SESSION['uid']);
@@ -1930,7 +1930,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $this->dbh->query(
             "DELETE FROM ttrss_feed_categories
-			WHERE id = '$id' AND owner_uid = $owner_uid"
+            WHERE id = '$id' AND owner_uid = $owner_uid"
         );
 
         \SmallSmallRSS\CounterCache::remove($id, $owner_uid, true);
@@ -1949,14 +1949,14 @@ class Pref_Feeds extends ProtectedHandler
 
             $result = db_query(
                 "SELECT feed_url FROM ttrss_feeds WHERE id = $id
-				AND owner_uid = $owner_uid"
+                AND owner_uid = $owner_uid"
             );
 
             $feed_url = db_escape_string(db_fetch_result($result, 0, "feed_url"));
 
             $result = db_query(
                 "SELECT id FROM ttrss_archived_feeds
-				WHERE feed_url = '$feed_url' AND owner_uid = $owner_uid"
+                WHERE feed_url = '$feed_url' AND owner_uid = $owner_uid"
             );
 
             if (db_num_rows($result) == 0) {
@@ -1965,9 +1965,9 @@ class Pref_Feeds extends ProtectedHandler
 
                 db_query(
                     "INSERT INTO ttrss_archived_feeds
-					(id, owner_uid, title, feed_url, site_url)
-				SELECT $new_feed_id, owner_uid, title, feed_url, site_url from ttrss_feeds
-				WHERE id = '$id'"
+                    (id, owner_uid, title, feed_url, site_url)
+                SELECT $new_feed_id, owner_uid, title, feed_url, site_url from ttrss_feeds
+                WHERE id = '$id'"
                 );
 
                 $archive_id = $new_feed_id;
@@ -1977,22 +1977,22 @@ class Pref_Feeds extends ProtectedHandler
 
             db_query(
                 "UPDATE ttrss_user_entries SET feed_id = NULL,
-				orig_feed_id = '$archive_id' WHERE feed_id = '$id' AND
-					marked = true AND owner_uid = $owner_uid"
+                orig_feed_id = '$archive_id' WHERE feed_id = '$id' AND
+                    marked = true AND owner_uid = $owner_uid"
             );
 
             /* Remove access key for the feed */
 
             db_query(
                 "DELETE FROM ttrss_access_keys WHERE
-				feed_id = '$id' AND owner_uid = $owner_uid"
+                feed_id = '$id' AND owner_uid = $owner_uid"
             );
 
             /* remove the feed */
 
             db_query(
                 "DELETE FROM ttrss_feeds
-					WHERE id = '$id' AND owner_uid = $owner_uid"
+                    WHERE id = '$id' AND owner_uid = $owner_uid"
             );
 
             db_query("COMMIT");
@@ -2014,37 +2014,37 @@ class Pref_Feeds extends ProtectedHandler
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"batchaddfeeds\">";
 
         print "<table width='100%'><tr><td>
-			".__("Add one valid RSS feed per line (no feed detection is done)")."
-		</td><td align='right'>";
+            ".__("Add one valid RSS feed per line (no feed detection is done)")."
+        </td><td align='right'>";
         if (get_pref('ENABLE_FEED_CATS')) {
             print __('Place in category:') . " ";
             print_feed_cat_select("cat", false, 'dojoType="dijit.form.Select"');
         }
         print "</td></tr><tr><td colspan='2'>";
         print "<textarea
-			style='font-size : 12px; width : 100%; height: 200px;'
-			placeHolder=\"".__("Feeds to subscribe, One per line")."\"
-			dojoType=\"dijit.form.SimpleTextarea\" required=\"1\" name=\"feeds\"></textarea>";
+            style='font-size : 12px; width : 100%; height: 200px;'
+            placeHolder=\"".__("Feeds to subscribe, One per line")."\"
+            dojoType=\"dijit.form.SimpleTextarea\" required=\"1\" name=\"feeds\"></textarea>";
 
         print "</td></tr><tr><td colspan='2'>";
 
         print "<div id='feedDlg_loginContainer' style='display : none'>
-				" .
+                " .
             " <input dojoType=\"dijit.form.TextBox\" name='login'\"
-					placeHolder=\"".__("Login")."\"
-					style=\"width : 10em;\"> ".
+                    placeHolder=\"".__("Login")."\"
+                    style=\"width : 10em;\"> ".
             " <input
-					placeHolder=\"".__("Password")."\"
-					dojoType=\"dijit.form.TextBox\" type='password'
-					style=\"width : 10em;\" name='pass'\">".
+                    placeHolder=\"".__("Password")."\"
+                    dojoType=\"dijit.form.TextBox\" type='password'
+                    style=\"width : 10em;\" name='pass'\">".
             "</div>";
 
         print "</td></tr><tr><td colspan='2'>";
 
         print "<div style=\"clear : both\">
-			<input type=\"checkbox\" name=\"need_auth\" dojoType=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"
-					onclick='checkboxToggleElement(this, \"feedDlg_loginContainer\")'>
-				<label for=\"feedDlg_loginCheck\">".
+            <input type=\"checkbox\" name=\"need_auth\" dojoType=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"
+                    onclick='checkboxToggleElement(this, \"feedDlg_loginContainer\")'>
+                <label for=\"feedDlg_loginCheck\">".
             __('Feeds require authentication.')."</div>";
 
         print "</form>";
@@ -2052,9 +2052,9 @@ class Pref_Feeds extends ProtectedHandler
         print "</td></tr></table>";
 
         print "<div class=\"dlgButtons\">
-			<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').execute()\">".__('Subscribe')."</button>
-			<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').hide()\">".__('Cancel')."</button>
-			</div>";
+            <button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').execute()\">".__('Subscribe')."</button>
+            <button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').hide()\">".__('Cancel')."</button>
+            </div>";
     }
 
     function batchAddFeeds()
@@ -2079,7 +2079,7 @@ class Pref_Feeds extends ProtectedHandler
 
                 $result = $this->dbh->query(
                     "SELECT id FROM ttrss_feeds
-					WHERE feed_url = '$feed' AND owner_uid = ".$_SESSION["uid"]
+                    WHERE feed_url = '$feed' AND owner_uid = ".$_SESSION["uid"]
                 );
 
                 if (strlen(FEED_CRYPT_KEY) > 0) {
@@ -2094,9 +2094,9 @@ class Pref_Feeds extends ProtectedHandler
                 if ($this->dbh->num_rows($result) == 0) {
                     $result = $this->dbh->query(
                         "INSERT INTO ttrss_feeds
-							(owner_uid,feed_url,title,cat_id,auth_login,auth_pass,update_method,auth_pass_encrypted)
-						VALUES ('".$_SESSION["uid"]."', '$feed',
-							'[Unknown]', $cat_qpart, '$login', '$pass', 0, $auth_pass_encrypted)"
+                            (owner_uid,feed_url,title,cat_id,auth_login,auth_pass,update_method,auth_pass_encrypted)
+                        VALUES ('".$_SESSION["uid"]."', '$feed',
+                            '[Unknown]', $cat_qpart, '$login', '$pass', 0, $auth_pass_encrypted)"
                     );
                 }
 
@@ -2137,8 +2137,8 @@ class Pref_Feeds extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT access_key FROM ttrss_access_keys
-			WHERE feed_id = '$feed_id'	AND is_cat = $sql_is_cat
-			AND owner_uid = " . $owner_uid
+            WHERE feed_id = '$feed_id'    AND is_cat = $sql_is_cat
+            AND owner_uid = " . $owner_uid
         );
 
         if ($this->dbh->num_rows($result) == 1) {
@@ -2146,8 +2146,8 @@ class Pref_Feeds extends ProtectedHandler
 
             $this->dbh->query(
                 "UPDATE ttrss_access_keys SET access_key = '$key'
-				WHERE feed_id = '$feed_id' AND is_cat = $sql_is_cat
-				AND owner_uid = " . $owner_uid
+                WHERE feed_id = '$feed_id' AND is_cat = $sql_is_cat
+                AND owner_uid = " . $owner_uid
             );
 
             return $key;
@@ -2162,7 +2162,7 @@ class Pref_Feeds extends ProtectedHandler
     {
         $this->dbh->query(
             "DELETE FROM ttrss_access_keys WHERE
-			owner_uid = " . $_SESSION["uid"]
+            owner_uid = " . $_SESSION["uid"]
         );
     }
 

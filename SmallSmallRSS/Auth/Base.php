@@ -29,8 +29,8 @@ class Auth_Base implements Auth_Interface
                 $pwd_hash = encrypt_password($password, $salt, true);
 
                 $query = "INSERT INTO ttrss_users
-			  (login,access_level,last_login,created,pwd_hash,salt)
-			  VALUES ('$login', 0, null, NOW(), '$pwd_hash','$salt')";
+              (login,access_level,last_login,created,pwd_hash,salt)
+              VALUES ('$login', 0, null, NOW(), '$pwd_hash','$salt')";
 
                 \SmallSmallRSS\Database::query($query);
 
@@ -50,7 +50,7 @@ class Auth_Base implements Auth_Interface
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_users WHERE
-			login = '$login'"
+            login = '$login'"
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {

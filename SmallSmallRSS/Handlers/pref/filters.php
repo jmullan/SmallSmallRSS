@@ -15,7 +15,7 @@ class Pref_Filters extends ProtectedHandler
     {
         $this->dbh->query(
             "UPDATE ttrss_filters2
-				SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
+                SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
         );
         return;
     }
@@ -41,8 +41,8 @@ class Pref_Filters extends ProtectedHandler
 
                     $this->dbh->query(
                         "UPDATE ttrss_filters2 SET
-						order_id = $index WHERE id = '$filter_id' AND
-						owner_uid = " .$_SESSION["uid"]
+                        order_id = $index WHERE id = '$filter_id' AND
+                        owner_uid = " .$_SESSION["uid"]
                     );
 
                     ++$index;
@@ -127,8 +127,8 @@ class Pref_Filters extends ProtectedHandler
             print "<tr>";
 
             print "<td width='5%' align='center'><input
-				dojoType=\"dijit.form.CheckBox\" checked=\"1\"
-				disabled=\"1\" type=\"checkbox\"></td>";
+                dojoType=\"dijit.form.CheckBox\" checked=\"1\"
+                disabled=\"1\" type=\"checkbox\"></td>";
             print "<td>";
 
             print $line["title"];
@@ -176,17 +176,17 @@ class Pref_Filters extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT *,
-			(SELECT action_param FROM ttrss_filters2_actions
-				WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_param,
-			(SELECT action_id FROM ttrss_filters2_actions
-				WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_id,
-			(SELECT description FROM ttrss_filter_actions
-				WHERE id = (SELECT action_id FROM ttrss_filters2_actions
-					WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1)) AS action_name,
-			(SELECT reg_exp FROM ttrss_filters2_rules
-				WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS reg_exp
-			FROM ttrss_filters2 WHERE
-			owner_uid = ".$_SESSION["uid"]." ORDER BY order_id, title"
+            (SELECT action_param FROM ttrss_filters2_actions
+                WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_param,
+            (SELECT action_id FROM ttrss_filters2_actions
+                WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_id,
+            (SELECT description FROM ttrss_filter_actions
+                WHERE id = (SELECT action_id FROM ttrss_filters2_actions
+                    WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1)) AS action_name,
+            (SELECT reg_exp FROM ttrss_filters2_rules
+                WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS reg_exp
+            FROM ttrss_filters2 WHERE
+            owner_uid = ".$_SESSION["uid"]." ORDER BY order_id, title"
         );
 
 
@@ -227,8 +227,8 @@ class Pref_Filters extends ProtectedHandler
             if ($line['action_id'] == 7) {
                 $label_result = $this->dbh->query(
                     "SELECT fg_color, bg_color
-					FROM ttrss_labels2 WHERE caption = '".$this->dbh->escape_string($line['action_param'])."' AND
-						owner_uid = " . $_SESSION["uid"]
+                    FROM ttrss_labels2 WHERE caption = '".$this->dbh->escape_string($line['action_param'])."' AND
+                        owner_uid = " . $_SESSION["uid"]
                 );
 
                 if ($this->dbh->num_rows($label_result) > 0) {
@@ -302,9 +302,9 @@ class Pref_Filters extends ProtectedHandler
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"dijit.byId('filterEditDlg').selectRules(true)\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"dijit.byId('filterEditDlg').selectRules(false)\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addRule()\">".
@@ -319,7 +319,7 @@ class Pref_Filters extends ProtectedHandler
 
         $rules_result = $this->dbh->query(
             "SELECT * FROM ttrss_filters2_rules
-			WHERE filter_id = '$filter_id' ORDER BY reg_exp, id"
+            WHERE filter_id = '$filter_id' ORDER BY reg_exp, id"
         );
 
         while ($line = $this->dbh->fetch_assoc($rules_result)) {
@@ -353,9 +353,9 @@ class Pref_Filters extends ProtectedHandler
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"dijit.byId('filterEditDlg').selectActions(true)\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"dijit.byId('filterEditDlg').selectActions(false)\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addAction()\">".
@@ -370,7 +370,7 @@ class Pref_Filters extends ProtectedHandler
 
         $actions_result = $this->dbh->query(
             "SELECT * FROM ttrss_filters2_actions
-			WHERE filter_id = '$filter_id' ORDER BY id"
+            WHERE filter_id = '$filter_id' ORDER BY id"
         );
 
         while ($line = $this->dbh->fetch_assoc($actions_result)) {
@@ -397,7 +397,7 @@ class Pref_Filters extends ProtectedHandler
         }
 
         print "<input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"enabled\" id=\"enabled\" $checked>
-				<label for=\"enabled\">".__('Enabled')."</label>";
+                <label for=\"enabled\">".__('Enabled')."</label>";
 
         if ($match_any_rule) {
             $checked = "checked=\"1\"";
@@ -406,7 +406,7 @@ class Pref_Filters extends ProtectedHandler
         }
 
         print "<br/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"match_any_rule\" id=\"match_any_rule\" $checked>
-				<label for=\"match_any_rule\">".__('Match any rule')."</label>";
+                <label for=\"match_any_rule\">".__('Match any rule')."</label>";
 
         if ($inverse) {
             $checked = "checked=\"1\"";
@@ -415,7 +415,7 @@ class Pref_Filters extends ProtectedHandler
         }
 
         print "<br/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"inverse\" id=\"inverse\" $checked>
-				<label for=\"inverse\">".__('Inverse matching')."</label>";
+                <label for=\"inverse\">".__('Inverse matching')."</label>";
 
         print "<p/>";
 
@@ -461,7 +461,7 @@ class Pref_Filters extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT description FROM ttrss_filter_types
-			WHERE id = ". (int) $rule["filter_type"]
+            WHERE id = ". (int) $rule["filter_type"]
         );
         $filter_type = $this->dbh->fetch_result($result, 0, "description");
 
@@ -480,7 +480,7 @@ class Pref_Filters extends ProtectedHandler
     {
         $result = $this->dbh->query(
             "SELECT description FROM
-			ttrss_filter_actions WHERE id = " . (int) $action["action_id"]
+            ttrss_filter_actions WHERE id = " . (int) $action["action_id"]
         );
 
         $title = __($this->dbh->fetch_result($result, 0, "description"));
@@ -504,7 +504,7 @@ class Pref_Filters extends ProtectedHandler
             return $this->testFilter();
         }
 
-        #		print_r($_REQUEST);
+        #        print_r($_REQUEST);
 
         $filter_id = $this->dbh->escape_string($_REQUEST["id"]);
         $enabled = checkbox_to_sql_bool($this->dbh->escape_string($_REQUEST["enabled"]));
@@ -514,11 +514,11 @@ class Pref_Filters extends ProtectedHandler
 
         $result = $this->dbh->query(
             "UPDATE ttrss_filters2 SET enabled = $enabled,
-			match_any_rule = $match_any_rule,
-			inverse = $inverse,
-			title = '$title'
-			WHERE id = '$filter_id'
-			AND owner_uid = ". $_SESSION["uid"]
+            match_any_rule = $match_any_rule,
+            inverse = $inverse,
+            title = '$title'
+            WHERE id = '$filter_id'
+            AND owner_uid = ". $_SESSION["uid"]
         );
 
         $this->saveRulesAndActions($filter_id);
@@ -592,8 +592,8 @@ class Pref_Filters extends ProtectedHandler
                     }
 
                     $query = "INSERT INTO ttrss_filters2_rules
-						(filter_id, reg_exp,filter_type,feed_id,cat_id,cat_filter,inverse) VALUES
-						('$filter_id', '$reg_exp', '$filter_type', $feed_id, $cat_id, $cat_filter, $inverse)";
+                        (filter_id, reg_exp,filter_type,feed_id,cat_id,cat_filter,inverse) VALUES
+                        ('$filter_id', '$reg_exp', '$filter_type', $feed_id, $cat_id, $cat_filter, $inverse)";
 
                     $this->dbh->query($query);
                 }
@@ -615,8 +615,8 @@ class Pref_Filters extends ProtectedHandler
                     }
 
                     $query = "INSERT INTO ttrss_filters2_actions
-						(filter_id, action_id, action_param) VALUES
-						('$filter_id', '$action_id', '$action_param')";
+                        (filter_id, action_id, action_param) VALUES
+                        ('$filter_id', '$action_id', '$action_param')";
 
                     $this->dbh->query($query);
                 }
@@ -632,7 +632,7 @@ class Pref_Filters extends ProtectedHandler
             return $this->testFilter();
         }
 
-        #		print_r($_REQUEST);
+        #        print_r($_REQUEST);
 
         $enabled = checkbox_to_sql_bool($_REQUEST["enabled"]);
         $match_any_rule = checkbox_to_sql_bool($_REQUEST["match_any_rule"]);
@@ -644,13 +644,13 @@ class Pref_Filters extends ProtectedHandler
 
         $result = $this->dbh->query(
             "INSERT INTO ttrss_filters2
-			(owner_uid, match_any_rule, enabled, title) VALUES
-			(".$_SESSION["uid"].",$match_any_rule,$enabled, '$title')"
+            (owner_uid, match_any_rule, enabled, title) VALUES
+            (".$_SESSION["uid"].",$match_any_rule,$enabled, '$title')"
         );
 
         $result = $this->dbh->query(
             "SELECT MAX(id) AS id FROM ttrss_filters2
-			WHERE owner_uid = ".$_SESSION["uid"]
+            WHERE owner_uid = ".$_SESSION["uid"]
         );
 
         $filter_id = $this->dbh->fetch_result($result, 0, "id");
@@ -690,19 +690,19 @@ class Pref_Filters extends ProtectedHandler
         }
 
         print "<div style='float : right; padding-right : 4px;'>
-			<input dojoType=\"dijit.form.TextBox\" id=\"filter_search\" size=\"20\" type=\"search\"
-				value=\"$filter_search\">
-			<button dojoType=\"dijit.form.Button\" onclick=\"updateFilterList()\">".
+            <input dojoType=\"dijit.form.TextBox\" id=\"filter_search\" size=\"20\" type=\"search\"
+                value=\"$filter_search\">
+            <button dojoType=\"dijit.form.Button\" onclick=\"updateFilterList()\">".
             __('Search')."</button>
-			</div>";
+            </div>";
 
         print "<div dojoType=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"dijit.byId('filterTree').model.setAllChecked(true)\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"dijit.byId('filterTree').model.setAllChecked(false)\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return quickAddFilter()\">".
@@ -731,33 +731,33 @@ class Pref_Filters extends ProtectedHandler
         print "<div id=\"pref-filter-content\" dojoType=\"dijit.layout.ContentPane\" region=\"center\">";
 
         print "<div id=\"filterlistLoading\">
-		<img src='images/indicator_tiny.gif'>".
+        <img src='images/indicator_tiny.gif'>".
             __("Loading, please wait...")."</div>";
 
         print "<div dojoType=\"fox.PrefFilterStore\" jsId=\"filterStore\"
-			url=\"backend.php?op=pref-filters&method=getfiltertree\">
-		</div>
-		<div dojoType=\"lib.CheckBoxStoreModel\" jsId=\"filterModel\" store=\"filterStore\"
-			query=\"{id:'root'}\" rootId=\"root\" rootLabel=\"Filters\"
-			childrenAttrs=\"items\" checkboxStrict=\"false\" checkboxAll=\"false\">
-		</div>
-		<div dojoType=\"fox.PrefFilterTree\" id=\"filterTree\"
-			dndController=\"dijit.tree.dndSource\"
-			betweenThreshold=\"5\"
-			model=\"filterModel\" openOnClick=\"true\">
-		<script type=\"dojo/method\" event=\"onLoad\" args=\"item\">
-			Element.hide(\"filterlistLoading\");
-		</script>
-		<script type=\"dojo/method\" event=\"onClick\" args=\"item\">
-			var id = String(item.id);
-			var bare_id = id.substr(id.indexOf(':')+1);
+            url=\"backend.php?op=pref-filters&method=getfiltertree\">
+        </div>
+        <div dojoType=\"lib.CheckBoxStoreModel\" jsId=\"filterModel\" store=\"filterStore\"
+            query=\"{id:'root'}\" rootId=\"root\" rootLabel=\"Filters\"
+            childrenAttrs=\"items\" checkboxStrict=\"false\" checkboxAll=\"false\">
+        </div>
+        <div dojoType=\"fox.PrefFilterTree\" id=\"filterTree\"
+            dndController=\"dijit.tree.dndSource\"
+            betweenThreshold=\"5\"
+            model=\"filterModel\" openOnClick=\"true\">
+        <script type=\"dojo/method\" event=\"onLoad\" args=\"item\">
+            Element.hide(\"filterlistLoading\");
+        </script>
+        <script type=\"dojo/method\" event=\"onClick\" args=\"item\">
+            var id = String(item.id);
+            var bare_id = id.substr(id.indexOf(':')+1);
 
-			if (id.match('FILTER:')) {
-				editFilter(bare_id);
-			}
-		</script>
+            if (id.match('FILTER:')) {
+                editFilter(bare_id);
+            }
+        </script>
 
-		</div>";
+        </div>";
 
         print "</div>"; #pane
 
@@ -791,9 +791,9 @@ class Pref_Filters extends ProtectedHandler
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"dijit.byId('filterEditDlg').selectRules(true)\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"dijit.byId('filterEditDlg').selectRules(false)\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addRule()\">".
@@ -805,7 +805,7 @@ class Pref_Filters extends ProtectedHandler
         print "</div>";
 
         print "<ul id='filterDlg_Matches'>";
-        #		print "<li>No rules</li>";
+        #        print "<li>No rules</li>";
         print "</ul>";
 
         print "</div>";
@@ -818,9 +818,9 @@ class Pref_Filters extends ProtectedHandler
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"dijit.byId('filterEditDlg').selectActions(true)\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"dijit.byId('filterEditDlg').selectActions(false)\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addAction()\">".
@@ -832,22 +832,22 @@ class Pref_Filters extends ProtectedHandler
         print "</div>";
 
         print "<ul id='filterDlg_Actions'>";
-        #		print "<li>No actions</li>";
+        #        print "<li>No actions</li>";
         print "</ul>";
 
-        /*		print "<div class=\"dlgSec\">".__("Options")."</div>";
+        /*        print "<div class=\"dlgSec\">".__("Options")."</div>";
                         print "<div class=\"dlgSecCont\">"; */
 
         print "<input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"enabled\" id=\"enabled\" checked=\"1\">
-				<label for=\"enabled\">".__('Enabled')."</label>";
+                <label for=\"enabled\">".__('Enabled')."</label>";
 
         print "<br/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"match_any_rule\" id=\"match_any_rule\">
-				<label for=\"match_any_rule\">".__('Match any rule')."</label>";
+                <label for=\"match_any_rule\">".__('Match any rule')."</label>";
 
         print "<br/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"inverse\" id=\"inverse\">
-				<label for=\"inverse\">".__('Inverse matching')."</label>";
+                <label for=\"inverse\">".__('Inverse matching')."</label>";
 
-        //		print "</div>";
+        //        print "</div>";
 
         print "<div class=\"dlgButtons\">";
 
@@ -892,7 +892,7 @@ class Pref_Filters extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT id,description
-			FROM ttrss_filter_types WHERE id != 5 ORDER BY description"
+            FROM ttrss_filter_types WHERE id != 5 ORDER BY description"
         );
 
         $filter_types = array();
@@ -906,13 +906,13 @@ class Pref_Filters extends ProtectedHandler
         print "<div class=\"dlgSecCont\">";
 
         print "<input dojoType=\"dijit.form.ValidationTextBox\"
-			 required=\"true\" id=\"filterDlg_regExp\"
-			 style=\"font-size : 16px; width : 20em;\"
-			 name=\"reg_exp\" value=\"$reg_exp\"/>";
+             required=\"true\" id=\"filterDlg_regExp\"
+             style=\"font-size : 16px; width : 20em;\"
+             name=\"reg_exp\" value=\"$reg_exp\"/>";
 
         print "<hr/>";
         print "<input id=\"filterDlg_inverse\" dojoType=\"dijit.form.CheckBox\"
-			 name=\"inverse\" $inverse_checked/>";
+             name=\"inverse\" $inverse_checked/>";
         print "<label for=\"filterDlg_inverse\">".__("Inverse regular expression matching")."</label>";
 
         print "<hr/>" .  __("on field") . " ";
@@ -967,11 +967,11 @@ class Pref_Filters extends ProtectedHandler
         print "<div class=\"dlgSecCont\">";
 
         print "<select name=\"action_id\" dojoType=\"dijit.form.Select\"
-			onchange=\"filterDlgCheckAction(this)\">";
+            onchange=\"filterDlgCheckAction(this)\">";
 
         $result = $this->dbh->query(
             "SELECT id,description FROM ttrss_filter_actions
-			ORDER BY name"
+            ORDER BY name"
         );
 
         while ($line = $this->dbh->fetch_assoc($result)) {
@@ -987,18 +987,18 @@ class Pref_Filters extends ProtectedHandler
         $param_hidden = ($action_id == 4 || $action_id == 6) ?
             "" : "display : none";
 
-        $label_param_hidden = ($action_id == 7) ?	"" : "display : none";
+        $label_param_hidden = ($action_id == 7) ?    "" : "display : none";
 
         print "<span id=\"filterDlg_paramBox\" style=\"$param_box_hidden\">";
         print " " . __("with parameters:") . " ";
         print "<input dojoType=\"dijit.form.TextBox\"
-			id=\"filterDlg_actionParam\" style=\"$param_hidden\"
-			name=\"action_param\" value=\"$action_param\">";
+            id=\"filterDlg_actionParam\" style=\"$param_hidden\"
+            name=\"action_param\" value=\"$action_param\">";
 
         print_label_select(
             "action_param_label", $action_param,
             "id=\"filterDlg_actionParamLabel\" style=\"$label_param_hidden\"
-			dojoType=\"dijit.form.Select\""
+            dojoType=\"dijit.form.Select\""
         );
 
         print "</span>";
@@ -1025,10 +1025,10 @@ class Pref_Filters extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT title,COUNT(DISTINCT r.id) AS num_rules,COUNT(DISTINCT a.id) AS num_actions
-				FROM ttrss_filters2 AS f LEFT JOIN ttrss_filters2_rules AS r
-					ON (r.filter_id = f.id)
-						LEFT JOIN ttrss_filters2_actions AS a
-							ON (a.filter_id = f.id) WHERE f.id = '$id' GROUP BY f.title"
+                FROM ttrss_filters2 AS f LEFT JOIN ttrss_filters2_rules AS r
+                    ON (r.filter_id = f.id)
+                        LEFT JOIN ttrss_filters2_actions AS a
+                            ON (a.filter_id = f.id) WHERE f.id = '$id' GROUP BY f.title"
         );
 
         $title = $this->dbh->fetch_result($result, 0, "title");
@@ -1071,11 +1071,11 @@ class Pref_Filters extends ProtectedHandler
             $this->dbh->query("BEGIN");
             $this->dbh->query(
                 "UPDATE ttrss_filters2_rules
-				SET filter_id = '$base_id' WHERE filter_id IN ($ids_str)"
+                SET filter_id = '$base_id' WHERE filter_id IN ($ids_str)"
             );
             $this->dbh->query(
                 "UPDATE ttrss_filters2_actions
-				SET filter_id = '$base_id' WHERE filter_id IN ($ids_str)"
+                SET filter_id = '$base_id' WHERE filter_id IN ($ids_str)"
             );
 
             $this->dbh->query("DELETE FROM ttrss_filters2 WHERE id IN ($ids_str)");
@@ -1093,7 +1093,7 @@ class Pref_Filters extends ProtectedHandler
         $this->dbh->query("BEGIN");
         $result = $this->dbh->query(
             "SELECT * FROM ttrss_filters2_actions
-			WHERE filter_id = '$id'"
+            WHERE filter_id = '$id'"
         );
 
         $tmp = array();
@@ -1114,13 +1114,13 @@ class Pref_Filters extends ProtectedHandler
             $ids_str = join(",", $dupe_ids);
             $this->dbh->query(
                 "DELETE FROM ttrss_filters2_actions
-				WHERE id IN ($ids_str)"
+                WHERE id IN ($ids_str)"
             );
         }
 
         $result = $this->dbh->query(
             "SELECT * FROM ttrss_filters2_rules
-			WHERE filter_id = '$id'"
+            WHERE filter_id = '$id'"
         );
 
         $tmp = array();
@@ -1141,7 +1141,7 @@ class Pref_Filters extends ProtectedHandler
             $ids_str = join(",", $dupe_ids);
             $this->dbh->query(
                 "DELETE FROM ttrss_filters2_rules
-				WHERE id IN ($ids_str)"
+                WHERE id IN ($ids_str)"
             );
         }
 

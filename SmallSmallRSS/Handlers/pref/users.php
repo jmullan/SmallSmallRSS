@@ -28,13 +28,13 @@ class Pref_Users extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT login,
-				".SUBSTRING_FOR_DATE."(last_login,1,16) AS last_login,
-				access_level,
-				(SELECT COUNT(int_id) FROM ttrss_user_entries
-					WHERE owner_uid = id) AS stored_articles,
-				".SUBSTRING_FOR_DATE."(created,1,16) AS created
-				FROM ttrss_users
-				WHERE id = '$uid'"
+                ".SUBSTRING_FOR_DATE."(last_login,1,16) AS last_login,
+                access_level,
+                (SELECT COUNT(int_id) FROM ttrss_user_entries
+                    WHERE owner_uid = id) AS stored_articles,
+                ".SUBSTRING_FOR_DATE."(created,1,16) AS created
+                FROM ttrss_users
+                WHERE id = '$uid'"
         );
 
         if ($this->dbh->num_rows($result) == 0) {
@@ -64,7 +64,7 @@ class Pref_Users extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT COUNT(id) as num_feeds FROM ttrss_feeds
-				WHERE owner_uid = '$uid'"
+                WHERE owner_uid = '$uid'"
         );
 
         $num_feeds = $this->dbh->fetch_result($result, 0, "num_feeds");
@@ -77,7 +77,7 @@ class Pref_Users extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT id,title,site_url FROM ttrss_feeds
-				WHERE owner_uid = '$uid' ORDER BY title"
+                WHERE owner_uid = '$uid' ORDER BY title"
         );
 
 
@@ -100,13 +100,13 @@ class Pref_Users extends ProtectedHandler
         if ($this->dbh->num_rows($result) < $num_feeds) {
             // FIXME - add link to show ALL subscribed feeds here somewhere
             print "<li><img
-					class=\"tinyFeedIcon\" src=\"images/blank_icon.gif\">&nbsp;...</li>";
+                    class=\"tinyFeedIcon\" src=\"images/blank_icon.gif\">&nbsp;...</li>";
         }
 
         print "</ul>";
 
         print "<div align='center'>
-				<button dojoType=\"dijit.form.Button\" type=\"submit\">".__("Close this window").
+                <button dojoType=\"dijit.form.Button\" type=\"submit\">".__("Close this window").
             "</button></div>";
 
         return;
@@ -139,9 +139,9 @@ class Pref_Users extends ProtectedHandler
         }
 
         print "<input size=\"30\" style=\"font-size : 16px\"
-				dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
-				onkeypress=\"return filterCR(event, userEditSave)\" $sel_disabled
-				name=\"login\" value=\"$login\">";
+                dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
+                onkeypress=\"return filterCR(event, userEditSave)\" $sel_disabled
+                name=\"login\" value=\"$login\">";
 
         print "</div>";
 
@@ -166,7 +166,7 @@ class Pref_Users extends ProtectedHandler
         print "<hr/>";
 
         print "<input dojoType=\"dijit.form.TextBox\" type=\"password\" size=\"20\" onkeypress=\"return filterCR(event, userEditSave)\" placeholder=\"Change password\"
-				name=\"password\">";
+                name=\"password\">";
 
         print "</div>";
 
@@ -174,7 +174,7 @@ class Pref_Users extends ProtectedHandler
         print "<div class=\"dlgSecCont\">";
 
         print "<input dojoType=\"dijit.form.TextBox\" size=\"30\" name=\"email\" onkeypress=\"return filterCR(event, userEditSave)\" placeholder=\"E-mail\"
-				value=\"$email\">";
+                value=\"$email\">";
 
         print "</div>";
 
@@ -183,9 +183,9 @@ class Pref_Users extends ProtectedHandler
         print "</form>";
 
         print "<div class=\"dlgButtons\">
-				<button dojoType=\"dijit.form.Button\" type=\"submit\">".
+                <button dojoType=\"dijit.form.Button\" type=\"submit\">".
             __('Save')."</button>
-				<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('userEditDlg').hide()\">".
+                <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('userEditDlg').hide()\">".
             __('Cancel')."</button></div>";
 
         return;
@@ -209,8 +209,8 @@ class Pref_Users extends ProtectedHandler
 
         $this->dbh->query(
             "UPDATE ttrss_users SET $pass_query_part login = '$login',
-				access_level = '$access_level', email = '$email', otp_enabled = false
-				WHERE id = '$uid'"
+                access_level = '$access_level', email = '$email', otp_enabled = false
+                WHERE id = '$uid'"
         );
 
     }
@@ -238,21 +238,21 @@ class Pref_Users extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT id FROM ttrss_users WHERE
-				login = '$login'"
+                login = '$login'"
         );
 
         if ($this->dbh->num_rows($result) == 0) {
 
             $this->dbh->query(
                 "INSERT INTO ttrss_users
-					(login,pwd_hash,access_level,last_login,created, salt)
-					VALUES ('$login', '$pwd_hash', 0, null, NOW(), '$salt')"
+                    (login,pwd_hash,access_level,last_login,created, salt)
+                    VALUES ('$login', '$pwd_hash', 0, null, NOW(), '$salt')"
             );
 
 
             $result = $this->dbh->query(
                 "SELECT id FROM ttrss_users WHERE
-					login = '$login' AND pwd_hash = '$pwd_hash'"
+                    login = '$login' AND pwd_hash = '$pwd_hash'"
             );
 
             if ($this->dbh->num_rows($result) == 1) {
@@ -284,7 +284,7 @@ class Pref_Users extends ProtectedHandler
 
         $result = db_query(
             "SELECT login,email
-				FROM ttrss_users WHERE id = '$uid'"
+                FROM ttrss_users WHERE id = '$uid'"
         );
 
         $login = db_fetch_result($result, 0, "login");
@@ -298,7 +298,7 @@ class Pref_Users extends ProtectedHandler
 
         db_query(
             "UPDATE ttrss_users SET pwd_hash = '$pwd_hash', salt = '$new_salt'
-				WHERE id = '$uid'"
+                WHERE id = '$uid'"
         );
 
         if ($show_password) {
@@ -364,11 +364,11 @@ class Pref_Users extends ProtectedHandler
         }
 
         print "<div style='float : right; padding-right : 4px;'>
-				<input dojoType=\"dijit.form.TextBox\" id=\"user_search\" size=\"20\" type=\"search\"
-					value=\"$user_search\">
-				<button dojoType=\"dijit.form.Button\" onclick=\"updateUsersList()\">".
+                <input dojoType=\"dijit.form.TextBox\" id=\"user_search\" size=\"20\" type=\"search\"
+                    value=\"$user_search\">
+                <button dojoType=\"dijit.form.Button\" onclick=\"updateUsersList()\">".
             __('Search')."</button>
-				</div>";
+                </div>";
 
         $sort = $this->dbh->escape_string($_REQUEST["sort"]);
 
@@ -380,21 +380,21 @@ class Pref_Users extends ProtectedHandler
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"selectTableRows('prefUserList', 'all')\"
-				dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+                dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"selectTableRows('prefUserList', 'none')\"
-				dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+                dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"addUser()\">".__('Create user')."</button>";
 
         print "
-				<button dojoType=\"dijit.form.Button\" onclick=\"selectedUserDetails()\">".
+                <button dojoType=\"dijit.form.Button\" onclick=\"selectedUserDetails()\">".
             __('Details')."</button dojoType=\"dijit.form.Button\">
-				<button dojoType=\"dijit.form.Button\" onclick=\"editSelectedUser()\">".
+                <button dojoType=\"dijit.form.Button\" onclick=\"editSelectedUser()\">".
             __('Edit')."</button dojoType=\"dijit.form.Button\">
-				<button dojoType=\"dijit.form.Button\" onclick=\"removeSelectedUsers()\">".
+                <button dojoType=\"dijit.form.Button\" onclick=\"removeSelectedUsers()\">".
             __('Remove')."</button dojoType=\"dijit.form.Button\">
-				<button dojoType=\"dijit.form.Button\" onclick=\"resetSelectedUserPass()\">".
+                <button dojoType=\"dijit.form.Button\" onclick=\"resetSelectedUserPass()\">".
             __('Reset password')."</button dojoType=\"dijit.form.Button\">";
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
@@ -426,28 +426,28 @@ class Pref_Users extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT
-					id,login,access_level,email,
-					".SUBSTRING_FOR_DATE."(last_login,1,16) as last_login,
-					".SUBSTRING_FOR_DATE."(created,1,16) as created
-				FROM
-					ttrss_users
-				WHERE
-					$user_search_query
-					id > 0
-				ORDER BY $sort"
+                    id,login,access_level,email,
+                    ".SUBSTRING_FOR_DATE."(last_login,1,16) as last_login,
+                    ".SUBSTRING_FOR_DATE."(created,1,16) as created
+                FROM
+                    ttrss_users
+                WHERE
+                    $user_search_query
+                    id > 0
+                ORDER BY $sort"
         );
 
         if ($this->dbh->num_rows($result) > 0) {
 
             print "<p><table width=\"100%\" cellspacing=\"0\"
-				class=\"prefUserList\" id=\"prefUserList\">";
+                class=\"prefUserList\" id=\"prefUserList\">";
 
             print "<tr class=\"title\">
-						<td align='center' width=\"5%\">&nbsp;</td>
-						<td width='30%'><a href=\"#\" onclick=\"updateUsersList('login')\">".__('Login')."</a></td>
-						<td width='30%'><a href=\"#\" onclick=\"updateUsersList('access_level')\">".__('Access Level')."</a></td>
-						<td width='20%'><a href=\"#\" onclick=\"updateUsersList('created')\">".__('Registered')."</a></td>
-						<td width='20%'><a href=\"#\" onclick=\"updateUsersList('last_login')\">".__('Last login')."</a></td></tr>";
+                        <td align='center' width=\"5%\">&nbsp;</td>
+                        <td width='30%'><a href=\"#\" onclick=\"updateUsersList('login')\">".__('Login')."</a></td>
+                        <td width='30%'><a href=\"#\" onclick=\"updateUsersList('access_level')\">".__('Access Level')."</a></td>
+                        <td width='20%'><a href=\"#\" onclick=\"updateUsersList('created')\">".__('Registered')."</a></td>
+                        <td width='20%'><a href=\"#\" onclick=\"updateUsersList('last_login')\">".__('Last login')."</a></td></tr>";
 
             $lnum = 0;
 
@@ -463,8 +463,8 @@ class Pref_Users extends ProtectedHandler
                 $line["last_login"] = make_local_datetime($line["last_login"], false);
 
                 print "<td align='center'><input onclick='toggleSelectRow2(this);'
-					dojoType=\"dijit.form.CheckBox\" type=\"checkbox\"
-					id=\"UMCHK-$uid\"></td>";
+                    dojoType=\"dijit.form.CheckBox\" type=\"checkbox\"
+                    id=\"UMCHK-$uid\"></td>";
 
                 $onclick = "onclick='editUser($uid, event)' title='".__('Click to edit')."'";
 
@@ -473,7 +473,7 @@ class Pref_Users extends ProtectedHandler
                 if (!$line["email"]) {  $line["email"] = "&nbsp;";
                 }
 
-                print "<td $onclick>" .	$access_level_names[$line["access_level"]] . "</td>";
+                print "<td $onclick>" .    $access_level_names[$line["access_level"]] . "</td>";
                 print "<td $onclick>" . $line["created"] . "</td>";
                 print "<td $onclick>" . $line["last_login"] . "</td>";
 

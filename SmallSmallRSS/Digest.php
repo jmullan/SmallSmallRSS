@@ -26,7 +26,7 @@ class Digest
 
         $result = db_query(
             "SELECT id,email FROM ttrss_users
-				WHERE email != '' AND (last_digest_sent IS NULL OR $interval_query)"
+                WHERE email != '' AND (last_digest_sent IS NULL OR $interval_query)"
         );
 
         while ($line = db_fetch_assoc($result)) {
@@ -64,7 +64,7 @@ class Digest
                     }
                     db_query(
                         "UPDATE ttrss_users SET last_digest_sent = NOW()
-						WHERE id = " . $line["id"]
+                        WHERE id = " . $line["id"]
                     );
 
                 }
@@ -104,27 +104,27 @@ class Digest
 
         $result = db_query(
             "SELECT ttrss_entries.title,
-				ttrss_feeds.title AS feed_title,
-				COALESCE(ttrss_feed_categories.title, '".__('Uncategorized')."') AS cat_title,
-				date_updated,
-				ttrss_user_entries.ref_id,
-				link,
-				score,
-				content,
-				".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
-			FROM
-				ttrss_user_entries,ttrss_entries,ttrss_feeds
-			LEFT JOIN
-				ttrss_feed_categories ON (cat_id = ttrss_feed_categories.id)
-			WHERE
-				ref_id = ttrss_entries.id AND feed_id = ttrss_feeds.id
-				AND include_in_digest = true
-				AND $interval_query
-				AND ttrss_user_entries.owner_uid = $user_id
-				AND unread = true
-				AND score >= 0
-			ORDER BY ttrss_feed_categories.title, ttrss_feeds.title, score DESC, date_updated DESC
-			LIMIT $limit"
+                ttrss_feeds.title AS feed_title,
+                COALESCE(ttrss_feed_categories.title, '".__('Uncategorized')."') AS cat_title,
+                date_updated,
+                ttrss_user_entries.ref_id,
+                link,
+                score,
+                content,
+                ".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+            FROM
+                ttrss_user_entries,ttrss_entries,ttrss_feeds
+            LEFT JOIN
+                ttrss_feed_categories ON (cat_id = ttrss_feed_categories.id)
+            WHERE
+                ref_id = ttrss_entries.id AND feed_id = ttrss_feeds.id
+                AND include_in_digest = true
+                AND $interval_query
+                AND ttrss_user_entries.owner_uid = $user_id
+                AND unread = true
+                AND score >= 0
+            ORDER BY ttrss_feed_categories.title, ttrss_feeds.title, score DESC, date_updated DESC
+            LIMIT $limit"
         );
 
         $cur_feed_title = "";
@@ -148,10 +148,10 @@ class Digest
                 $user_id
             );
 
-            /*			if ($line["score"] != 0) {
-				if ($line["score"] > 0) $line["score"] = '+' . $line["score"];
+            /*            if ($line["score"] != 0) {
+                if ($line["score"] > 0) $line["score"] = '+' . $line["score"];
 
-				$line["title"] .= " (".$line['score'].")";
+                $line["title"] .= " (".$line['score'].")";
                                 } */
 
             if (get_pref('ENABLE_FEED_CATS', $user_id)) {
@@ -166,8 +166,8 @@ class Digest
                 'ARTICLE_EXCERPT',
                 truncate_string(strip_tags($line["content"]), 300)
             );
-            //			$tpl->setVariable('ARTICLE_CONTENT',
-            //				strip_tags($article_content));
+            //            $tpl->setVariable('ARTICLE_CONTENT',
+            //                strip_tags($article_content));
 
             $tpl->addBlock('article');
 
@@ -175,8 +175,8 @@ class Digest
             $tpl_t->setVariable('ARTICLE_TITLE', $line["title"]);
             $tpl_t->setVariable('ARTICLE_LINK', $line["link"]);
             $tpl_t->setVariable('ARTICLE_UPDATED', $updated);
-            //			$tpl_t->setVariable('ARTICLE_EXCERPT',
-            //				truncate_string(strip_tags($line["excerpt"]), 100));
+            //            $tpl_t->setVariable('ARTICLE_EXCERPT',
+            //                truncate_string(strip_tags($line["excerpt"]), 100));
 
             $tpl_t->addBlock('article');
 

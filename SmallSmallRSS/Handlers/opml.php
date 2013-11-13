@@ -29,14 +29,14 @@ class Opml extends ProtectedHandler
         header('Content-Type: text/html; charset=utf-8');
 
         print "<html>
-			<head>
-				<link rel=\"stylesheet\" href=\"css/utility.css\" type=\"text/css\">
-				<title>".__("OPML Utility")."</title>
-				<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
-			</head>
-			<body>
-			<div class=\"floatingLogo\"><img src=\"images/logo_small.png\"></div>
-			<h1>".__('OPML Utility')."</h1><div class='content'>";
+            <head>
+                <link rel=\"stylesheet\" href=\"css/utility.css\" type=\"text/css\">
+                <title>".__("OPML Utility")."</title>
+                <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
+            </head>
+            <body>
+            <div class=\"floatingLogo\"><img src=\"images/logo_small.png\"></div>
+            <h1>".__('OPML Utility')."</h1><div class='content'>";
 
         add_feed_category("Imported feeds");
 
@@ -44,8 +44,8 @@ class Opml extends ProtectedHandler
         $this->opml_import($owner_uid);
 
         print "<br><form method=\"GET\" action=\"prefs.php\">
-			<input type=\"submit\" value=\"".__("Return to preferences")."\">
-			</form>";
+            <input type=\"submit\" value=\"".__("Return to preferences")."\">
+            </form>";
 
         print "</div></body></html>";
 
@@ -77,7 +77,7 @@ class Opml extends ProtectedHandler
         if ($cat_id) {
             $result = $this->dbh->query(
                 "SELECT title FROM ttrss_feed_categories WHERE id = '$cat_id'
-				AND owner_uid = '$owner_uid'"
+                AND owner_uid = '$owner_uid'"
             );
             $cat_title = htmlspecialchars($this->dbh->fetch_result($result, 0, "title"));
         }
@@ -87,8 +87,8 @@ class Opml extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT id,title
-			FROM ttrss_feed_categories WHERE
-			$cat_qpart AND owner_uid = '$owner_uid' ORDER BY order_id, title"
+            FROM ttrss_feed_categories WHERE
+            $cat_qpart AND owner_uid = '$owner_uid' ORDER BY order_id, title"
         );
 
         while ($line = $this->dbh->fetch_assoc($result)) {
@@ -98,8 +98,8 @@ class Opml extends ProtectedHandler
 
         $feeds_result = $this->dbh->query(
             "select title, feed_url, site_url
-				from ttrss_feeds where $feed_cat_qpart AND owner_uid = '$owner_uid' AND $hide_qpart
-				order by order_id, title"
+                from ttrss_feeds where $feed_cat_qpart AND owner_uid = '$owner_uid' AND $hide_qpart
+                order by order_id, title"
         );
 
         while ($fline = $this->dbh->fetch_assoc($feeds_result)) {
@@ -138,9 +138,9 @@ class Opml extends ProtectedHandler
 
         $out .= "<opml version=\"1.0\">";
         $out .= "<head>
-			<dateCreated>" . date("r", time()) . "</dateCreated>
-			<title>Tiny Tiny RSS Feed Export</title>
-		</head>";
+            <dateCreated>" . date("r", time()) . "</dateCreated>
+            <title>Tiny Tiny RSS Feed Export</title>
+        </head>";
         $out .= "<body>";
 
         $out .= $this->opml_export_category($owner_uid, false, $hide_private_feeds);
@@ -152,7 +152,7 @@ class Opml extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "SELECT pref_name, value FROM ttrss_user_prefs WHERE
-			   profile IS NULL AND owner_uid = " . $_SESSION["uid"] . " ORDER BY pref_name"
+               profile IS NULL AND owner_uid = " . $_SESSION["uid"] . " ORDER BY pref_name"
             );
 
             while ($line = $this->dbh->fetch_assoc($result)) {
@@ -168,7 +168,7 @@ class Opml extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "SELECT * FROM ttrss_labels2 WHERE
-				owner_uid = " . $_SESSION['uid']
+                owner_uid = " . $_SESSION['uid']
             );
 
             while ($line = $this->dbh->fetch_assoc($result)) {
@@ -186,7 +186,7 @@ class Opml extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "SELECT * FROM ttrss_filters2
-				WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY id"
+                WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY id"
             );
 
             while ($line = $this->dbh->fetch_assoc($result)) {
@@ -199,7 +199,7 @@ class Opml extends ProtectedHandler
 
                 $tmp_result = $this->dbh->query(
                     "SELECT * FROM ttrss_filters2_rules
-					WHERE filter_id = ".$line["id"]
+                    WHERE filter_id = ".$line["id"]
                 );
 
                 while ($tmp_line = $this->dbh->fetch_assoc($tmp_result)) {
@@ -227,7 +227,7 @@ class Opml extends ProtectedHandler
 
                 $tmp_result = $this->dbh->query(
                     "SELECT * FROM ttrss_filters2_actions
-					WHERE filter_id = ".$line["id"]
+                    WHERE filter_id = ".$line["id"]
                 );
 
                 while ($tmp_line = $this->dbh->fetch_assoc($tmp_result)) {
@@ -269,12 +269,12 @@ class Opml extends ProtectedHandler
 
         $res = $doc->saveXML();
 
-        /*		// saveXML uses a two-space indent.  Change to tabs.
+        /*        // saveXML uses a two-space indent.  Change to tabs.
                         $res = preg_replace_callback('/^(?:  )+/mu',
-			create_function(
+            create_function(
                         '$matches',
                         'return str_repeat("\t", intval(strlen($matches[0])/2));'),
-			$res); */
+            $res); */
 
         print $res;
     }
@@ -298,7 +298,7 @@ class Opml extends ProtectedHandler
         if ($feed_url && $feed_title) {
             $result = $this->dbh->query(
                 "SELECT id FROM ttrss_feeds WHERE
-				feed_url = '$feed_url' AND owner_uid = '$owner_uid'"
+                feed_url = '$feed_url' AND owner_uid = '$owner_uid'"
             );
 
             if ($this->dbh->num_rows($result) == 0) {
@@ -309,9 +309,9 @@ class Opml extends ProtectedHandler
                 }
 
                 $query = "INSERT INTO ttrss_feeds
-					(title, feed_url, owner_uid, cat_id, site_url, order_id) VALUES
-					('$feed_title', '$feed_url', '$owner_uid',
-					$cat_id, '$site_url', 0)";
+                    (title, feed_url, owner_uid, cat_id, site_url, order_id) VALUES
+                    ('$feed_title', '$feed_url', '$owner_uid',
+                    $cat_id, '$site_url', 0)";
                 $this->dbh->query($query);
 
             } else {
@@ -374,13 +374,13 @@ class Opml extends ProtectedHandler
 
                 $this->dbh->query(
                     "INSERT INTO ttrss_filters2 (match_any_rule,enabled,inverse,title,owner_uid)
-					VALUES ($match_any_rule, $enabled, $inverse, '$title',
-					".$_SESSION["uid"].")"
+                    VALUES ($match_any_rule, $enabled, $inverse, '$title',
+                    ".$_SESSION["uid"].")"
                 );
 
                 $result = $this->dbh->query(
                     "SELECT MAX(id) AS id FROM ttrss_filters2 WHERE
-					owner_uid = ".$_SESSION["uid"]
+                    owner_uid = ".$_SESSION["uid"]
                 );
                 $filter_id = $this->dbh->fetch_result($result, 0, "id");
 
@@ -394,7 +394,7 @@ class Opml extends ProtectedHandler
                         if (!$rule["cat_filter"]) {
                             $tmp_result = $this->dbh->query(
                                 "SELECT id FROM ttrss_feeds
-								WHERE title = '".$this->dbh->escape_string($rule["feed"])."' AND owner_uid = ".$_SESSION["uid"]
+                                WHERE title = '".$this->dbh->escape_string($rule["feed"])."' AND owner_uid = ".$_SESSION["uid"]
                             );
                             if ($this->dbh->num_rows($tmp_result) > 0) {
                                 $feed_id = $this->dbh->fetch_result($tmp_result, 0, "id");
@@ -402,7 +402,7 @@ class Opml extends ProtectedHandler
                         } else {
                             $tmp_result = $this->dbh->query(
                                 "SELECT id FROM ttrss_feed_categories
-								WHERE title = '".$this->dbh->escape_string($rule["feed"])."' AND owner_uid = ".$_SESSION["uid"]
+                                WHERE title = '".$this->dbh->escape_string($rule["feed"])."' AND owner_uid = ".$_SESSION["uid"]
                             );
 
                             if ($this->dbh->num_rows($tmp_result) > 0) {
@@ -416,7 +416,7 @@ class Opml extends ProtectedHandler
 
                         $this->dbh->query(
                             "INSERT INTO ttrss_filters2_rules (feed_id,cat_id,filter_id,filter_type,reg_exp,cat_filter)
-							VALUES ($feed_id, $cat_id, $filter_id, $filter_type, '$reg_exp', $cat_filter)"
+                            VALUES ($feed_id, $cat_id, $filter_id, $filter_type, '$reg_exp', $cat_filter)"
                         );
                     }
 
@@ -427,7 +427,7 @@ class Opml extends ProtectedHandler
 
                         $this->dbh->query(
                             "INSERT INTO ttrss_filters2_actions (filter_id,action_id,action_param)
-							VALUES ($filter_id, $action_id, '$action_param')"
+                            VALUES ($filter_id, $action_id, '$action_param')"
                         );
                     }
                 }
@@ -521,7 +521,7 @@ class Opml extends ProtectedHandler
         $debug = isset($_REQUEST["debug"]);
         $doc = false;
 
-        #		if ($debug) $doc = DOMDocument::load("/tmp/test.opml");
+        #        if ($debug) $doc = DOMDocument::load("/tmp/test.opml");
 
         if ($_FILES['opml_file']['error'] != 0) {
             \SmallSmallRSS\Renderers\Messages::renderError(T_sprintf(

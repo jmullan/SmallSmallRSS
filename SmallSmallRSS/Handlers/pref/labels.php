@@ -16,7 +16,7 @@ class Pref_Labels extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT * FROM ttrss_labels2 WHERE
-			id = '$label_id' AND owner_uid = " . $_SESSION["uid"]
+            id = '$label_id' AND owner_uid = " . $_SESSION["uid"]
         );
 
         $line = $this->dbh->fetch_assoc($result);
@@ -35,9 +35,9 @@ class Pref_Labels extends ProtectedHandler
         print "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color : $fg_color; background-color : $bg_color; margin-bottom : 4px; margin-right : 4px'>&alpha;</span>";
 
         print "<input style=\"font-size : 16px\" name=\"caption\"
-			dojoType=\"dijit.form.ValidationTextBox\"
-			required=\"true\"
-			value=\"".htmlspecialchars($line['caption'])."\">";
+            dojoType=\"dijit.form.ValidationTextBox\"
+            required=\"true\"
+            value=\"".htmlspecialchars($line['caption'])."\">";
 
         print "</div>";
         print "<div class=\"dlgSec\">" . __("Colors") . "</div>";
@@ -51,34 +51,34 @@ class Pref_Labels extends ProtectedHandler
         print "<tr><td style='padding-right : 10px'>";
 
         print "<input dojoType=\"dijit.form.TextBox\"
-			style=\"display : none\" id=\"labelEdit_fgColor\"
-			name=\"fg_color\" value=\"$fg_color\">";
+            style=\"display : none\" id=\"labelEdit_fgColor\"
+            name=\"fg_color\" value=\"$fg_color\">";
         print "<input dojoType=\"dijit.form.TextBox\"
-			style=\"display : none\" id=\"labelEdit_bgColor\"
-			name=\"bg_color\" value=\"$bg_color\">";
+            style=\"display : none\" id=\"labelEdit_bgColor\"
+            name=\"bg_color\" value=\"$bg_color\">";
 
         print "<div dojoType=\"dijit.ColorPalette\">
-			<script type=\"dojo/method\" event=\"onChange\" args=\"fg_color\">
-				dijit.byId(\"labelEdit_fgColor\").attr('value', fg_color);
-				$('label-editor-indicator').setStyle({color: fg_color});
-			</script>
-		</div>";
+            <script type=\"dojo/method\" event=\"onChange\" args=\"fg_color\">
+                dijit.byId(\"labelEdit_fgColor\").attr('value', fg_color);
+                $('label-editor-indicator').setStyle({color: fg_color});
+            </script>
+        </div>";
         print "</div>";
 
         print "</td><td>";
 
         print "<div dojoType=\"dijit.ColorPalette\">
-			<script type=\"dojo/method\" event=\"onChange\" args=\"bg_color\">
-				dijit.byId(\"labelEdit_bgColor\").attr('value', bg_color);
-				$('label-editor-indicator').setStyle({backgroundColor: bg_color});
-			</script>
-		</div>";
+            <script type=\"dojo/method\" event=\"onChange\" args=\"bg_color\">
+                dijit.byId(\"labelEdit_bgColor\").attr('value', bg_color);
+                $('label-editor-indicator').setStyle({backgroundColor: bg_color});
+            </script>
+        </div>";
         print "</div>";
 
         print "</td></tr></table>";
         print "</div>";
 
-        #			print "</form>";
+        #            print "</form>";
 
         print "<div class=\"dlgButtons\">";
         print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('labelEditDlg').execute()\">".
@@ -99,9 +99,9 @@ class Pref_Labels extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT *
-			FROM ttrss_labels2
-			WHERE owner_uid = ".$_SESSION["uid"]."
-			ORDER BY caption"
+            FROM ttrss_labels2
+            WHERE owner_uid = ".$_SESSION["uid"]."
+            ORDER BY caption"
         );
 
         while ($line = $this->dbh->fetch_assoc($result)) {
@@ -139,14 +139,14 @@ class Pref_Labels extends ProtectedHandler
             if ($kind == "fg" || $kind == "bg") {
                 $this->dbh->query(
                     "UPDATE ttrss_labels2 SET
-					${kind}_color = '$color' WHERE id = '$id'
-					AND owner_uid = " . $_SESSION["uid"]
+                    ${kind}_color = '$color' WHERE id = '$id'
+                    AND owner_uid = " . $_SESSION["uid"]
                 );
             } else {
                 $this->dbh->query(
                     "UPDATE ttrss_labels2 SET
-					fg_color = '$fg', bg_color = '$bg' WHERE id = '$id'
-					AND owner_uid = " . $_SESSION["uid"]
+                    fg_color = '$fg', bg_color = '$bg' WHERE id = '$id'
+                    AND owner_uid = " . $_SESSION["uid"]
                 );
             }
 
@@ -156,7 +156,7 @@ class Pref_Labels extends ProtectedHandler
 
             $this->dbh->query(
                 "UPDATE ttrss_user_entries SET label_cache = ''
-				WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
+                WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
             );
 
         }
@@ -171,8 +171,8 @@ class Pref_Labels extends ProtectedHandler
         foreach ($ids as $id) {
             $this->dbh->query(
                 "UPDATE ttrss_labels2 SET
-				fg_color = '', bg_color = '' WHERE id = '$id'
-				AND owner_uid = " . $_SESSION["uid"]
+                fg_color = '', bg_color = '' WHERE id = '$id'
+                AND owner_uid = " . $_SESSION["uid"]
             );
 
             $caption = $this->dbh->escape_string(label_find_caption($id, $_SESSION["uid"]));
@@ -181,7 +181,7 @@ class Pref_Labels extends ProtectedHandler
 
             $this->dbh->query(
                 "UPDATE ttrss_user_entries SET label_cache = ''
-				WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
+                WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
             );
         }
 
@@ -197,7 +197,7 @@ class Pref_Labels extends ProtectedHandler
 
         $result = $this->dbh->query(
             "SELECT caption FROM ttrss_labels2
-			WHERE id = '$id' AND owner_uid = ". $_SESSION["uid"]
+            WHERE id = '$id' AND owner_uid = ". $_SESSION["uid"]
         );
 
         if ($this->dbh->num_rows($result) != 0) {
@@ -205,15 +205,15 @@ class Pref_Labels extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "SELECT id FROM ttrss_labels2
-				WHERE caption = '$caption' AND owner_uid = ". $_SESSION["uid"]
+                WHERE caption = '$caption' AND owner_uid = ". $_SESSION["uid"]
             );
 
             if ($this->dbh->num_rows($result) == 0) {
                 if ($caption) {
                     $result = $this->dbh->query(
                         "UPDATE ttrss_labels2 SET
-						caption = '$caption' WHERE id = '$id' AND
-						owner_uid = " . $_SESSION["uid"]
+                        caption = '$caption' WHERE id = '$id' AND
+                        owner_uid = " . $_SESSION["uid"]
                     );
 
                     /* Update filters that reference label being renamed */
@@ -222,9 +222,9 @@ class Pref_Labels extends ProtectedHandler
 
                     $this->dbh->query(
                         "UPDATE ttrss_filters2_actions SET
-						action_param = '$caption' WHERE action_param = '$old_caption'
-						AND action_id = 7
-						AND filter_id IN (SELECT id FROM ttrss_filters2 WHERE owner_uid = ".$_SESSION["uid"].")"
+                        action_param = '$caption' WHERE action_param = '$old_caption'
+                        AND action_id = 7
+                        AND filter_id IN (SELECT id FROM ttrss_filters2 WHERE owner_uid = ".$_SESSION["uid"].")"
                     );
 
                     print $_REQUEST["value"];
@@ -307,9 +307,9 @@ class Pref_Labels extends ProtectedHandler
             "<span>" . __('Select')."</span>";
         print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"dijit.byId('labelTree').model.setAllChecked(true)\"
-			dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"dijit.byId('labelTree').model.setAllChecked(false)\"
-			dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print"<button dojoType=\"dijit.form.Button\" onclick=\"return addLabel()\">".
@@ -327,30 +327,30 @@ class Pref_Labels extends ProtectedHandler
         print "<div id=\"pref-label-content\" dojoType=\"dijit.layout.ContentPane\" region=\"center\">";
 
         print "<div id=\"labellistLoading\">
-		<img src='images/indicator_tiny.gif'>".
+        <img src='images/indicator_tiny.gif'>".
             __("Loading, please wait...")."</div>";
 
         print "<div dojoType=\"dojo.data.ItemFileWriteStore\" jsId=\"labelStore\"
-			url=\"backend.php?op=pref-labels&method=getlabeltree\">
-		</div>
-		<div dojoType=\"lib.CheckBoxStoreModel\" jsId=\"labelModel\" store=\"labelStore\"
-		query=\"{id:'root'}\" rootId=\"root\"
-			childrenAttrs=\"items\" checkboxStrict=\"false\" checkboxAll=\"false\">
-		</div>
-		<div dojoType=\"fox.PrefLabelTree\" id=\"labelTree\"
-			model=\"labelModel\" openOnClick=\"true\">
-		<script type=\"dojo/method\" event=\"onLoad\" args=\"item\">
-			Element.hide(\"labellistLoading\");
-		</script>
-		<script type=\"dojo/method\" event=\"onClick\" args=\"item\">
-			var id = String(item.id);
-			var bare_id = id.substr(id.indexOf(':')+1);
+            url=\"backend.php?op=pref-labels&method=getlabeltree\">
+        </div>
+        <div dojoType=\"lib.CheckBoxStoreModel\" jsId=\"labelModel\" store=\"labelStore\"
+        query=\"{id:'root'}\" rootId=\"root\"
+            childrenAttrs=\"items\" checkboxStrict=\"false\" checkboxAll=\"false\">
+        </div>
+        <div dojoType=\"fox.PrefLabelTree\" id=\"labelTree\"
+            model=\"labelModel\" openOnClick=\"true\">
+        <script type=\"dojo/method\" event=\"onLoad\" args=\"item\">
+            Element.hide(\"labellistLoading\");
+        </script>
+        <script type=\"dojo/method\" event=\"onClick\" args=\"item\">
+            var id = String(item.id);
+            var bare_id = id.substr(id.indexOf(':')+1);
 
-			if (id.match('LABEL:')) {
-				editLabel(bare_id);
-			}
-		</script>
-		</div>";
+            if (id.match('LABEL:')) {
+                editLabel(bare_id);
+            }
+        </script>
+        </div>";
 
         print "</div>"; #pane
 

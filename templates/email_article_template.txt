@@ -11,6 +11,6 @@ Thought I'd share the following with you:
   ${ARTICLE_URL}
 <!-- $EndBlock article -->
 
--- 
+--
 This message has been sent by Tiny Tiny RSS installation at ${TTRSS_HOST}.
 <!-- $EndBlock email -->

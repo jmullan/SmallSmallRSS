@@ -3,11 +3,11 @@ namespace SmallSmallRSS;
 require_once 'lib/phpmailer/class.phpmailer.php';
 
 /**
- *	@class Mailer
- *	@brief A SmallSmallRSS extension to the PHPMailer class
- *	Configures default values through the __construct() function
- *	@author Derek Murawsky
- *	@version .1 (alpha)
+ * @class Mailer
+ * @brief A SmallSmallRSS extension to the PHPMailer class
+ * Configures default values through the __construct() function
+ * @author Derek Murawsky
+ * @version .1 (alpha)
  */
 class Mailer extends PHPMailer
 {
@@ -49,12 +49,12 @@ class Mailer extends PHPMailer
         }
     }
     /**
-     *  A simple mail function to send email using the defaults
-     *	This will send an HTML email using the configured defaults
-     *	@param $toAddress A string with the recipients email address
-     *	@param $toName A string with the recipients name
-     *	@param $subject A string with the emails subject
-     *	@param $body A string containing the body of the email
+     * A simple mail function to send email using the defaults
+     * This will send an HTML email using the configured defaults
+     * @param $toAddress A string with the recipients email address
+     * @param $toName A string with the recipients name
+     * @param $subject A string with the emails subject
+     * @param $body A string containing the body of the email
      */
     public function quickMail($toAddress, $toName, $subject, $body, $altbody = "")
     {

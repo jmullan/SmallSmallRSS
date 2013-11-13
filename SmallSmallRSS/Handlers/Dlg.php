@@ -37,7 +37,7 @@ class Dlg extends ProtectedHandler
 
         print "<div align='center'>";
         print "<button dojoType=\"dijit.form.Button\"
-			onclick=\"dijit.byId('opmlImportDlg').execute()\">".
+            onclick=\"dijit.byId('opmlImportDlg').execute()\">".
             __('Close this window')."</button>";
         print "</div>";
 
@@ -110,8 +110,8 @@ class Dlg extends ProtectedHandler
         // from here: http://www.roscripts.com/Create_tag_cloud-71.html
 
         $query = "SELECT tag_name, COUNT(post_int_id) AS count
-			FROM ttrss_tags WHERE owner_uid = ".$_SESSION["uid"]."
-			GROUP BY tag_name ORDER BY count DESC LIMIT 50";
+            FROM ttrss_tags WHERE owner_uid = ".$_SESSION["uid"]."
+            GROUP BY tag_name ORDER BY count DESC LIMIT 50";
 
         $result = $this->dbh->query($query);
 
@@ -163,7 +163,7 @@ class Dlg extends ProtectedHandler
 
         print "<div align='center'>";
         print "<button dojoType=\"dijit.form.Button\"
-			onclick=\"return closeInfoBox()\">".
+            onclick=\"return closeInfoBox()\">".
             __('Close this window')."</button>";
         print "</div>";
 
@@ -182,7 +182,7 @@ class Dlg extends ProtectedHandler
         print "<select id=\"all_tags\" name=\"all_tags\" title=\"" . __('Which Tags?') . "\" multiple=\"multiple\" size=\"10\" style=\"width : 100%\">";
         $result = $this->dbh->query(
             "SELECT DISTINCT tag_name FROM ttrss_tags WHERE owner_uid = ".$_SESSION['uid']."
-			AND LENGTH(tag_name) <= 30 ORDER BY tag_name ASC"
+            AND LENGTH(tag_name) <= 30 ORDER BY tag_name ASC"
         );
 
         while ($row = $this->dbh->fetch_assoc($result)) {
@@ -194,10 +194,10 @@ class Dlg extends ProtectedHandler
 
         print "<div align='right'>";
         print "<button dojoType=\"dijit.form.Button\" onclick=\"viewfeed(get_all_tags($('all_tags')),
-			get_radio_checked($('tag_mode')));\">" . __('Display entries') . "</button>";
+            get_radio_checked($('tag_mode')));\">" . __('Display entries') . "</button>";
         print "&nbsp;";
         print "<button dojoType=\"dijit.form.Button\"
-		onclick=\"return closeInfoBox()\">" .
+        onclick=\"return closeInfoBox()\">" .
             __('Close this window') . "</button>";
         print "</div>";
 

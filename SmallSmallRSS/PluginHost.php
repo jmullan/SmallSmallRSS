@@ -292,7 +292,7 @@ class PluginHost
         if ($this->owner_uid)  {
             $result = $this->dbh->query(
                 "SELECT name, content FROM ttrss_plugin_storage
-				WHERE owner_uid = '".$this->owner_uid."'"
+                WHERE owner_uid = '".$this->owner_uid."'"
             );
 
             while ($line = $this->dbh->fetch_assoc($result)) {
@@ -310,7 +310,7 @@ class PluginHost
 
             $result = $this->dbh->query(
                 "SELECT id FROM ttrss_plugin_storage WHERE
-				owner_uid= '".$this->owner_uid."' AND name = '$plugin'"
+                owner_uid= '".$this->owner_uid."' AND name = '$plugin'"
             );
 
             if (!isset($this->storage[$plugin])) {
@@ -325,14 +325,14 @@ class PluginHost
             if ($this->dbh->num_rows($result) != 0) {
                 $this->dbh->query(
                     "UPDATE ttrss_plugin_storage SET content = '$content'
-					WHERE owner_uid= '".$this->owner_uid."' AND name = '$plugin'"
+                    WHERE owner_uid= '".$this->owner_uid."' AND name = '$plugin'"
                 );
 
             } else {
                 $this->dbh->query(
                     "INSERT INTO ttrss_plugin_storage
-					(name,owner_uid,content) VALUES
-					('$plugin','".$this->owner_uid."','$content')"
+                    (name,owner_uid,content) VALUES
+                    ('$plugin','".$this->owner_uid."','$content')"
                 );
             }
 
@@ -383,7 +383,7 @@ class PluginHost
 
             $this->dbh->query(
                 "DELETE FROM ttrss_plugin_storage WHERE name = '$idx'
-				AND owner_uid = " . $this->owner_uid
+                AND owner_uid = " . $this->owner_uid
             );
         }
     }

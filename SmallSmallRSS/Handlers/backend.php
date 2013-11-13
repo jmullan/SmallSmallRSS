@@ -109,7 +109,7 @@ class Backend extends Handler
 
         print "<div align='center'>";
         print "<button dojoType=\"dijit.form.Button\"
-			onclick=\"return dijit.byId('helpDlg').hide()\">".
+            onclick=\"return dijit.byId('helpDlg').hide()\">".
             __('Close this window')."</button>";
         print "</div>";
     }

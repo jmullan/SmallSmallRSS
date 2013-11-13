@@ -36,27 +36,27 @@ class Pref_System extends ProtectedHandler
 
             $result = $this->dbh->query(
                 "SELECT errno, errstr, filename, lineno,
-				created_at, login FROM ttrss_error_log
-				LEFT JOIN ttrss_users ON (owner_uid = ttrss_users.id)
-				ORDER BY ttrss_error_log.id DESC
-				LIMIT 100"
+                created_at, login FROM ttrss_error_log
+                LEFT JOIN ttrss_users ON (owner_uid = ttrss_users.id)
+                ORDER BY ttrss_error_log.id DESC
+                LIMIT 100"
             );
 
             print "<button dojoType=\"dijit.form.Button\"
-				onclick=\"updateSystemList()\">".__('Refresh')."</button> ";
+                onclick=\"updateSystemList()\">".__('Refresh')."</button> ";
 
             print "&nbsp;<button dojoType=\"dijit.form.Button\"
-				onclick=\"clearSqlLog()\">".__('Clear log')."</button> ";
+                onclick=\"clearSqlLog()\">".__('Clear log')."</button> ";
 
             print "<p><table width=\"100%\" cellspacing=\"10\" class=\"prefErrorLog\">";
 
             print "<tr class=\"title\">
-				<td width='5%'>".__("Error")."</td>
-				<td>".__("Filename")."</td>
-				<td>".__("Message")."</td>
-				<td width='5%'>".__("User")."</td>
-				<td width='5%'>".__("Date")."</td>
-				</tr>";
+                <td width='5%'>".__("Error")."</td>
+                <td>".__("Filename")."</td>
+                <td>".__("Message")."</td>
+                <td width='5%'>".__("User")."</td>
+                <td width='5%'>".__("Date")."</td>
+                </tr>";
 
             while ($line = $this->dbh->fetch_assoc($result)) {
                 print "<tr class=\"errrow\">";

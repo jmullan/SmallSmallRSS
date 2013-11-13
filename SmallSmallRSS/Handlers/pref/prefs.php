@@ -1,17 +1,20 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Pref_Prefs extends ProtectedHandler {
+class Pref_Prefs extends ProtectedHandler
+{
 
     private $pref_help = array();
     private $pref_sections = array();
 
-    function csrf_ignore($method) {
+    function csrf_ignore($method)
+    {
         $csrf_ignored = array("index", "updateself", "customizecss", "editprefprofiles");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function __construct($args) {
+    function __construct($args)
+    {
         parent::__construct($args);
 
         $this->pref_sections = array(
@@ -59,7 +62,8 @@ class Pref_Prefs extends ProtectedHandler {
         );
     }
 
-    function changepassword() {
+    function changepassword()
+    {
 
         $old_pw = $_POST["old_password"];
         $new_pw = $_POST["new_password"];
@@ -89,11 +93,13 @@ class Pref_Prefs extends ProtectedHandler {
         }
     }
 
-    function saveconfig() {
+    function saveconfig()
+    {
         $boolean_prefs = explode(",", $_POST["boolean_prefs"]);
 
         foreach ($boolean_prefs as $pref) {
-            if (!isset($_POST[$pref])) $_POST[$pref] = 'false';
+            if (!isset($_POST[$pref])) {  $_POST[$pref] = 'false';
+            }
         }
 
         $need_reload = false;
@@ -106,8 +112,10 @@ class Pref_Prefs extends ProtectedHandler {
             if ($pref_name == 'DIGEST_PREFERRED_TIME') {
                 if (get_pref('DIGEST_PREFERRED_TIME') != $value) {
 
-                    $this->dbh->query("UPDATE ttrss_users SET
-						last_digest_sent = NULL WHERE id = " . $_SESSION['uid']);
+                    $this->dbh->query(
+                        "UPDATE ttrss_users SET
+						last_digest_sent = NULL WHERE id = " . $_SESSION['uid']
+                    );
 
                 }
             }
@@ -128,12 +136,15 @@ class Pref_Prefs extends ProtectedHandler {
         }
     }
 
-    function getHelp() {
+    function getHelp()
+    {
 
         $pref_name = $this->dbh->escape_string($_REQUEST["pn"]);
 
-        $result = $this->dbh->query("SELECT help_text FROM ttrss_prefs
-			WHERE pref_name = '$pref_name'");
+        $result = $this->dbh->query(
+            "SELECT help_text FROM ttrss_prefs
+			WHERE pref_name = '$pref_name'"
+        );
 
         if ($this->dbh->num_rows($result) > 0) {
             $help_text = $this->dbh->fetch_result($result, 0, "help_text");
@@ -143,22 +154,26 @@ class Pref_Prefs extends ProtectedHandler {
         }
     }
 
-    function changeemail() {
+    function changeemail()
+    {
 
         $email = $this->dbh->escape_string($_POST["email"]);
         $full_name = $this->dbh->escape_string($_POST["full_name"]);
 
         $active_uid = $_SESSION["uid"];
 
-        $this->dbh->query("UPDATE ttrss_users SET email = '$email',
-			full_name = '$full_name' WHERE id = '$active_uid'");
+        $this->dbh->query(
+            "UPDATE ttrss_users SET email = '$email',
+			full_name = '$full_name' WHERE id = '$active_uid'"
+        );
 
         print __("Your personal data has been saved.");
 
         return;
     }
 
-    function resetconfig() {
+    function resetconfig()
+    {
 
         $_SESSION["prefs_op_result"] = "reset-to-defaults";
 
@@ -168,15 +183,18 @@ class Pref_Prefs extends ProtectedHandler {
             $profile_qpart = "profile IS NULL";
         }
 
-        $this->dbh->query("DELETE FROM ttrss_user_prefs
-			WHERE $profile_qpart AND owner_uid = ".$_SESSION["uid"]);
+        $this->dbh->query(
+            "DELETE FROM ttrss_user_prefs
+			WHERE $profile_qpart AND owner_uid = ".$_SESSION["uid"]
+        );
 
         initialize_user_prefs($_SESSION["uid"], $_SESSION["profile"]);
 
         echo __("Your preferences are now set to default values.");
     }
 
-    function index() {
+    function index()
+    {
 
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
         $prefs_blacklist = array("STRIP_UNSAFE_TAGS", "REVERSE_HEADLINES",
@@ -216,9 +234,11 @@ class Pref_Prefs extends ProtectedHandler {
 
         print "<h2>" . __("Personal data") . "</h2>";
 
-        $result = $this->dbh->query("SELECT email,full_name,otp_enabled,
+        $result = $this->dbh->query(
+            "SELECT email,full_name,otp_enabled,
 			access_level FROM ttrss_users
-			WHERE id = ".$_SESSION["uid"]);
+			WHERE id = ".$_SESSION["uid"]
+        );
 
         $email = htmlspecialchars($this->dbh->fetch_result($result, 0, "email"));
         $full_name = htmlspecialchars($this->dbh->fetch_result($result, 0, "full_name"));
@@ -258,13 +278,16 @@ class Pref_Prefs extends ProtectedHandler {
 
             print "<h2>" . __("Password") . "</h2>";
 
-            $result = $this->dbh->query("SELECT id FROM ttrss_users
+            $result = $this->dbh->query(
+                "SELECT id FROM ttrss_users
 				WHERE id = ".$_SESSION["uid"]." AND pwd_hash
-				= 'SHA1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'");
+				= 'SHA1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'"
+            );
 
             if ($this->dbh->num_rows($result) != 0) {
                 \SmallSmallRSS\Renderers\Messages::renderWarning(
-                    __("Your password is at default value, please change it."), "default_pass_warning");
+                    __("Your password is at default value, please change it."), "default_pass_warning"
+                );
             }
 
             print "<form dojoType=\"dijit.form.Form\">";
@@ -292,7 +315,8 @@ class Pref_Prefs extends ProtectedHandler {
 
             if ($otp_enabled) {
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
-                    __("Changing your current password will disable OTP."));
+                    __("Changing your current password will disable OTP.")
+                );
             }
 
             print "<table width=\"100%\" class=\"prefPrefsList\">";
@@ -326,7 +350,8 @@ class Pref_Prefs extends ProtectedHandler {
                 if ($otp_enabled) {
 
                     \SmallSmallRSS\Renderers\Messages::renderNotice(
-                        __("One time passwords are currently enabled. Enter your current password below to disable."));
+                        __("One time passwords are currently enabled. Enter your current password below to disable.")
+                    );
 
                     print "<form dojoType=\"dijit.form.Form\">";
 
@@ -369,7 +394,8 @@ class Pref_Prefs extends ProtectedHandler {
                 } elseif (function_exists("imagecreatefromstring")) {
 
                     \SmallSmallRSS\Renderers\Messages::renderWarning(
-                        __("You will need a compatible Authenticator to use this. Changing your password would automatically disable OTP."));
+                        __("You will need a compatible Authenticator to use this. Changing your password would automatically disable OTP.")
+                    );
 
                     print "<p>".__("Scan the following code by the Authenticator application:")."</p>";
 
@@ -429,15 +455,18 @@ class Pref_Prefs extends ProtectedHandler {
                 } else {
 
                     \SmallSmallRSS\Renderers\Messages::renderNotice(
-                        __("PHP GD functions are required for OTP support."));
+                        __("PHP GD functions are required for OTP support.")
+                    );
 
                 }
 
             }
         }
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-                                             "hook_prefs_tab_section", "prefPrefsAuth");
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
+            "hook_prefs_tab_section", "prefPrefsAuth"
+        );
 
         print "</div>"; #pane
 
@@ -473,7 +502,8 @@ class Pref_Prefs extends ProtectedHandler {
 
         if (!empty($_SESSION["profile"])) {
             \SmallSmallRSS\Renderers\Messages::renderNotice(
-                __("Some preferences are only available in default profile."));
+                __("Some preferences are only available in default profile.")
+            );
         }
 
         if (!empty($_SESSION["profile"])) {
@@ -491,7 +521,8 @@ class Pref_Prefs extends ProtectedHandler {
 
         $access_query = 'true';
 
-        $result = $this->dbh->query("SELECT DISTINCT
+        $result = $this->dbh->query(
+            "SELECT DISTINCT
 			ttrss_user_prefs.pref_name,value,type_name,
 			ttrss_prefs_sections.order_id,
 			def_value,section_id
@@ -502,7 +533,8 @@ class Pref_Prefs extends ProtectedHandler {
 				ttrss_user_prefs.pref_name = ttrss_prefs.pref_name AND
 				$access_query AND
 				owner_uid = ".$_SESSION["uid"]."
-			ORDER BY ttrss_prefs_sections.order_id,pref_name");
+			ORDER BY ttrss_prefs_sections.order_id,pref_name"
+        );
 
         $lnum = 0;
 
@@ -524,10 +556,13 @@ class Pref_Prefs extends ProtectedHandler {
             $short_desc = $this->getShortDesc($pref_name);
             $help_text = $this->getHelpText($pref_name);
 
-            if (!$short_desc) continue;
+            if (!$short_desc) {  continue;
+            }
 
-            if (!empty($_SESSION["profile"]) && in_array($line["pref_name"],
-                                                         $profile_blacklist)) {
+            if (!empty($_SESSION["profile"]) && in_array(
+                $line["pref_name"],
+                $profile_blacklist
+            )) {
                 continue;
             }
 
@@ -553,15 +588,18 @@ class Pref_Prefs extends ProtectedHandler {
             print $short_desc;
             print "</label>";
 
-            if ($help_text) print "<div class=\"prefHelp\">".__($help_text)."</div>";
+            if ($help_text) {  print "<div class=\"prefHelp\">".__($help_text)."</div>";
+            }
 
             print "</td>";
 
             print "<td class=\"prefValue\">";
 
             if ($pref_name == "USER_LANGUAGE") {
-                print_select_hash($pref_name, $value, get_translations(),
-                                  "style='width : 220px; margin : 0px' dojoType='dijit.form.Select'");
+                print_select_hash(
+                    $pref_name, $value, get_translations(),
+                    "style='width : 220px; margin : 0px' dojoType='dijit.form.Select'"
+                );
 
             } elseif ($pref_name == "USER_TIMEZONE") {
 
@@ -577,8 +615,10 @@ class Pref_Prefs extends ProtectedHandler {
 
                 $themes = array_map("basename", glob("themes/*.css"));
 
-                print_select($pref_name, $value, $themes,
-                             'dojoType="dijit.form.Select"');
+                print_select(
+                    $pref_name, $value, $themes,
+                    'dojoType="dijit.form.Select"'
+                );
 
 
             } elseif ($pref_name == "DEFAULT_UPDATE_INTERVAL") {
@@ -664,8 +704,10 @@ class Pref_Prefs extends ProtectedHandler {
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-                                             "hook_prefs_tab_section", "prefPrefsPrefsInside");
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
+            "hook_prefs_tab_section", "prefPrefsPrefsInside"
+        );
 
         print '</div>'; # inside pane
         print '<div dojoType="dijit.layout.ContentPane" region="bottom">';
@@ -700,8 +742,10 @@ class Pref_Prefs extends ProtectedHandler {
            <label for='prefs_show_advanced'>" .
            __("Show additional preferences") . "</label>"; */
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-                                             "hook_prefs_tab_section", "prefPrefsPrefsOutside");
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
+            "hook_prefs_tab_section", "prefPrefsPrefsOutside"
+        );
 
         print "</form>";
         print '</div>'; # inner pane
@@ -714,7 +758,8 @@ class Pref_Prefs extends ProtectedHandler {
         print "<p>" . __("You will need to reload Tiny Tiny RSS for plugin changes to take effect.") . "</p>";
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            __("Download more plugins at tt-rss.org <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/forum/viewforum.php?f=22\">forums</a> or <a target=\"_blank\" class=\"visibleLink\" href=\"http://tt-rss.org/wiki/Plugins\">wiki</a>."));
+            __("Download more plugins at tt-rss.org <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/forum/viewforum.php?f=22\">forums</a> or <a target=\"_blank\" class=\"visibleLink\" href=\"http://tt-rss.org/wiki/Plugins\">wiki</a>.")
+        );
 
         print "<form dojoType=\"dijit.form.Form\" id=\"changePluginsForm\">";
 
@@ -863,25 +908,31 @@ class Pref_Prefs extends ProtectedHandler {
 
         print "</div>"; #pane
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-                                             "hook_prefs_tab", "prefPrefs");
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
+            "hook_prefs_tab", "prefPrefs"
+        );
 
         print "</div>"; #container
     }
 
-    function toggleAdvanced() {
+    function toggleAdvanced()
+    {
         $_SESSION["prefs_show_advanced"] = !$_SESSION["prefs_show_advanced"];
     }
 
-    function otpqrcode() {
+    function otpqrcode()
+    {
         require_once "lib/otphp/vendor/base32.php";
         require_once "lib/otphp/lib/otp.php";
         require_once "lib/otphp/lib/totp.php";
         require_once "lib/phpqrcode/phpqrcode.php";
 
-        $result = $this->dbh->query("SELECT login,salt,otp_enabled
+        $result = $this->dbh->query(
+            "SELECT login,salt,otp_enabled
 			FROM ttrss_users
-			WHERE id = ".$_SESSION["uid"]);
+			WHERE id = ".$_SESSION["uid"]
+        );
 
         $base32 = new Base32();
 
@@ -895,7 +946,8 @@ class Pref_Prefs extends ProtectedHandler {
         }
     }
 
-    function otpenable() {
+    function otpenable()
+    {
         require_once "lib/otphp/vendor/base32.php";
         require_once "lib/otphp/lib/otp.php";
         require_once "lib/otphp/lib/totp.php";
@@ -907,9 +959,11 @@ class Pref_Prefs extends ProtectedHandler {
 
         if ($authenticator->check_password($_SESSION["uid"], $password)) {
 
-            $result = $this->dbh->query("SELECT salt
+            $result = $this->dbh->query(
+                "SELECT salt
 				FROM ttrss_users
-				WHERE id = ".$_SESSION["uid"]);
+				WHERE id = ".$_SESSION["uid"]
+            );
 
             $base32 = new Base32();
 
@@ -919,8 +973,10 @@ class Pref_Prefs extends ProtectedHandler {
             $otp_check = $topt->now();
 
             if ($otp == $otp_check) {
-                $this->dbh->query("UPDATE ttrss_users SET otp_enabled = true WHERE
-					id = " . $_SESSION["uid"]);
+                $this->dbh->query(
+                    "UPDATE ttrss_users SET otp_enabled = true WHERE
+					id = " . $_SESSION["uid"]
+                );
 
                 print "OK";
             } else {
@@ -932,15 +988,18 @@ class Pref_Prefs extends ProtectedHandler {
 
     }
 
-    function otpdisable() {
+    function otpdisable()
+    {
         $password = $this->dbh->escape_string($_REQUEST["password"]);
 
         $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
 
         if ($authenticator->check_password($_SESSION["uid"], $password)) {
 
-            $this->dbh->query("UPDATE ttrss_users SET otp_enabled = false WHERE
-				id = " . $_SESSION["uid"]);
+            $this->dbh->query(
+                "UPDATE ttrss_users SET otp_enabled = false WHERE
+				id = " . $_SESSION["uid"]
+            );
 
             print "OK";
         } else {
@@ -949,28 +1008,34 @@ class Pref_Prefs extends ProtectedHandler {
 
     }
 
-    function setplugins() {
-        if (is_array($_REQUEST["plugins"]))
+    function setplugins()
+    {
+        if (is_array($_REQUEST["plugins"])) {
             $plugins = join(",", $_REQUEST["plugins"]);
-        else
+        }
+        else {
             $plugins = "";
+        }
 
         set_pref("_ENABLED_PLUGINS", $plugins);
     }
 
-    function clearplugindata() {
+    function clearplugindata()
+    {
         $name = $this->dbh->escape_string($_REQUEST["name"]);
 
         \SmallSmallRSS\PluginHost::getInstance()->clear_data(\SmallSmallRSS\PluginHost::getInstance()->get_plugin($name));
     }
 
-    function customizeCSS() {
+    function customizeCSS()
+    {
         $value = get_pref("USER_STYLESHEET");
 
         $value = str_replace("<br/>", "\n", $value);
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            T_sprintf("You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target=\"_blank\" class=\"visibleLink\" href=\"%s\">This file</a> can be used as a baseline.", "css/tt-rss.css"));
+            T_sprintf("You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target=\"_blank\" class=\"visibleLink\" href=\"%s\">This file</a> can be used as a baseline.", "css/tt-rss.css")
+        );
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"rpc\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"setpref\">";
@@ -992,7 +1057,8 @@ class Pref_Prefs extends ProtectedHandler {
 
     }
 
-    function editPrefProfiles() {
+    function editPrefProfiles()
+    {
         print "<div dojoType=\"dijit.Toolbar\">";
 
         print "<div dojoType=\"dijit.form.DropDownButton\">".
@@ -1014,8 +1080,10 @@ class Pref_Prefs extends ProtectedHandler {
 
         print "</div>";
 
-        $result = $this->dbh->query("SELECT title,id FROM ttrss_settings_profiles
-			WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY title");
+        $result = $this->dbh->query(
+            "SELECT title,id FROM ttrss_settings_profiles
+			WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY title"
+        );
 
         print "<div class=\"prefProfileHolder\">";
 
@@ -1106,21 +1174,24 @@ class Pref_Prefs extends ProtectedHandler {
 
     }
 
-    private function getShortDesc($pref_name) {
+    private function getShortDesc($pref_name)
+    {
         if (isset($this->pref_help[$pref_name][0])) {
             return $this->pref_help[$pref_name][0];
         }
         return "";
     }
 
-    private function getHelpText($pref_name) {
+    private function getHelpText($pref_name)
+    {
         if (isset($this->pref_help[$pref_name][1])) {
             return $this->pref_help[$pref_name][1];
         }
         return "";
     }
 
-    private function getSectionName($id) {
+    private function getSectionName($id)
+    {
         if (isset($this->pref_sections[$id])) {
             return $this->pref_sections[$id];
         }

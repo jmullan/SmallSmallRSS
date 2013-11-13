@@ -1,7 +1,9 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Pref_Users extends ProtectedHandler {
-    function before($method) {
+class Pref_Users extends ProtectedHandler
+{
+    function before($method)
+    {
         if (parent::before($method)) {
             if ($_SESSION["access_level"] < 10) {
                 print __("Your access level is insufficient to open this tab.");
@@ -12,24 +14,28 @@ class Pref_Users extends ProtectedHandler {
         return false;
     }
 
-    function csrf_ignore($method) {
+    function csrf_ignore($method)
+    {
         $csrf_ignored = array("index", "edit", "userdetails");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function userdetails() {
+    function userdetails()
+    {
 
         $uid = sprintf("%d", $_REQUEST["id"]);
 
-        $result = $this->dbh->query("SELECT login,
+        $result = $this->dbh->query(
+            "SELECT login,
 				".SUBSTRING_FOR_DATE."(last_login,1,16) AS last_login,
 				access_level,
 				(SELECT COUNT(int_id) FROM ttrss_user_entries
 					WHERE owner_uid = id) AS stored_articles,
 				".SUBSTRING_FOR_DATE."(created,1,16) AS created
 				FROM ttrss_users
-				WHERE id = '$uid'");
+				WHERE id = '$uid'"
+        );
 
         if ($this->dbh->num_rows($result) == 0) {
             print "<h1>".__('User not found')."</h1>";
@@ -43,10 +49,12 @@ class Pref_Users extends ProtectedHandler {
         print "<table width='100%'>";
 
         $last_login = make_local_datetime(
-            $this->dbh->fetch_result($result, 0, "last_login"), true);
+            $this->dbh->fetch_result($result, 0, "last_login"), true
+        );
 
         $created = make_local_datetime(
-            $this->dbh->fetch_result($result, 0, "created"), true);
+            $this->dbh->fetch_result($result, 0, "created"), true
+        );
 
         $access_level = $this->dbh->fetch_result($result, 0, "access_level");
         $stored_articles = $this->dbh->fetch_result($result, 0, "stored_articles");
@@ -54,8 +62,10 @@ class Pref_Users extends ProtectedHandler {
         print "<tr><td>".__('Registered')."</td><td>$created</td></tr>";
         print "<tr><td>".__('Last logged in')."</td><td>$last_login</td></tr>";
 
-        $result = $this->dbh->query("SELECT COUNT(id) as num_feeds FROM ttrss_feeds
-				WHERE owner_uid = '$uid'");
+        $result = $this->dbh->query(
+            "SELECT COUNT(id) as num_feeds FROM ttrss_feeds
+				WHERE owner_uid = '$uid'"
+        );
 
         $num_feeds = $this->dbh->fetch_result($result, 0, "num_feeds");
 
@@ -65,8 +75,10 @@ class Pref_Users extends ProtectedHandler {
 
         print "<h1>".__('Subscribed feeds')."</h1>";
 
-        $result = $this->dbh->query("SELECT id,title,site_url FROM ttrss_feeds
-				WHERE owner_uid = '$uid' ORDER BY title");
+        $result = $this->dbh->query(
+            "SELECT id,title,site_url FROM ttrss_feeds
+				WHERE owner_uid = '$uid' ORDER BY title"
+        );
 
 
         print "<ul class=\"userFeedList\">";
@@ -100,7 +112,8 @@ class Pref_Users extends ProtectedHandler {
         return;
     }
 
-    function edit() {
+    function edit()
+    {
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
 
         $id = $this->dbh->escape_string($_REQUEST["id"]);
@@ -138,11 +151,15 @@ class Pref_Users extends ProtectedHandler {
         print __('Access level: ') . " ";
 
         if (!$sel_disabled) {
-            print_select_hash("access_level", $access_level, $access_level_names,
-                              "dojoType=\"dijit.form.Select\" $sel_disabled");
+            print_select_hash(
+                "access_level", $access_level, $access_level_names,
+                "dojoType=\"dijit.form.Select\" $sel_disabled"
+            );
         } else {
-            print_select_hash("", $access_level, $access_level_names,
-                              "dojoType=\"dijit.form.Select\" $sel_disabled");
+            print_select_hash(
+                "", $access_level, $access_level_names,
+                "dojoType=\"dijit.form.Select\" $sel_disabled"
+            );
             print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"access_level\" value=\"$access_level\">";
         }
 
@@ -174,7 +191,8 @@ class Pref_Users extends ProtectedHandler {
         return;
     }
 
-    function editSave() {
+    function editSave()
+    {
         $login = $this->dbh->escape_string(trim($_REQUEST["login"]));
         $uid = $this->dbh->escape_string($_REQUEST["id"]);
         $access_level = (int) $_REQUEST["access_level"];
@@ -189,13 +207,16 @@ class Pref_Users extends ProtectedHandler {
             $pass_query_part = "";
         }
 
-        $this->dbh->query("UPDATE ttrss_users SET $pass_query_part login = '$login',
+        $this->dbh->query(
+            "UPDATE ttrss_users SET $pass_query_part login = '$login',
 				access_level = '$access_level', email = '$email', otp_enabled = false
-				WHERE id = '$uid'");
+				WHERE id = '$uid'"
+        );
 
     }
 
-    function remove() {
+    function remove()
+    {
         $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
@@ -207,51 +228,64 @@ class Pref_Users extends ProtectedHandler {
         }
     }
 
-    function add() {
+    function add()
+    {
 
         $login = $this->dbh->escape_string(trim($_REQUEST["login"]));
         $tmp_user_pwd = make_password(8);
         $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
         $pwd_hash = encrypt_password($tmp_user_pwd, $salt, true);
 
-        $result = $this->dbh->query("SELECT id FROM ttrss_users WHERE
-				login = '$login'");
+        $result = $this->dbh->query(
+            "SELECT id FROM ttrss_users WHERE
+				login = '$login'"
+        );
 
         if ($this->dbh->num_rows($result) == 0) {
 
-            $this->dbh->query("INSERT INTO ttrss_users
+            $this->dbh->query(
+                "INSERT INTO ttrss_users
 					(login,pwd_hash,access_level,last_login,created, salt)
-					VALUES ('$login', '$pwd_hash', 0, null, NOW(), '$salt')");
+					VALUES ('$login', '$pwd_hash', 0, null, NOW(), '$salt')"
+            );
 
 
-            $result = $this->dbh->query("SELECT id FROM ttrss_users WHERE
-					login = '$login' AND pwd_hash = '$pwd_hash'");
+            $result = $this->dbh->query(
+                "SELECT id FROM ttrss_users WHERE
+					login = '$login' AND pwd_hash = '$pwd_hash'"
+            );
 
             if ($this->dbh->num_rows($result) == 1) {
 
                 $new_uid = $this->dbh->fetch_result($result, 0, "id");
 
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
-                    T_sprintf("Added user <b>%s</b> with password <b>%s</b>", $login, $tmp_user_pwd));
+                    T_sprintf("Added user <b>%s</b> with password <b>%s</b>", $login, $tmp_user_pwd)
+                );
 
                 initialize_user($new_uid);
 
             } else {
 
                 \SmallSmallRSS\Renderers\Messages::renderWarning(
-                    T_sprintf("Could not create user <b>%s</b>", $login));
+                    T_sprintf("Could not create user <b>%s</b>", $login)
+                );
 
             }
         } else {
             \SmallSmallRSS\Renderers\Messages::renderWarning(
-                T_sprintf("User <b>%s</b> already exists.", $login));
+                T_sprintf("User <b>%s</b> already exists.", $login)
+            );
         }
     }
 
-    static function resetUserPassword($uid, $show_password) {
+    static function resetUserPassword($uid, $show_password)
+    {
 
-        $result = db_query("SELECT login,email
-				FROM ttrss_users WHERE id = '$uid'");
+        $result = db_query(
+            "SELECT login,email
+				FROM ttrss_users WHERE id = '$uid'"
+        );
 
         $login = db_fetch_result($result, 0, "login");
         $email = db_fetch_result($result, 0, "email");
@@ -262,14 +296,17 @@ class Pref_Users extends ProtectedHandler {
 
         $pwd_hash = encrypt_password($tmp_user_pwd, $new_salt, true);
 
-        db_query("UPDATE ttrss_users SET pwd_hash = '$pwd_hash', salt = '$new_salt'
-				WHERE id = '$uid'");
+        db_query(
+            "UPDATE ttrss_users SET pwd_hash = '$pwd_hash', salt = '$new_salt'
+				WHERE id = '$uid'"
+        );
 
         if ($show_password) {
             print T_sprintf("Changed password of user <b>%s</b> to <b>%s</b>", $login, $tmp_user_pwd);
         } else {
             \SmallSmallRSS\Renderers\Messages::renderNotice(
-                T_sprintf("Sending new password of user <b>%s</b> to <b>%s</b>", $login, $email));
+                T_sprintf("Sending new password of user <b>%s</b> to <b>%s</b>", $login, $email)
+            );
         }
 
         if ($email) {
@@ -290,9 +327,11 @@ class Pref_Users extends ProtectedHandler {
 
             $mail = new \SmallSmallRSS\Mailer();
 
-            $rc = $mail->quickMail($email, $login,
-                                   __("[tt-rss] Password change notification"),
-                                   $message, false);
+            $rc = $mail->quickMail(
+                $email, $login,
+                __("[tt-rss] Password change notification"),
+                $message, false
+            );
 
             if (!$rc) {
                 \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
@@ -300,12 +339,14 @@ class Pref_Users extends ProtectedHandler {
         }
     }
 
-    function resetPass() {
+    function resetPass()
+    {
         $uid = $this->dbh->escape_string($_REQUEST["id"]);
         Pref_Users::resetUserPassword($uid, true);
     }
 
-    function index() {
+    function index()
+    {
 
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
 
@@ -356,8 +397,10 @@ class Pref_Users extends ProtectedHandler {
 				<button dojoType=\"dijit.form.Button\" onclick=\"resetSelectedUserPass()\">".
             __('Reset password')."</button dojoType=\"dijit.form.Button\">";
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-                                             "hook_prefs_tab_section", "prefUsersToolbar");
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
+            "hook_prefs_tab_section", "prefUsersToolbar"
+        );
 
         print "</div>"; #toolbar
         print "</div>"; #pane
@@ -381,7 +424,8 @@ class Pref_Users extends ProtectedHandler {
             $user_search_query = "";
         }
 
-        $result = $this->dbh->query("SELECT
+        $result = $this->dbh->query(
+            "SELECT
 					id,login,access_level,email,
 					".SUBSTRING_FOR_DATE."(last_login,1,16) as last_login,
 					".SUBSTRING_FOR_DATE."(created,1,16) as created
@@ -390,7 +434,8 @@ class Pref_Users extends ProtectedHandler {
 				WHERE
 					$user_search_query
 					id > 0
-				ORDER BY $sort");
+				ORDER BY $sort"
+        );
 
         if ($this->dbh->num_rows($result) > 0) {
 
@@ -425,7 +470,8 @@ class Pref_Users extends ProtectedHandler {
 
                 print "<td $onclick>" . $line["login"] . "</td>";
 
-                if (!$line["email"]) $line["email"] = "&nbsp;";
+                if (!$line["email"]) {  $line["email"] = "&nbsp;";
+                }
 
                 print "<td $onclick>" .	$access_level_names[$line["access_level"]] . "</td>";
                 print "<td $onclick>" . $line["created"] . "</td>";
@@ -450,8 +496,10 @@ class Pref_Users extends ProtectedHandler {
         }
 
         print "</div>"; #pane
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-                                             "hook_prefs_tab", "prefUsers");
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
+            "hook_prefs_tab", "prefUsers"
+        );
         print "</div>"; #container
     }
 }

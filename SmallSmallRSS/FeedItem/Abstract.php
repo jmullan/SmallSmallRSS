@@ -51,6 +51,7 @@ abstract class FeedItem_Abstract
             return $comments->nodeValue;
         }
     }
-    public function get_comments_url() {
+    public function get_comments_url()
+    {
     }
 }

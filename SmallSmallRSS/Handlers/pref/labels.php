@@ -1,18 +1,23 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Pref_Labels extends ProtectedHandler {
+class Pref_Labels extends ProtectedHandler
+{
 
-    function csrf_ignore($method) {
+    function csrf_ignore($method)
+    {
         $csrf_ignored = array("index", "getlabeltree", "edit");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function edit() {
+    function edit()
+    {
         $label_id = $this->dbh->escape_string($_REQUEST['id']);
 
-        $result = $this->dbh->query("SELECT * FROM ttrss_labels2 WHERE
-			id = '$label_id' AND owner_uid = " . $_SESSION["uid"]);
+        $result = $this->dbh->query(
+            "SELECT * FROM ttrss_labels2 WHERE
+			id = '$label_id' AND owner_uid = " . $_SESSION["uid"]
+        );
 
         $line = $this->dbh->fetch_assoc($result);
 
@@ -85,16 +90,19 @@ class Pref_Labels extends ProtectedHandler {
         return;
     }
 
-    function getlabeltree() {
+    function getlabeltree()
+    {
         $root = array();
         $root['id'] = 'root';
         $root['name'] = __('Labels');
         $root['items'] = array();
 
-        $result = $this->dbh->query("SELECT *
+        $result = $this->dbh->query(
+            "SELECT *
 			FROM ttrss_labels2
 			WHERE owner_uid = ".$_SESSION["uid"]."
-			ORDER BY caption");
+			ORDER BY caption"
+        );
 
         while ($line = $this->dbh->fetch_assoc($result)) {
             $label = array();
@@ -118,7 +126,8 @@ class Pref_Labels extends ProtectedHandler {
         return;
     }
 
-    function colorset() {
+    function colorset()
+    {
         $kind = $this->dbh->escape_string($_REQUEST["kind"]);
         $ids = explode(',', $this->dbh->escape_string($_REQUEST["ids"]));
         $color = $this->dbh->escape_string($_REQUEST["color"]);
@@ -128,75 +137,95 @@ class Pref_Labels extends ProtectedHandler {
         foreach ($ids as $id) {
 
             if ($kind == "fg" || $kind == "bg") {
-                $this->dbh->query("UPDATE ttrss_labels2 SET
+                $this->dbh->query(
+                    "UPDATE ttrss_labels2 SET
 					${kind}_color = '$color' WHERE id = '$id'
-					AND owner_uid = " . $_SESSION["uid"]);
+					AND owner_uid = " . $_SESSION["uid"]
+                );
             } else {
-                $this->dbh->query("UPDATE ttrss_labels2 SET
+                $this->dbh->query(
+                    "UPDATE ttrss_labels2 SET
 					fg_color = '$fg', bg_color = '$bg' WHERE id = '$id'
-					AND owner_uid = " . $_SESSION["uid"]);
+					AND owner_uid = " . $_SESSION["uid"]
+                );
             }
 
             $caption = $this->dbh->escape_string(label_find_caption($id, $_SESSION["uid"]));
 
             /* Remove cached data */
 
-            $this->dbh->query("UPDATE ttrss_user_entries SET label_cache = ''
-				WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]);
+            $this->dbh->query(
+                "UPDATE ttrss_user_entries SET label_cache = ''
+				WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
+            );
 
         }
 
         return;
     }
 
-    function colorreset() {
+    function colorreset()
+    {
         $ids = explode(',', $this->dbh->escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
-            $this->dbh->query("UPDATE ttrss_labels2 SET
+            $this->dbh->query(
+                "UPDATE ttrss_labels2 SET
 				fg_color = '', bg_color = '' WHERE id = '$id'
-				AND owner_uid = " . $_SESSION["uid"]);
+				AND owner_uid = " . $_SESSION["uid"]
+            );
 
             $caption = $this->dbh->escape_string(label_find_caption($id, $_SESSION["uid"]));
 
             /* Remove cached data */
 
-            $this->dbh->query("UPDATE ttrss_user_entries SET label_cache = ''
-				WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]);
+            $this->dbh->query(
+                "UPDATE ttrss_user_entries SET label_cache = ''
+				WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
+            );
         }
 
     }
 
-    function save() {
+    function save()
+    {
 
         $id = $this->dbh->escape_string($_REQUEST["id"]);
         $caption = $this->dbh->escape_string(trim($_REQUEST["caption"]));
 
         $this->dbh->query("BEGIN");
 
-        $result = $this->dbh->query("SELECT caption FROM ttrss_labels2
-			WHERE id = '$id' AND owner_uid = ". $_SESSION["uid"]);
+        $result = $this->dbh->query(
+            "SELECT caption FROM ttrss_labels2
+			WHERE id = '$id' AND owner_uid = ". $_SESSION["uid"]
+        );
 
         if ($this->dbh->num_rows($result) != 0) {
             $old_caption = $this->dbh->fetch_result($result, 0, "caption");
 
-            $result = $this->dbh->query("SELECT id FROM ttrss_labels2
-				WHERE caption = '$caption' AND owner_uid = ". $_SESSION["uid"]);
+            $result = $this->dbh->query(
+                "SELECT id FROM ttrss_labels2
+				WHERE caption = '$caption' AND owner_uid = ". $_SESSION["uid"]
+            );
 
             if ($this->dbh->num_rows($result) == 0) {
                 if ($caption) {
-                    $result = $this->dbh->query("UPDATE ttrss_labels2 SET
+                    $result = $this->dbh->query(
+                        "UPDATE ttrss_labels2 SET
 						caption = '$caption' WHERE id = '$id' AND
-						owner_uid = " . $_SESSION["uid"]);
+						owner_uid = " . $_SESSION["uid"]
+                    );
 
                     /* Update filters that reference label being renamed */
 
                     $old_caption = $this->dbh->escape_string($old_caption);
 
-                    $this->dbh->query("UPDATE ttrss_filters2_actions SET
+                    $this->dbh->query(
+                        "UPDATE ttrss_filters2_actions SET
 						action_param = '$caption' WHERE action_param = '$old_caption'
 						AND action_id = 7
-						AND filter_id IN (SELECT id FROM ttrss_filters2 WHERE owner_uid = ".$_SESSION["uid"].")");
+						AND filter_id IN (SELECT id FROM ttrss_filters2 WHERE owner_uid = ".$_SESSION["uid"].")"
+                    );
 
                     print $_REQUEST["value"];
                 } else {
@@ -212,7 +241,8 @@ class Pref_Labels extends ProtectedHandler {
         return;
     }
 
-    function remove() {
+    function remove()
+    {
 
         $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
 
@@ -222,7 +252,8 @@ class Pref_Labels extends ProtectedHandler {
 
     }
 
-    function add() {
+    function add()
+    {
         $caption = $this->dbh->escape_string($_REQUEST["caption"]);
         $output = $this->dbh->escape_string($_REQUEST["output"]);
 
@@ -239,8 +270,10 @@ class Pref_Labels extends ProtectedHandler {
 
                 print "<rpc-reply><payload>";
 
-                print_label_select("select_label",
-                                   $caption, "");
+                print_label_select(
+                    "select_label",
+                    $caption, ""
+                );
 
                 print "</payload></rpc-reply>";
             }
@@ -249,7 +282,8 @@ class Pref_Labels extends ProtectedHandler {
         return;
     }
 
-    function index() {
+    function index()
+    {
 
         $sort = $this->dbh->escape_string($_REQUEST["sort"]);
 
@@ -320,8 +354,10 @@ class Pref_Labels extends ProtectedHandler {
 
         print "</div>"; #pane
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-                                             "hook_prefs_tab", "prefLabels");
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
+            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
+            "hook_prefs_tab", "prefLabels"
+        );
 
         print "</div>"; #container
 

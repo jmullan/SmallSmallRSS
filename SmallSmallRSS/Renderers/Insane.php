@@ -3,7 +3,8 @@ namespace SmallSmallRSS\Renderers;
 
 class Insance extends \SmallSmallRSS\Renderers\Base
 {
-    public function __construct($errors) {
+    public function __construct($errors)
+    {
         $this->errors = $errors;
     }
     public function render()

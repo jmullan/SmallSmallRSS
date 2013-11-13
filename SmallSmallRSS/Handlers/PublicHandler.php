@@ -26,14 +26,14 @@ class PublicHandler extends Handler
             $date_sort_field = "last_marked DESC";
 
         switch ($order) {
-        case "title":
-            $date_sort_field = "ttrss_entries.title";
+            case "title":
+                $date_sort_field = "ttrss_entries.title";
                 break;
-        case "date_reverse":
-            $date_sort_field = "date_entered, updated";
+            case "date_reverse":
+                $date_sort_field = "date_entered, updated";
                 break;
-        case "feed_dates":
-            $date_sort_field = "updated DESC";
+            case "feed_dates":
+                $date_sort_field = "updated DESC";
                 break;
         }
 
@@ -623,34 +623,34 @@ class PublicHandler extends Handler
             $rc = subscribe_to_feed($feed_url);
 
             switch ($rc['code']) {
-            case 0:
-                \SmallSmallRSS\Renderers\Messages::renderWarning(
-                    T_sprintf("Already subscribed to <b>%s</b>.", $feed_url)
-                );
+                case 0:
+                    \SmallSmallRSS\Renderers\Messages::renderWarning(
+                        T_sprintf("Already subscribed to <b>%s</b>.", $feed_url)
+                    );
                     break;
-            case 1:
-                \SmallSmallRSS\Renderers\Messages::renderNotice(
-                    T_sprintf("Subscribed to <b>%s</b>.", $feed_url)
-                );
+                case 1:
+                    \SmallSmallRSS\Renderers\Messages::renderNotice(
+                        T_sprintf("Subscribed to <b>%s</b>.", $feed_url)
+                    );
                     break;
-            case 2:
-                \SmallSmallRSS\Renderers\Messages::renderError(
-                    T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url)
-                );
+                case 2:
+                    \SmallSmallRSS\Renderers\Messages::renderError(
+                        T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url)
+                    );
                     break;
-            case 3:
-                \SmallSmallRSS\Renderers\Messages::renderError(
-                    T_sprintf("No feeds found in <b>%s</b>.", $feed_url)
-                );
+                case 3:
+                    \SmallSmallRSS\Renderers\Messages::renderError(
+                        T_sprintf("No feeds found in <b>%s</b>.", $feed_url)
+                    );
                     break;
-            case 4:
-                \SmallSmallRSS\Renderers\Messages::renderNotice(__("Multiple feed URLs found."));
-                $feed_urls = $rc["feeds"];
+                case 4:
+                    \SmallSmallRSS\Renderers\Messages::renderNotice(__("Multiple feed URLs found."));
+                    $feed_urls = $rc["feeds"];
                     break;
-            case 5:
-                \SmallSmallRSS\Renderers\Messages::renderError(
-                    T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url)
-                );
+                case 5:
+                    \SmallSmallRSS\Renderers\Messages::renderError(
+                        T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url)
+                    );
                     break;
             }
 
@@ -726,37 +726,37 @@ class PublicHandler extends Handler
         $rc = subscribe_to_feed($feed_url, $cat_id, $auth_login, $auth_pass);
 
         switch ($rc) {
-        case 1:
-            \SmallSmallRSS\Renderers\Messages::renderNotice(
-                T_sprintf("Subscribed to <b>%s</b>.", $feed_url)
-            );
+            case 1:
+                \SmallSmallRSS\Renderers\Messages::renderNotice(
+                    T_sprintf("Subscribed to <b>%s</b>.", $feed_url)
+                );
                 break;
-        case 2:
-            \SmallSmallRSS\Renderers\Messages::renderError(
-                T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url)
-            );
+            case 2:
+                \SmallSmallRSS\Renderers\Messages::renderError(
+                    T_sprintf("Could not subscribe to <b>%s</b>.", $feed_url)
+                );
                 break;
-        case 3:
-            \SmallSmallRSS\Renderers\Messages::renderError(
-                T_sprintf("No feeds found in <b>%s</b>.", $feed_url)
-            );
+            case 3:
+                \SmallSmallRSS\Renderers\Messages::renderError(
+                    T_sprintf("No feeds found in <b>%s</b>.", $feed_url)
+                );
                 break;
-        case 0:
-            \SmallSmallRSS\Renderers\Messages::renderWarning(
-                T_sprintf("Already subscribed to <b>%s</b>.", $feed_url)
-            );
+            case 0:
+                \SmallSmallRSS\Renderers\Messages::renderWarning(
+                    T_sprintf("Already subscribed to <b>%s</b>.", $feed_url)
+                );
                 break;
-        case 4:
-            \SmallSmallRSS\Renderers\Messages::renderNotice(__("Multiple feed URLs found."));
-            $contents = @\SmallSmallRSS\Fetcher::fetch($url, false, $auth_login, $auth_pass);
-            if (is_html($contents)) {
-                $feed_urls = get_feeds_from_html($url, $contents);
-            }
+            case 4:
+                \SmallSmallRSS\Renderers\Messages::renderNotice(__("Multiple feed URLs found."));
+                $contents = @\SmallSmallRSS\Fetcher::fetch($url, false, $auth_login, $auth_pass);
+                if (is_html($contents)) {
+                    $feed_urls = get_feeds_from_html($url, $contents);
+                }
                 break;
-        case 5:
-            \SmallSmallRSS\Renderers\Messages::renderError(
-                T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url)
-            );
+            case 5:
+                \SmallSmallRSS\Renderers\Messages::renderError(
+                    T_sprintf("Could not subscribe to <b>%s</b>.<br>Can't download the Feed URL.", $feed_url)
+                );
                 break;
         }
 

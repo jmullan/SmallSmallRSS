@@ -14,8 +14,14 @@ if (!$method) {
 /* Public calls compatibility shim */
 
 $public_calls = array(
-    "globalUpdateFeeds", "rss", "getUnread", "getProfiles", "share",
-    "fbexport", "logout", "pubsub"
+    "globalUpdateFeeds",
+    "rss",
+    "getUnread",
+    "getProfiles",
+    "share",
+    "fbexport",
+    "logout",
+    "pubsub"
 );
 
 if (array_search($op, $public_calls) !== false) {
@@ -64,7 +70,6 @@ if (isset($legacy_ops[$op])) {
 }
 $handler = '\\SmallSmallRSS\\Handlers\\' . $op;
 $override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler($op, $method);
-$start = time();
 $error_code = 7;
 if (class_exists($handler) || $override) {
     if ($override) {
@@ -96,5 +101,3 @@ if (class_exists($handler) || $override) {
 }
 $renderer = new \SmallSmallRSS\Renderers\JSONError($error_code);
 $renderer->render();
-$end = time();
-\SmallSmallRSS\Logger::log(array($op, $method, $end - $start)); 

@@ -9,7 +9,12 @@ class Database
 
     public static function query($query, $die_on_error = true)
     {
-        return \Db::get()->query($query, $die_on_error);
+        $result = \Db::get()->query($query, $die_on_error);
+        $error = \Db::get()->last_error();
+        if ($error) {
+            \SmallSmallRSS\Logger::log('SQL error');
+        }
+        return $result;
     }
 
     public static function fetch_assoc($result)

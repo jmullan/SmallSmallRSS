@@ -80,7 +80,6 @@ class Fetcher
                 curl_setopt($ch, CURLOPT_ENCODING, 'none');
                 $contents = @curl_exec($ch);
             }
-
             if ($contents === false) {
                 $this->fetch_last_error = curl_errno($ch) . " " . curl_error($ch);
                 curl_close($ch);

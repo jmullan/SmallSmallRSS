@@ -80,7 +80,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
         } else {
             $login_thresh_qpart = (
                 "AND ttrss_users.last_login >= DATE_SUB("
-                . "    NOW(), INTERVAL" . DAEMON_UPDATE_LOGIN_LIMIT . " DAY"
+                . "    NOW(), INTERVAL " . DAEMON_UPDATE_LOGIN_LIMIT . " DAY"
                 . ")"
             );
         }
@@ -158,7 +158,6 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
                   $updstart_thresh_qpart
               ORDER BY last_updated
               $query_limit";
-    _debug($query);
     // We search for feed needing update.
     $result = db_query($query);
 
@@ -189,13 +188,16 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 
     // For each feed, we call the feed update function.
     foreach ($feeds_to_update as $feed) {
-        $query = "SELECT DISTINCT ttrss_feeds.id,last_updated,ttrss_feeds.owner_uid
+        $query = "SELECT DISTINCT
+                      ttrss_feeds.id,
+                      last_updated,
+                      ttrss_feeds.owner_uid
                   FROM ttrss_feeds, ttrss_users, ttrss_user_prefs
                   WHERE
                       ttrss_user_prefs.owner_uid = ttrss_feeds.owner_uid
                       AND ttrss_users.id = ttrss_user_prefs.owner_uid
                       AND ttrss_user_prefs.pref_name = 'DEFAULT_UPDATE_INTERVAL'
-                      AND feed_url = '".db_escape_string($feed)."'
+                      AND feed_url = '" . db_escape_string($feed) . "'
                       AND (
                           ttrss_feeds.update_interval > 0
                           OR ttrss_user_prefs.value != '-1'
@@ -203,8 +205,8 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
                   $login_thresh_qpart
                   ORDER BY ttrss_feeds.id
                   $query_limit";
+        _debug($query);
         $tmp_result = db_query($query);
-
         if (db_num_rows($tmp_result) > 0) {
             while ($tline = db_fetch_assoc($tmp_result)) {
                 update_rss_feed($tline["id"], true);
@@ -218,26 +220,39 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 
 function update_rss_feed($feed, $no_cache = false)
 {
-    $debug_enabled = defined('DAEMON_EXTENDED_DEBUG') || !empty($_REQUEST['xdebug']);
-    _debug("start", $debug_enabled);
+    _debug("start $feed");
     $result = db_query(
-        "SELECT id,update_interval,auth_login,
-            feed_url,auth_pass,cache_images,last_updated,
-            mark_unread_on_update, owner_uid,
-            pubsub_state, auth_pass_encrypted,
-            (SELECT max(date_entered) FROM
-                ttrss_entries, ttrss_user_entries where ref_id = id AND feed_id = '$feed') AS last_article_timestamp
-            FROM ttrss_feeds WHERE id = '$feed'"
+        "SELECT
+             id,
+             update_interval,
+             auth_login,
+             feed_url,
+             auth_pass,
+             cache_images,
+             last_updated,
+             mark_unread_on_update,
+             owner_uid,
+             pubsub_state,
+             auth_pass_encrypted,
+             (
+                  SELECT max(date_entered)
+                  FROM
+                      ttrss_entries,
+                      ttrss_user_entries
+                  WHERE
+                      ref_id = id
+                      AND feed_id = '$feed'
+             ) AS last_article_timestamp
+             FROM ttrss_feeds WHERE id = '$feed'"
     );
 
     if (db_num_rows($result) == 0) {
-        _debug("feed $feed NOT FOUND/SKIPPED", $debug_enabled);
+        _debug("feed $feed NOT FOUND/SKIPPED");
         return false;
     }
 
     $last_updated = db_fetch_result($result, 0, "last_updated");
     $last_article_timestamp = @strtotime(db_fetch_result($result, 0, "last_article_timestamp"));
-
     if (defined('_DISABLE_HTTP_304')) {
         $last_article_timestamp = 0;
     }
@@ -275,7 +290,8 @@ function update_rss_feed($feed, $no_cache = false)
     $cache_filename = CACHE_DIR . "/simplepie/" . sha1($fetch_url) . ".xml";
 
     $pluginhost = new \SmallSmallRSS\PluginHost();
-    $pluginhost->set_debug($debug_enabled);
+    $pluginhost->set_debug(true);
+
     $user_plugins = get_pref("_ENABLED_PLUGINS", $owner_uid);
 
     $pluginhost->load(PLUGINS, \SmallSmallRSS\PluginHost::KIND_ALL);
@@ -292,7 +308,7 @@ function update_rss_feed($feed, $no_cache = false)
         && !$auth_login && !$auth_pass
         && filemtime($cache_filename) > time() - 30) {
 
-        _debug("using local cache.", $debug_enabled);
+        _debug("using local cache.");
 
         @$feed_data = file_get_contents($cache_filename);
 
@@ -301,22 +317,23 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
     } else {
-        _debug("local cache will not be used for this feed", $debug_enabled);
+        _debug("local cache will not be used for this feed");
     }
 
     if (!$rss) {
         $feed_fetching_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FETCH_FEED);
         if (!$feed_fetching_hooks) {
-            _debug('No feed fetching hooks', $debug_enabled);
+            _debug('No feed fetching hooks');
         }
         foreach ($feed_fetching_hooks as $plugin) {
             if (!$feed_data) {
                 $feed_data = $plugin->hook_fetch_feed($feed_data, $fetch_url, $owner_uid, $feed);
             }
         }
+        $fetch_last_error = false;
         if (!$feed_data) {
-            _debug("fetching [$fetch_url]...", $debug_enabled);
-            _debug("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $last_article_timestamp), $debug_enabled);
+            _debug("fetching [$fetch_url]...");
+            _debug("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $last_article_timestamp));
             $fetcher = new \SmallSmallRSS\Fetcher();
             $feed_data = $fetcher->getFileContents(
                 $fetch_url, false,
@@ -326,21 +343,19 @@ function update_rss_feed($feed, $no_cache = false)
             );
 
             $feed_data = trim($feed_data);
-
-            _debug("fetch done.", $debug_enabled);
+            _debug("fetch done.");
             $fetch_last_error = $fetcher->last_error;
             $fetch_last_error_code = $fetcher->last_error_code;
-            _debug("unable to fetch: $fetch_last_error [$fetch_last_error_code]", $debug_enabled);
-
+        }
+        if ($fetch_last_error) {
+            _debug("unable to fetch: $fetch_last_error [$fetch_last_error_code]");
             $error_escaped = '';
-
             // If-Modified-Since
             if ($fetch_last_error_code != 304) {
                 $error_escaped = db_escape_string($fetch_last_error);
             } else {
-                _debug("source claims data not modified, nothing to do.", $debug_enabled);
+                _debug("source claims data not modified, nothing to do.");
             }
-
             db_query(
                 "UPDATE ttrss_feeds
                  SET last_error = '$error_escaped', last_updated = NOW() WHERE id = '$feed'"
@@ -350,7 +365,7 @@ function update_rss_feed($feed, $no_cache = false)
     }
     $fetched_feed_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_FETCHED);
     if (!$fetched_feed_hooks) {
-        _debug('No fetched feed hooks', $debug_enabled);
+        _debug('No fetched feed hooks');
     }
     foreach ($fetched_feed_hooks as $plugin) {
         $feed_data = $plugin->hook_feed_fetched($feed_data, $fetch_url, $owner_uid, $feed);
@@ -367,7 +382,7 @@ function update_rss_feed($feed, $no_cache = false)
     $feed = db_escape_string($feed);
     if ($rss->error()) {
         $error_msg = db_escape_string(mb_substr($rss->error(), 0, 245));
-        _debug("error fetching feed: $error_msg", $debug_enabled);
+        _debug("error fetching feed: $error_msg");
         db_query(
             "UPDATE ttrss_feeds
              SET
@@ -383,18 +398,18 @@ function update_rss_feed($feed, $no_cache = false)
         if (is_writable(CACHE_DIR . "/simplepie")) {
             $new_rss_hash = md5($feed_data);
             if ($new_rss_hash != $rss_hash && count($rss->get_items()) > 0) {
-                _debug("saving $cache_filename", $debug_enabled);
+                _debug("saving $cache_filename");
                 @file_put_contents($cache_filename, $feed_data);
             }
         } else {
-            _debug("$cache_filename is not writable", $debug_enabled);
+            _debug("$cache_filename is not writable");
         }
     }
 
     // We use local pluginhost here because we need to load different per-user feed plugins
     $pluginhost->run_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_PARSED, "hook_feed_parsed", $rss);
 
-    _debug("processing feed data...", $debug_enabled);
+    _debug("processing feed data...");
 
     if (DB_TYPE == "pgsql") {
         $favicon_interval_qpart = "favicon_last_checked < NOW() - INTERVAL '12 hour'";
@@ -421,8 +436,8 @@ function update_rss_feed($feed, $no_cache = false)
 
     $site_url = db_escape_string(mb_substr(rewrite_relative_url($fetch_url, $rss->get_link()), 0, 245));
 
-    _debug("site_url: $site_url", $debug_enabled);
-    _debug("feed_title: " . $rss->get_title(), $debug_enabled);
+    _debug("site_url: $site_url");
+    _debug("feed_title: " . $rss->get_title());
 
     if ($favicon_needs_check || $force_refetch) {
 
@@ -432,7 +447,7 @@ function update_rss_feed($feed, $no_cache = false)
         $favicon_file = ICONS_DIR . "/$feed.ico";
         $favicon_modified = @filemtime($favicon_file);
 
-        _debug("checking favicon...", $debug_enabled);
+        _debug("checking favicon...");
 
         check_feed_favicon($site_url, $feed);
         $favicon_modified_new = @filemtime($favicon_file);
@@ -454,7 +469,7 @@ function update_rss_feed($feed, $no_cache = false)
 
             $favicon_colorstring = ",favicon_avg_color = '".$favicon_color."'";
         } elseif ($favicon_avg_color == 'fail') {
-            _debug("floicon failed on this file, not trying to recalculate avg color", $debug_enabled);
+            _debug("floicon failed on this file, not trying to recalculate avg color");
         }
 
         db_query(
@@ -469,7 +484,7 @@ function update_rss_feed($feed, $no_cache = false)
         $feed_title = db_escape_string($rss->get_title());
 
         if ($feed_title) {
-            _debug("registering title: $feed_title", $debug_enabled);
+            _debug("registering title: $feed_title");
 
             db_query(
                 "UPDATE ttrss_feeds SET
@@ -485,28 +500,27 @@ function update_rss_feed($feed, $no_cache = false)
         );
     }
 
-    _debug("loading filters & labels...", $debug_enabled);
+    _debug("loading filters & labels...");
 
     $filters = load_filters($feed, $owner_uid);
     $labels = get_all_labels($owner_uid);
 
-    _debug("" . count($filters) . " filters loaded.", $debug_enabled);
+    _debug("" . count($filters) . " filters loaded.");
 
     $items = $rss->get_items();
-
     if (!is_array($items)) {
-        _debug("no articles found.", $debug_enabled);
+        _debug("no articles found.");
 
         db_query(
             "UPDATE ttrss_feeds
-                    SET last_updated = NOW(), last_error = '' WHERE id = '$feed'"
+             SET last_updated = NOW(), last_error = ''
+             WHERE id = '$feed'"
         );
-
-        return; // no articles
+        return;
     }
 
     if ($pubsub_state != 2 && PUBSUBHUBBUB_ENABLED) {
-        _debug("checking for PUSH hub...", $debug_enabled);
+        _debug("checking for PUSH hub...");
         $feed_hub_url = false;
         $links = $rss->get_links('hub');
         if ($links && is_array($links)) {
@@ -515,7 +529,7 @@ function update_rss_feed($feed, $no_cache = false)
                 break;
             }
         }
-        _debug("feed hub url: $feed_hub_url", $debug_enabled);
+        _debug("feed hub url: $feed_hub_url");
         if ($feed_hub_url && function_exists('curl_init')
             && !ini_get("open_basedir")) {
             require_once 'lib/pubsubhubbub/subscriber.php';
@@ -523,12 +537,12 @@ function update_rss_feed($feed, $no_cache = false)
                 "/public.php?op=pubsub&id=$feed";
             $s = new Subscriber($feed_hub_url, $callback_url);
             $rc = $s->subscribe($fetch_url);
-            _debug("feed hub url found, subscribe request sent.", $debug_enabled);
+            _debug("feed hub url found, subscribe request sent.");
             db_query("UPDATE ttrss_feeds SET pubsub_state = 1 WHERE id = '$feed'");
         }
     }
 
-    _debug("processing articles...", $debug_enabled);
+    _debug("processing articles...");
 
     foreach ($items as $item) {
         if (!empty($_REQUEST['xdebug']) && $_REQUEST['xdebug'] == 3) {
@@ -548,7 +562,7 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
 
-        _debug("f_guid $entry_guid", $debug_enabled);
+        _debug("f_guid $entry_guid");
 
         if (!$entry_guid) {
             continue;
@@ -558,13 +572,13 @@ function update_rss_feed($feed, $no_cache = false)
 
         $entry_guid_hashed = db_escape_string('SHA1:' . sha1($entry_guid));
 
-        _debug("guid $entry_guid / $entry_guid_hashed", $debug_enabled);
+        _debug("guid $entry_guid / $entry_guid_hashed");
 
         $entry_timestamp = "";
 
         $entry_timestamp = $item->get_date();
 
-        _debug("orig date: " . $item->get_date(), $debug_enabled);
+        _debug("orig date: " . $item->get_date());
 
         if ($entry_timestamp == -1 || !$entry_timestamp || $entry_timestamp > time()) {
             $entry_timestamp = time();
@@ -575,7 +589,7 @@ function update_rss_feed($feed, $no_cache = false)
 
         $entry_timestamp_fmt = strftime("%Y/%m/%d %H:%M:%S", $entry_timestamp);
 
-        _debug("date $entry_timestamp [$entry_timestamp_fmt]", $debug_enabled);
+        _debug("date $entry_timestamp [$entry_timestamp_fmt]");
 
         //                $entry_title = html_entity_decode($item->get_title(), ENT_COMPAT, 'UTF-8');
         //                $entry_title = decode_numeric_entities($entry_title);
@@ -583,8 +597,8 @@ function update_rss_feed($feed, $no_cache = false)
 
         $entry_link = rewrite_relative_url($site_url, $item->get_link());
 
-        _debug("title $entry_title", $debug_enabled);
-        _debug("link $entry_link", $debug_enabled);
+        _debug("title $entry_title");
+        _debug("link $entry_link");
 
         if (!$entry_title) {
             $entry_title = date("Y-m-d H:i:s", $entry_timestamp);
@@ -611,9 +625,9 @@ function update_rss_feed($feed, $no_cache = false)
 
         $num_comments = (int) $item->get_comments_count();
 
-        _debug("author $entry_author", $debug_enabled);
-        _debug("num_comments: $num_comments", $debug_enabled);
-        _debug("looking for tags...", $debug_enabled);
+        _debug("author $entry_author");
+        _debug("num_comments: $num_comments");
+        _debug("looking for tags...");
 
         // parse <category> entries into tags
 
@@ -633,13 +647,13 @@ function update_rss_feed($feed, $no_cache = false)
             $entry_tags[$i] = mb_strtolower($entry_tags[$i], 'utf-8');
         }
 
-        _debug("tags found: " . join(",", $entry_tags), $debug_enabled);
+        _debug("tags found: " . join(",", $entry_tags));
 
-        _debug("done collecting data.", $debug_enabled);
+        _debug("done collecting data.");
 
         // TODO: less memory-hungry implementation
 
-        _debug("applying plugin filters..", $debug_enabled);
+        _debug("applying plugin filters..");
 
         // FIXME not sure if owner_uid is a good idea here, we may have a base
         // entry (?)
@@ -694,10 +708,10 @@ function update_rss_feed($feed, $no_cache = false)
         $entry_content = $article["content"]; // escaped below
 
 
-        _debug("plugin data: $entry_plugin_data", $debug_enabled);
+        _debug("plugin data: $entry_plugin_data");
 
         if ($cache_images && is_writable(CACHE_DIR . '/images')) {
-            cache_images($entry_content, $site_url, $debug_enabled);
+            cache_images($entry_content, $site_url);
         }
 
         $entry_content = db_escape_string($entry_content, false);
@@ -712,7 +726,7 @@ function update_rss_feed($feed, $no_cache = false)
         );
 
         if (db_num_rows($result) == 0) {
-            _debug("base guid [$entry_guid] not found", $debug_enabled);
+            _debug("base guid [$entry_guid] not found");
 
             // base post entry does not exist, create it
             $query = "
@@ -783,7 +797,7 @@ function update_rss_feed($feed, $no_cache = false)
 
         if (db_num_rows($result) == 1) {
 
-            _debug("base guid found, checking for user record", $debug_enabled);
+            _debug("base guid found, checking for user record");
 
             // this will be used below in update handler
             $orig_content_hash = db_fetch_result($result, 0, "content_hash");
@@ -800,7 +814,7 @@ function update_rss_feed($feed, $no_cache = false)
 
             /* $stored_guid = db_fetch_result($result, 0, "guid");
                if ($stored_guid != $entry_guid_hashed) {
-               if ($debug_enabled) _debug("upgrading compat guid to hashed one", $debug_enabled);
+               if ($debug_enabled) _debug("upgrading compat guid to hashed one");
 
                db_query("UPDATE ttrss_entries SET guid = '$entry_guid_hashed' WHERE
                id = '$ref_id'");
@@ -824,7 +838,7 @@ function update_rss_feed($feed, $no_cache = false)
             );
 
             if ($debug_enabled) {
-                _debug("article filters: ", $debug_enabled);
+                _debug("article filters: ");
                 if (count($article_filters) != 0) {
                     print_r($article_filters);
                 }
@@ -837,7 +851,7 @@ function update_rss_feed($feed, $no_cache = false)
 
             $score = calculate_article_score($article_filters);
 
-            _debug("initial score: $score", $debug_enabled);
+            _debug("initial score: $score");
 
             $query = "SELECT ref_id, int_id
                       FROM ttrss_user_entries
@@ -851,7 +865,7 @@ function update_rss_feed($feed, $no_cache = false)
             // okay it doesn't exist - create user entry
             if (db_num_rows($result) == 0) {
 
-                _debug("user record not found, creating...", $debug_enabled);
+                _debug("user record not found, creating...");
 
                 if ($score >= -500 && !find_article_filter($article_filters, 'catchup')) {
                     $unread = 'true';
@@ -889,7 +903,7 @@ function update_rss_feed($feed, $no_cache = false)
 
                     $ngram_similar = db_fetch_result($result, 0, "similar");
 
-                    _debug("N-gram similar results: $ngram_similar", $debug_enabled);
+                    _debug("N-gram similar results: $ngram_similar");
 
                     if ($ngram_similar > 0) {
                         $unread = 'false';
@@ -929,13 +943,13 @@ function update_rss_feed($feed, $no_cache = false)
                     $entry_int_id = db_fetch_result($result, 0, "int_id");
                 }
             } else {
-                _debug("user record FOUND", $debug_enabled);
+                _debug("user record FOUND");
 
                 $entry_ref_id = db_fetch_result($result, 0, "ref_id");
                 $entry_int_id = db_fetch_result($result, 0, "int_id");
             }
 
-            _debug("RID: $entry_ref_id, IID: $entry_int_id", $debug_enabled);
+            _debug("RID: $entry_ref_id, IID: $entry_int_id");
 
             $post_needs_update = false;
             $update_insignificant = false;
@@ -965,7 +979,7 @@ function update_rss_feed($feed, $no_cache = false)
             if ($post_needs_update) {
 
                 if (defined('DAEMON_EXTENDED_DEBUG')) {
-                    _debug("post $entry_guid_hashed needs update...", $debug_enabled);
+                    _debug("post $entry_guid_hashed needs update...");
                 }
 
                 //                        print "<!-- post $orig_title needs update : $post_needs_update -->";
@@ -993,14 +1007,14 @@ function update_rss_feed($feed, $no_cache = false)
 
         db_query("COMMIT");
 
-        _debug("assigning labels...", $debug_enabled);
+        _debug("assigning labels...");
 
         assign_article_to_label_filters(
             $entry_ref_id, $article_filters,
             $owner_uid, $article_labels
         );
 
-        _debug("looking for enclosures...", $debug_enabled);
+        _debug("looking for enclosures...");
 
         // enclosures
 
@@ -1017,7 +1031,7 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
         if ($debug_enabled) {
-            _debug("article enclosures:", $debug_enabled);
+            _debug("article enclosures:");
             print_r($enclosures);
         }
 
@@ -1079,7 +1093,7 @@ function update_rss_feed($feed, $no_cache = false)
         $filtered_tags = array_unique($filtered_tags);
 
         if ($debug_enabled) {
-            _debug("filtered article tags:", $debug_enabled);
+            _debug("filtered article tags:");
             print_r($filtered_tags);
         }
 
@@ -1132,7 +1146,7 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
         if (get_pref("AUTO_ASSIGN_LABELS", $owner_uid, false)) {
-            _debug("auto-assigning labels...", $debug_enabled);
+            _debug("auto-assigning labels...");
             foreach ($labels as $label) {
                 $caption = preg_quote($label["caption"]);
                 if (strlen($caption)) {
@@ -1147,17 +1161,17 @@ function update_rss_feed($feed, $no_cache = false)
             }
         }
 
-        _debug("article processed", $debug_enabled);
+        _debug("article processed");
     }
 
     if (!$last_updated) {
-        _debug("new feed, catching it up...", $debug_enabled);
+        _debug("new feed, catching it up...");
         catchup_feed($feed, false, $owner_uid);
     }
 
-    _debug("purging feed...", $debug_enabled);
+    _debug("purging feed...");
 
-    purge_feed($feed, 0, $debug_enabled);
+    purge_feed($feed, 0);
 
     db_query(
         "UPDATE ttrss_feeds
@@ -1167,7 +1181,7 @@ function update_rss_feed($feed, $no_cache = false)
          WHERE id = '$feed'"
     );
     unset($rss);
-    _debug("done", $debug_enabled);
+    _debug("done");
 }
 
 function cache_images($html, $site_url, $debug)

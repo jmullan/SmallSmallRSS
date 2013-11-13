@@ -1,13 +1,9 @@
 <?php
 namespace SmallSmallRSS;
 
-if (file_exists(__DIR__ . "/../lib/floIcon.php")) {
-    require_once __DIR__ . "/../lib/floIcon.php";
-}
-
 class Colors
 {
-    static $htmlcolors = array(
+    public static $htmlcolors = array(
         'aliceblue' => '#f0f8ff',
         'antiquewhite' => '#faebd7',
         'aqua' => '#00ffff',
@@ -157,7 +153,7 @@ class Colors
         'yellowgreen' => '#9acd32'
     );
 
-    function _resolve_htmlcolor($color)
+    public static function resolveHTMLColor($color)
     {
         $color = strtolower($color);
         if (isset(self::$htmlcolors[$color])) {
@@ -167,37 +163,47 @@ class Colors
         }
     }
 
-    ### Helper function for self::hsl2rgb().
+    /**
+     * Helper function for self::hsl2rgb().
+     */
     public static function hue2rgb($m1, $m2, $h)
     {
         $h = ($h < 0) ? $h + 1 : (($h > 1) ? $h - 1 : $h);
-        if ($h * 6 < 1) {  return $m1 + ($m2 - $m1) * $h * 6;
+        if ($h * 6 < 1) {
+            return $m1 + ($m2 - $m1) * $h * 6;
         }
-        if ($h * 2 < 1) {  return $m2;
+        if ($h * 2 < 1) {
+            return $m2;
         }
-        if ($h * 3 < 2) {  return $m1 + ($m2 - $m1) * (0.66666 - $h) * 6;
+        if ($h * 3 < 2) {
+            return $m1 + ($m2 - $m1) * (0.66666 - $h) * 6;
         }
         return $m1;
     }
 
-    ### Convert a hex color into an RGB triplet.
+    /**
+     *  Convert a hex color into an RGB triplet.
+     */
     public static function unpack($hex, $normalize = false)
     {
         $out = array();
         if (strpos($hex, '#') !== 0) {
-            $hex = _resolve_htmlcolor($hex);
+            $hex = self::resolveHTMLColor($hex);
         }
 
         if (strlen($hex) == 4) {
             $hex = $hex[1] . $hex[1] . $hex[2] . $hex[2] . $hex[3] . $hex[3];
-        } $c = hexdec($hex);
+        }
+        $c = hexdec($hex);
         for ($i = 16; $i >= 0; $i -= 8) {
             $out[] = (($c >> $i) & 0xFF) / ($normalize ? 255 : 1);
         }
         return $out;
     }
 
-    ### Convert an RGB triplet to a hex color.
+    /**
+     * Convert an RGB triplet to a hex color.
+     */
     public static function pack($rgb, $normalize = false)
     {
         $out = 0;
@@ -207,24 +213,32 @@ class Colors
         return '#'. str_pad(dechex($out), 6, 0, STR_PAD_LEFT);
     }
 
-    ### RGB >> HSL
+    /**
+     * RGB >> HSL
+     */
     public static function rgb2hsl($rgb)
     {
         $r = $rgb[0];
         $g = $rgb[1];
         $b = $rgb[2];
-        $min = min($r, min($g, $b)); $max = max($r, max($g, $b));
-        $delta = $max - $min; $l = ($min + $max) / 2; $s = 0;
+        $min = min($r, min($g, $b));
+        $max = max($r, max($g, $b));
+        $delta = $max - $min;
+        $l = ($min + $max) / 2;
+        $s = 0;
         if ($l > 0 && $l < 1) {
             $s = $delta / ($l < 0.5 ? (2 * $l) : (2 - 2 * $l));
         }
         $h = 0;
         if ($delta > 0) {
-            if ($max == $r && $max != $g) {  $h += ($g - $b) / $delta;
+            if ($max == $r && $max != $g) {
+                $h += ($g - $b) / $delta;
             }
-            if ($max == $g && $max != $b) {  $h += (2 + ($b - $r) / $delta);
+            if ($max == $g && $max != $b) {
+                $h += (2 + ($b - $r) / $delta);
             }
-            if ($max == $b && $max != $r) {  $h += (4 + ($r - $g) / $delta);
+            if ($max == $b && $max != $r) {
+                $h += (4 + ($r - $g) / $delta);
             }
             $h /= 6;
         }
@@ -276,18 +290,24 @@ class Colors
         return array($h, $s, $v);
     }
 
-    ### HSL >> RGB
+    /**
+     * HSL >> RGB
+     */
     public static function hsl2rgb($hsl)
     {
-        $h = $hsl[0]; $s = $hsl[1]; $l = $hsl[2];
+        $h = $hsl[0];
+        $s = $hsl[1];
+        $l = $hsl[2];
         $m2 = ($l <= 0.5) ? $l * ($s + 1) : $l + $s - $l*$s;
         $m1 = $l * 2 - $m2;
-        return array(self::hue2rgb($m1, $m2, $h + 0.33333),
-                     self::hue2rgb($m1, $m2, $h),
-                     self::hue2rgb($m1, $m2, $h - 0.33333));
+        return array(
+            self::hue2rgb($m1, $m2, $h + 0.33333),
+            self::hue2rgb($m1, $m2, $h),
+            self::hue2rgb($m1, $m2, $h - 0.33333)
+        );
     }
 
-    function hsv2rgb($arr)
+    public static function hsv2rgb($arr)
     {
         $h = $arr[0];
         $s = $arr[1];
@@ -303,17 +323,29 @@ class Colors
             $var_3 = $v * (1 - $s * (1 - ($var_H - $var_i)));
 
             if ($var_i == 0) {
-                $var_R = $v; $var_G = $var_3; $var_B = $var_1;
+                $var_R = $v;
+                $var_G = $var_3;
+                $var_B = $var_1;
             } elseif ($var_i == 1) {
-                $var_R = $var_2; $var_G = $v; $var_B = $var_1;
+                $var_R = $var_2;
+                $var_G = $v;
+                $var_B = $var_1;
             } elseif ($var_i == 2) {
-                $var_R = $var_1; $var_G = $v; $var_B = $var_3;
+                $var_R = $var_1;
+                $var_G = $v;
+                $var_B = $var_3;
             } elseif ($var_i == 3) {
-                $var_R = $var_1; $var_G = $var_2; $var_B = $v;
+                $var_R = $var_1;
+                $var_G = $var_2;
+                $var_B = $v;
             } elseif ($var_i == 4) {
-                $var_R = $var_3; $var_G = $var_1; $var_B = $v;
+                $var_R = $var_3;
+                $var_G = $var_1;
+                $var_B = $v;
             } else {
-                $var_R = $v; $var_G = $var_1; $var_B = $var_2;
+                $var_R = $v;
+                $var_G = $var_1;
+                $var_B = $var_2;
             }
 
             $r = $var_R * 255;
@@ -323,7 +355,7 @@ class Colors
         return array($r, $g, $B);
     }
 
-    function palette($imageFile, $numColors, $granularity = 5)
+    public static function palette($imageFile, $numColors, $granularity = 5)
     {
         $granularity = max(1, abs((int) $granularity));
         $colors = array();
@@ -340,8 +372,7 @@ class Colors
 
                 if (count($ico->images) == 0) {
                     return false;
-                }
-                else {
+                } else {
                     $img = @$ico->images[count($ico->images)-1]->getImageResource();
                 }
 
@@ -353,7 +384,8 @@ class Colors
             $img = @imagecreatefromstring(file_get_contents($imageFile));
         }
 
-        if (!$img) {  return false;
+        if (!$img) {
+            return false;
         }
 
         for ($x = 0; $x < $size[0]; $x += $granularity) {
@@ -376,7 +408,7 @@ class Colors
         return array_slice(array_keys($colors), 0, $numColors);
     }
 
-    function calculate_avg($iconFile)
+    public static function calculateAverage($iconFile)
     {
         $palette = self::palette($iconFile, 4, 4);
 

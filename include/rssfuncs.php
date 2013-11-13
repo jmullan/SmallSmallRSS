@@ -449,7 +449,7 @@ function update_rss_feed($feed, $no_cache = false)
             );
 
             $favicon_color = db_escape_string(
-                \SmallSmallRSS\Colors::calculate_avg($favicon_file)
+                \SmallSmallRSS\Colors::calculateAverage($favicon_file)
             );
 
             $favicon_colorstring = ",favicon_avg_color = '".$favicon_color."'";
@@ -586,11 +586,13 @@ function update_rss_feed($feed, $no_cache = false)
         _debug("title $entry_title", $debug_enabled);
         _debug("link $entry_link", $debug_enabled);
 
-        if (!$entry_title) {  $entry_title = date("Y-m-d H:i:s", $entry_timestamp);
+        if (!$entry_title) {
+            $entry_title = date("Y-m-d H:i:s", $entry_timestamp);
         };
 
         $entry_content = $item->get_content();
-        if (!$entry_content) {  $entry_content = $item->get_description();
+        if (!$entry_content) {
+            $entry_content = $item->get_description();
         }
 
         if (!empty($_REQUEST['xdebug']) && $_REQUEST["xdebug"] == 2) {
@@ -837,9 +839,12 @@ function update_rss_feed($feed, $no_cache = false)
 
             _debug("initial score: $score", $debug_enabled);
 
-            $query = "SELECT ref_id, int_id FROM ttrss_user_entries WHERE
-                            ref_id = '$ref_id' AND owner_uid = '$owner_uid'
-                            $dupcheck_qpart";
+            $query = "SELECT ref_id, int_id
+                      FROM ttrss_user_entries
+                      WHERE
+                          ref_id = '$ref_id'
+                          AND owner_uid = '$owner_uid'
+                          $dupcheck_qpart";
 
             $result = db_query($query);
 
@@ -873,11 +878,13 @@ function update_rss_feed($feed, $no_cache = false)
                 if (DB_TYPE == "pgsql" and defined('_NGRAM_TITLE_DUPLICATE_THRESHOLD')) {
 
                     $result = db_query(
-                        "SELECT COUNT(*) AS similar FROM
-                                    ttrss_entries,ttrss_user_entries
-                                WHERE ref_id = id AND updated >= NOW() - INTERVAL '7 day'
-                                    AND similarity(title, '$entry_title') >= "._NGRAM_TITLE_DUPLICATE_THRESHOLD."
-                                    AND owner_uid = $owner_uid"
+                        "SELECT COUNT(*) AS similar
+                         FROM ttrss_entries, ttrss_user_entries
+                         WHERE
+                             ref_id = id
+                             AND updated >= NOW() - INTERVAL '7 day'
+                             AND similarity(title, '$entry_title') >= "._NGRAM_TITLE_DUPLICATE_THRESHOLD."
+                             AND owner_uid = $owner_uid"
                     );
 
                     $ngram_similar = db_fetch_result($result, 0, "similar");
@@ -1087,7 +1094,8 @@ function update_rss_feed($feed, $no_cache = false)
                 $tag = sanitize_tag($tag);
                 $tag = db_escape_string($tag);
 
-                if (!tag_is_valid($tag)) {  continue;
+                if (!tag_is_valid($tag)) {
+                    continue;
                 }
 
                 $result = db_query(
@@ -1097,11 +1105,10 @@ function update_rss_feed($feed, $no_cache = false)
                 );
 
                 if ($result && db_num_rows($result) == 0) {
-
                     db_query(
                         "INSERT INTO ttrss_tags
-                                    (owner_uid,tag_name,post_int_id)
-                                    VALUES ('$owner_uid','$tag', '$entry_int_id')"
+                         (owner_uid,tag_name,post_int_id)
+                         VALUES ('$owner_uid', '$tag', '$entry_int_id')"
                     );
                 }
 
@@ -1116,8 +1123,9 @@ function update_rss_feed($feed, $no_cache = false)
 
             db_query(
                 "UPDATE ttrss_user_entries
-                        SET tag_cache = '$tags_str' WHERE ref_id = '$entry_ref_id'
-                        AND owner_uid = $owner_uid"
+                 SET tag_cache = '$tags_str'
+                 WHERE ref_id = '$entry_ref_id'
+                 AND owner_uid = $owner_uid"
             );
 
             db_query("COMMIT");
@@ -1125,12 +1133,14 @@ function update_rss_feed($feed, $no_cache = false)
 
         if (get_pref("AUTO_ASSIGN_LABELS", $owner_uid, false)) {
             _debug("auto-assigning labels...", $debug_enabled);
-
             foreach ($labels as $label) {
                 $caption = preg_quote($label["caption"]);
-
-                if ($caption && preg_match("/\b$caption\b/i", "$tags_str " . strip_tags($entry_content) . " $entry_title")) {
-                    if (!labels_contains_caption($article_labels, $caption)) {
+                if (strlen($caption)) {
+                    $matched = preg_match(
+                        "/\b$caption\b/i",
+                        "$tags_str " . strip_tags($entry_content) . " $entry_title"
+                    );
+                    if ($matched && !labels_contains_caption($article_labels, $caption)) {
                         label_add_article($entry_ref_id, $caption, $owner_uid);
                     }
                 }
@@ -1151,7 +1161,10 @@ function update_rss_feed($feed, $no_cache = false)
 
     db_query(
         "UPDATE ttrss_feeds
-         SET last_updated = NOW(), last_error = '' WHERE id = '$feed'"
+         SET
+             last_updated = NOW(),
+             last_error = ''
+         WHERE id = '$feed'"
     );
     unset($rss);
     _debug("done", $debug_enabled);
@@ -1195,12 +1208,12 @@ function expire_error_log($debug)
     if (DB_TYPE == "pgsql") {
         db_query(
             "DELETE FROM ttrss_error_log
-                  WHERE created_at < NOW() - INTERVAL '7 days'"
+             WHERE created_at < NOW() - INTERVAL '7 days'"
         );
     } else {
         db_query(
             "DELETE FROM ttrss_error_log
-                  WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)"
+             WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)"
         );
     }
 
@@ -1316,7 +1329,8 @@ function get_article_filters($filters, $title, $content, $link, $timestamp, $aut
                     break;
             }
 
-            if ($rule_inverse) {  $match = !$match;
+            if ($rule_inverse) {
+                $match = !$match;
             }
 
             if ($match_any_rule) {
@@ -1332,15 +1346,16 @@ function get_article_filters($filters, $title, $content, $link, $timestamp, $aut
             }
         }
 
-        if ($inverse) {  $filter_match = !$filter_match;
+        if ($inverse) {
+            $filter_match = !$filter_match;
         }
 
         if ($filter_match) {
             foreach ($filter["actions"] as $action) {
                 array_push($matches, $action);
-
                 // if Stop action encountered, perform no further processing
-                if ($action["type"] == "stop") {  return $matches;
+                if ($action["type"] == "stop") {
+                    return $matches;
                 }
             }
         }
@@ -1404,7 +1419,8 @@ function assign_article_to_label_filters($id, $filters, $owner_uid, $article_lab
 function make_guid_from_title($title)
 {
     return preg_replace(
-        "/[ \"\',.:;]/", "-",
+        "/[ \"\',.:;]/",
+        "-",
         mb_strtolower(strip_tags($title), 'utf-8')
     );
 }

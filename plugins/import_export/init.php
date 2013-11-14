@@ -357,10 +357,10 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                                 if (is_array($label_cache) && $label_cache["no-labels"] != 1) {
                                     foreach ($label_cache as $label) {
 
-                                        label_create($label[1],
+                                        \SmallSmallRSS\Labels::create($label[1],
                                                      $label[2], $label[3], $owner_uid);
 
-                                        label_add_article($ref_id, $label[1], $owner_uid);
+                                        \SmallSmallRSS\Labels::addArticle($ref_id, $label[1], $owner_uid);
 
                                     }
                                 }

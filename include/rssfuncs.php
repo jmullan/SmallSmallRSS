@@ -503,7 +503,7 @@ function update_rss_feed($feed, $no_cache = false)
     _debug("loading filters & labels...");
 
     $filters = load_filters($feed, $owner_uid);
-    $labels = get_all_labels($owner_uid);
+    $labels = \SmallSmallRSS\Labels::getAll($owner_uid);
 
     _debug("" . count($filters) . " filters loaded.");
 
@@ -776,7 +776,7 @@ function update_rss_feed($feed, $no_cache = false)
                         WHERE id = '$base_entry_id'"
             );
 
-            $article_labels = get_article_labels($base_entry_id, $owner_uid);
+            $article_labels = \SmallSmallRSS\Labels::getForArticle($base_entry_id, $owner_uid);
         }
 
         // now it should exist, if not - bad luck then
@@ -1155,7 +1155,7 @@ function update_rss_feed($feed, $no_cache = false)
                         "$tags_str " . strip_tags($entry_content) . " $entry_title"
                     );
                     if ($matched && !labels_contains_caption($article_labels, $caption)) {
-                        label_add_article($entry_ref_id, $caption, $owner_uid);
+                        \SmallSmallRSS\Labels::addArticle($entry_ref_id, $caption, $owner_uid);
                     }
                 }
             }
@@ -1424,7 +1424,7 @@ function assign_article_to_label_filters($id, $filters, $owner_uid, $article_lab
     foreach ($filters as $f) {
         if ($f["type"] == "label") {
             if (!labels_contains_caption($article_labels, $f["param"])) {
-                label_add_article($id, $f["param"], $owner_uid);
+                \SmallSmallRSS\Labels::addArticle($id, $f["param"], $owner_uid);
             }
         }
     }

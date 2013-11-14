@@ -373,7 +373,7 @@ class API extends Handler
                         "id" => $line["id"],
                         "title" => $line["title"],
                         "link" => $line["link"],
-                        "labels" => get_article_labels($line['id']),
+                        "labels" => \SmallSmallRSS\Labels::getForArticle($line['id']),
                         "unread" => sql_bool_to_bool($line["unread"]),
                         "marked" => sql_bool_to_bool($line["marked"]),
                         "published" => sql_bool_to_bool($line["published"]),
@@ -461,7 +461,7 @@ class API extends Handler
         );
 
         if ($article_id) {
-            $article_labels = get_article_labels($article_id);
+            $article_labels = \SmallSmallRSS\Labels::getForArticle($article_id);
         }
         else {
             $article_labels = array();
@@ -495,7 +495,7 @@ class API extends Handler
         $label_id = (int) $this->escape_from_request('label_id');
         $assign = (bool) $this->escape_from_request('assign') == "true";
 
-        $label = $this->dbh->escape_string(label_find_caption(
+        $label = $this->dbh->escape_string(\SmallSmallRSS\Labels::findCaption(
             $label_id, $_SESSION["uid"]
         ));
 
@@ -506,10 +506,10 @@ class API extends Handler
             foreach ($article_ids as $id) {
 
                 if ($assign) {
-                    label_add_article($id, $label, $_SESSION["uid"]);
+                    \SmallSmallRSS\Labels::addArticle($id, $label, $_SESSION["uid"]);
                 }
                 else {
-                    label_remove_article($id, $label, $_SESSION["uid"]);
+                    \SmallSmallRSS\Labels::removeArticle($id, $label, $_SESSION["uid"]);
                 }
 
                 $num_updated += 1;
@@ -721,7 +721,7 @@ class API extends Handler
             $labels = json_decode($line["label_cache"], true);
 
             //if (!$tags) $tags = get_article_tags($line["id"]);
-            //if (!$labels) $labels = get_article_labels($line["id"]);
+            //if (!$labels) $labels = \SmallSmallRSS\Labels::getForArticle($line["id"]);
 
             $headline_row = array(
                 "id" => (int) $line["id"],

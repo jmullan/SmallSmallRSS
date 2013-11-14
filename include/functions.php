@@ -117,7 +117,6 @@ function startup_gettext()
 }
 
 require_once __DIR__ . '/db-prefs.php';
-require_once __DIR__ . '/labels.php';
 
 define(
     'SELF_USER_AGENT',

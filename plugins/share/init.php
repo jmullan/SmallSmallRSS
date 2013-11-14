@@ -53,10 +53,6 @@ class Share extends \SmallSmallRSS\Plugin {
 			print "<a id='pub_opml_url' href='$url_path' target='_blank'>$url_path</a>";
 			print "</div>";
 
-			/* if (!label_find_id(__('Shared'), $_SESSION["uid"]))
-				label_create(__('Shared'), $_SESSION["uid"]);
-
-			label_add_article($ref_id, __('Shared'), $_SESSION['uid']); */
 		}
 
 		print "<div align='center'>";

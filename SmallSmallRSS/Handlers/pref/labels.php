@@ -150,7 +150,7 @@ class Pref_Labels extends ProtectedHandler
                 );
             }
 
-            $caption = $this->dbh->escape_string(label_find_caption($id, $_SESSION["uid"]));
+            $caption = $this->dbh->escape_string(\SmallSmallRSS\Labels::findCaption($id, $_SESSION["uid"]));
 
             /* Remove cached data */
 
@@ -175,7 +175,7 @@ class Pref_Labels extends ProtectedHandler
                 AND owner_uid = " . $_SESSION["uid"]
             );
 
-            $caption = $this->dbh->escape_string(label_find_caption($id, $_SESSION["uid"]));
+            $caption = $this->dbh->escape_string(\SmallSmallRSS\Labels::findCaption($id, $_SESSION["uid"]));
 
             /* Remove cached data */
 
@@ -247,7 +247,7 @@ class Pref_Labels extends ProtectedHandler
         $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
-            label_remove($id, $_SESSION["uid"]);
+            \SmallSmallRSS\Labels::remove($id, $_SESSION["uid"]);
         }
 
     }
@@ -259,7 +259,7 @@ class Pref_Labels extends ProtectedHandler
 
         if ($caption) {
 
-            if (label_create($caption)) {
+            if (\SmallSmallRSS\Labels::create($caption)) {
                 if (!$output) {
                     print T_sprintf("Created label <b>%s</b>", htmlspecialchars($caption));
                 }

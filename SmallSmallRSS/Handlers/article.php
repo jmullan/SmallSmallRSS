@@ -162,7 +162,7 @@ class Article extends ProtectedHandler
 
             if (count($labels) != 0) {
                 foreach ($labels as $label) {
-                    label_add_article($ref_id, trim($label), $owner_uid);
+                    \SmallSmallRSS\Labels::addArticle($ref_id, trim($label), $owner_uid);
                 }
             }
 
@@ -191,7 +191,7 @@ class Article extends ProtectedHandler
 
                 if (count($labels) != 0) {
                     foreach ($labels as $label) {
-                        label_add_article($ref_id, trim($label), $owner_uid);
+                        \SmallSmallRSS\Labels::addArticle($ref_id, trim($label), $owner_uid);
                     }
                 }
 
@@ -362,16 +362,16 @@ class Article extends ProtectedHandler
         $reply = array();
         $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
         $label_id = $this->dbh->escape_string($_REQUEST["lid"]);
-        $label = $this->dbh->escape_string(label_find_caption($label_id, $_SESSION["uid"]));
+        $label = $this->dbh->escape_string(\SmallSmallRSS\Labels::findCaption($label_id, $_SESSION["uid"]));
         $reply["info-for-headlines"] = array();
         if ($label) {
             foreach ($ids as $id) {
                 if ($assign) {
-                    label_add_article($id, $label, $_SESSION["uid"]);
+                    \SmallSmallRSS\Labels::addArticle($id, $label, $_SESSION["uid"]);
                 } else {
-                    label_remove_article($id, $label, $_SESSION["uid"]);
+                    \SmallSmallRSS\Labels::removeArticle($id, $label, $_SESSION["uid"]);
                 }
-                $labels = get_article_labels($id, $_SESSION["uid"]);
+                $labels = \SmallSmallRSS\Labels::getForArticle($id, $_SESSION["uid"]);
                 array_push(
                     $reply["info-for-headlines"],
                     array(

@@ -2004,7 +2004,7 @@ class Pref_Feeds extends ProtectedHandler
             \SmallSmallRSS\CounterCache::remove($id, $owner_uid);
 
         } else {
-            label_remove(feed_to_label_id($id), $owner_uid);
+            \SmallSmallRSS\Labels::remove(feed_to_label_id($id), $owner_uid);
         }
     }
 

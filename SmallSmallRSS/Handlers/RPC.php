@@ -133,19 +133,19 @@ class RPC extends ProtectedHandler
     public function togglepref()
     {
         $key = $this->dbh->escape_string($_REQUEST["key"]);
-        set_pref($key, !get_pref($key));
-        $value = get_pref($key);
+        \SmallSmallRSS\DBPrefs::write($key, !\SmallSmallRSS\DBPrefs::read($key));
+        $value = \SmallSmallRSS\DBPrefs::read($key);
 
         print json_encode(array("param" => $key, "value" => $value));
     }
 
     public function setpref()
     {
-        // set_pref escapes input, so no need to double escape it here
+        // \SmallSmallRSS\DBPrefs::write escapes input, so no need to double escape it here
         $key = $_REQUEST['key'];
         $value = str_replace("\n", "<br/>", $_REQUEST['value']);
 
-        set_pref($key, $value, $_SESSION['uid'], $key != 'USER_STYLESHEET');
+        \SmallSmallRSS\DBPrefs::write($key, $value, $_SESSION['uid'], $key != 'USER_STYLESHEET');
 
         print json_encode(array("param" => $key, "value" => $value));
     }

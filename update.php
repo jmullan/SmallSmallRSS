@@ -11,7 +11,6 @@ chdir(dirname(__FILE__));
 
 require_once "rssfuncs.php";
 \SmallSmallRSS\Sanity::initialCheck();
-require_once "db-prefs.php";
 
 if (!defined('PHP_EXECUTABLE')) {
     define('PHP_EXECUTABLE', '/usr/bin/php');

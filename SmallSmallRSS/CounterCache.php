@@ -34,7 +34,7 @@ class CounterCache
     public static function update_all($owner_uid)
     {
 
-        if (get_pref('ENABLE_FEED_CATS', $owner_uid)) {
+        if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS', $owner_uid)) {
 
             $result = \SmallSmallRSS\Database::query(
                 "SELECT feed_id FROM ttrss_cat_counters_cache

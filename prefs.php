@@ -15,12 +15,11 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initialCheck();
-require_once "db-prefs.php";
 
-if (!init_plugins()) return;
-
+if (!init_plugins()) {
+    return;
+}
 login_sequence();
-
 header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -33,7 +32,7 @@ header('Content-Type: text/html; charset=utf-8');
 <?php stylesheet_tag("css/layout.css"); ?>
 
 <?php if ($_SESSION["uid"]) {
-$theme = get_pref("USER_CSS_THEME", $_SESSION["uid"], false);
+$theme = \SmallSmallRSS\DBPrefs::read("USER_CSS_THEME", $_SESSION["uid"], false);
 if ($theme && file_exists("themes/$theme")) {
     stylesheet_tag("themes/$theme");
 } else {

@@ -153,7 +153,7 @@ class Pref_Feeds extends ProtectedHandler
         $root['type'] = 'category';
         $root['param'] = 0;
 
-        $enable_cats = get_pref('ENABLE_FEED_CATS');
+        $enable_cats = \SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS');
 
         if ($this->get_mode() == 2) {
 
@@ -205,7 +205,7 @@ class Pref_Feeds extends ProtectedHandler
 
             if ($this->dbh->num_rows($result) > 0) {
 
-                if (get_pref('ENABLE_FEED_CATS')) {
+                if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
                     $cat = $this->feedlist_init_cat(-2);
                 } else {
                     $cat['items'] = array();
@@ -668,7 +668,7 @@ class Pref_Feeds extends ProtectedHandler
 
         /* Category */
 
-        if (get_pref('ENABLE_FEED_CATS')) {
+        if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
 
             $cat_id = $this->dbh->fetch_result($result, 0, "cat_id");
 
@@ -913,7 +913,7 @@ class Pref_Feeds extends ProtectedHandler
 
         /* Category */
 
-        if (get_pref('ENABLE_FEED_CATS')) {
+        if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
 
             print "<br/>";
 
@@ -1084,7 +1084,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $auth_pass = $this->dbh->escape_string($auth_pass);
 
-        if (get_pref('ENABLE_FEED_CATS')) {
+        if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
             if ($cat_id && $cat_id != 0) {
                 $category_qpart = "cat_id = '$cat_id',";
                 $category_qpart_nocomma = "cat_id = '$cat_id'";
@@ -1496,7 +1496,7 @@ class Pref_Feeds extends ProtectedHandler
             .__('Unsubscribe')."</div> ";
         print "</div></div>";
 
-        if (get_pref('ENABLE_FEED_CATS')) {
+        if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
             print "<div dojoType=\"dijit.form.DropDownButton\">".
                 "<span>" . __('Categories')."</span>";
             print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
@@ -2016,7 +2016,7 @@ class Pref_Feeds extends ProtectedHandler
         print "<table width='100%'><tr><td>
             ".__("Add one valid RSS feed per line (no feed detection is done)")."
         </td><td align='right'>";
-        if (get_pref('ENABLE_FEED_CATS')) {
+        if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
             print __('Place in category:') . " ";
             print_feed_cat_select("cat", false, 'dojoType="dijit.form.Select"');
         }

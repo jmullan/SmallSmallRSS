@@ -351,7 +351,7 @@ class Opml extends ProtectedHandler
                 $pref_name, $pref_value
             ));
 
-            set_pref($pref_name, $pref_value);
+            \SmallSmallRSS\DBPrefs::write($pref_name, $pref_value);
         }
     }
 

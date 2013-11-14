@@ -27,8 +27,6 @@ require_once __DIR__ . '/../SmallSmallRSS/bootstrap.php';
 
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initialCheck();
-require_once "db-prefs.php";
-
 
 if (!init_plugins()) {
     Logger::log('Error initializing plugins');

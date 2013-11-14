@@ -110,7 +110,7 @@ class Pref_Prefs extends ProtectedHandler
             $value = $this->dbh->escape_string($_POST[$pref_name]);
 
             if ($pref_name == 'DIGEST_PREFERRED_TIME') {
-                if (get_pref('DIGEST_PREFERRED_TIME') != $value) {
+                if (\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME') != $value) {
 
                     $this->dbh->query(
                         "UPDATE ttrss_users SET
@@ -126,7 +126,7 @@ class Pref_Prefs extends ProtectedHandler
                 }
             }
 
-            set_pref($pref_name, $value);
+            \SmallSmallRSS\DBPrefs::write($pref_name, $value);
         }
 
         if ($need_reload) {
@@ -795,7 +795,7 @@ class Pref_Prefs extends ProtectedHandler
                 <td width='10%'>".__('Author')."</td></tr>";
 
         $system_enabled = array_map("trim", explode(",", PLUGINS));
-        $user_enabled = array_map("trim", explode(",", get_pref("_ENABLED_PLUGINS")));
+        $user_enabled = array_map("trim", explode(",", \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS")));
 
         $tmppluginhost = new \SmallSmallRSS\PluginHost();
         $tmppluginhost->load_all($tmppluginhost::KIND_ALL, $_SESSION["uid"]);
@@ -1017,7 +1017,7 @@ class Pref_Prefs extends ProtectedHandler
             $plugins = "";
         }
 
-        set_pref("_ENABLED_PLUGINS", $plugins);
+        \SmallSmallRSS\DBPrefs::write("_ENABLED_PLUGINS", $plugins);
     }
 
     function clearplugindata()
@@ -1029,7 +1029,7 @@ class Pref_Prefs extends ProtectedHandler
 
     function customizeCSS()
     {
-        $value = get_pref("USER_STYLESHEET");
+        $value = \SmallSmallRSS\DBPrefs::read("USER_STYLESHEET");
 
         $value = str_replace("<br/>", "\n", $value);
 

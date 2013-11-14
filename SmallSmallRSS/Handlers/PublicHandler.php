@@ -555,7 +555,7 @@ class PublicHandler extends Handler
                 $_POST["password"] = "";
 
                 if (\SmallSmallRSS\Sanity::getSchemaVersion() >= 120) {
-                    $_SESSION["language"] = get_pref("USER_LANGUAGE", $_SESSION["uid"]);
+                    $_SESSION["language"] = \SmallSmallRSS\DBPrefs::read("USER_LANGUAGE", $_SESSION["uid"]);
                 }
 
                 $_SESSION["ref_schema_version"] = \SmallSmallRSS\Sanity::getSchemaVersion(true);

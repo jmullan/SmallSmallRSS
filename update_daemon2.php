@@ -21,8 +21,6 @@ define_default('MAX_JOBS', 2);
 define_default('SPAWN_INTERVAL', DAEMON_SLEEP_INTERVAL); // seconds
 
 \SmallSmallRSS\Sanity::initialCheck();
-require_once "db-prefs.php";
-
 
 if (!function_exists('pcntl_fork')) {
     die("error: This script requires PHP compiled with PCNTL module.\n");

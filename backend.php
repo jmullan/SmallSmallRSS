@@ -32,7 +32,6 @@ if (array_search($op, $public_calls) !== false) {
 $csrf_token = (isset($_REQUEST['csrf_token']) ? $_REQUEST['csrf_token'] : '');
 
 \SmallSmallRSS\Session::init();
-require_once "db-prefs.php";
 
 startup_gettext();
 

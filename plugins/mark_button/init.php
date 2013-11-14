@@ -18,7 +18,7 @@ class Mark_Button extends \SmallSmallRSS\Plugin {
 		$marked_pic = "";
 		$id = $line["id"];
 
-		if (get_pref("COMBINED_DISPLAY_MODE")) {
+		if (\SmallSmallRSS\DBPrefs::read("COMBINED_DISPLAY_MODE")) {
 			if (sql_bool_to_bool($line["marked"])) {
 				$marked_pic = "<img
 					src=\"images/mark_set.svg\"

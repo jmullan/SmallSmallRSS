@@ -31,13 +31,13 @@ class Digest
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
-            if (@get_pref('DIGEST_ENABLE', $line['id'], false)) {
-                $preferred_ts = strtotime(get_pref('DIGEST_PREFERRED_TIME', $line['id'], '00:00'));
+            if (@\SmallSmallRSS\DBPrefs::read('DIGEST_ENABLE', $line['id'], false)) {
+                $preferred_ts = strtotime(\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME', $line['id'], '00:00'));
                 $since = time() - $preferred_ts;
                 // try to send digests within 2 hours of preferred time
                 if ($preferred_ts && $since >= 0 && $since < 7200) {
                     _debug("Sending digest for UID:" . $line['id'] . " - " . $line["email"], true, $debug);
-                    $do_catchup = get_pref('DIGEST_CATCHUP', $line['id'], false);
+                    $do_catchup = \SmallSmallRSS\DBPrefs::read('DIGEST_CATCHUP', $line['id'], false);
                     $tuple = prepare_headlines_digest($line["id"], 1, $limit);
                     $digest = $tuple[0];
                     $headlines_count = $tuple[1];
@@ -85,7 +85,7 @@ class Digest
         $tpl->readTemplateFromFile("templates/digest_template_html.txt");
         $tpl_t->readTemplateFromFile("templates/digest_template.txt");
 
-        $user_tz_string = get_pref('USER_TIMEZONE', $user_id);
+        $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $user_id);
         $local_ts = convert_timestamp(time(), 'UTC', $user_tz_string);
 
         $tpl->setVariable('CUR_DATE', date('Y/m/d', $local_ts));
@@ -148,13 +148,7 @@ class Digest
                 $user_id
             );
 
-            /*            if ($line["score"] != 0) {
-                if ($line["score"] > 0) $line["score"] = '+' . $line["score"];
-
-                $line["title"] .= " (".$line['score'].")";
-                                } */
-
-            if (get_pref('ENABLE_FEED_CATS', $user_id)) {
+            if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS', $user_id)) {
                 $line['feed_title'] = $line['cat_title'] . " / " . $line['feed_title'];
             }
 

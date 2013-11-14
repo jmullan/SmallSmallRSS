@@ -18,7 +18,6 @@ require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initialCheck();
-require_once "db-prefs.php";
 require_once "lib/Mobile_Detect.php";
 
 $mobile = new Mobile_Detect();
@@ -54,7 +53,7 @@ require 'lib/jshrink/Minifier.php';
 
 $theme_css = 'themes/default.css';
 if ($_SESSION["uid"]) {
-    $theme = get_pref("USER_CSS_THEME", $_SESSION["uid"], false);
+    $theme = \SmallSmallRSS\DBPrefs::read("USER_CSS_THEME", $_SESSION["uid"], false);
     if ($theme && file_exists("themes/$theme")) {
         $theme_css = "themes/$theme";
     }

@@ -318,12 +318,12 @@ class Feeds extends ProtectedHandler
             $lnum = $offset;
             $num_unread = 0;
             $cur_feed_title = '';
-            $fresh_intl = get_pref("FRESH_ARTICLE_MAX_AGE") * 60 * 60;
+            $fresh_intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE") * 60 * 60;
             if (!empty($_REQUEST["debug"])) {
                 $timing_info = print_checkpoint("PS", $timing_info);
             }
 
-            $expand_cdm = get_pref('CDM_EXPANDED');
+            $expand_cdm = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
 
             while ($line = $this->dbh->fetch_assoc($result)) {
                 $id = $line["id"];
@@ -391,7 +391,7 @@ class Feeds extends ProtectedHandler
                     make_local_datetime($line["date_entered"], false)
                 );
 
-                if (get_pref('SHOW_CONTENT_PREVIEW')) {
+                if (\SmallSmallRSS\DBPrefs::read('SHOW_CONTENT_PREVIEW')) {
                     $content_preview = truncate_string(
                         strip_tags($line["content_preview"]),
                         250
@@ -438,9 +438,9 @@ class Feeds extends ProtectedHandler
                     }
                 }
 
-                if (!get_pref('COMBINED_DISPLAY_MODE')) {
+                if (!\SmallSmallRSS\DBPrefs::read('COMBINED_DISPLAY_MODE')) {
 
-                    if (get_pref('VFEED_GROUP_BY_FEED')) {
+                    if (\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED')) {
                         if ($feed_id != $vgroup_last_feed && $line["feed_title"]) {
 
                             $cur_feed_title = $line["feed_title"];
@@ -484,7 +484,7 @@ class Feeds extends ProtectedHandler
                         onclick=\"\">" .
                         truncate_string($line["title"], 200);
 
-                    if (get_pref('SHOW_CONTENT_PREVIEW')) {
+                    if (\SmallSmallRSS\DBPrefs::read('SHOW_CONTENT_PREVIEW')) {
                         if ($content_preview) {
                             $reply['content'] .= "<span class=\"contentPreview\"> - $content_preview</span>";
                         }
@@ -498,7 +498,7 @@ class Feeds extends ProtectedHandler
 
                     $reply['content'] .= "<span class=\"hlUpdated\">";
 
-                    if (!get_pref('VFEED_GROUP_BY_FEED')) {
+                    if (!\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED')) {
                         if (@$line["feed_title"]) {
                             $rgba = @$rgba_cache[$feed_id];
 
@@ -514,7 +514,7 @@ class Feeds extends ProtectedHandler
 
                     $reply['content'] .= $score_pic;
 
-                    if ($line["feed_title"] && !get_pref('VFEED_GROUP_BY_FEED')) {
+                    if ($line["feed_title"] && !\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED')) {
 
                         $reply['content'] .= "<span onclick=\"viewfeed($feed_id)\"
                             style=\"cursor : pointer\"
@@ -543,7 +543,7 @@ class Feeds extends ProtectedHandler
                         $line = $p->hook_render_article_cdm($line);
                     }
 
-                    if (get_pref('VFEED_GROUP_BY_FEED') && $line["feed_title"]) {
+                    if (\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED') && $line["feed_title"]) {
                         if ($feed_id != $vgroup_last_feed) {
 
                             $cur_feed_title = $line["feed_title"];
@@ -615,7 +615,7 @@ class Feeds extends ProtectedHandler
                         id=\"CEXC-$id\" class=\"cdmExcerpt\"> - $content_preview</span>";
                     $reply['content'] .= "</span>";
 
-                    if (!get_pref('VFEED_GROUP_BY_FEED')) {
+                    if (!\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED')) {
                         if (@$line["feed_title"]) {
                             $rgba = @$rgba_cache[$feed_id];
 
@@ -633,7 +633,7 @@ class Feeds extends ProtectedHandler
                     $reply['content'] .= "<div class='scoreWrap' style=\"vertical-align : middle\">";
                     $reply['content'] .= "$score_pic";
 
-                    if (!get_pref("VFEED_GROUP_BY_FEED") && $line["feed_title"]) {
+                    if (!\SmallSmallRSS\DBPrefs::read("VFEED_GROUP_BY_FEED") && $line["feed_title"]) {
                         $reply['content'] .= "<span style=\"cursor : pointer\"
                             title=\"".htmlspecialchars($line["feed_title"])."\"
                             onclick=\"viewfeed($feed_id)\">$feed_icon_img</span>";
@@ -889,8 +889,8 @@ class Feeds extends ProtectedHandler
             \SmallSmallRSS\CounterCache::update($feed, $_SESSION["uid"], $cat_view);
         }
 
-        set_pref("_DEFAULT_VIEW_MODE", $view_mode);
-        set_pref("_DEFAULT_VIEW_ORDER_BY", $order_by);
+        \SmallSmallRSS\DBPrefs::write("_DEFAULT_VIEW_MODE", $view_mode);
+        \SmallSmallRSS\DBPrefs::write("_DEFAULT_VIEW_ORDER_BY", $order_by);
 
         /* bump login timestamp if needed */
         if (time() - $_SESSION["last_login_update"] > 3600) {
@@ -1050,7 +1050,7 @@ class Feeds extends ProtectedHandler
 
         print "<hr/>";
 
-        if (get_pref('ENABLE_FEED_CATS')) {
+        if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
             print __('Place in category:') . " ";
             print_feed_cat_select("cat", false, 'dojoType="dijit.form.Select"');
         }
@@ -1187,7 +1187,7 @@ class Feeds extends ProtectedHandler
             $cat_preselected = "selected=\"1\"";
         }
 
-        if (get_pref('ENABLE_FEED_CATS') && ($active_feed_id > 0 || $is_cat)) {
+        if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS') && ($active_feed_id > 0 || $is_cat)) {
             print "<option $cat_preselected value=\"this_cat\">$feed_cat_title</option>";
         } else {
             //print "<option disabled>".__('This category')."</option>";

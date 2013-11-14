@@ -95,7 +95,7 @@ function startup_gettext()
 
     if (!empty($_SESSION["uid"])
         && \SmallSmallRSS\Sanity::getSchemaVersion() >= 120) {
-        $pref_lang = get_pref("USER_LANGUAGE", $_SESSION["uid"]);
+        $pref_lang = \SmallSmallRSS\DBPrefs::read("USER_LANGUAGE", $_SESSION["uid"]);
 
         if ($pref_lang && $pref_lang != 'auto') {
             $lang = $pref_lang;
@@ -115,8 +115,6 @@ function startup_gettext()
         _bind_textdomain_codeset("messages", "UTF-8");
     }
 }
-
-require_once __DIR__ . '/db-prefs.php';
 
 define(
     'SELF_USER_AGENT',
@@ -201,7 +199,7 @@ function purge_feed($feed_id, $purge_interval, $debug = false)
     if (!$owner_uid) return;
 
     if (FORCE_ARTICLE_PURGE == 0) {
-        $purge_unread = get_pref("PURGE_UNREAD_ARTICLES",
+        $purge_unread = \SmallSmallRSS\DBPrefs::read("PURGE_UNREAD_ARTICLES",
                                  $owner_uid, false);
     } else {
         $purge_unread = true;
@@ -275,7 +273,7 @@ function feed_purge_interval($feed_id)
         $purge_interval = \SmallSmallRSS\Database::fetch_result($result, 0, "purge_interval");
         $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
 
-        if ($purge_interval == 0) $purge_interval = get_pref(
+        if ($purge_interval == 0) $purge_interval = \SmallSmallRSS\DBPrefs::read(
             'PURGE_OLD_DAYS', $owner_uid);
 
         return $purge_interval;
@@ -314,7 +312,7 @@ function get_feed_update_interval($feed_id)
         if ($update_interval != 0) {
             return $update_interval;
         } else {
-            return get_pref('DEFAULT_UPDATE_INTERVAL', $owner_uid, false);
+            return \SmallSmallRSS\DBPrefs::read('DEFAULT_UPDATE_INTERVAL', $owner_uid, false);
         }
     } else {
         return -1;
@@ -637,7 +635,7 @@ function validate_csrf($csrf_token)
 function load_user_plugins($owner_uid)
 {
     if ($owner_uid) {
-        $plugins = get_pref("_ENABLED_PLUGINS", $owner_uid);
+        $plugins = \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS", $owner_uid);
 
         \SmallSmallRSS\PluginHost::getInstance()->load($plugins, \SmallSmallRSS\PluginHost::KIND_USER, $owner_uid);
 
@@ -744,7 +742,7 @@ function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt
     # We store date in UTC internally
     $dt = new DateTime($timestamp, $utc_tz);
 
-    $user_tz_string = get_pref('USER_TIMEZONE', $owner_uid);
+    $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $owner_uid);
     if ($user_tz_string != 'Automatic') {
         try {
             $user_tz = new DateTimeZone($user_tz_string);
@@ -762,9 +760,9 @@ function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt
         return smart_date_time($user_timestamp, $tz_offset, $owner_uid);
     } else {
         if ($long) {
-            $format = get_pref('LONG_DATE_FORMAT', $owner_uid);
+            $format = \SmallSmallRSS\DBPrefs::read('LONG_DATE_FORMAT', $owner_uid);
         } else {
-            $format = get_pref('SHORT_DATE_FORMAT', $owner_uid);
+            $format = \SmallSmallRSS\DBPrefs::read('SHORT_DATE_FORMAT', $owner_uid);
         }
         return date($format, $user_timestamp);
     }
@@ -778,10 +776,10 @@ function smart_date_time($timestamp, $tz_offset = 0, $owner_uid = false)
     if (date("Y.m.d", $timestamp) == date("Y.m.d", time() + $tz_offset)) {
         return date("G:i", $timestamp);
     } elseif (date("Y", $timestamp) == date("Y", time() + $tz_offset)) {
-        $format = get_pref('SHORT_DATE_FORMAT', $owner_uid);
+        $format = \SmallSmallRSS\DBPrefs::read('SHORT_DATE_FORMAT', $owner_uid);
         return date($format, $timestamp);
     } else {
-        $format = get_pref('LONG_DATE_FORMAT', $owner_uid);
+        $format = \SmallSmallRSS\DBPrefs::read('LONG_DATE_FORMAT', $owner_uid);
         return date($format, $timestamp);
     }
 }
@@ -997,7 +995,7 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
 
             if ($feed == -3) {
 
-                $intl = get_pref("FRESH_ARTICLE_MAX_AGE");
+                $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE");
 
                 if (DB_TYPE == "pgsql") {
                     $match_part = "date_entered > NOW() - INTERVAL '$intl hour' ";
@@ -1252,7 +1250,7 @@ function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_ui
     } elseif ($n_feed == -3) {
         $match_part = "unread = true AND score >= 0";
 
-        $intl = get_pref("FRESH_ARTICLE_MAX_AGE", $owner_uid);
+        $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE", $owner_uid);
 
         if (DB_TYPE == "pgsql") {
             $match_part .= " AND updated > NOW() - INTERVAL '$intl hour' ";
@@ -1456,7 +1454,7 @@ function getFeedCounters($active_feed = false)
         if ($last_error)
             $cv["error"] = $last_error;
 
-        //            if (get_pref('EXTENDED_FEEDLIST'))
+        //            if (\SmallSmallRSS\DBPrefs::read('EXTENDED_FEEDLIST'))
         //                $cv["xmsg"] = getFeedArticles($id)." ".__("total");
 
         if ($active_feed && $id == $active_feed)
@@ -1571,7 +1569,7 @@ function print_feed_select(
         }
     }
 
-    if (get_pref('ENABLE_FEED_CATS')) {
+    if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
 
         if ($root_id)
             $parent_qpart = "parent_cat = '$root_id'";
@@ -1818,14 +1816,14 @@ function make_init_params()
                    "CDM_AUTO_CATCHUP", "FRESH_ARTICLE_MAX_AGE",
                    "HIDE_READ_SHOWS_SPECIAL", "COMBINED_DISPLAY_MODE") as $param) {
 
-        $params[strtolower($param)] = (int) get_pref($param);
+        $params[strtolower($param)] = (int) \SmallSmallRSS\DBPrefs::read($param);
     }
 
     $params["icons_url"] = ICONS_URL;
     $params["cookie_lifetime"] = SESSION_COOKIE_LIFETIME;
-    $params["default_view_mode"] = get_pref("_DEFAULT_VIEW_MODE");
-    $params["default_view_limit"] = (int) get_pref("_DEFAULT_VIEW_LIMIT");
-    $params["default_view_order_by"] = get_pref("_DEFAULT_VIEW_ORDER_BY");
+    $params["default_view_mode"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_MODE");
+    $params["default_view_limit"] = (int) \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_LIMIT");
+    $params["default_view_order_by"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_ORDER_BY");
     $params["bw_limit"] = (int) $_SESSION["bw_limit"];
     $params["label_base_index"] = (int) LABEL_BASE_INDEX;
 
@@ -1989,7 +1987,7 @@ function get_hotkeys_map() {
         "^(191)|Ctrl+/" => "help_dialog",
     );
 
-    if (get_pref('COMBINED_DISPLAY_MODE')) {
+    if (\SmallSmallRSS\DBPrefs::read('COMBINED_DISPLAY_MODE')) {
         $hotkeys["^(38)|Ctrl-up"] = "prev_article_noscroll";
         $hotkeys["^(40)|Ctrl-down"] = "next_article_noscroll";
     }
@@ -2026,7 +2024,7 @@ function make_runtime_info()
     $data["num_feeds"] = (int) $num_feeds;
 
     $data['last_article_id'] = getLastArticleId();
-    $data['cdm_expanded'] = get_pref('CDM_EXPANDED');
+    $data['cdm_expanded'] = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
 
     $data['dependency_timestamp'] = calculate_dep_timestamp();
     $data['reload_on_ts_change'] = !defined('_NO_RELOAD_ON_TS_CHANGE');
@@ -2129,7 +2127,7 @@ function search_to_sql($search)
             default:
                 if (strpos($k, "@") === 0) {
 
-                    $user_tz_string = get_pref('USER_TIMEZONE', $_SESSION['uid']);
+                    $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $_SESSION['uid']);
                     $orig_ts = strtotime(substr($k, 1));
                     $k = date("Y-m-d", convert_timestamp($orig_ts, $user_tz_string, 'UTC'));
 
@@ -2383,7 +2381,7 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
     } elseif ($feed == -3) { // fresh virtual feed
         $query_strategy_part = "unread = true AND score >= 0";
 
-        $intl = get_pref("FRESH_ARTICLE_MAX_AGE", $owner_uid);
+        $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE", $owner_uid);
 
         if (DB_TYPE == "pgsql") {
             $query_strategy_part .= " AND date_entered > NOW() - INTERVAL '$intl hour' ";
@@ -2458,7 +2456,7 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
         }
 
         // proper override_order applied above
-        if ($vfeed_query_part && !$ignore_vfeed_group && get_pref('VFEED_GROUP_BY_FEED', $owner_uid)) {
+        if ($vfeed_query_part && !$ignore_vfeed_group && \SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED', $owner_uid)) {
             if (!$override_order) {
                 $order_by = "ttrss_feeds.title, $order_by";
             } else {
@@ -2636,7 +2634,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
             }
 
             if ($entry->nodeName == 'img') {
-                if (($owner && get_pref("STRIP_IMAGES", $owner)) ||
+                if (($owner && \SmallSmallRSS\DBPrefs::read("STRIP_IMAGES", $owner)) ||
                     $force_remove_images || !empty($_SESSION["bw_limit"])) {
 
                     $p = $doc->createElement('p');
@@ -3540,7 +3538,7 @@ function format_article_enclosures($id, $always_display_enclosures,
             array_push($entries, $entry);
         }
 
-        if ($_SESSION['uid'] && !get_pref("STRIP_IMAGES") && !$_SESSION["bw_limit"]) {
+        if ($_SESSION['uid'] && !\SmallSmallRSS\DBPrefs::read("STRIP_IMAGES") && !$_SESSION["bw_limit"]) {
             if ($always_display_enclosures ||
                 !preg_match("/<img/i", $article_content)) {
 
@@ -3713,7 +3711,7 @@ function cleanup_tags($days = 14, $limit = 1000) {
 }
 
 function print_user_stylesheet() {
-    $value = get_pref('USER_STYLESHEET');
+    $value = \SmallSmallRSS\DBPrefs::read('USER_STYLESHEET');
 
     if ($value) {
         print "<style type=\"text/css\">";

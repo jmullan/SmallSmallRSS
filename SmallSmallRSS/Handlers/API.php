@@ -37,7 +37,7 @@ class API extends Handler
                 return false;
             }
 
-            if (!empty($_SESSION["uid"]) && $method != "logout" && !get_pref('ENABLE_API_ACCESS')) {
+            if (!empty($_SESSION["uid"]) && $method != "logout" && !\SmallSmallRSS\DBPrefs::read('ENABLE_API_ACCESS')) {
                 $this->wrap(self::STATUS_ERR, array("error" => 'API_DISABLED'));
                 return false;
             }
@@ -86,7 +86,7 @@ class API extends Handler
             $this->wrap(self::STATUS_ERR, array("error" => "LOGIN_ERROR"));
             return;
         }
-        if (!get_pref("ENABLE_API_ACCESS", $uid)) {
+        if (!\SmallSmallRSS\DBPrefs::read("ENABLE_API_ACCESS", $uid)) {
             \SmallSmallRss\Logger::log("Api access disabled for: '$login'");
             $this->wrap(self::STATUS_ERR, array("error" => "API_DISABLED"));
             return;
@@ -445,7 +445,7 @@ class API extends Handler
     {
         $pref_name = $this->escape_from_request("pref_name");
 
-        $this->wrap(self::STATUS_OK, array("value" => get_pref($pref_name)));
+        $this->wrap(self::STATUS_OK, array("value" => \SmallSmallRSS\DBPrefs::read($pref_name)));
     }
 
     function getLabels()

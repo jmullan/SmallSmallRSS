@@ -292,7 +292,7 @@ function update_rss_feed($feed, $no_cache = false)
     $pluginhost = new \SmallSmallRSS\PluginHost();
     $pluginhost->set_debug(true);
 
-    $user_plugins = get_pref("_ENABLED_PLUGINS", $owner_uid);
+    $user_plugins = \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS", $owner_uid);
 
     $pluginhost->load(PLUGINS, \SmallSmallRSS\PluginHost::KIND_ALL);
     $pluginhost->load($user_plugins, \SmallSmallRSS\PluginHost::KIND_USER, $owner_uid);
@@ -823,7 +823,7 @@ function update_rss_feed($feed, $no_cache = false)
             // check for user post link to main table
 
             // do we allow duplicate posts with same GUID in different feeds?
-            if (get_pref("ALLOW_DUPLICATE_POSTS", $owner_uid, false)) {
+            if (\SmallSmallRSS\DBPrefs::read("ALLOW_DUPLICATE_POSTS", $owner_uid, false)) {
                 $dupcheck_qpart = "AND (feed_id = '$feed' OR feed_id IS NULL)";
             } else {
                 $dupcheck_qpart = "";
@@ -1075,7 +1075,7 @@ function update_rss_feed($feed, $no_cache = false)
 
         // Skip boring tags
 
-        $boring_tags = trim_array(explode(",", mb_strtolower(get_pref(
+        $boring_tags = trim_array(explode(",", mb_strtolower(\SmallSmallRSS\DBPrefs::read(
             'BLACKLISTED_TAGS', $owner_uid, ''
         ), 'utf-8')));
 
@@ -1145,7 +1145,7 @@ function update_rss_feed($feed, $no_cache = false)
             \SmallSmallRSS\Database::query("COMMIT");
         }
 
-        if (get_pref("AUTO_ASSIGN_LABELS", $owner_uid, false)) {
+        if (\SmallSmallRSS\DBPrefs::read("AUTO_ASSIGN_LABELS", $owner_uid, false)) {
             _debug("auto-assigning labels...");
             foreach ($labels as $label) {
                 $caption = preg_quote($label["caption"]);

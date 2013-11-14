@@ -45,7 +45,7 @@ class Db_Prefs
             $profile_qpart = "";
         }
 
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT
                  value,ttrss_prefs_types.type_name as type_name,ttrss_prefs.pref_name AS pref_name
              FROM
@@ -58,7 +58,7 @@ class Db_Prefs
                  ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
         );
 
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             if ($user_id == $_SESSION["uid"]) {
                 $pref_name = $line["pref_name"];
 
@@ -71,7 +71,7 @@ class Db_Prefs
     public function read($pref_name, $user_id = false, $die_on_error = false)
     {
 
-        $pref_name = db_escape_string($pref_name);
+        $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
         $profile = false;
 
         if (!$user_id) {
@@ -96,7 +96,7 @@ class Db_Prefs
             $profile_qpart = "";
         }
 
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT
              value,ttrss_prefs_types.type_name as type_name
              FROM
@@ -109,9 +109,9 @@ class Db_Prefs
                  AND ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
         );
 
-        if (db_num_rows($result) > 0) {
-            $value = db_fetch_result($result, 0, "value");
-            $type_name = db_fetch_result($result, 0, "type_name");
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+            $value = \SmallSmallRSS\Database::fetch_result($result, 0, "value");
+            $type_name = \SmallSmallRSS\Database::fetch_result($result, 0, "type_name");
 
             if (!empty($_SESSION["uid"]) && $user_id == $_SESSION["uid"]) {
                 $this->cache[$pref_name]["type"] = $type_name;
@@ -142,8 +142,8 @@ class Db_Prefs
 
     public function write($pref_name, $value, $user_id = false, $strip_tags = true)
     {
-        $pref_name = db_escape_string($pref_name);
-        $value = db_escape_string($value, $strip_tags);
+        $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
+        $value = \SmallSmallRSS\Database::escape_string($value, $strip_tags);
 
         if (!$user_id) {
             $user_id = $_SESSION["uid"];
@@ -172,7 +172,7 @@ class Db_Prefs
         }
 
         if (!$type_name) {
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT type_name
                  FROM ttrss_prefs,ttrss_prefs_types
                  WHERE
@@ -180,8 +180,8 @@ class Db_Prefs
                      AND type_id = ttrss_prefs_types.id"
             );
 
-            if (db_num_rows($result) > 0) {
-                $type_name = db_fetch_result($result, 0, "type_name");
+            if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+                $type_name = \SmallSmallRSS\Database::fetch_result($result, 0, "type_name");
             }
         } elseif ($current_value == $value) {
             return;
@@ -202,7 +202,7 @@ class Db_Prefs
                 $value = 'UTC';
             }
 
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_prefs
                  SET value = '$value'
                  WHERE

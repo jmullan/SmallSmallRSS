@@ -141,7 +141,7 @@ function make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS,
     return $rv;
 }
 
-function db_query($link, $query, $type, $die_on_error = true) {
+function \SmallSmallRSS\Database::query($link, $query, $type, $die_on_error = true) {
     if ($type == "pgsql") {
         $result = pg_query($link, $query);
         if (!$result) {
@@ -340,7 +340,7 @@ if ($op == 'testconfig') {
 
     echo '<h2>Initialize database</h2>';
     echo '<p>Before you can start using tt-rss, database needs to be initialized. Click on the button below to do that now.</p>';
-    $result = @db_query($link, "SELECT true FROM ttrss_feeds", $DB_TYPE, false);
+    $result = @\SmallSmallRSS\Database::query($link, "SELECT true FROM ttrss_feeds", $DB_TYPE, false);
     if ($result) {
         \SmallSmallRSS\Renderers\Messages::renderError(
             "Existing tt-rss tables will be removed from the database. If you would like to keep your data, skip database initialization.");
@@ -407,7 +407,7 @@ if ($op == 'testconfig') {
 
         foreach ($lines as $line) {
             if (strpos($line, "--") !== 0 && $line) {
-                db_query($link, $line, $DB_TYPE);
+                \SmallSmallRSS\Database::query($link, $line, $DB_TYPE);
             }
         }
 

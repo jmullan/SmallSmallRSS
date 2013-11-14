@@ -49,10 +49,10 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
             $date_qpart = "last_connected < DATE_SUB(NOW(), INTERVAL 6 HOUR)";
         }
 
-        $result = db_query("SELECT id, access_key, access_url FROM ttrss_linked_instances
+        $result = \SmallSmallRSS\Database::query("SELECT id, access_key, access_url FROM ttrss_linked_instances
 			WHERE $instance_qpart $date_qpart ORDER BY last_connected");
 
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line['id'];
 
             _debug("Updating: " . $line['access_url'] . " ($id)");
@@ -77,7 +77,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
                         // access denied
                         if ($status == 16) {
-                            db_query("DELETE FROM ttrss_linked_feeds
+                            \SmallSmallRSS\Database::query("DELETE FROM ttrss_linked_feeds
 								WHERE instance_id = '$id'");
                         }
                     } else {
@@ -85,16 +85,16 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
                         if (count($feeds['feeds']) > 0) {
 
-                            db_query("DELETE FROM ttrss_linked_feeds
+                            \SmallSmallRSS\Database::query("DELETE FROM ttrss_linked_feeds
 								WHERE instance_id = '$id'");
 
                             foreach ($feeds['feeds'] as $feed) {
-                                $feed_url = db_escape_string($feed['feed_url']);
-                                $title = db_escape_string($feed['title']);
-                                $subscribers = db_escape_string($feed['subscribers']);
-                                $site_url = db_escape_string($feed['site_url']);
+                                $feed_url = \SmallSmallRSS\Database::escape_string($feed['feed_url']);
+                                $title = \SmallSmallRSS\Database::escape_string($feed['title']);
+                                $subscribers = \SmallSmallRSS\Database::escape_string($feed['subscribers']);
+                                $site_url = \SmallSmallRSS\Database::escape_string($feed['site_url']);
 
-                                db_query("INSERT INTO ttrss_linked_feeds
+                                \SmallSmallRSS\Database::query("INSERT INTO ttrss_linked_feeds
 									(feed_url, site_url, title, subscribers, instance_id, created, updated)
 								VALUES
 									('$feed_url', '$site_url', '$title', '$subscribers', '$id', NOW(), NOW())");
@@ -119,7 +119,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
             _debug("Status: $status");
 
-            db_query("UPDATE ttrss_linked_instances SET
+            \SmallSmallRSS\Database::query("UPDATE ttrss_linked_instances SET
 				last_status_out = '$status', last_connected = NOW() WHERE id = '$id'");
 
         }
@@ -164,37 +164,37 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     }
 
     function remove() {
-        $ids = db_escape_string($_REQUEST['ids']);
+        $ids = \SmallSmallRSS\Database::escape_string($_REQUEST['ids']);
 
-        db_query("DELETE FROM ttrss_linked_instances WHERE
+        \SmallSmallRSS\Database::query("DELETE FROM ttrss_linked_instances WHERE
 			id IN ($ids)");
     }
 
     function add() {
-        $id = db_escape_string($_REQUEST["id"]);
-        $access_url = db_escape_string($_REQUEST["access_url"]);
-        $access_key = db_escape_string($_REQUEST["access_key"]);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $access_url = \SmallSmallRSS\Database::escape_string($_REQUEST["access_url"]);
+        $access_key = \SmallSmallRSS\Database::escape_string($_REQUEST["access_key"]);
 
-        db_query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
-        $result = db_query("SELECT id FROM ttrss_linked_instances
+        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_linked_instances
 			WHERE access_url = '$access_url'");
 
-        if (db_num_rows($result) == 0) {
-            db_query("INSERT INTO ttrss_linked_instances
+        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            \SmallSmallRSS\Database::query("INSERT INTO ttrss_linked_instances
 				(access_url, access_key, last_connected, last_status_in, last_status_out)
 				VALUES
 				('$access_url', '$access_key', '1970-01-01', -1, -1)");
 
         }
 
-        db_query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
     }
 
     function edit() {
-        $id = db_escape_string($_REQUEST["id"]);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
 
-        $result = db_query("SELECT * FROM ttrss_linked_instances WHERE
+        $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_linked_instances WHERE
 			id = '$id'");
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\"  name=\"id\" value=\"$id\">";
@@ -207,7 +207,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         /* URL */
 
-        $access_url = htmlspecialchars(db_fetch_result($result, 0, "access_url"));
+        $access_url = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "access_url"));
 
         print __("URL:") . " ";
 
@@ -219,7 +219,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         print "<hr/>";
 
-        $access_key = htmlspecialchars(db_fetch_result($result, 0, "access_key"));
+        $access_key = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "access_key"));
 
         /* Access key */
 
@@ -250,11 +250,11 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     }
 
     function editSave() {
-        $id = db_escape_string($_REQUEST["id"]);
-        $access_url = db_escape_string($_REQUEST["access_url"]);
-        $access_key = db_escape_string($_REQUEST["access_key"]);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $access_url = \SmallSmallRSS\Database::escape_string($_REQUEST["access_url"]);
+        $access_key = \SmallSmallRSS\Database::escape_string($_REQUEST["access_key"]);
 
-        db_query("UPDATE ttrss_linked_instances SET
+        \SmallSmallRSS\Database::query("UPDATE ttrss_linked_instances SET
 			access_key = '$access_key', access_url = '$access_url',
 			last_connected = '1970-01-01'
 			WHERE id = '$id'");
@@ -274,7 +274,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         print "<div id=\"pref-instance-toolbar\" dojoType=\"dijit.Toolbar\">";
 
-        $sort = db_escape_string($_REQUEST["sort"]);
+        $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);
 
         if (!$sort || $sort == "undefined") {
             $sort = "access_url";
@@ -295,7 +295,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         print "</div>"; #toolbar
 
-        $result = db_query("SELECT *,
+        $result = \SmallSmallRSS\Database::query("SELECT *,
 			(SELECT COUNT(*) FROM ttrss_linked_feeds
 				WHERE instance_id = ttrss_linked_instances.id) AS num_feeds
 			FROM ttrss_linked_instances
@@ -318,7 +318,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         $lnum = 0;
 
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $class = ($lnum % 2) ? "even" : "odd";
 
             $id = $line['id'];
@@ -361,26 +361,26 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     function fbexport() {
 
-        $access_key = db_escape_string($_POST["key"]);
+        $access_key = \SmallSmallRSS\Database::escape_string($_POST["key"]);
 
         // TODO: rate limit checking using last_connected
-        $result = db_query("SELECT id FROM ttrss_linked_instances
+        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_linked_instances
 			WHERE access_key = '$access_key'");
 
-        if (db_num_rows($result) == 1) {
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
 
-            $instance_id = db_fetch_result($result, 0, "id");
+            $instance_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
-            $result = db_query("SELECT feed_url, site_url, title, subscribers
+            $result = \SmallSmallRSS\Database::query("SELECT feed_url, site_url, title, subscribers
 				FROM ttrss_feedbrowser_cache ORDER BY subscribers DESC LIMIT 100");
 
             $feeds = array();
 
-            while ($line = db_fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 array_push($feeds, $line);
             }
 
-            db_query("UPDATE ttrss_linked_instances SET
+            \SmallSmallRSS\Database::query("UPDATE ttrss_linked_instances SET
 				last_status_in = 1 WHERE id = '$instance_id'");
 
             print json_encode(array("feeds" => $feeds));

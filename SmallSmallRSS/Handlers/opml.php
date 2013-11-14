@@ -368,7 +368,7 @@ class Opml extends ProtectedHandler
                 $match_any_rule = bool_to_sql_bool($filter["match_any_rule"]);
                 $enabled = bool_to_sql_bool($filter["enabled"]);
                 $inverse = bool_to_sql_bool($filter["inverse"]);
-                $title = db_escape_string($filter["title"]);
+                $title = \SmallSmallRSS\Database::escape_string($filter["title"]);
 
                 $this->dbh->query("BEGIN");
 

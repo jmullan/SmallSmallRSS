@@ -26,24 +26,24 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
         _debug("please enter your username:");
 
-        $username = db_escape_string(trim(read_stdin()));
+        $username = \SmallSmallRSS\Database::escape_string(trim(read_stdin()));
 
         _debug("importing $filename for user $username...\n");
 
-        $result = db_query("SELECT id FROM ttrss_users WHERE login = '$username'");
+        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE login = '$username'");
 
-        if (db_num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
             print "error: could not find user $username.\n";
             return;
         }
 
-        $owner_uid = db_fetch_result($result, 0, "id");
+        $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
         $this->perform_data_import($filename, $owner_uid);
     }
 
     function save() {
-        $example_value = db_escape_string($_POST["example_value"]);
+        $example_value = \SmallSmallRSS\Database::escape_string($_POST["example_value"]);
 
         echo "Value set to $example_value (not really)";
     }
@@ -120,12 +120,12 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
     }
 
     function exportrun() {
-        $offset = (int) db_escape_string($_REQUEST['offset']);
+        $offset = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['offset']);
         $exported = 0;
         $limit = 250;
 
         if ($offset < 10000 && is_writable(CACHE_DIR . "/export")) {
-            $result = db_query("SELECT
+            $result = \SmallSmallRSS\Database::query("SELECT
 					ttrss_entries.guid,
 					ttrss_entries.title,
 					content,
@@ -159,7 +159,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
             if ($fp) {
 
-                while ($line = db_fetch_assoc($result)) {
+                while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                     fputs($fp, "<article>");
 
                     foreach ($line as $k => $v) {
@@ -170,7 +170,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                     fputs($fp, "</article>");
                 }
 
-                $exported = db_num_rows($result);
+                $exported = \SmallSmallRSS\Database::num_rows($result);
 
                 if ($exported < $limit && $exported > 0) {
                     fputs($fp, "</articles>");
@@ -237,19 +237,19 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
                     foreach ($article_node->childNodes as $child) {
                         if ($child->nodeName != 'label_cache')
-                            $article[$child->nodeName] = db_escape_string($child->nodeValue);
+                            $article[$child->nodeName] = \SmallSmallRSS\Database::escape_string($child->nodeValue);
                         else
                             $article[$child->nodeName] = $child->nodeValue;
                     }
 
                     if ($article['guid']) {
                         ++$num_processed;
-                        $result = db_query("SELECT id FROM ttrss_entries
+                        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_entries
 							WHERE guid = '".$article['guid']."'");
 
-                        if (db_num_rows($result) == 0) {
+                        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
-                            $result = db_query(
+                            $result = \SmallSmallRSS\Database::query(
                                 "INSERT INTO ttrss_entries
 									(title,
 									guid,
@@ -277,15 +277,15 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 									'0',
 									'')");
 
-                            $result = db_query("SELECT id FROM ttrss_entries
+                            $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_entries
 								WHERE guid = '".$article['guid']."'");
 
-                            if (db_num_rows($result) != 0) {
-                                $ref_id = db_fetch_result($result, 0, "id");
+                            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                                $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
                             }
 
                         } else {
-                            $ref_id = db_fetch_result($result, 0, "id");
+                            $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
                         }
 
                         //print "Got ref ID: $ref_id\n";
@@ -298,24 +298,24 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                             $feed = 'NULL';
 
                             if ($feed_url && $feed_title) {
-                                $result = db_query("SELECT id FROM ttrss_feeds
+                                $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_feeds
 									WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'");
 
-                                if (db_num_rows($result) != 0) {
-                                    $feed = db_fetch_result($result, 0, "id");
+                                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                                    $feed = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
                                 } else {
                                     // try autocreating feed in Uncategorized...
 
-                                    $result = db_query("INSERT INTO ttrss_feeds (owner_uid,
+                                    $result = \SmallSmallRSS\Database::query("INSERT INTO ttrss_feeds (owner_uid,
 										feed_url, title) VALUES ($owner_uid, '$feed_url', '$feed_title')");
 
-                                    $result = db_query("SELECT id FROM ttrss_feeds
+                                    $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_feeds
 										WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'");
 
-                                    if (db_num_rows($result) != 0) {
+                                    if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                                         ++$num_feeds_created;
 
-                                        $feed = db_fetch_result($result, 0, "id");
+                                        $feed = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
                                     }
                                 }
                             }
@@ -327,24 +327,24 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
                             //print "$ref_id / $feed / " . $article['title'] . "\n";
 
-                            $result = db_query("SELECT int_id FROM ttrss_user_entries
+                            $result = \SmallSmallRSS\Database::query("SELECT int_id FROM ttrss_user_entries
 								WHERE ref_id = '$ref_id' AND owner_uid = '$owner_uid' AND $feed_qpart");
 
-                            if (db_num_rows($result) == 0) {
+                            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
                                 $marked = bool_to_sql_bool(sql_bool_to_bool($article['marked']));
                                 $published = bool_to_sql_bool(sql_bool_to_bool($article['published']));
                                 $score = (int) $article['score'];
 
                                 $tag_cache = $article['tag_cache'];
-                                $label_cache = db_escape_string($article['label_cache']);
+                                $label_cache = \SmallSmallRSS\Database::escape_string($article['label_cache']);
                                 $note = $article['note'];
 
                                 //print "Importing " . $article['title'] . "<br/>";
 
                                 ++$num_imported;
 
-                                $result = db_query(
+                                $result = \SmallSmallRSS\Database::query(
                                     "INSERT INTO ttrss_user_entries
 									(ref_id, owner_uid, feed_id, unread, last_read, marked,
 										published, score, tag_cache, label_cache, uuid, note)
@@ -365,7 +365,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                                     }
                                 }
 
-                                //db_query("COMMIT");
+                                //\SmallSmallRSS\Database::query("COMMIT");
                             }
                         }
                     }

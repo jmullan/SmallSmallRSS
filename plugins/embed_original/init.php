@@ -34,16 +34,16 @@ class Embed_Original extends \SmallSmallRSS\Plugin {
 	}
 
 	function getUrl() {
-		$id = db_escape_string($_REQUEST['id']);
+		$id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
 
-		$result = db_query("SELECT link
+		$result = \SmallSmallRSS\Database::query("SELECT link
 				FROM ttrss_entries, ttrss_user_entries
 				WHERE id = '$id' AND ref_id = id AND owner_uid = " .$_SESSION['uid']);
 
 		$url = "";
 
-		if (db_num_rows($result) != 0) {
-			$url = db_fetch_result($result, 0, "link");
+		if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+			$url = \SmallSmallRSS\Database::fetch_result($result, 0, "link");
 
 		}
 

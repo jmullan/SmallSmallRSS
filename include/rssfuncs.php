@@ -5,7 +5,7 @@ define_default('DAEMON_SLEEP_INTERVAL', 120);
 
 function update_feedbrowser_cache()
 {
-    $result = db_query(
+    $result = \SmallSmallRSS\Database::query(
         "SELECT feed_url, site_url, title, COUNT(id) AS subscribers
          FROM ttrss_feeds
          WHERE (
@@ -22,24 +22,24 @@ function update_feedbrowser_cache()
          ORDER BY subscribers DESC
          LIMIT 1000"
     );
-    db_query("BEGIN");
-    db_query("DELETE FROM ttrss_feedbrowser_cache");
+    \SmallSmallRSS\Database::query("BEGIN");
+    \SmallSmallRSS\Database::query("DELETE FROM ttrss_feedbrowser_cache");
 
     $count = 0;
 
-    while ($line = db_fetch_assoc($result)) {
-        $subscribers = db_escape_string($line["subscribers"]);
-        $feed_url = db_escape_string($line["feed_url"]);
-        $title = db_escape_string($line["title"]);
-        $site_url = db_escape_string($line["site_url"]);
+    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        $subscribers = \SmallSmallRSS\Database::escape_string($line["subscribers"]);
+        $feed_url = \SmallSmallRSS\Database::escape_string($line["feed_url"]);
+        $title = \SmallSmallRSS\Database::escape_string($line["title"]);
+        $site_url = \SmallSmallRSS\Database::escape_string($line["site_url"]);
 
-        $tmp_result = db_query(
+        $tmp_result = \SmallSmallRSS\Database::query(
             "SELECT subscribers FROM
                 ttrss_feedbrowser_cache WHERE feed_url = '$feed_url'"
         );
 
-        if (db_num_rows($tmp_result) == 0) {
-            db_query(
+        if (\SmallSmallRSS\Database::num_rows($tmp_result) == 0) {
+            \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_feedbrowser_cache
                  (feed_url, site_url, title, subscribers)
                  VALUES ('$feed_url', '$site_url', '$title', '$subscribers')"
@@ -47,7 +47,7 @@ function update_feedbrowser_cache()
             $count += 1;
         }
     }
-    db_query("COMMIT");
+    \SmallSmallRSS\Database::query("COMMIT");
     return $count;
 }
 
@@ -159,14 +159,14 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
               ORDER BY last_updated
               $query_limit";
     // We search for feed needing update.
-    $result = db_query($query);
+    $result = \SmallSmallRSS\Database::query($query);
 
-    _debug(sprintf("Scheduled %d feeds to update...", db_num_rows($result)), $debug);
+    _debug(sprintf("Scheduled %d feeds to update...", \SmallSmallRSS\Database::num_rows($result)), $debug);
 
     // Here is a little cache magic in order to minimize risk of double feed updates.
     $feeds_to_update = array();
-    while ($line = db_fetch_assoc($result)) {
-        array_push($feeds_to_update, db_escape_string($line['feed_url']));
+    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        array_push($feeds_to_update, \SmallSmallRSS\Database::escape_string($line['feed_url']));
     }
 
     // We update the feed last update started date before anything else.
@@ -176,9 +176,9 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
     if (count($feeds_to_update) > 0) {
         $feeds_quoted = array();
         foreach ($feeds_to_update as $feed) {
-            array_push($feeds_quoted, "'" . db_escape_string($feed) . "'");
+            array_push($feeds_quoted, "'" . \SmallSmallRSS\Database::escape_string($feed) . "'");
         }
-        db_query(sprintf(
+        \SmallSmallRSS\Database::query(sprintf(
             "UPDATE ttrss_feeds SET last_update_started = NOW()
              WHERE feed_url IN (%s)", implode(',', $feeds_quoted)
         ));
@@ -197,7 +197,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
                       ttrss_user_prefs.owner_uid = ttrss_feeds.owner_uid
                       AND ttrss_users.id = ttrss_user_prefs.owner_uid
                       AND ttrss_user_prefs.pref_name = 'DEFAULT_UPDATE_INTERVAL'
-                      AND feed_url = '" . db_escape_string($feed) . "'
+                      AND feed_url = '" . \SmallSmallRSS\Database::escape_string($feed) . "'
                       AND (
                           ttrss_feeds.update_interval > 0
                           OR ttrss_user_prefs.value != '-1'
@@ -206,9 +206,9 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
                   ORDER BY ttrss_feeds.id
                   $query_limit";
         _debug($query);
-        $tmp_result = db_query($query);
-        if (db_num_rows($tmp_result) > 0) {
-            while ($tline = db_fetch_assoc($tmp_result)) {
+        $tmp_result = \SmallSmallRSS\Database::query($query);
+        if (\SmallSmallRSS\Database::num_rows($tmp_result) > 0) {
+            while ($tline = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
                 update_rss_feed($tline["id"], true);
                 ++$nf;
             }
@@ -221,7 +221,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 function update_rss_feed($feed, $no_cache = false)
 {
     _debug("start $feed");
-    $result = db_query(
+    $result = \SmallSmallRSS\Database::query(
         "SELECT
              id,
              update_interval,
@@ -246,44 +246,44 @@ function update_rss_feed($feed, $no_cache = false)
              FROM ttrss_feeds WHERE id = '$feed'"
     );
 
-    if (db_num_rows($result) == 0) {
+    if (\SmallSmallRSS\Database::num_rows($result) == 0) {
         _debug("feed $feed NOT FOUND/SKIPPED");
         return false;
     }
 
-    $last_updated = db_fetch_result($result, 0, "last_updated");
-    $last_article_timestamp = @strtotime(db_fetch_result($result, 0, "last_article_timestamp"));
+    $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, "last_updated");
+    $last_article_timestamp = @strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, "last_article_timestamp"));
     if (defined('_DISABLE_HTTP_304')) {
         $last_article_timestamp = 0;
     }
-    $owner_uid = db_fetch_result($result, 0, "owner_uid");
-    $mark_unread_on_update = sql_bool_to_bool(db_fetch_result(
+    $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
+    $mark_unread_on_update = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result(
         $result,
         0, "mark_unread_on_update"
     ));
-    $pubsub_state = db_fetch_result($result, 0, "pubsub_state");
-    $auth_pass_encrypted = sql_bool_to_bool(db_fetch_result(
+    $pubsub_state = \SmallSmallRSS\Database::fetch_result($result, 0, "pubsub_state");
+    $auth_pass_encrypted = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result(
         $result,
         0, "auth_pass_encrypted"
     ));
 
-    db_query(
+    \SmallSmallRSS\Database::query(
         "UPDATE ttrss_feeds
          SET last_update_started = NOW()
          WHERE id = '$feed'"
     );
 
-    $auth_login = db_fetch_result($result, 0, "auth_login");
-    $auth_pass = db_fetch_result($result, 0, "auth_pass");
+    $auth_login = \SmallSmallRSS\Database::fetch_result($result, 0, "auth_login");
+    $auth_pass = \SmallSmallRSS\Database::fetch_result($result, 0, "auth_pass");
 
     if ($auth_pass_encrypted) {
         $auth_pass = \SmallSmallRSS\Crypt::de($auth_pass);
     }
 
-    $cache_images = sql_bool_to_bool(db_fetch_result($result, 0, "cache_images"));
-    $fetch_url = db_fetch_result($result, 0, "feed_url");
+    $cache_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "cache_images"));
+    $fetch_url = \SmallSmallRSS\Database::fetch_result($result, 0, "feed_url");
 
-    $feed = db_escape_string($feed);
+    $feed = \SmallSmallRSS\Database::escape_string($feed);
 
     $date_feed_processed = date('Y-m-d H:i');
 
@@ -352,11 +352,11 @@ function update_rss_feed($feed, $no_cache = false)
             $error_escaped = '';
             // If-Modified-Since
             if ($fetch_last_error_code != 304) {
-                $error_escaped = db_escape_string($fetch_last_error);
+                $error_escaped = \SmallSmallRSS\Database::escape_string($fetch_last_error);
             } else {
                 _debug("source claims data not modified, nothing to do.");
             }
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds
                  SET last_error = '$error_escaped', last_updated = NOW() WHERE id = '$feed'"
             );
@@ -379,11 +379,11 @@ function update_rss_feed($feed, $no_cache = false)
         $rss->init();
     }
 
-    $feed = db_escape_string($feed);
+    $feed = \SmallSmallRSS\Database::escape_string($feed);
     if ($rss->error()) {
-        $error_msg = db_escape_string(mb_substr($rss->error(), 0, 245));
+        $error_msg = \SmallSmallRSS\Database::escape_string(mb_substr($rss->error(), 0, 245));
         _debug("error fetching feed: $error_msg");
-        db_query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds
              SET
                  last_error = '$error_msg',
@@ -417,24 +417,24 @@ function update_rss_feed($feed, $no_cache = false)
         $favicon_interval_qpart = "favicon_last_checked < DATE_SUB(NOW(), INTERVAL 12 HOUR)";
     }
 
-    $result = db_query(
+    $result = \SmallSmallRSS\Database::query(
         "SELECT title,site_url,owner_uid,favicon_avg_color,
              (favicon_last_checked IS NULL OR $favicon_interval_qpart) AS favicon_needs_check
              FROM ttrss_feeds
              WHERE id = '$feed'"
     );
 
-    $registered_title = db_fetch_result($result, 0, "title");
-    $orig_site_url = db_fetch_result($result, 0, "site_url");
-    $favicon_needs_check = sql_bool_to_bool(db_fetch_result(
+    $registered_title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
+    $orig_site_url = \SmallSmallRSS\Database::fetch_result($result, 0, "site_url");
+    $favicon_needs_check = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result(
         $result, 0,
         "favicon_needs_check"
     ));
-    $favicon_avg_color = db_fetch_result($result, 0, "favicon_avg_color");
+    $favicon_avg_color = \SmallSmallRSS\Database::fetch_result($result, 0, "favicon_avg_color");
 
-    $owner_uid = db_fetch_result($result, 0, "owner_uid");
+    $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
 
-    $site_url = db_escape_string(mb_substr(rewrite_relative_url($fetch_url, $rss->get_link()), 0, 245));
+    $site_url = \SmallSmallRSS\Database::escape_string(mb_substr(rewrite_relative_url($fetch_url, $rss->get_link()), 0, 245));
 
     _debug("site_url: $site_url");
     _debug("feed_title: " . $rss->get_title());
@@ -458,12 +458,12 @@ function update_rss_feed($feed, $no_cache = false)
 
         $favicon_colorstring = '';
         if (file_exists($favicon_file) && function_exists("imagecreatefromstring") && $favicon_avg_color == '') {
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds SET favicon_avg_color = 'fail' WHERE
                             id = '$feed'"
             );
 
-            $favicon_color = db_escape_string(
+            $favicon_color = \SmallSmallRSS\Database::escape_string(
                 \SmallSmallRSS\Colors::calculateAverage($favicon_file)
             );
 
@@ -472,7 +472,7 @@ function update_rss_feed($feed, $no_cache = false)
             _debug("floicon failed on this file, not trying to recalculate avg color");
         }
 
-        db_query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds SET favicon_last_checked = NOW()
                     $favicon_colorstring
                     WHERE id = '$feed'"
@@ -481,12 +481,12 @@ function update_rss_feed($feed, $no_cache = false)
 
     if (!$registered_title || $registered_title == "[Unknown]") {
 
-        $feed_title = db_escape_string($rss->get_title());
+        $feed_title = \SmallSmallRSS\Database::escape_string($rss->get_title());
 
         if ($feed_title) {
             _debug("registering title: $feed_title");
 
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds SET
                         title = '$feed_title' WHERE id = '$feed'"
             );
@@ -494,7 +494,7 @@ function update_rss_feed($feed, $no_cache = false)
     }
 
     if ($site_url && $orig_site_url != $site_url) {
-        db_query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds SET
                     site_url = '$site_url' WHERE id = '$feed'"
         );
@@ -511,7 +511,7 @@ function update_rss_feed($feed, $no_cache = false)
     if (!is_array($items)) {
         _debug("no articles found.");
 
-        db_query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds
              SET last_updated = NOW(), last_error = ''
              WHERE id = '$feed'"
@@ -538,7 +538,7 @@ function update_rss_feed($feed, $no_cache = false)
             $s = new Subscriber($feed_hub_url, $callback_url);
             $rc = $s->subscribe($fetch_url);
             _debug("feed hub url found, subscribe request sent.");
-            db_query("UPDATE ttrss_feeds SET pubsub_state = 1 WHERE id = '$feed'");
+            \SmallSmallRSS\Database::query("UPDATE ttrss_feeds SET pubsub_state = 1 WHERE id = '$feed'");
         }
     }
 
@@ -570,7 +570,7 @@ function update_rss_feed($feed, $no_cache = false)
 
         $entry_guid = "$owner_uid,$entry_guid";
 
-        $entry_guid_hashed = db_escape_string('SHA1:' . sha1($entry_guid));
+        $entry_guid_hashed = \SmallSmallRSS\Database::escape_string('SHA1:' . sha1($entry_guid));
 
         _debug("guid $entry_guid / $entry_guid_hashed");
 
@@ -618,10 +618,10 @@ function update_rss_feed($feed, $no_cache = false)
         $entry_comments = $item->get_comments_url();
         $entry_author = $item->get_author();
 
-        $entry_guid = db_escape_string(mb_substr($entry_guid, 0, 245));
+        $entry_guid = \SmallSmallRSS\Database::escape_string(mb_substr($entry_guid, 0, 245));
 
-        $entry_comments = db_escape_string(mb_substr(trim($entry_comments), 0, 245));
-        $entry_author = db_escape_string(mb_substr(trim($entry_author), 0, 245));
+        $entry_comments = \SmallSmallRSS\Database::escape_string(mb_substr(trim($entry_comments), 0, 245));
+        $entry_author = \SmallSmallRSS\Database::escape_string(mb_substr(trim($entry_author), 0, 245));
 
         $num_comments = (int) $item->get_comments_count();
 
@@ -657,26 +657,26 @@ function update_rss_feed($feed, $no_cache = false)
 
         // FIXME not sure if owner_uid is a good idea here, we may have a base
         // entry (?)
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT plugin_data,title,content,link,tag_cache,author
              FROM ttrss_entries, ttrss_user_entries
              WHERE
                  ref_id = id
                  AND owner_uid = $owner_uid
                  AND (
-                     guid = '" . db_escape_string($entry_guid) . "'
+                     guid = '" . \SmallSmallRSS\Database::escape_string($entry_guid) . "'
                      OR guid = '$entry_guid_hashed'
                  )"
         );
 
-        if (db_num_rows($result) != 0) {
-            $entry_plugin_data = db_fetch_result($result, 0, "plugin_data");
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            $entry_plugin_data = \SmallSmallRSS\Database::fetch_result($result, 0, "plugin_data");
             $stored_article = array(
-                "title" => db_fetch_result($result, 0, "title"),
-                "content" => db_fetch_result($result, 0, "content"),
-                "link" => db_fetch_result($result, 0, "link"),
-                "tags" => explode(",", db_fetch_result($result, 0, "tag_cache")),
-                "author" => db_fetch_result($result, 0, "author")
+                "title" => \SmallSmallRSS\Database::fetch_result($result, 0, "title"),
+                "content" => \SmallSmallRSS\Database::fetch_result($result, 0, "content"),
+                "link" => \SmallSmallRSS\Database::fetch_result($result, 0, "link"),
+                "tags" => explode(",", \SmallSmallRSS\Database::fetch_result($result, 0, "tag_cache")),
+                "author" => \SmallSmallRSS\Database::fetch_result($result, 0, "author")
             );
         } else {
             $entry_plugin_data = "";
@@ -700,11 +700,11 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
         $entry_tags = $article["tags"];
-        $entry_guid = db_escape_string($entry_guid);
-        $entry_title = db_escape_string($article["title"]);
-        $entry_author = db_escape_string($article["author"]);
-        $entry_link = db_escape_string($article["link"]);
-        $entry_plugin_data = db_escape_string($article["plugin_data"]);
+        $entry_guid = \SmallSmallRSS\Database::escape_string($entry_guid);
+        $entry_title = \SmallSmallRSS\Database::escape_string($article["title"]);
+        $entry_author = \SmallSmallRSS\Database::escape_string($article["author"]);
+        $entry_link = \SmallSmallRSS\Database::escape_string($article["link"]);
+        $entry_plugin_data = \SmallSmallRSS\Database::escape_string($article["plugin_data"]);
         $entry_content = $article["content"]; // escaped below
 
 
@@ -714,18 +714,18 @@ function update_rss_feed($feed, $no_cache = false)
             cache_images($entry_content, $site_url);
         }
 
-        $entry_content = db_escape_string($entry_content, false);
+        $entry_content = \SmallSmallRSS\Database::escape_string($entry_content, false);
 
         $content_hash = "SHA1:" . sha1($entry_content);
 
-        db_query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_entries
              WHERE (guid = '$entry_guid' OR guid = '$entry_guid_hashed')"
         );
 
-        if (db_num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
             _debug("base guid [$entry_guid] not found");
 
             // base post entry does not exist, create it
@@ -761,7 +761,7 @@ function update_rss_feed($feed, $no_cache = false)
                    '$num_comments',
                    '$entry_plugin_data',
                    '$entry_author')";
-            $result = db_query($query);
+            $result = \SmallSmallRSS\Database::query($query);
             $article_labels = array();
         } else {
             // we keep encountering the entry in feeds, so we need to
@@ -769,9 +769,9 @@ function update_rss_feed($feed, $no_cache = false)
             // dupes when the entry gets purged and reinserted again e.g.
             // in the case of SLOW SLOW OMG SLOW updating feeds
 
-            $base_entry_id = db_fetch_result($result, 0, "id");
+            $base_entry_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_entries SET date_updated = NOW()
                         WHERE id = '$base_entry_id'"
             );
@@ -781,7 +781,7 @@ function update_rss_feed($feed, $no_cache = false)
 
         // now it should exist, if not - bad luck then
 
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT
                 id,content_hash,no_orig_date,title,plugin_data,guid,
                 ".SUBSTRING_FOR_DATE."(date_updated,1,19) as date_updated,
@@ -795,28 +795,28 @@ function update_rss_feed($feed, $no_cache = false)
         $entry_ref_id = 0;
         $entry_int_id = 0;
 
-        if (db_num_rows($result) == 1) {
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
 
             _debug("base guid found, checking for user record");
 
             // this will be used below in update handler
-            $orig_content_hash = db_fetch_result($result, 0, "content_hash");
-            $orig_title = db_fetch_result($result, 0, "title");
-            $orig_num_comments = db_fetch_result($result, 0, "num_comments");
-            $orig_date_updated = strtotime(db_fetch_result(
+            $orig_content_hash = \SmallSmallRSS\Database::fetch_result($result, 0, "content_hash");
+            $orig_title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
+            $orig_num_comments = \SmallSmallRSS\Database::fetch_result($result, 0, "num_comments");
+            $orig_date_updated = strtotime(\SmallSmallRSS\Database::fetch_result(
                 $result,
                 0, "date_updated"
             ));
-            $orig_plugin_data = db_fetch_result($result, 0, "plugin_data");
+            $orig_plugin_data = \SmallSmallRSS\Database::fetch_result($result, 0, "plugin_data");
 
-            $ref_id = db_fetch_result($result, 0, "id");
+            $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
             $entry_ref_id = $ref_id;
 
-            /* $stored_guid = db_fetch_result($result, 0, "guid");
+            /* $stored_guid = \SmallSmallRSS\Database::fetch_result($result, 0, "guid");
                if ($stored_guid != $entry_guid_hashed) {
                if ($debug_enabled) _debug("upgrading compat guid to hashed one");
 
-               db_query("UPDATE ttrss_entries SET guid = '$entry_guid_hashed' WHERE
+               \SmallSmallRSS\Database::query("UPDATE ttrss_entries SET guid = '$entry_guid_hashed' WHERE
                id = '$ref_id'");
                } */
 
@@ -845,7 +845,7 @@ function update_rss_feed($feed, $no_cache = false)
             }
 
             if (find_article_filter($article_filters, "filter")) {
-                db_query("COMMIT"); // close transaction in progress
+                \SmallSmallRSS\Database::query("COMMIT"); // close transaction in progress
                 continue;
             }
 
@@ -860,10 +860,10 @@ function update_rss_feed($feed, $no_cache = false)
                           AND owner_uid = '$owner_uid'
                           $dupcheck_qpart";
 
-            $result = db_query($query);
+            $result = \SmallSmallRSS\Database::query($query);
 
             // okay it doesn't exist - create user entry
-            if (db_num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
                 _debug("user record not found, creating...");
 
@@ -891,7 +891,7 @@ function update_rss_feed($feed, $no_cache = false)
 
                 if (DB_TYPE == "pgsql" and defined('_NGRAM_TITLE_DUPLICATE_THRESHOLD')) {
 
-                    $result = db_query(
+                    $result = \SmallSmallRSS\Database::query(
                         "SELECT COUNT(*) AS similar
                          FROM ttrss_entries, ttrss_user_entries
                          WHERE
@@ -901,7 +901,7 @@ function update_rss_feed($feed, $no_cache = false)
                              AND owner_uid = $owner_uid"
                     );
 
-                    $ngram_similar = db_fetch_result($result, 0, "similar");
+                    $ngram_similar = \SmallSmallRSS\Database::fetch_result($result, 0, "similar");
 
                     _debug("N-gram similar results: $ngram_similar");
 
@@ -913,7 +913,7 @@ function update_rss_feed($feed, $no_cache = false)
                 $last_marked = ($marked == 'true') ? 'NOW()' : 'NULL';
                 $last_published = ($published == 'true') ? 'NOW()' : 'NULL';
 
-                $result = db_query(
+                $result = \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_user_entries
                                 (ref_id, owner_uid, feed_id, unread, last_read, marked,
                                 published, score, tag_cache, label_cache, uuid,
@@ -933,20 +933,20 @@ function update_rss_feed($feed, $no_cache = false)
                     $pubsub_result = $p->publish_update($rss_link);
                 }
 
-                $result = db_query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT int_id FROM ttrss_user_entries WHERE
                                 ref_id = '$ref_id' AND owner_uid = '$owner_uid' AND
                                 feed_id = '$feed' LIMIT 1"
                 );
 
-                if (db_num_rows($result) == 1) {
-                    $entry_int_id = db_fetch_result($result, 0, "int_id");
+                if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+                    $entry_int_id = \SmallSmallRSS\Database::fetch_result($result, 0, "int_id");
                 }
             } else {
                 _debug("user record FOUND");
 
-                $entry_ref_id = db_fetch_result($result, 0, "ref_id");
-                $entry_int_id = db_fetch_result($result, 0, "int_id");
+                $entry_ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "ref_id");
+                $entry_int_id = \SmallSmallRSS\Database::fetch_result($result, 0, "int_id");
             }
 
             _debug("RID: $entry_ref_id, IID: $entry_int_id");
@@ -969,7 +969,7 @@ function update_rss_feed($feed, $no_cache = false)
                 $update_insignificant = false;
             }
 
-            if (db_escape_string($orig_title) != $entry_title) {
+            if (\SmallSmallRSS\Database::escape_string($orig_title) != $entry_title) {
                 $post_needs_update = true;
                 $update_insignificant = false;
             }
@@ -984,7 +984,7 @@ function update_rss_feed($feed, $no_cache = false)
 
                 //                        print "<!-- post $orig_title needs update : $post_needs_update -->";
 
-                db_query(
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_entries
                             SET title = '$entry_title', content = '$entry_content',
                                 content_hash = '$content_hash',
@@ -996,7 +996,7 @@ function update_rss_feed($feed, $no_cache = false)
 
                 if (!$update_insignificant) {
                     if ($mark_unread_on_update) {
-                        db_query(
+                        \SmallSmallRSS\Database::query(
                             "UPDATE ttrss_user_entries
                                     SET last_read = null, unread = true WHERE ref_id = '$ref_id'"
                         );
@@ -1005,7 +1005,7 @@ function update_rss_feed($feed, $no_cache = false)
             }
         }
 
-        db_query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
 
         _debug("assigning labels...");
 
@@ -1035,20 +1035,20 @@ function update_rss_feed($feed, $no_cache = false)
             print_r($enclosures);
         }
 
-        db_query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
         foreach ($enclosures as $enc) {
-            $enc_url = db_escape_string($enc[0]);
-            $enc_type = db_escape_string($enc[1]);
-            $enc_dur = db_escape_string($enc[2]);
+            $enc_url = \SmallSmallRSS\Database::escape_string($enc[0]);
+            $enc_type = \SmallSmallRSS\Database::escape_string($enc[1]);
+            $enc_dur = \SmallSmallRSS\Database::escape_string($enc[2]);
 
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_enclosures
                         WHERE content_url = '$enc_url' AND post_id = '$entry_ref_id'"
             );
 
-            if (db_num_rows($result) == 0) {
-                db_query(
+            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_enclosures
                             (content_url, content_type, title, duration, post_id) VALUES
                             ('$enc_url', '$enc_type', '', '$enc_dur', '$entry_ref_id')"
@@ -1056,7 +1056,7 @@ function update_rss_feed($feed, $no_cache = false)
             }
         }
 
-        db_query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
 
         // check for manual tags (we have to do it here since they're loaded from filters)
 
@@ -1101,25 +1101,25 @@ function update_rss_feed($feed, $no_cache = false)
 
         if (count($filtered_tags) > 0) {
 
-            db_query("BEGIN");
+            \SmallSmallRSS\Database::query("BEGIN");
 
             foreach ($filtered_tags as $tag) {
 
                 $tag = sanitize_tag($tag);
-                $tag = db_escape_string($tag);
+                $tag = \SmallSmallRSS\Database::escape_string($tag);
 
                 if (!tag_is_valid($tag)) {
                     continue;
                 }
 
-                $result = db_query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_tags
                             WHERE tag_name = '$tag' AND post_int_id = '$entry_int_id' AND
                             owner_uid = '$owner_uid' LIMIT 1"
                 );
 
-                if ($result && db_num_rows($result) == 0) {
-                    db_query(
+                if ($result && \SmallSmallRSS\Database::num_rows($result) == 0) {
+                    \SmallSmallRSS\Database::query(
                         "INSERT INTO ttrss_tags
                          (owner_uid,tag_name,post_int_id)
                          VALUES ('$owner_uid', '$tag', '$entry_int_id')"
@@ -1133,16 +1133,16 @@ function update_rss_feed($feed, $no_cache = false)
 
             $tags_to_cache = array_unique($tags_to_cache);
 
-            $tags_str = db_escape_string(join(",", $tags_to_cache));
+            $tags_str = \SmallSmallRSS\Database::escape_string(join(",", $tags_to_cache));
 
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries
                  SET tag_cache = '$tags_str'
                  WHERE ref_id = '$entry_ref_id'
                  AND owner_uid = $owner_uid"
             );
 
-            db_query("COMMIT");
+            \SmallSmallRSS\Database::query("COMMIT");
         }
 
         if (get_pref("AUTO_ASSIGN_LABELS", $owner_uid, false)) {
@@ -1173,7 +1173,7 @@ function update_rss_feed($feed, $no_cache = false)
 
     purge_feed($feed, 0);
 
-    db_query(
+    \SmallSmallRSS\Database::query(
         "UPDATE ttrss_feeds
          SET
              last_updated = NOW(),
@@ -1220,12 +1220,12 @@ function expire_error_log($debug)
 {
     _debug("Removing old error log entries...", $debug, $debug);
     if (DB_TYPE == "pgsql") {
-        db_query(
+        \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_error_log
              WHERE created_at < NOW() - INTERVAL '7 days'"
         );
     } else {
-        db_query(
+        \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_error_log
              WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)"
         );

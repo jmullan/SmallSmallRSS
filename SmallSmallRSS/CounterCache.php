@@ -1,18 +1,16 @@
 <?php
 namespace SmallSmallRSS;
 
-require_once __DIR__ . '/../include/db.php';
-
 class CounterCache
 {
     public static function zero_all($owner_uid)
     {
-        db_query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_counters_cache SET
              value = 0 WHERE owner_uid = '$owner_uid'"
         );
 
-        db_query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_cat_counters_cache SET
              value = 0 WHERE owner_uid = '$owner_uid'"
         );
@@ -26,7 +24,7 @@ class CounterCache
             $table = "ttrss_cat_counters_cache";
         }
 
-        db_query(
+        \SmallSmallRSS\Database::query(
             "DELETE FROM $table WHERE
              feed_id = '$feed_id' AND owner_uid = '$owner_uid'"
         );
@@ -38,12 +36,12 @@ class CounterCache
 
         if (get_pref('ENABLE_FEED_CATS', $owner_uid)) {
 
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT feed_id FROM ttrss_cat_counters_cache
                  WHERE feed_id > 0 AND owner_uid = '$owner_uid'"
             );
 
-            while ($line = db_fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 self::update($line["feed_id"], $owner_uid, true);
             }
 
@@ -52,12 +50,12 @@ class CounterCache
             self::update(0, $owner_uid, true);
 
         } else {
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT feed_id FROM ttrss_counters_cache
                  WHERE feed_id > 0 AND owner_uid = '$owner_uid'"
             );
 
-            while ($line = db_fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 print self::update($line["feed_id"], $owner_uid);
 
             }
@@ -83,7 +81,7 @@ class CounterCache
             $date_qpart = "updated > DATE_SUB(NOW(), INTERVAL 15 MINUTE)";
         }
 
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT value FROM $table
              WHERE
                  owner_uid = '$owner_uid'
@@ -91,8 +89,8 @@ class CounterCache
              LIMIT 1"
         );
 
-        if (db_num_rows($result) == 1) {
-            return db_fetch_result($result, 0, "value");
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "value");
         } else {
             if ($no_update) {
                 return -1;
@@ -138,58 +136,58 @@ class CounterCache
 
             /* Recalculate counters for child feeds */
 
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_feeds
                         WHERE owner_uid = '$owner_uid' AND $cat_qpart"
             );
 
-            while ($line = db_fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 self::update($line["id"], $owner_uid, false, false);
             }
 
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT SUM(value) AS sv
                 FROM ttrss_counters_cache, ttrss_feeds
                 WHERE id = feed_id AND $cat_qpart AND
                 ttrss_feeds.owner_uid = '$owner_uid'"
             );
 
-            $unread = (int) db_fetch_result($result, 0, "sv");
+            $unread = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "sv");
 
         } else {
             $unread = (int) getFeedArticles($feed_id, $is_cat, true, $owner_uid);
         }
 
-        db_query("BEGIN");
-        $result = db_query(
+        \SmallSmallRSS\Database::query("BEGIN");
+        $result = \SmallSmallRSS\Database::query(
             "SELECT feed_id FROM $table
              WHERE owner_uid = '$owner_uid' AND feed_id = '$feed_id' LIMIT 1"
         );
 
-        if (db_num_rows($result) == 1) {
-            db_query(
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            \SmallSmallRSS\Database::query(
                 "UPDATE $table SET
                  value = '$unread', updated = NOW() WHERE
                  feed_id = '$feed_id' AND owner_uid = '$owner_uid'"
             );
         } else {
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "INSERT INTO $table
                  (feed_id, value, owner_uid, updated)
                  VALUES
                  ($feed_id, $unread, $owner_uid, NOW())"
             );
         }
-        db_query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
         if ($feed_id > 0 && $prev_unread != $unread) {
             if (!$is_cat) {
                 /* Update parent category */
                 if ($update_pcat) {
-                    $result = db_query(
+                    $result = \SmallSmallRSS\Database::query(
                         "SELECT cat_id FROM ttrss_feeds
                          WHERE owner_uid = '$owner_uid' AND id = '$feed_id'"
                     );
-                    $cat_id = (int) db_fetch_result($result, 0, "cat_id");
+                    $cat_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
                     self::update($cat_id, $owner_uid, true);
                 }
             }

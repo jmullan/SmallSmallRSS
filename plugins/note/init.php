@@ -27,12 +27,12 @@ class Note extends \SmallSmallRSS\Plugin {
 	}
 
 	function edit() {
-		$param = db_escape_string($_REQUEST['param']);
+		$param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
 
-		$result = db_query("SELECT note FROM ttrss_user_entries WHERE
+		$result = \SmallSmallRSS\Database::query("SELECT note FROM ttrss_user_entries WHERE
 			ref_id = '$param' AND owner_uid = " . $_SESSION['uid']);
 
-		$note = db_fetch_result($result, 0, "note");
+		$note = \SmallSmallRSS\Database::fetch_result($result, 0, "note");
 
 		print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$param\">";
 		print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pluginhandler\">";
@@ -56,10 +56,10 @@ class Note extends \SmallSmallRSS\Plugin {
 	}
 
 	function setNote() {
-		$id = db_escape_string($_REQUEST["id"]);
-		$note = trim(strip_tags(db_escape_string($_REQUEST["note"])));
+		$id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+		$note = trim(strip_tags(\SmallSmallRSS\Database::escape_string($_REQUEST["note"])));
 
-		db_query("UPDATE ttrss_user_entries SET note = '$note'
+		\SmallSmallRSS\Database::query("UPDATE ttrss_user_entries SET note = '$note'
 			WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]);
 
 		$formatted_note = format_article_note($id, $note);

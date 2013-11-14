@@ -5,14 +5,14 @@ class Labels
 {
     public static function findId($label, $owner_uid)
     {
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id
              FROM ttrss_labels2
              WHERE caption = '$label'
              AND owner_uid = '$owner_uid' LIMIT 1"
         );
-        if (db_num_rows($result) == 1) {
-            return db_fetch_result($result, 0, "id");
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "id");
         } else {
             return 0;
         }
@@ -24,13 +24,13 @@ class Labels
         if (!$owner_uid) {
             $owner_uid = $_SESSION["uid"];
         }
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT label_cache
             FROM ttrss_user_entries
             WHERE ref_id = '$id' AND owner_uid = '$owner_uid'"
         );
-        if (db_num_rows($result) > 0) {
-            $label_cache = db_fetch_result($result, 0, "label_cache");
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+            $label_cache = \SmallSmallRSS\Database::fetch_result($result, 0, "label_cache");
             if ($label_cache) {
                 $label_cache = json_decode($label_cache, true);
                 if ($label_cache["no-labels"] == 1) {
@@ -40,7 +40,7 @@ class Labels
                 }
             }
         }
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT label_id,caption,fg_color,bg_color
                 FROM ttrss_labels2, ttrss_user_labels2
             WHERE
@@ -49,7 +49,7 @@ class Labels
                 AND owner_uid = $owner_uid
             ORDER BY caption"
         );
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $rk = array($line["label_id"], $line["caption"], $line["fg_color"], $line["bg_color"]);
             array_push($rv, $rk);
         }
@@ -64,7 +64,7 @@ class Labels
 
     public static function findCaption($label, $owner_uid)
     {
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT caption
              FROM ttrss_labels2
              WHERE
@@ -72,8 +72,8 @@ class Labels
                  AND owner_uid = '$owner_uid'
              LIMIT 1"
         );
-        if (db_num_rows($result) == 1) {
-            return db_fetch_result($result, 0, "caption");
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "caption");
         } else {
             return "";
         }
@@ -82,8 +82,8 @@ class Labels
     public static function getAll($owner_uid)
     {
         $rv = array();
-        $result = db_query("SELECT fg_color, bg_color, caption FROM ttrss_labels2 WHERE owner_uid = " . $owner_uid);
-        while ($line = db_fetch_assoc($result)) {
+        $result = \SmallSmallRSS\Database::query("SELECT fg_color, bg_color, caption FROM ttrss_labels2 WHERE owner_uid = " . $owner_uid);
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             array_push($rv, $line);
         }
         return $rv;
@@ -97,8 +97,8 @@ class Labels
         if (!$labels) {
             $labels = self::getForArticle($id);
         }
-        $labels = db_escape_string(json_encode($labels));
-        db_query(
+        $labels = \SmallSmallRSS\Database::escape_string(json_encode($labels));
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries SET
             label_cache = '$labels' WHERE ref_id = '$id' AND  owner_uid = '$owner_uid'"
         );
@@ -106,7 +106,7 @@ class Labels
 
     public static function clearCache($id)
     {
-        db_query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries SET
             label_cache = '' WHERE ref_id = '$id'"
         );
@@ -118,7 +118,7 @@ class Labels
         if (!$label_id) {
             return;
         }
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_user_labels2
             WHERE
                 label_id = '$label_id'
@@ -133,7 +133,7 @@ class Labels
         if (!$label_id) {
             return;
         }
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT
                 article_id
             FROM
@@ -146,8 +146,8 @@ class Labels
                 AND owner_uid = '$owner_uid'
             LIMIT 1"
         );
-        if (db_num_rows($result) == 0) {
-            db_query(
+        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_user_labels2
                 (label_id, article_id)
                 VALUES ('$label_id', '$id')"
@@ -161,29 +161,29 @@ class Labels
         if (!$owner_uid) {
             $owner_uid = $_SESSION["uid"];
         }
-        db_query("BEGIN");
-        $result = db_query(
+        \SmallSmallRSS\Database::query("BEGIN");
+        $result = \SmallSmallRSS\Database::query(
             "SELECT caption
              FROM ttrss_labels2
              WHERE id = '$id'"
         );
-        $caption = db_fetch_result($result, 0, "caption");
-        $result = db_query(
+        $caption = \SmallSmallRSS\Database::fetch_result($result, 0, "caption");
+        $result = \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_labels2
              WHERE id = '$id'
              AND owner_uid = $owner_uid"
         );
-        if (db_affected_rows($result) != 0 && $caption) {
+        if (\SmallSmallRSS\Database::affected_rows($result) != 0 && $caption) {
             /* Remove access key for the label */
             $ext_id = LABEL_BASE_INDEX - 1 - $id;
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_access_keys
                  WHERE
                      feed_id = '$ext_id'
                      AND owner_uid = $owner_uid"
             );
             /* Remove cached data */
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries
                  SET label_cache = ''
                  WHERE
@@ -191,7 +191,7 @@ class Labels
                      AND owner_uid = $owner_uid"
             );
         }
-        db_query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
     }
 
     public static function create($caption, $fg_color = '', $bg_color = '', $owner_uid = false)
@@ -199,25 +199,25 @@ class Labels
         if (!$owner_uid) {
             $owner_uid = $_SESSION['uid'];
         }
-        db_query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
         $result = false;
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id
              FROM ttrss_labels2
              WHERE
                  caption = '$caption'
                  AND owner_uid = $owner_uid"
         );
-        if (db_num_rows($result) == 0) {
-            $result = db_query(
+        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_labels2
                  (caption, owner_uid, fg_color, bg_color)
                  VALUES
                  ('$caption', '$owner_uid', '$fg_color', '$bg_color')"
             );
-            $result = db_affected_rows($result) != 0;
+            $result = \SmallSmallRSS\Database::affected_rows($result) != 0;
         }
-        db_query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
         return $result;
     }
 }

@@ -199,9 +199,9 @@ class RPC extends ProtectedHandler
             );
 
             if ($this->dbh->num_rows($result) != 0) {
-                $feed_url = $this->dbh->escape_string(db_fetch_result($result, 0, "feed_url"));
-                $site_url = $this->dbh->escape_string(db_fetch_result($result, 0, "site_url"));
-                $title = $this->dbh->escape_string(db_fetch_result($result, 0, "title"));
+                $feed_url = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "feed_url"));
+                $site_url = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "site_url"));
+                $title = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "title"));
 
                 $result = $this->dbh->query(
                     "SELECT id FROM ttrss_feeds WHERE feed_url = '$feed_url'
@@ -509,9 +509,9 @@ class RPC extends ProtectedHandler
                 );
 
                 if ($this->dbh->num_rows($result) != 0) {
-                    $site_url = $this->dbh->escape_string(db_fetch_result($result, 0, "site_url"));
-                    $feed_url = $this->dbh->escape_string(db_fetch_result($result, 0, "feed_url"));
-                    $title = $this->dbh->escape_string(db_fetch_result($result, 0, "title"));
+                    $site_url = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "site_url"));
+                    $feed_url = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "feed_url"));
+                    $title = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "title"));
 
                     $result = $this->dbh->query(
                         "SELECT id FROM ttrss_feeds WHERE

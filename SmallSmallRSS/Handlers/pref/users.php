@@ -282,21 +282,21 @@ class Pref_Users extends ProtectedHandler
     static function resetUserPassword($uid, $show_password)
     {
 
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT login,email
                 FROM ttrss_users WHERE id = '$uid'"
         );
 
-        $login = db_fetch_result($result, 0, "login");
-        $email = db_fetch_result($result, 0, "email");
-        $salt = db_fetch_result($result, 0, "salt");
+        $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
+        $email = \SmallSmallRSS\Database::fetch_result($result, 0, "email");
+        $salt = \SmallSmallRSS\Database::fetch_result($result, 0, "salt");
 
         $new_salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
         $tmp_user_pwd = make_password(8);
 
         $pwd_hash = encrypt_password($tmp_user_pwd, $new_salt, true);
 
-        db_query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users SET pwd_hash = '$pwd_hash', salt = '$new_salt'
                 WHERE id = '$uid'"
         );

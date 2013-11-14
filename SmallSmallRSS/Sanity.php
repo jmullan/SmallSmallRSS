@@ -115,9 +115,9 @@ class Sanity
             }
 
             if (SINGLE_USER_MODE) {
-                $result = db_query("SELECT id FROM ttrss_users WHERE id = 1");
+                $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE id = 1");
 
-                if (db_num_rows($result) != 1) {
+                if (\SmallSmallRSS\Database::num_rows($result) != 1) {
                     array_push(
                         $errors,
                         "SINGLE_USER_MODE is enabled in config.php but default admin account is not found."

@@ -24,12 +24,12 @@ class Digest
             $interval_query = "last_digest_sent < DATE_SUB(NOW(), INTERVAL 1 DAY)";
         }
 
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id,email FROM ttrss_users
                 WHERE email != '' AND (last_digest_sent IS NULL OR $interval_query)"
         );
 
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             if (@get_pref('DIGEST_ENABLE', $line['id'], false)) {
                 $preferred_ts = strtotime(get_pref('DIGEST_PREFERRED_TIME', $line['id'], '00:00'));
@@ -62,7 +62,7 @@ class Digest
                     } else {
                         _debug("No headlines", true, $debug);
                     }
-                    db_query(
+                    \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_users SET last_digest_sent = NOW()
                         WHERE id = " . $line["id"]
                     );
@@ -102,7 +102,7 @@ class Digest
             $interval_query = "ttrss_entries.date_updated > DATE_SUB(NOW(), INTERVAL $days DAY)";
         }
 
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT ttrss_entries.title,
                 ttrss_feeds.title AS feed_title,
                 COALESCE(ttrss_feed_categories.title, '".__('Uncategorized')."') AS cat_title,
@@ -129,11 +129,11 @@ class Digest
 
         $cur_feed_title = "";
 
-        $headlines_count = db_num_rows($result);
+        $headlines_count = \SmallSmallRSS\Database::num_rows($result);
 
         $headlines = array();
 
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             array_push($headlines, $line);
         }
 

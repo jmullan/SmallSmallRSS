@@ -1943,27 +1943,27 @@ class Pref_Feeds extends ProtectedHandler
 
             /* save starred articles in Archived feed */
 
-            db_query("BEGIN");
+            \SmallSmallRSS\Database::query("BEGIN");
 
             /* prepare feed if necessary */
 
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT feed_url FROM ttrss_feeds WHERE id = $id
                 AND owner_uid = $owner_uid"
             );
 
-            $feed_url = db_escape_string(db_fetch_result($result, 0, "feed_url"));
+            $feed_url = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "feed_url"));
 
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_archived_feeds
                 WHERE feed_url = '$feed_url' AND owner_uid = $owner_uid"
             );
 
-            if (db_num_rows($result) == 0) {
-                $result = db_query("SELECT MAX(id) AS id FROM ttrss_archived_feeds");
-                $new_feed_id = (int) db_fetch_result($result, 0, "id") + 1;
+            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                $result = \SmallSmallRSS\Database::query("SELECT MAX(id) AS id FROM ttrss_archived_feeds");
+                $new_feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "id") + 1;
 
-                db_query(
+                \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_archived_feeds
                     (id, owner_uid, title, feed_url, site_url)
                 SELECT $new_feed_id, owner_uid, title, feed_url, site_url from ttrss_feeds
@@ -1972,10 +1972,10 @@ class Pref_Feeds extends ProtectedHandler
 
                 $archive_id = $new_feed_id;
             } else {
-                $archive_id = db_fetch_result($result, 0, "id");
+                $archive_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
             }
 
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET feed_id = NULL,
                 orig_feed_id = '$archive_id' WHERE feed_id = '$id' AND
                     marked = true AND owner_uid = $owner_uid"
@@ -1983,19 +1983,19 @@ class Pref_Feeds extends ProtectedHandler
 
             /* Remove access key for the feed */
 
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_access_keys WHERE
                 feed_id = '$id' AND owner_uid = $owner_uid"
             );
 
             /* remove the feed */
 
-            db_query(
+            \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_feeds
                     WHERE id = '$id' AND owner_uid = $owner_uid"
             );
 
-            db_query("COMMIT");
+            \SmallSmallRSS\Database::query("COMMIT");
 
             if (file_exists(ICONS_DIR . "/$id.ico")) {
                 unlink(ICONS_DIR . "/$id.ico");

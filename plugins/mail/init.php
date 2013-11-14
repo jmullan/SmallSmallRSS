@@ -26,17 +26,17 @@ class Mail extends \SmallSmallRSS\Plugin
 
     function emailArticle() {
 
-        $param = db_escape_string($_REQUEST['param']);
+        $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pluginhandler\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"plugin\" value=\"mail\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"sendEmail\">";
 
-        $result = db_query("SELECT email, full_name FROM ttrss_users WHERE
+        $result = \SmallSmallRSS\Database::query("SELECT email, full_name FROM ttrss_users WHERE
 			id = " . $_SESSION["uid"]);
 
-        $user_email = htmlspecialchars(db_fetch_result($result, 0, "email"));
-        $user_name = htmlspecialchars(db_fetch_result($result, 0, "full_name"));
+        $user_email = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "email"));
+        $user_name = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "full_name"));
 
         if (!$user_name) $user_name = $_SESSION['name'];
 
@@ -54,15 +54,15 @@ class Mail extends \SmallSmallRSS\Plugin
         $tpl->setVariable('USER_EMAIL', $user_email, true);
         $tpl->setVariable('TTRSS_HOST', $_SERVER["HTTP_HOST"], true);
 
-        $result = db_query("SELECT link, content, title, note
+        $result = \SmallSmallRSS\Database::query("SELECT link, content, title, note
 			FROM ttrss_user_entries, ttrss_entries WHERE id = ref_id AND
 			id IN ($param) AND owner_uid = " . $_SESSION["uid"]);
 
-        if (db_num_rows($result) > 1) {
+        if (\SmallSmallRSS\Database::num_rows($result) > 1) {
             $subject = __("[Forwarded]") . " " . __("Multiple articles");
         }
 
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             if (!$subject)
                 $subject = __("[Forwarded]") . " " . htmlspecialchars($line["title"]);
@@ -151,7 +151,7 @@ class Mail extends \SmallSmallRSS\Plugin
         if (!$rc) {
             $reply['error'] = $mail->ErrorInfo;
         } else {
-            save_email_address(db_escape_string($destination));
+            save_email_address(\SmallSmallRSS\Database::escape_string($destination));
             $reply['message'] = "UPDATE_COUNTERS";
         }
 
@@ -159,7 +159,7 @@ class Mail extends \SmallSmallRSS\Plugin
     }
 
     function completeEmails() {
-        $search = db_escape_string($_REQUEST["search"]);
+        $search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
         print "<ul>";
 

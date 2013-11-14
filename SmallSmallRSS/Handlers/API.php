@@ -612,14 +612,14 @@ class API extends Handler
         /* Child cats */
 
         if ($include_nested && $cat_id) {
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT
                     id, title FROM ttrss_feed_categories
                     WHERE parent_cat = '$cat_id' AND owner_uid = " . $_SESSION["uid"] .
                 " ORDER BY id, title"
             );
 
-            while ($line = db_fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $unread = getFeedUnread($line["id"], true) +
                     getCategoryChildrenUnread($line["id"]);
 
@@ -644,7 +644,7 @@ class API extends Handler
         }
 
         if ($cat_id == -4 || $cat_id == -3) {
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT
                     id, feed_url, cat_id, title, order_id, ".
                 SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
@@ -660,7 +660,7 @@ class API extends Handler
                 $cat_qpart = "cat_id IS NULL";
             }
 
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT
                     id, feed_url, cat_id, title, order_id, ".
                 SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
@@ -670,7 +670,7 @@ class API extends Handler
             );
         }
 
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             $unread = getFeedUnread($line["id"]);
 
@@ -713,7 +713,7 @@ class API extends Handler
 
         $headlines = array();
 
-        while ($line = db_fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $is_updated = ($line["last_read"] == "" &&
                            ($line["unread"] != "t" && $line["unread"] != "1"));
 

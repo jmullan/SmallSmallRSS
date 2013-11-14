@@ -120,38 +120,38 @@ class Article extends ProtectedHandler
         if (filter_var($url, FILTER_VALIDATE_URL) === false) {  return false;
         }
 
-        db_query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
         // only check for our user data here, others might have shared this with different content etc
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_entries, ttrss_user_entries WHERE
             link = '$url' AND ref_id = id AND owner_uid = '$owner_uid' LIMIT 1"
         );
 
-        if (db_num_rows($result) != 0) {
-            $ref_id = db_fetch_result($result, 0, "id");
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT int_id FROM ttrss_user_entries WHERE
                 ref_id = '$ref_id' AND owner_uid = '$owner_uid' LIMIT 1"
             );
 
-            if (db_num_rows($result) != 0) {
-                $int_id = db_fetch_result($result, 0, "int_id");
+            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                $int_id = \SmallSmallRSS\Database::fetch_result($result, 0, "int_id");
 
-                db_query(
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_entries SET
                     content = '$content', content_hash = '$content_hash' WHERE id = '$ref_id'"
                 );
 
-                db_query(
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_user_entries SET published = true,
                         last_published = NOW() WHERE
                         int_id = '$int_id' AND owner_uid = '$owner_uid'"
                 );
             } else {
 
-                db_query(
+                \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_user_entries
                     (ref_id, uuid, feed_id, orig_feed_id, owner_uid, published, tag_cache, label_cache,
                         last_read, note, unread, last_published)
@@ -169,19 +169,19 @@ class Article extends ProtectedHandler
             $rc = true;
 
         } else {
-            $result = db_query(
+            $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_entries
                 (title, guid, link, updated, content, content_hash, date_entered, date_updated)
                 VALUES
                 ('$title', '$guid', '$url', NOW(), '$content', '$content_hash', NOW(), NOW())"
             );
 
-            $result = db_query("SELECT id FROM ttrss_entries WHERE guid = '$guid'");
+            $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_entries WHERE guid = '$guid'");
 
-            if (db_num_rows($result) != 0) {
-                $ref_id = db_fetch_result($result, 0, "id");
+            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
-                db_query(
+                \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_user_entries
                     (ref_id, uuid, feed_id, orig_feed_id, owner_uid, published, tag_cache, label_cache,
                         last_read, note, unread, last_published)
@@ -199,7 +199,7 @@ class Article extends ProtectedHandler
             }
         }
 
-        db_query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
 
         return $rc;
     }

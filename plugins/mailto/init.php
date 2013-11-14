@@ -27,7 +27,7 @@ class MailTo extends \SmallSmallRSS\Plugin {
 
 	function emailArticle() {
 
-		$param = db_escape_string($_REQUEST['param']);
+		$param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
 
 		require_once "lib/MiniTemplator.class.php";
 
@@ -41,15 +41,15 @@ class MailTo extends \SmallSmallRSS\Plugin {
 		$tpl->setVariable('TTRSS_HOST', $_SERVER["HTTP_HOST"], true);
 
 
-		$result = db_query("SELECT link, content, title
+		$result = \SmallSmallRSS\Database::query("SELECT link, content, title
 			FROM ttrss_user_entries, ttrss_entries WHERE id = ref_id AND
 			id IN ($param) AND owner_uid = " . $_SESSION["uid"]);
 
-		if (db_num_rows($result) > 1) {
+		if (\SmallSmallRSS\Database::num_rows($result) > 1) {
 			$subject = __("[Forwarded]") . " " . __("Multiple articles");
 		}
 
-		while ($line = db_fetch_assoc($result)) {
+		while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
 			if (!$subject)
 				$subject = __("[Forwarded]") . " " . htmlspecialchars($line["title"]);

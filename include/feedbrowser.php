@@ -13,7 +13,7 @@ function make_feed_browser($search, $limit, $mode = 1)
     }
 
     if ($mode == 1) {
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT feed_url, site_url, title, SUM(subscribers) AS subscribers
              FROM (
                  SELECT feed_url, site_url, title, subscribers FROM ttrss_feedbrowser_cache
@@ -29,7 +29,7 @@ function make_feed_browser($search, $limit, $mode = 1)
         );
 
     } elseif ($mode == 2) {
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT
                  *,
                  (
@@ -55,7 +55,7 @@ function make_feed_browser($search, $limit, $mode = 1)
 
     $feedctr = 0;
 
-    while ($line = db_fetch_assoc($result)) {
+    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
         if ($mode == 1) {
 

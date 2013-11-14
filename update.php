@@ -11,7 +11,6 @@ chdir(dirname(__FILE__));
 
 require_once "rssfuncs.php";
 \SmallSmallRSS\Sanity::initialCheck();
-require_once "db.php";
 require_once "db-prefs.php";
 
 if (!defined('PHP_EXECUTABLE')) {
@@ -129,7 +128,7 @@ if (!$lock_handle) {
 if (isset($options["force-update"])) {
     _debug("marking all feeds as needing update...");
 
-    db_query(
+    \SmallSmallRSS\Database::query(
         "UPDATE ttrss_feeds
          SET
              last_update_started = '1970-01-01',
@@ -193,7 +192,7 @@ if (isset($options["indexes"])) {
     _debug("clearing existing indexes...");
 
     if (DB_TYPE == "pgsql") {
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT relname
              FROM pg_catalog.pg_class
              WHERE
@@ -202,14 +201,14 @@ if (isset($options["indexes"])) {
                  AND relkind = 'i'"
         );
     } else {
-        $result = db_query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT index_name,table_name
              FROM information_schema.statistics
              WHERE index_name LIKE 'ttrss_%'"
         );
     }
 
-    while ($line = db_fetch_assoc($result)) {
+    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         if (DB_TYPE == "pgsql") {
             $statement = "DROP INDEX " . $line["relname"];
             _debug($statement);
@@ -217,7 +216,7 @@ if (isset($options["indexes"])) {
             $statement = "ALTER TABLE " . $line['table_name'] . " DROP INDEX ".$line['index_name'];
             _debug($statement);
         }
-        db_query($statement, false);
+        \SmallSmallRSS\Database::query($statement, false);
     }
 
     _debug("reading indexes from schema for: " . DB_TYPE);
@@ -234,7 +233,7 @@ if (isset($options["indexes"])) {
                 $statement = "CREATE INDEX $index ON $table";
 
                 _debug($statement);
-                db_query($statement);
+                \SmallSmallRSS\Database::query($statement);
             }
         }
         fclose($fp);
@@ -253,11 +252,11 @@ if (isset($options["convert-filters"])) {
     }
     _debug("converting filters...");
 
-    db_query("DELETE FROM ttrss_filters2");
+    \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2");
 
-    $result = db_query("SELECT * FROM ttrss_filters ORDER BY id");
+    $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_filters ORDER BY id");
 
-    while ($line = db_fetch_assoc($result)) {
+    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         $owner_uid = $line["owner_uid"];
 
         // date filters are removed

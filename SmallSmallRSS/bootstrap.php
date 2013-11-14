@@ -7,7 +7,7 @@ require_once __DIR__ . '/Utils.php';
 error_reporting(-1);
 \SmallSmallRSS\Utils::cleanUpStripslashes();
 spl_autoload_register(array('\SmallSmallRSS\Utils', 'smallSmallAutoload'));
-require __DIR__ . '/../jwage/SplClassLoader.php';
+require __DIR__ . '/../lib/jwage/SplClassLoader.php';
 $myLibLoader = new SplClassLoader('SmallSmallRSS', dirname(__DIR__));
 $myLibLoader->register();
 $include_paths = array(

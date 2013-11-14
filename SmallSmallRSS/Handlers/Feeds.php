@@ -16,7 +16,6 @@ class Feeds extends ProtectedHandler
     public function csrf_ignore($method)
     {
         $csrf_ignored = array("index", "feedbrowser", "quickaddfeed", "search");
-
         return array_search($method, $csrf_ignored) !== false;
     }
 
@@ -1144,10 +1143,13 @@ class Feeds extends ProtectedHandler
 
         $owner_uid = $_SESSION["uid"];
 
-        require_once "feedbrowser.php";
-
         print "<ul class='browseFeedList' id='browseFeedList'>";
-        print make_feed_browser($search, 25);
+        $feedbrowser = \SmallSmallRSS\Renderers\FeedBrower(
+            $search,
+            25,
+            \SmallSmallRSS\Renderers\FeedBrower::MODE_1
+        );
+        $feedbrowser->render();
         print "</ul>";
 
         print "<div align='center'>

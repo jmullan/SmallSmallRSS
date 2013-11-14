@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Renderers;
 
-class Insance extends \SmallSmallRSS\Renderers\Base
+class Insane extends \SmallSmallRSS\Renderers\Base
 {
     public function __construct($errors)
     {
@@ -9,8 +9,8 @@ class Insance extends \SmallSmallRSS\Renderers\Base
     }
     public function render()
     {
-        $params = array('errors' => $this->errors);
         header('Cache-Control: public');
+        $params = array('errors' => $this->errors);
         $this->renderPHP(__DIR__ . '/templates/insane.php', $params);
         exit;
     }

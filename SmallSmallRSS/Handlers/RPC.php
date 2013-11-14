@@ -461,12 +461,11 @@ class RPC extends ProtectedHandler
         $search = $this->dbh->escape_string($_REQUEST["search"]);
         $limit = $this->dbh->escape_string($_REQUEST["limit"]);
         $mode = (int) $this->dbh->escape_string($_REQUEST["mode"]);
-
-        require_once "feedbrowser.php";
-
-        print json_encode(array("content" =>
-                                make_feed_browser($search, $limit, $mode),
-                    "mode" => $mode));
+        ob_start();
+        $feedbrowser = \SmallSmallRSS\Renderers\FeedBrower($search, $limit, $mode);
+        $feedbrowser->render();
+        $buffer = ob_get_flush();
+        print json_encode(array("content" => $buffer, "mode" => $mode));
     }
 
     // Silent

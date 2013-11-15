@@ -23,7 +23,7 @@ class Pref_System extends ProtectedHandler
 
     function clearLog()
     {
-        $this->dbh->query("DELETE FROM ttrss_error_log");
+        \SmallSmallRSS\Database::query("DELETE FROM ttrss_error_log");
     }
 
     function index()
@@ -34,7 +34,7 @@ class Pref_System extends ProtectedHandler
 
         if (LOG_DESTINATION == "sql") {
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT errno, errstr, filename, lineno,
                 created_at, login FROM ttrss_error_log
                 LEFT JOIN ttrss_users ON (owner_uid = ttrss_users.id)
@@ -58,7 +58,7 @@ class Pref_System extends ProtectedHandler
                 <td width='5%'>".__("Date")."</td>
                 </tr>";
 
-            while ($line = $this->dbh->fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 print "<tr class=\"errrow\">";
 
                 foreach ($line as $k => $v) {

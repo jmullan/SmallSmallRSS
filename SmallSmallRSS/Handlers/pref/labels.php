@@ -12,14 +12,14 @@ class Pref_Labels extends ProtectedHandler
 
     function edit()
     {
-        $label_id = $this->dbh->escape_string($_REQUEST['id']);
+        $label_id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_labels2 WHERE
             id = '$label_id' AND owner_uid = " . $_SESSION["uid"]
         );
 
-        $line = $this->dbh->fetch_assoc($result);
+        $line = \SmallSmallRSS\Database::fetch_assoc($result);
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$label_id\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-labels\">";
@@ -97,14 +97,14 @@ class Pref_Labels extends ProtectedHandler
         $root['name'] = __('Labels');
         $root['items'] = array();
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT *
             FROM ttrss_labels2
             WHERE owner_uid = ".$_SESSION["uid"]."
             ORDER BY caption"
         );
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $label = array();
             $label['id'] = 'LABEL:' . $line['id'];
             $label['bare_id'] = $line['id'];
@@ -128,33 +128,33 @@ class Pref_Labels extends ProtectedHandler
 
     function colorset()
     {
-        $kind = $this->dbh->escape_string($_REQUEST["kind"]);
-        $ids = explode(',', $this->dbh->escape_string($_REQUEST["ids"]));
-        $color = $this->dbh->escape_string($_REQUEST["color"]);
-        $fg = $this->dbh->escape_string($_REQUEST["fg"]);
-        $bg = $this->dbh->escape_string($_REQUEST["bg"]);
+        $kind = \SmallSmallRSS\Database::escape_string($_REQUEST["kind"]);
+        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
+        $color = \SmallSmallRSS\Database::escape_string($_REQUEST["color"]);
+        $fg = \SmallSmallRSS\Database::escape_string($_REQUEST["fg"]);
+        $bg = \SmallSmallRSS\Database::escape_string($_REQUEST["bg"]);
 
         foreach ($ids as $id) {
 
             if ($kind == "fg" || $kind == "bg") {
-                $this->dbh->query(
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_labels2 SET
                     ${kind}_color = '$color' WHERE id = '$id'
                     AND owner_uid = " . $_SESSION["uid"]
                 );
             } else {
-                $this->dbh->query(
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_labels2 SET
                     fg_color = '$fg', bg_color = '$bg' WHERE id = '$id'
                     AND owner_uid = " . $_SESSION["uid"]
                 );
             }
 
-            $caption = $this->dbh->escape_string(\SmallSmallRSS\Labels::findCaption($id, $_SESSION["uid"]));
+            $caption = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Labels::findCaption($id, $_SESSION["uid"]));
 
             /* Remove cached data */
 
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET label_cache = ''
                 WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
             );
@@ -166,20 +166,20 @@ class Pref_Labels extends ProtectedHandler
 
     function colorreset()
     {
-        $ids = explode(',', $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_labels2 SET
                 fg_color = '', bg_color = '' WHERE id = '$id'
                 AND owner_uid = " . $_SESSION["uid"]
             );
 
-            $caption = $this->dbh->escape_string(\SmallSmallRSS\Labels::findCaption($id, $_SESSION["uid"]));
+            $caption = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Labels::findCaption($id, $_SESSION["uid"]));
 
             /* Remove cached data */
 
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET label_cache = ''
                 WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
             );
@@ -190,27 +190,27 @@ class Pref_Labels extends ProtectedHandler
     function save()
     {
 
-        $id = $this->dbh->escape_string($_REQUEST["id"]);
-        $caption = $this->dbh->escape_string(trim($_REQUEST["caption"]));
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $caption = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["caption"]));
 
-        $this->dbh->query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT caption FROM ttrss_labels2
             WHERE id = '$id' AND owner_uid = ". $_SESSION["uid"]
         );
 
-        if ($this->dbh->num_rows($result) != 0) {
-            $old_caption = $this->dbh->fetch_result($result, 0, "caption");
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            $old_caption = \SmallSmallRSS\Database::fetch_result($result, 0, "caption");
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_labels2
                 WHERE caption = '$caption' AND owner_uid = ". $_SESSION["uid"]
             );
 
-            if ($this->dbh->num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
                 if ($caption) {
-                    $result = $this->dbh->query(
+                    $result = \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_labels2 SET
                         caption = '$caption' WHERE id = '$id' AND
                         owner_uid = " . $_SESSION["uid"]
@@ -218,9 +218,9 @@ class Pref_Labels extends ProtectedHandler
 
                     /* Update filters that reference label being renamed */
 
-                    $old_caption = $this->dbh->escape_string($old_caption);
+                    $old_caption = \SmallSmallRSS\Database::escape_string($old_caption);
 
-                    $this->dbh->query(
+                    \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_filters2_actions SET
                         action_param = '$caption' WHERE action_param = '$old_caption'
                         AND action_id = 7
@@ -236,7 +236,7 @@ class Pref_Labels extends ProtectedHandler
             }
         }
 
-        $this->dbh->query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
 
         return;
     }
@@ -244,7 +244,7 @@ class Pref_Labels extends ProtectedHandler
     function remove()
     {
 
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
             \SmallSmallRSS\Labels::remove($id, $_SESSION["uid"]);
@@ -254,8 +254,8 @@ class Pref_Labels extends ProtectedHandler
 
     function add()
     {
-        $caption = $this->dbh->escape_string($_REQUEST["caption"]);
-        $output = $this->dbh->escape_string($_REQUEST["output"]);
+        $caption = \SmallSmallRSS\Database::escape_string($_REQUEST["caption"]);
+        $output = \SmallSmallRSS\Database::escape_string($_REQUEST["output"]);
 
         if ($caption) {
 
@@ -285,13 +285,13 @@ class Pref_Labels extends ProtectedHandler
     function index()
     {
 
-        $sort = $this->dbh->escape_string($_REQUEST["sort"]);
+        $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);
 
         if (!$sort || $sort == "undefined") {
             $sort = "caption";
         }
 
-        $label_search = $this->dbh->escape_string($_REQUEST["search"]);
+        $label_search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
         if (array_key_exists("search", $_REQUEST)) {
             $_SESSION["prefs_label_search"] = $label_search;

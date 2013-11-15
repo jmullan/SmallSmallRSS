@@ -12,18 +12,18 @@ class RPC extends ProtectedHandler
 
     public function setprofile()
     {
-        $id = $this->dbh->escape_string($_REQUEST["id"]);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
 
         $_SESSION["profile"] = $id;
     }
 
     public function remprofiles()
     {
-        $ids = explode(",", $this->dbh->escape_string(trim($_REQUEST["ids"])));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string(trim($_REQUEST["ids"])));
 
         foreach ($ids as $id) {
             if ($_SESSION["profile"] != $id) {
-                $this->dbh->query(
+                \SmallSmallRSS\Database::query(
                     "DELETE FROM ttrss_settings_profiles WHERE id = '$id' AND
                             owner_uid = " . $_SESSION["uid"]
                 );
@@ -33,29 +33,29 @@ class RPC extends ProtectedHandler
 
     public function addprofile()
     {
-        $title = $this->dbh->escape_string(trim($_REQUEST["title"]));
+        $title = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["title"]));
         if ($title) {
-            $this->dbh->query("BEGIN");
+            \SmallSmallRSS\Database::query("BEGIN");
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_settings_profiles
                 WHERE title = '$title' AND owner_uid = " . $_SESSION["uid"]
             );
 
-            if ($this->dbh->num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
-                $this->dbh->query(
+                \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_settings_profiles (title, owner_uid)
                             VALUES ('$title', ".$_SESSION["uid"] .")"
                 );
 
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_settings_profiles WHERE
                     title = '$title'"
                 );
 
-                if ($this->dbh->num_rows($result) != 0) {
-                    $profile_id = $this->dbh->fetch_result($result, 0, "id");
+                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                    $profile_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
                     if ($profile_id) {
                         initialize_user_prefs($_SESSION["uid"], $profile_id);
@@ -63,14 +63,14 @@ class RPC extends ProtectedHandler
                 }
             }
 
-            $this->dbh->query("COMMIT");
+            \SmallSmallRSS\Database::query("COMMIT");
         }
     }
 
     public function saveprofile()
     {
-        $id = $this->dbh->escape_string($_REQUEST["id"]);
-        $title = $this->dbh->escape_string(trim($_REQUEST["value"]));
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $title = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["value"]));
 
         if ($id == 0) {
             print __("Default profile");
@@ -78,53 +78,53 @@ class RPC extends ProtectedHandler
         }
 
         if ($title) {
-            $this->dbh->query("BEGIN");
+            \SmallSmallRSS\Database::query("BEGIN");
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_settings_profiles
                 WHERE title = '$title' AND owner_uid =" . $_SESSION["uid"]
             );
 
-            if ($this->dbh->num_rows($result) == 0) {
-                $this->dbh->query(
+            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_settings_profiles
                             SET title = '$title' WHERE id = '$id' AND
                             owner_uid = " . $_SESSION["uid"]
                 );
                 print $title;
             } else {
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT title FROM ttrss_settings_profiles
                             WHERE id = '$id' AND owner_uid =" . $_SESSION["uid"]
                 );
-                print $this->dbh->fetch_result($result, 0, "title");
+                print \SmallSmallRSS\Database::fetch_result($result, 0, "title");
             }
 
-            $this->dbh->query("COMMIT");
+            \SmallSmallRSS\Database::query("COMMIT");
         }
     }
 
     public function remarchive()
     {
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_archived_feeds WHERE
         (SELECT COUNT(*) FROM ttrss_user_entries
                             WHERE orig_feed_id = '$id') = 0 AND
         id = '$id' AND owner_uid = ".$_SESSION["uid"]
             );
 
-            $rc = $this->dbh->affected_rows($result);
+            $rc = \SmallSmallRSS\Database::affected_rows($result);
         }
     }
 
     public function addfeed()
     {
-        $feed = $this->dbh->escape_string($_REQUEST['feed']);
-        $cat = $this->dbh->escape_string($_REQUEST['cat']);
-        $login = $this->dbh->escape_string($_REQUEST['login']);
+        $feed = \SmallSmallRSS\Database::escape_string($_REQUEST['feed']);
+        $cat = \SmallSmallRSS\Database::escape_string($_REQUEST['cat']);
+        $login = \SmallSmallRSS\Database::escape_string($_REQUEST['login']);
         $pass = trim($_REQUEST['pass']); // escaped later
         $rc = subscribe_to_feed($feed, $cat, $login, $pass);
         print json_encode(array("result" => $rc));
@@ -132,7 +132,7 @@ class RPC extends ProtectedHandler
 
     public function togglepref()
     {
-        $key = $this->dbh->escape_string($_REQUEST["key"]);
+        $key = \SmallSmallRSS\Database::escape_string($_REQUEST["key"]);
         \SmallSmallRSS\DBPrefs::write($key, !\SmallSmallRSS\DBPrefs::read($key));
         $value = \SmallSmallRSS\DBPrefs::read($key);
 
@@ -153,7 +153,7 @@ class RPC extends ProtectedHandler
     public function mark()
     {
         $mark = $_REQUEST["mark"];
-        $id = $this->dbh->escape_string($_REQUEST["id"]);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
 
         if ($mark == "1") {
             $mark = "true";
@@ -161,7 +161,7 @@ class RPC extends ProtectedHandler
             $mark = "false";
         }
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries SET marked = $mark,
                     last_marked = NOW()
                     WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
@@ -172,9 +172,9 @@ class RPC extends ProtectedHandler
 
     public function delete()
     {
-        $ids = $this->dbh->escape_string($_REQUEST["ids"]);
+        $ids = \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_user_entries
         WHERE ref_id IN ($ids) AND owner_uid = " . $_SESSION["uid"]
         );
@@ -189,32 +189,32 @@ class RPC extends ProtectedHandler
         $ids = explode(",", $_REQUEST["ids"]);
 
         foreach ($ids as $id) {
-            $id = $this->dbh->escape_string(trim($id));
-            $this->dbh->query("BEGIN");
+            $id = \SmallSmallRSS\Database::escape_string(trim($id));
+            \SmallSmallRSS\Database::query("BEGIN");
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT feed_url,site_url,title FROM ttrss_archived_feeds
                 WHERE id = (SELECT orig_feed_id FROM ttrss_user_entries WHERE ref_id = $id
                 AND owner_uid = ".$_SESSION["uid"].")"
             );
 
-            if ($this->dbh->num_rows($result) != 0) {
-                $feed_url = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "feed_url"));
-                $site_url = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "site_url"));
-                $title = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "title"));
+            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                $feed_url = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "feed_url"));
+                $site_url = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "site_url"));
+                $title = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "title"));
 
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_feeds WHERE feed_url = '$feed_url'
                     AND owner_uid = " .$_SESSION["uid"]
                 );
 
-                if ($this->dbh->num_rows($result) == 0) {
+                if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
                     if (!$title) {
                         $title = '[Unknown]';
                     }
 
-                    $result = $this->dbh->query(
+                    $result = \SmallSmallRSS\Database::query(
                         "INSERT INTO ttrss_feeds (
                              owner_uid,feed_url,site_url,title,cat_id,auth_login,auth_pass,update_method
                          )
@@ -230,21 +230,21 @@ class RPC extends ProtectedHandler
                          )"
                     );
 
-                    $result = $this->dbh->query(
+                    $result = \SmallSmallRSS\Database::query(
                         "SELECT id FROM ttrss_feeds WHERE feed_url = '$feed_url'
                          AND owner_uid = ".$_SESSION["uid"]
                     );
 
-                    if ($this->dbh->num_rows($result) != 0) {
-                        $feed_id = $this->dbh->fetch_result($result, 0, "id");
+                    if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                        $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
                     }
 
                 } else {
-                    $feed_id = $this->dbh->fetch_result($result, 0, "id");
+                    $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
                 }
 
                 if ($feed_id) {
-                    $result = $this->dbh->query(
+                    $result = \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries
                          SET feed_id = '$feed_id', orig_feed_id = NULL
                          WHERE ref_id = $id AND owner_uid = " . $_SESSION["uid"]
@@ -252,7 +252,7 @@ class RPC extends ProtectedHandler
                 }
             }
 
-            $this->dbh->query("COMMIT");
+            \SmallSmallRSS\Database::query("COMMIT");
         }
 
         print json_encode(array("message" => "UPDATE_COUNTERS"));
@@ -260,7 +260,7 @@ class RPC extends ProtectedHandler
 
     public function archive()
     {
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
             $this->archive_article($id, $_SESSION["uid"]);
@@ -271,27 +271,27 @@ class RPC extends ProtectedHandler
 
     private function archive_article($id, $owner_uid)
     {
-        $this->dbh->query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT feed_id FROM ttrss_user_entries
              WHERE ref_id = '$id' AND owner_uid = $owner_uid"
         );
 
-        if ($this->dbh->num_rows($result) != 0) {
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
 
             /* prepare the archived table */
 
-            $feed_id = (int) $this->dbh->fetch_result($result, 0, "feed_id");
+            $feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "feed_id");
 
             if ($feed_id) {
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_archived_feeds
                      WHERE id = '$feed_id'"
                 );
 
-                if ($this->dbh->num_rows($result) == 0) {
-                    $this->dbh->query(
+                if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                    \SmallSmallRSS\Database::query(
                         "INSERT INTO ttrss_archived_feeds
                          (id, owner_uid, title, feed_url, site_url)
                          SELECT id, owner_uid, title, feed_url, site_url
@@ -300,7 +300,7 @@ class RPC extends ProtectedHandler
                     );
                 }
 
-                $this->dbh->query(
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_user_entries
                      SET orig_feed_id = feed_id, feed_id = NULL
                      WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
@@ -308,14 +308,14 @@ class RPC extends ProtectedHandler
             }
         }
 
-        $this->dbh->query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
     }
 
     public function publ()
     {
         $pub = $_REQUEST["pub"];
-        $id = $this->dbh->escape_string($_REQUEST["id"]);
-        $note = trim(strip_tags($this->dbh->escape_string($_REQUEST["note"])));
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $note = trim(strip_tags(\SmallSmallRSS\Database::escape_string($_REQUEST["note"])));
 
         if ($pub == "1") {
             $pub = "true";
@@ -323,7 +323,7 @@ class RPC extends ProtectedHandler
             $pub = "false";
         }
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries
              SET published = $pub, last_published = NOW()
              WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
@@ -368,7 +368,7 @@ class RPC extends ProtectedHandler
     /* GET["cmode"] = 0 - mark as read, 1 - as unread, 2 - toggle */
     public function catchupSelected()
     {
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
         $cmode = sprintf("%d", $_REQUEST["cmode"]);
         catchupArticlesById($ids, $cmode);
         print json_encode(array("message" => "UPDATE_COUNTERS", "ids" => $ids));
@@ -376,7 +376,7 @@ class RPC extends ProtectedHandler
 
     public function markSelected()
     {
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
         $cmode = sprintf("%d", $_REQUEST["cmode"]);
         $this->markArticlesById($ids, $cmode);
         print json_encode(array("message" => "UPDATE_COUNTERS"));
@@ -384,7 +384,7 @@ class RPC extends ProtectedHandler
 
     public function publishSelected()
     {
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
         $cmode = sprintf("%d", $_REQUEST["cmode"]);
         $this->publishArticlesById($ids, $cmode);
         print json_encode(array("message" => "UPDATE_COUNTERS"));
@@ -421,9 +421,9 @@ class RPC extends ProtectedHandler
 
     public function completeLabels()
     {
-        $search = $this->dbh->escape_string($_REQUEST["search"]);
+        $search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT caption FROM
                 ttrss_labels2
                 WHERE owner_uid = '".$_SESSION["uid"]."' AND
@@ -432,7 +432,7 @@ class RPC extends ProtectedHandler
         );
 
         print "<ul>";
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             print "<li>" . $line["caption"] . "</li>";
         }
         print "</ul>";
@@ -440,17 +440,17 @@ class RPC extends ProtectedHandler
 
     public function purge()
     {
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
         $days = sprintf("%d", $_REQUEST["days"]);
 
         foreach ($ids as $id) {
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_feeds WHERE
                 id = '$id' AND owner_uid = ".$_SESSION["uid"]
             );
 
-            if ($this->dbh->num_rows($result) == 1) {
+            if (\SmallSmallRSS\Database::num_rows($result) == 1) {
                 purge_feed($id, $days);
             }
         }
@@ -458,9 +458,9 @@ class RPC extends ProtectedHandler
 
     public function updateFeedBrowser()
     {
-        $search = $this->dbh->escape_string($_REQUEST["search"]);
-        $limit = $this->dbh->escape_string($_REQUEST["limit"]);
-        $mode = (int) $this->dbh->escape_string($_REQUEST["mode"]);
+        $search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
+        $limit = \SmallSmallRSS\Database::escape_string($_REQUEST["limit"]);
+        $mode = (int) \SmallSmallRSS\Database::escape_string($_REQUEST["mode"]);
         ob_start();
         $feedbrowser = \SmallSmallRSS\Renderers\FeedBrower($search, $limit, $mode);
         $feedbrowser->render();
@@ -482,16 +482,16 @@ class RPC extends ProtectedHandler
         if ($mode == 1) {
             foreach ($payload as $feed) {
 
-                $title = $this->dbh->escape_string($feed[0]);
-                $feed_url = $this->dbh->escape_string($feed[1]);
+                $title = \SmallSmallRSS\Database::escape_string($feed[0]);
+                $feed_url = \SmallSmallRSS\Database::escape_string($feed[1]);
 
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_feeds WHERE
                     feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
                 );
 
-                if ($this->dbh->num_rows($result) == 0) {
-                    $result = $this->dbh->query(
+                if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                    $result = \SmallSmallRSS\Database::query(
                         "INSERT INTO ttrss_feeds
                                     (owner_uid,feed_url,title,cat_id,site_url)
                                     VALUES ('".$_SESSION["uid"]."',
@@ -502,23 +502,23 @@ class RPC extends ProtectedHandler
         } elseif ($mode == 2) {
             // feed archive
             foreach ($payload as $id) {
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT * FROM ttrss_archived_feeds
                     WHERE id = '$id' AND owner_uid = " . $_SESSION["uid"]
                 );
 
-                if ($this->dbh->num_rows($result) != 0) {
-                    $site_url = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "site_url"));
-                    $feed_url = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "feed_url"));
-                    $title = $this->dbh->escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "title"));
+                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                    $site_url = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "site_url"));
+                    $feed_url = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "feed_url"));
+                    $title = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "title"));
 
-                    $result = $this->dbh->query(
+                    $result = \SmallSmallRSS\Database::query(
                         "SELECT id FROM ttrss_feeds WHERE
                         feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
                     );
 
-                    if ($this->dbh->num_rows($result) == 0) {
-                        $result = $this->dbh->query(
+                    if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                        $result = \SmallSmallRSS\Database::query(
                             "INSERT INTO ttrss_feeds
                                         (owner_uid,feed_url,title,cat_id,site_url)
                                     VALUES ('$id','".$_SESSION["uid"]."',
@@ -532,9 +532,9 @@ class RPC extends ProtectedHandler
 
     public function catchupFeed()
     {
-        $feed_id = $this->dbh->escape_string($_REQUEST['feed_id']);
-        $is_cat = $this->dbh->escape_string($_REQUEST['is_cat']) == "true";
-        $mode = $this->dbh->escape_string($_REQUEST['mode']);
+        $feed_id = \SmallSmallRSS\Database::escape_string($_REQUEST['feed_id']);
+        $is_cat = \SmallSmallRSS\Database::escape_string($_REQUEST['is_cat']) == "true";
+        $mode = \SmallSmallRSS\Database::escape_string($_REQUEST['mode']);
 
         catchup_feed($feed_id, $is_cat, false, false, $mode);
 
@@ -543,17 +543,17 @@ class RPC extends ProtectedHandler
 
     public function quickAddCat()
     {
-        $cat = $this->dbh->escape_string($_REQUEST["cat"]);
+        $cat = \SmallSmallRSS\Database::escape_string($_REQUEST["cat"]);
 
         add_feed_category($cat);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_feed_categories WHERE
             title = '$cat' AND owner_uid = " . $_SESSION["uid"]
         );
 
-        if ($this->dbh->num_rows($result) == 1) {
-            $id = $this->dbh->fetch_result($result, 0, "id");
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            $id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
         } else {
             $id = 0;
         }
@@ -564,7 +564,7 @@ class RPC extends ProtectedHandler
     // Silent
     public function clearArticleKeys()
     {
-        $this->dbh->query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries SET uuid = '' WHERE
             owner_uid = " . $_SESSION["uid"]
         );
@@ -624,7 +624,7 @@ class RPC extends ProtectedHandler
         }
         $random_qpart = sql_random_function();
         // We search for feed needing update.
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT ttrss_feeds.feed_url,ttrss_feeds.id
             FROM
                 ttrss_feeds, ttrss_users, ttrss_user_prefs
@@ -641,7 +641,7 @@ class RPC extends ProtectedHandler
         require_once "rssfuncs.php";
         $num_updated = 0;
         $tstart = time();
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $feed_id = $line["id"];
 
             if (time() - $tstart < ini_get("max_execution_time") * 0.7) {
@@ -679,19 +679,19 @@ class RPC extends ProtectedHandler
         $ids_qpart = join(" OR ", $tmp_ids);
 
         if ($cmode == 0) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             marked = false, last_marked = NOW()
             WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]
             );
         } elseif ($cmode == 1) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             marked = true, last_marked = NOW()
             WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]
             );
         } else {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             marked = NOT marked,last_marked = NOW()
             WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]
@@ -711,19 +711,19 @@ class RPC extends ProtectedHandler
         $ids_qpart = join(" OR ", $tmp_ids);
 
         if ($cmode == 0) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             published = false,last_published = NOW()
             WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]
             );
         } elseif ($cmode == 1) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             published = true,last_published = NOW()
             WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]
             );
         } else {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             published = NOT published,last_published = NOW()
             WHERE ($ids_qpart) AND owner_uid = " . $_SESSION["uid"]
@@ -743,16 +743,16 @@ class RPC extends ProtectedHandler
 
     public function getlinktitlebyid()
     {
-        $id = $this->dbh->escape_string($_REQUEST['id']);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT link, title FROM ttrss_entries, ttrss_user_entries
              WHERE ref_id = '$id' AND ref_id = id AND owner_uid = ". $_SESSION["uid"]
         );
 
-        if ($this->dbh->num_rows($result) != 0) {
-            $link = $this->dbh->fetch_result($result, 0, "link");
-            $title = $this->dbh->fetch_result($result, 0, "title");
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            $link = \SmallSmallRSS\Database::fetch_result($result, 0, "link");
+            $title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
             echo json_encode(array("link" => $link, "title" => $title));
         } else {
             echo json_encode(array("error" => "ARTICLE_NOT_FOUND"));
@@ -761,7 +761,7 @@ class RPC extends ProtectedHandler
 
     public function log()
     {
-        $logmsg = $this->dbh->escape_string($_REQUEST['logmsg']);
+        $logmsg = \SmallSmallRSS\Database::escape_string($_REQUEST['logmsg']);
 
         if ($logmsg) {
             \SmallSmallRSS\Logger::logError(

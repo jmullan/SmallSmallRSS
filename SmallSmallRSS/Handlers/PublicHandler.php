@@ -48,8 +48,8 @@ class PublicHandler extends Handler
 
         $result = $qfh_ret[0];
 
-        if ($this->dbh->num_rows($result) != 0) {
-            $ts = strtotime($this->dbh->fetch_result($result, 0, "date_entered"));
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            $ts = strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, "date_entered"));
 
             if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) &&
                 strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $ts) {
@@ -97,7 +97,7 @@ class PublicHandler extends Handler
 
             $tpl->setVariable('SELF_URL', htmlspecialchars(get_self_url_prefix()), true);
 
-            while ($line = $this->dbh->fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
                 $tpl->setVariable('ARTICLE_ID', htmlspecialchars($line['link']), true);
                 $tpl->setVariable('ARTICLE_LINK', htmlspecialchars($line['link']), true);
@@ -180,7 +180,7 @@ class PublicHandler extends Handler
 
             $feed['articles'] = array();
 
-            while ($line = $this->dbh->fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $article = array();
 
                 $article['id'] = $line['link'];
@@ -233,13 +233,13 @@ class PublicHandler extends Handler
 
     function getUnread()
     {
-        $login = $this->dbh->escape_string($_REQUEST["login"]);
+        $login = \SmallSmallRSS\Database::escape_string($_REQUEST["login"]);
         $fresh = $_REQUEST["fresh"] == "1";
 
-        $result = $this->dbh->query("SELECT id FROM ttrss_users WHERE login = '$login'");
+        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE login = '$login'");
 
-        if ($this->dbh->num_rows($result) == 1) {
-            $uid = $this->dbh->fetch_result($result, 0, "id");
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            $uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
             print getGlobalUnread($uid);
 
@@ -256,9 +256,9 @@ class PublicHandler extends Handler
 
     function getProfiles()
     {
-        $login = $this->dbh->escape_string($_REQUEST["login"]);
+        $login = \SmallSmallRSS\Database::escape_string($_REQUEST["login"]);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT ttrss_settings_profiles.*
              FROM ttrss_settings_profiles,ttrss_users
              WHERE
@@ -268,7 +268,7 @@ class PublicHandler extends Handler
         );
         print "<select dojoType='dijit.form.Select' style='width : 220px; margin : 0px' name='profile'>";
         print "<option value='0'>" . __("Default profile") . "</option>";
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line["id"];
             $title = $line["title"];
             print "<option value='$id'>$title</option>";
@@ -278,9 +278,9 @@ class PublicHandler extends Handler
 
     function pubsub()
     {
-        $mode = $this->dbh->escape_string($_REQUEST['hub_mode']);
-        $feed_id = (int) $this->dbh->escape_string($_REQUEST['id']);
-        $feed_url = $this->dbh->escape_string($_REQUEST['hub_topic']);
+        $mode = \SmallSmallRSS\Database::escape_string($_REQUEST['hub_mode']);
+        $feed_id = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
+        $feed_url = \SmallSmallRSS\Database::escape_string($_REQUEST['hub_topic']);
 
         if (!PUBSUBHUBBUB_ENABLED) {
             header('HTTP/1.0 404 Not Found');
@@ -290,19 +290,19 @@ class PublicHandler extends Handler
 
         // TODO: implement hub_verifytoken checking
 
-        $result = $this->dbh->query("SELECT feed_url FROM ttrss_feeds WHERE id = '$feed_id'");
-        if ($this->dbh->num_rows($result) != 0) {
-            $check_feed_url = $this->dbh->fetch_result($result, 0, "feed_url");
+        $result = \SmallSmallRSS\Database::query("SELECT feed_url FROM ttrss_feeds WHERE id = '$feed_id'");
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            $check_feed_url = \SmallSmallRSS\Database::fetch_result($result, 0, "feed_url");
             if ($check_feed_url && ($check_feed_url == $feed_url || !$feed_url)) {
                 if ($mode == "subscribe") {
-                    $this->dbh->query(
+                    \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_feeds SET pubsub_state = 2
                         WHERE id = '$feed_id'"
                     );
                     print $_REQUEST['hub_challenge'];
                     return;
                 } elseif ($mode == "unsubscribe") {
-                    $this->dbh->query(
+                    \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_feeds SET pubsub_state = 0
                          WHERE id = '$feed_id'"
                     );
@@ -310,7 +310,7 @@ class PublicHandler extends Handler
                     return;
 
                 } elseif (!$mode) {
-                    $this->dbh->query(
+                    \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_feeds SET
                         last_update_started = '1970-01-01',
                         last_updated = '1970-01-01' WHERE id = '$feed_id'"
@@ -334,16 +334,16 @@ class PublicHandler extends Handler
 
     function share()
     {
-        $uuid = $this->dbh->escape_string($_REQUEST["key"]);
-        $result = $this->dbh->query(
+        $uuid = \SmallSmallRSS\Database::escape_string($_REQUEST["key"]);
+        $result = \SmallSmallRSS\Database::query(
             "SELECT ref_id, owner_uid
              FROM ttrss_user_entries
              WHERE uuid = '$uuid'"
         );
-        if ($this->dbh->num_rows($result) != 0) {
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
             header("Content-Type: text/html");
-            $id = $this->dbh->fetch_result($result, 0, "ref_id");
-            $owner_uid = $this->dbh->fetch_result($result, 0, "owner_uid");
+            $id = \SmallSmallRSS\Database::fetch_result($result, 0, "ref_id");
+            $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
 
             $article = format_article($id, false, true, $owner_uid);
             print_r($article['content']);
@@ -355,18 +355,18 @@ class PublicHandler extends Handler
 
     function rss()
     {
-        $feed = $this->dbh->escape_string($_REQUEST["id"]);
-        $key = $this->dbh->escape_string($_REQUEST["key"]);
+        $feed = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $key = \SmallSmallRSS\Database::escape_string($_REQUEST["key"]);
         $is_cat = $_REQUEST["is_cat"] != false;
-        $limit = (int) $this->dbh->escape_string($_REQUEST["limit"]);
-        $offset = (int) $this->dbh->escape_string($_REQUEST["offset"]);
+        $limit = (int) \SmallSmallRSS\Database::escape_string($_REQUEST["limit"]);
+        $offset = (int) \SmallSmallRSS\Database::escape_string($_REQUEST["offset"]);
 
-        $search = $this->dbh->escape_string($_REQUEST["q"]);
-        $search_mode = $this->dbh->escape_string($_REQUEST["smode"]);
-        $view_mode = $this->dbh->escape_string($_REQUEST["view-mode"]);
-        $order = $this->dbh->escape_string($_REQUEST["order"]);
+        $search = \SmallSmallRSS\Database::escape_string($_REQUEST["q"]);
+        $search_mode = \SmallSmallRSS\Database::escape_string($_REQUEST["smode"]);
+        $view_mode = \SmallSmallRSS\Database::escape_string($_REQUEST["view-mode"]);
+        $order = \SmallSmallRSS\Database::escape_string($_REQUEST["order"]);
 
-        $format = $this->dbh->escape_string($_REQUEST['format']);
+        $format = \SmallSmallRSS\Database::escape_string($_REQUEST['format']);
 
         if (!$format) {  $format = 'atom';
         }
@@ -378,7 +378,7 @@ class PublicHandler extends Handler
         $owner_id = false;
 
         if ($key) {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT owner_uid
                  FROM ttrss_access_keys
                  WHERE
@@ -386,8 +386,8 @@ class PublicHandler extends Handler
                      AND feed_id = '$feed'"
             );
 
-            if ($this->dbh->num_rows($result) == 1) {
-                $owner_id = $this->dbh->fetch_result($result, 0, "owner_uid");
+            if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+                $owner_id = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
             }
         }
 
@@ -433,10 +433,10 @@ class PublicHandler extends Handler
 
             if ($action == 'share') {
 
-                $title = $this->dbh->escape_string(strip_tags($_REQUEST["title"]));
-                $url = $this->dbh->escape_string(strip_tags($_REQUEST["url"]));
-                $content = $this->dbh->escape_string(strip_tags($_REQUEST["content"]));
-                $labels = $this->dbh->escape_string(strip_tags($_REQUEST["labels"]));
+                $title = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["title"]));
+                $url = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["url"]));
+                $content = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["content"]));
+                $labels = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["labels"]));
 
                 Article::create_published_article(
                     $title, $url, $content, $labels,
@@ -536,7 +536,7 @@ class PublicHandler extends Handler
 
     function login()
     {
-        $login = $this->dbh->escape_string($_POST["login"]);
+        $login = \SmallSmallRSS\Database::escape_string($_POST["login"]);
         $password = $_POST["password"];
         $remember_me = !empty($_POST["remember_me"]);
 
@@ -563,14 +563,14 @@ class PublicHandler extends Handler
 
                 if (!empty($_POST["profile"])) {
 
-                    $profile = $this->dbh->escape_string($_POST["profile"]);
+                    $profile = \SmallSmallRSS\Database::escape_string($_POST["profile"]);
 
-                    $result = $this->dbh->query(
+                    $result = \SmallSmallRSS\Database::query(
                         "SELECT id FROM ttrss_settings_profiles
                                                  WHERE id = '$profile' AND owner_uid = " . $_SESSION["uid"]
                     );
 
-                    if ($this->dbh->num_rows($result) != 0) {
+                    if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                         $_SESSION["profile"] = $profile;
                     }
                 }
@@ -594,7 +594,7 @@ class PublicHandler extends Handler
         $feed_urls = false;
         if (!empty($_SESSION["uid"])) {
 
-            $feed_url = $this->dbh->escape_string(trim($_REQUEST["feed_url"]));
+            $feed_url = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["feed_url"]));
 
             header('Content-Type: text/html; charset=utf-8');
             print "<html>
@@ -666,12 +666,12 @@ class PublicHandler extends Handler
             $tt_uri = get_self_url_prefix();
 
             if ($rc['code'] <= 2) {
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_feeds WHERE
                     feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
                 );
 
-                $feed_id = $this->dbh->fetch_result($result, 0, "id");
+                $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
             } else {
                 $feed_id = 0;
             }
@@ -701,15 +701,15 @@ class PublicHandler extends Handler
 
     function subscribe2()
     {
-        $feed_url = $this->dbh->escape_string(trim($_REQUEST["feed_url"]));
-        $cat_id = $this->dbh->escape_string($_REQUEST["cat_id"]);
-        $from = $this->dbh->escape_string($_REQUEST["from"]);
+        $feed_url = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["feed_url"]));
+        $cat_id = \SmallSmallRSS\Database::escape_string($_REQUEST["cat_id"]);
+        $from = \SmallSmallRSS\Database::escape_string($_REQUEST["from"]);
         $feed_urls = array();
 
         /* only read authentication information from POST */
 
-        $auth_login = $this->dbh->escape_string(trim($_POST["auth_login"]));
-        $auth_pass = $this->dbh->escape_string(trim($_POST["auth_pass"]));
+        $auth_login = \SmallSmallRSS\Database::escape_string(trim($_POST["auth_login"]));
+        $auth_pass = \SmallSmallRSS\Database::escape_string(trim($_POST["auth_pass"]));
 
         $rc = subscribe_to_feed($feed_url, $cat_id, $auth_login, $auth_pass);
 
@@ -770,12 +770,12 @@ class PublicHandler extends Handler
         $tt_uri = get_self_url_prefix();
 
         if ($rc <= 2) {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_feeds WHERE
                 feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
             );
 
-            $feed_id = $this->dbh->fetch_result($result, 0, "id");
+            $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
         } else {
             $feed_id = 0;
         }
@@ -854,9 +854,9 @@ class PublicHandler extends Handler
             print "</form>";
         } elseif ($method == 'do') {
 
-            $login = $this->dbh->escape_string($_POST["login"]);
-            $email = $this->dbh->escape_string($_POST["email"]);
-            $test = $this->dbh->escape_string($_POST["test"]);
+            $login = \SmallSmallRSS\Database::escape_string($_POST["login"]);
+            $email = \SmallSmallRSS\Database::escape_string($_POST["email"]);
+            $test = \SmallSmallRSS\Database::escape_string($_POST["test"]);
 
             if (($test != 4 && $test != 'four') || !$email || !$login) {
                  \SmallSmallRSS\Renderers\Messages::renderError(
@@ -870,13 +870,13 @@ class PublicHandler extends Handler
 
             } else {
 
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_users
                     WHERE login = '$login' AND email = '$email'"
                 );
 
-                if ($this->dbh->num_rows($result) != 0) {
-                    $id = $this->dbh->fetch_result($result, 0, "id");
+                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                    $id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
                     Pref_Users::resetUserPassword($id, false);
 

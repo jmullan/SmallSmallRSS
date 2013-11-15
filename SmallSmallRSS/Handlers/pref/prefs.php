@@ -106,13 +106,13 @@ class Pref_Prefs extends ProtectedHandler
 
         foreach (array_keys($_POST) as $pref_name) {
 
-            $pref_name = $this->dbh->escape_string($pref_name);
-            $value = $this->dbh->escape_string($_POST[$pref_name]);
+            $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
+            $value = \SmallSmallRSS\Database::escape_string($_POST[$pref_name]);
 
             if ($pref_name == 'DIGEST_PREFERRED_TIME') {
                 if (\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME') != $value) {
 
-                    $this->dbh->query(
+                    \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_users SET
                         last_digest_sent = NULL WHERE id = " . $_SESSION['uid']
                     );
@@ -139,15 +139,15 @@ class Pref_Prefs extends ProtectedHandler
     function getHelp()
     {
 
-        $pref_name = $this->dbh->escape_string($_REQUEST["pn"]);
+        $pref_name = \SmallSmallRSS\Database::escape_string($_REQUEST["pn"]);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT help_text FROM ttrss_prefs
             WHERE pref_name = '$pref_name'"
         );
 
-        if ($this->dbh->num_rows($result) > 0) {
-            $help_text = $this->dbh->fetch_result($result, 0, "help_text");
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+            $help_text = \SmallSmallRSS\Database::fetch_result($result, 0, "help_text");
             print $help_text;
         } else {
             printf(__("Unknown option: %s"), $pref_name);
@@ -157,12 +157,12 @@ class Pref_Prefs extends ProtectedHandler
     function changeemail()
     {
 
-        $email = $this->dbh->escape_string($_POST["email"]);
-        $full_name = $this->dbh->escape_string($_POST["full_name"]);
+        $email = \SmallSmallRSS\Database::escape_string($_POST["email"]);
+        $full_name = \SmallSmallRSS\Database::escape_string($_POST["full_name"]);
 
         $active_uid = $_SESSION["uid"];
 
-        $this->dbh->query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users SET email = '$email',
             full_name = '$full_name' WHERE id = '$active_uid'"
         );
@@ -183,7 +183,7 @@ class Pref_Prefs extends ProtectedHandler
             $profile_qpart = "profile IS NULL";
         }
 
-        $this->dbh->query(
+        \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_user_prefs
             WHERE $profile_qpart AND owner_uid = ".$_SESSION["uid"]
         );
@@ -234,15 +234,15 @@ class Pref_Prefs extends ProtectedHandler
 
         print "<h2>" . __("Personal data") . "</h2>";
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT email,full_name,otp_enabled,
             access_level FROM ttrss_users
             WHERE id = ".$_SESSION["uid"]
         );
 
-        $email = htmlspecialchars($this->dbh->fetch_result($result, 0, "email"));
-        $full_name = htmlspecialchars($this->dbh->fetch_result($result, 0, "full_name"));
-        $otp_enabled = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "otp_enabled"));
+        $email = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "email"));
+        $full_name = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "full_name"));
+        $otp_enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "otp_enabled"));
 
         print "<tr><td width=\"40%\">".__('Full name')."</td>";
         print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" name=\"full_name\" required=\"1\"
@@ -253,7 +253,7 @@ class Pref_Prefs extends ProtectedHandler
 
         if (!SINGLE_USER_MODE && empty($_SESSION["hide_hello"])) {
 
-            $access_level = $this->dbh->fetch_result($result, 0, "access_level");
+            $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, "access_level");
             print "<tr><td width=\"40%\">".__('Access level')."</td>";
             print "<td>" . $access_level_names[$access_level] . "</td></tr>";
         }
@@ -278,13 +278,13 @@ class Pref_Prefs extends ProtectedHandler
 
             print "<h2>" . __("Password") . "</h2>";
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_users
                 WHERE id = ".$_SESSION["uid"]." AND pwd_hash
                 = 'SHA1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'"
             );
 
-            if ($this->dbh->num_rows($result) != 0) {
+            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                 \SmallSmallRSS\Renderers\Messages::renderWarning(
                     __("Your password is at default value, please change it."), "default_pass_warning"
                 );
@@ -521,7 +521,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $access_query = 'true';
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT
             ttrss_user_prefs.pref_name,value,type_name,
             ttrss_prefs_sections.order_id,
@@ -542,7 +542,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $listed_boolean_prefs = array();
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             if (in_array($line["pref_name"], $prefs_blacklist)) {
                 continue;
@@ -928,7 +928,7 @@ class Pref_Prefs extends ProtectedHandler
         require_once "lib/otphp/lib/totp.php";
         require_once "lib/phpqrcode/phpqrcode.php";
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT login,salt,otp_enabled
             FROM ttrss_users
             WHERE id = ".$_SESSION["uid"]
@@ -936,11 +936,11 @@ class Pref_Prefs extends ProtectedHandler
 
         $base32 = new Base32();
 
-        $login = $this->dbh->fetch_result($result, 0, "login");
-        $otp_enabled = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "otp_enabled"));
+        $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
+        $otp_enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "otp_enabled"));
 
         if (!$otp_enabled) {
-            $secret = $base32->encode(sha1($this->dbh->fetch_result($result, 0, "salt")));
+            $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetch_result($result, 0, "salt")));
             $topt = new \OTPHP\TOTP($secret);
             print QRcode::png($topt->provisioning_uri($login));
         }
@@ -959,7 +959,7 @@ class Pref_Prefs extends ProtectedHandler
 
         if ($authenticator->check_password($_SESSION["uid"], $password)) {
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT salt
                 FROM ttrss_users
                 WHERE id = ".$_SESSION["uid"]
@@ -967,13 +967,13 @@ class Pref_Prefs extends ProtectedHandler
 
             $base32 = new Base32();
 
-            $secret = $base32->encode(sha1($this->dbh->fetch_result($result, 0, "salt")));
+            $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetch_result($result, 0, "salt")));
             $topt = new \OTPHP\TOTP($secret);
 
             $otp_check = $topt->now();
 
             if ($otp == $otp_check) {
-                $this->dbh->query(
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_users SET otp_enabled = true WHERE
                     id = " . $_SESSION["uid"]
                 );
@@ -990,13 +990,13 @@ class Pref_Prefs extends ProtectedHandler
 
     function otpdisable()
     {
-        $password = $this->dbh->escape_string($_REQUEST["password"]);
+        $password = \SmallSmallRSS\Database::escape_string($_REQUEST["password"]);
 
         $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
 
         if ($authenticator->check_password($_SESSION["uid"], $password)) {
 
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_users SET otp_enabled = false WHERE
                 id = " . $_SESSION["uid"]
             );
@@ -1022,7 +1022,7 @@ class Pref_Prefs extends ProtectedHandler
 
     function clearplugindata()
     {
-        $name = $this->dbh->escape_string($_REQUEST["name"]);
+        $name = \SmallSmallRSS\Database::escape_string($_REQUEST["name"]);
 
         \SmallSmallRSS\PluginHost::getInstance()->clear_data(\SmallSmallRSS\PluginHost::getInstance()->get_plugin($name));
     }
@@ -1080,7 +1080,7 @@ class Pref_Prefs extends ProtectedHandler
 
         print "</div>";
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT title,id FROM ttrss_settings_profiles
             WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY title"
         );
@@ -1113,7 +1113,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $lnum = 1;
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             $profile_id = $line["id"];
             $this_row_id = "id=\"FCATR-$profile_id\"";

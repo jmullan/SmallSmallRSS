@@ -3,7 +3,6 @@ namespace SmallSmallRSS;
 
 // Original from http://www.daniweb.com/code/snippet43.html
 require_once __DIR__ . "/../config.php";
-require_once __DIR__ . "/../classes/db.php";
 require_once __DIR__ . "/../lib/accept-to-gettext.php";
 require_once __DIR__ . "/../lib/gettext/gettext.inc";
 

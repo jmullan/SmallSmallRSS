@@ -12,16 +12,16 @@ class Article extends ProtectedHandler
 
     function redirect()
     {
-        $id = $this->dbh->escape_string($_REQUEST['id']);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT link FROM ttrss_entries, ttrss_user_entries
                         WHERE id = '$id' AND id = ref_id AND owner_uid = '".$_SESSION['uid']."'
                         LIMIT 1"
         );
 
-        if ($this->dbh->num_rows($result) == 1) {
-            $article_url = $this->dbh->fetch_result($result, 0, 'link');
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            $article_url = \SmallSmallRSS\Database::fetch_result($result, 0, 'link');
             $article_url = str_replace("\n", "", $article_url);
 
             header("Location: $article_url");
@@ -34,10 +34,10 @@ class Article extends ProtectedHandler
 
     function view()
     {
-        $id = $this->dbh->escape_string($_REQUEST["id"]);
-        $cids = explode(",", $this->dbh->escape_string($_REQUEST["cids"]));
-        $mode = $this->dbh->escape_string($_REQUEST["mode"]);
-        $omode = $this->dbh->escape_string($_REQUEST["omode"]);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $cids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["cids"]));
+        $mode = \SmallSmallRSS\Database::escape_string($_REQUEST["mode"]);
+        $omode = \SmallSmallRSS\Database::escape_string($_REQUEST["omode"]);
 
         // in prefetch mode we only output requested cids, main article
         // just gets marked as read (it already exists in client cache)
@@ -76,19 +76,19 @@ class Article extends ProtectedHandler
     {
 
         if ($cmode == 0) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             unread = false,last_read = NOW()
             WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
             );
         } elseif ($cmode == 1) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             unread = true
             WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
             );
         } else {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries SET
             unread = NOT unread,last_read = NOW()
             WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
@@ -209,9 +209,9 @@ class Article extends ProtectedHandler
 
         print __("Tags for this article (separated by commas):")."<br>";
 
-        $param = $this->dbh->escape_string($_REQUEST['param']);
+        $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
 
-        $tags = get_article_tags($this->dbh->escape_string($param));
+        $tags = get_article_tags(\SmallSmallRSS\Database::escape_string($param));
 
         $tags_str = join(", ", $tags);
 
@@ -241,10 +241,10 @@ class Article extends ProtectedHandler
 
     function setScore()
     {
-        $ids = $this->dbh->escape_string($_REQUEST['id']);
-        $score = (int) $this->dbh->escape_string($_REQUEST['score']);
+        $ids = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
+        $score = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['score']);
 
-        $this->dbh->query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries SET
             score = '$score' WHERE ref_id IN ($ids) AND owner_uid = " . $_SESSION["uid"]
         );
@@ -257,25 +257,25 @@ class Article extends ProtectedHandler
     function setArticleTags()
     {
 
-        $id = $this->dbh->escape_string($_REQUEST["id"]);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
 
-        $tags_str = $this->dbh->escape_string($_REQUEST["tags_str"]);
+        $tags_str = \SmallSmallRSS\Database::escape_string($_REQUEST["tags_str"]);
         $tags = array_unique(trim_array(explode(",", $tags_str)));
 
-        $this->dbh->query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT int_id FROM ttrss_user_entries WHERE
                 ref_id = '$id' AND owner_uid = '".$_SESSION["uid"]."' LIMIT 1"
         );
 
-        if ($this->dbh->num_rows($result) == 1) {
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
 
             $tags_to_cache = array();
 
-            $int_id = $this->dbh->fetch_result($result, 0, "int_id");
+            $int_id = \SmallSmallRSS\Database::fetch_result($result, 0, "int_id");
 
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_tags WHERE
                 post_int_id = $int_id AND owner_uid = '".$_SESSION["uid"]."'"
             );
@@ -294,7 +294,7 @@ class Article extends ProtectedHandler
                 //                    print "<!-- $id : $int_id : $tag -->";
 
                 if ($tag != '') {
-                    $this->dbh->query(
+                    \SmallSmallRSS\Database::query(
                         "INSERT INTO ttrss_tags
                                 (post_int_id, owner_uid, tag_name) VALUES ('$int_id', '".$_SESSION["uid"]."', '$tag')"
                     );
@@ -308,14 +308,14 @@ class Article extends ProtectedHandler
             sort($tags_to_cache);
             $tags_str = join(",", $tags_to_cache);
 
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries
                 SET tag_cache = '$tags_str' WHERE ref_id = '$id'
                         AND owner_uid = " . $_SESSION["uid"]
             );
         }
 
-        $this->dbh->query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
 
         $tags = get_article_tags($id);
         $tags_str = format_tags_string($tags, $id);
@@ -331,9 +331,9 @@ class Article extends ProtectedHandler
 
     function completeTags()
     {
-        $search = $this->dbh->escape_string($_REQUEST["search"]);
+        $search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT tag_name FROM ttrss_tags
                 WHERE owner_uid = '".$_SESSION["uid"]."' AND
                 tag_name LIKE '$search%' ORDER BY tag_name
@@ -341,7 +341,7 @@ class Article extends ProtectedHandler
         );
 
         print "<ul>";
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             print "<li>" . $line["tag_name"] . "</li>";
         }
         print "</ul>";
@@ -360,9 +360,9 @@ class Article extends ProtectedHandler
     private function labelops($assign)
     {
         $reply = array();
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
-        $label_id = $this->dbh->escape_string($_REQUEST["lid"]);
-        $label = $this->dbh->escape_string(\SmallSmallRSS\Labels::findCaption($label_id, $_SESSION["uid"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
+        $label_id = \SmallSmallRSS\Database::escape_string($_REQUEST["lid"]);
+        $label = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Labels::findCaption($label_id, $_SESSION["uid"]));
         $reply["info-for-headlines"] = array();
         if ($label) {
             foreach ($ids as $id) {

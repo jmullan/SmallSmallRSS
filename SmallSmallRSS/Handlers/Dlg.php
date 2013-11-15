@@ -9,7 +9,7 @@ class Dlg extends ProtectedHandler
         if (parent::before($method)) {
             header("Content-Type: text/html"); # required for iframe
 
-            $this->param = $this->dbh->escape_string($_REQUEST["param"]);
+            $this->param = \SmallSmallRSS\Database::escape_string($_REQUEST["param"]);
             return true;
         }
         return false;
@@ -22,7 +22,7 @@ class Dlg extends ProtectedHandler
         print "<div class=\"prefFeedOPMLHolder\">";
         $owner_uid = $_SESSION["uid"];
 
-        $this->dbh->query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
         print "<ul class='nomarks'>";
 
@@ -30,7 +30,7 @@ class Dlg extends ProtectedHandler
 
         $opml->opml_import($_SESSION["uid"]);
 
-        $this->dbh->query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
 
         print "</ul>";
         print "</div>";
@@ -113,11 +113,11 @@ class Dlg extends ProtectedHandler
             FROM ttrss_tags WHERE owner_uid = ".$_SESSION["uid"]."
             GROUP BY tag_name ORDER BY count DESC LIMIT 50";
 
-        $result = $this->dbh->query($query);
+        $result = \SmallSmallRSS\Database::query($query);
 
         $tags = array();
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $tags[$line["tag_name"]] = $line["count"];
         }
 
@@ -180,12 +180,12 @@ class Dlg extends ProtectedHandler
         print "<label for=\"tag_mode_all\">".__("All tags.")."</input>";
 
         print "<select id=\"all_tags\" name=\"all_tags\" title=\"" . __('Which Tags?') . "\" multiple=\"multiple\" size=\"10\" style=\"width : 100%\">";
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT tag_name FROM ttrss_tags WHERE owner_uid = ".$_SESSION['uid']."
             AND LENGTH(tag_name) <= 30 ORDER BY tag_name ASC"
         );
 
-        while ($row = $this->dbh->fetch_assoc($result)) {
+        while ($row = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $tmp = htmlspecialchars($row["tag_name"]);
             print "<option value=\"" . str_replace(" ", "%20", $tmp) . "\">$tmp</option>";
         }
@@ -207,7 +207,7 @@ class Dlg extends ProtectedHandler
     {
 
         $this->params = explode(":", $this->param, 3);
-        $feed_id = $this->dbh->escape_string($this->params[0]);
+        $feed_id = \SmallSmallRSS\Database::escape_string($this->params[0]);
         $is_cat = (bool) $this->params[1];
 
         $key = get_feed_access_key($feed_id, $is_cat);

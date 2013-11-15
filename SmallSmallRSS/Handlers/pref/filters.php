@@ -13,7 +13,7 @@ class Pref_Filters extends ProtectedHandler
 
     function filtersortreset()
     {
-        $this->dbh->query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_filters2
                 SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
         );
@@ -39,7 +39,7 @@ class Pref_Filters extends ProtectedHandler
 
                 if ($filter_id > 0) {
 
-                    $this->dbh->query(
+                    \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_filters2 SET
                         order_id = $index WHERE id = '$filter_id' AND
                         owner_uid = " .$_SESSION["uid"]
@@ -60,18 +60,18 @@ class Pref_Filters extends ProtectedHandler
 
         $filter["enabled"] = true;
         $filter["match_any_rule"] = sql_bool_to_bool(
-            checkbox_to_sql_bool($this->dbh->escape_string($_REQUEST["match_any_rule"]))
+            checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST["match_any_rule"]))
         );
         $filter["inverse"] = sql_bool_to_bool(
-            checkbox_to_sql_bool($this->dbh->escape_string($_REQUEST["inverse"]))
+            checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST["inverse"]))
         );
 
         $filter["rules"] = array();
 
-        $result = $this->dbh->query("SELECT id,name FROM ttrss_filter_types");
+        $result = \SmallSmallRSS\Database::query("SELECT id,name FROM ttrss_filter_types");
 
         $filter_types = array();
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $filter_types[$line["id"]] = $line["name"];
         }
 
@@ -111,7 +111,7 @@ class Pref_Filters extends ProtectedHandler
         print "<div class=\"filterTestHolder\">";
         print "<table width=\"100%\" cellspacing=\"0\" id=\"prefErrorFeedList\">";
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             $entry_timestamp = strtotime($line["updated"]);
             $entry_tags = get_article_tags($line["id"], $_SESSION["uid"]);
@@ -174,7 +174,7 @@ class Pref_Filters extends ProtectedHandler
 
         $filter_search = $_SESSION["prefs_filter_search"];
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT *,
             (SELECT action_param FROM ttrss_filters2_actions
                 WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_param,
@@ -194,7 +194,7 @@ class Pref_Filters extends ProtectedHandler
         $folder = array();
         $folder['items'] = array();
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             /* if ($action_id != $line["action_id"]) {
                if (count($folder['items']) > 0) {
@@ -212,11 +212,11 @@ class Pref_Filters extends ProtectedHandler
 
             $match_ok = false;
             if ($filter_search) {
-                $rules_result = $this->dbh->query(
+                $rules_result = \SmallSmallRSS\Database::query(
                     "SELECT reg_exp FROM ttrss_filters2_rules WHERE filter_id = ".$line["id"]
                 );
 
-                while ($rule_line = $this->dbh->fetch_assoc($rules_result)) {
+                while ($rule_line = \SmallSmallRSS\Database::fetch_assoc($rules_result)) {
                     if (mb_strpos($rule_line['reg_exp'], $filter_search) !== false) {
                         $match_ok = true;
                         break;
@@ -225,15 +225,15 @@ class Pref_Filters extends ProtectedHandler
             }
 
             if ($line['action_id'] == 7) {
-                $label_result = $this->dbh->query(
+                $label_result = \SmallSmallRSS\Database::query(
                     "SELECT fg_color, bg_color
-                    FROM ttrss_labels2 WHERE caption = '".$this->dbh->escape_string($line['action_param'])."' AND
+                    FROM ttrss_labels2 WHERE caption = '".\SmallSmallRSS\Database::escape_string($line['action_param'])."' AND
                         owner_uid = " . $_SESSION["uid"]
                 );
 
-                if ($this->dbh->num_rows($label_result) > 0) {
-                    $fg_color = $this->dbh->fetch_result($label_result, 0, "fg_color");
-                    $bg_color = $this->dbh->fetch_result($label_result, 0, "bg_color");
+                if (\SmallSmallRSS\Database::num_rows($label_result) > 0) {
+                    $fg_color = \SmallSmallRSS\Database::fetch_result($label_result, 0, "fg_color");
+                    $bg_color = \SmallSmallRSS\Database::fetch_result($label_result, 0, "bg_color");
 
                     $name[1] = "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color : $fg_color; background-color : $bg_color; margin-right : 4px'>&alpha;</span>" . $name[1];
                 }
@@ -270,16 +270,16 @@ class Pref_Filters extends ProtectedHandler
     function edit()
     {
 
-        $filter_id = $this->dbh->escape_string($_REQUEST["id"]);
+        $filter_id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2 WHERE id = '$filter_id' AND owner_uid = " . $_SESSION["uid"]
         );
 
-        $enabled = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "enabled"));
-        $match_any_rule = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "match_any_rule"));
-        $inverse = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "inverse"));
-        $title = htmlspecialchars($this->dbh->fetch_result($result, 0, "title"));
+        $enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "enabled"));
+        $match_any_rule = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "match_any_rule"));
+        $inverse = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "inverse"));
+        $title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "title"));
 
         print "<form id=\"filter_edit_form\" onsubmit='return false'>";
 
@@ -317,12 +317,12 @@ class Pref_Filters extends ProtectedHandler
 
         print "<ul id='filterDlg_Matches'>";
 
-        $rules_result = $this->dbh->query(
+        $rules_result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2_rules
             WHERE filter_id = '$filter_id' ORDER BY reg_exp, id"
         );
 
-        while ($line = $this->dbh->fetch_assoc($rules_result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($rules_result)) {
             if (sql_bool_to_bool($line["cat_filter"])) {
                 $line["feed_id"] = "CAT:" . (int) $line["cat_id"];
             }
@@ -368,12 +368,12 @@ class Pref_Filters extends ProtectedHandler
 
         print "<ul id='filterDlg_Actions'>";
 
-        $actions_result = $this->dbh->query(
+        $actions_result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2_actions
             WHERE filter_id = '$filter_id' ORDER BY id"
         );
 
-        while ($line = $this->dbh->fetch_assoc($actions_result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($actions_result)) {
             $line["action_param_label"] = $line["action_param"];
 
             unset($line["filter_id"]);
@@ -459,11 +459,11 @@ class Pref_Filters extends ProtectedHandler
             }
         }
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT description FROM ttrss_filter_types
             WHERE id = ". (int) $rule["filter_type"]
         );
-        $filter_type = $this->dbh->fetch_result($result, 0, "description");
+        $filter_type = \SmallSmallRSS\Database::fetch_result($result, 0, "description");
 
         return T_sprintf(
             "%s on %s in %s %s", strip_tags($rule["reg_exp"]),
@@ -478,12 +478,12 @@ class Pref_Filters extends ProtectedHandler
 
     private function getActionName($action)
     {
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT description FROM
             ttrss_filter_actions WHERE id = " . (int) $action["action_id"]
         );
 
-        $title = __($this->dbh->fetch_result($result, 0, "description"));
+        $title = __(\SmallSmallRSS\Database::fetch_result($result, 0, "description"));
 
         if ($action["action_id"] == 4 || $action["action_id"] == 6 ||
             $action["action_id"] == 7) {
@@ -506,13 +506,13 @@ class Pref_Filters extends ProtectedHandler
 
         #        print_r($_REQUEST);
 
-        $filter_id = $this->dbh->escape_string($_REQUEST["id"]);
-        $enabled = checkbox_to_sql_bool($this->dbh->escape_string($_REQUEST["enabled"]));
-        $match_any_rule = checkbox_to_sql_bool($this->dbh->escape_string($_REQUEST["match_any_rule"]));
-        $inverse = checkbox_to_sql_bool($this->dbh->escape_string($_REQUEST["inverse"]));
-        $title = $this->dbh->escape_string($_REQUEST["title"]);
+        $filter_id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $enabled = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST["enabled"]));
+        $match_any_rule = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST["match_any_rule"]));
+        $inverse = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST["inverse"]));
+        $title = \SmallSmallRSS\Database::escape_string($_REQUEST["title"]);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "UPDATE ttrss_filters2 SET enabled = $enabled,
             match_any_rule = $match_any_rule,
             inverse = $inverse,
@@ -528,18 +528,18 @@ class Pref_Filters extends ProtectedHandler
     function remove()
     {
 
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
-            $this->dbh->query("DELETE FROM ttrss_filters2 WHERE id = '$id' AND owner_uid = ". $_SESSION["uid"]);
+            \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2 WHERE id = '$id' AND owner_uid = ". $_SESSION["uid"]);
         }
     }
 
     private function saveRulesAndActions($filter_id)
     {
 
-        $this->dbh->query("DELETE FROM ttrss_filters2_rules WHERE filter_id = '$filter_id'");
-        $this->dbh->query("DELETE FROM ttrss_filters2_actions WHERE filter_id = '$filter_id'");
+        \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2_rules WHERE filter_id = '$filter_id'");
+        \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2_actions WHERE filter_id = '$filter_id'");
 
         if ($filter_id) {
             /* create rules */
@@ -568,11 +568,11 @@ class Pref_Filters extends ProtectedHandler
             foreach ($rules as $rule) {
                 if ($rule) {
 
-                    $reg_exp = strip_tags($this->dbh->escape_string(trim($rule["reg_exp"])));
+                    $reg_exp = strip_tags(\SmallSmallRSS\Database::escape_string(trim($rule["reg_exp"])));
                     $inverse = isset($rule["inverse"]) ? "true" : "false";
 
-                    $filter_type = (int) $this->dbh->escape_string(trim($rule["filter_type"]));
-                    $feed_id = $this->dbh->escape_string(trim($rule["feed_id"]));
+                    $filter_type = (int) \SmallSmallRSS\Database::escape_string(trim($rule["filter_type"]));
+                    $feed_id = \SmallSmallRSS\Database::escape_string(trim($rule["feed_id"]));
 
                     if (strpos($feed_id, "CAT:") === 0) {
 
@@ -595,16 +595,16 @@ class Pref_Filters extends ProtectedHandler
                         (filter_id, reg_exp,filter_type,feed_id,cat_id,cat_filter,inverse) VALUES
                         ('$filter_id', '$reg_exp', '$filter_type', $feed_id, $cat_id, $cat_filter, $inverse)";
 
-                    $this->dbh->query($query);
+                    \SmallSmallRSS\Database::query($query);
                 }
             }
 
             foreach ($actions as $action) {
                 if ($action) {
 
-                    $action_id = (int) $this->dbh->escape_string($action["action_id"]);
-                    $action_param = $this->dbh->escape_string($action["action_param"]);
-                    $action_param_label = $this->dbh->escape_string($action["action_param_label"]);
+                    $action_id = (int) \SmallSmallRSS\Database::escape_string($action["action_id"]);
+                    $action_param = \SmallSmallRSS\Database::escape_string($action["action_param"]);
+                    $action_param_label = \SmallSmallRSS\Database::escape_string($action["action_param_label"]);
 
                     if ($action_id == 7) {
                         $action_param = $action_param_label;
@@ -618,7 +618,7 @@ class Pref_Filters extends ProtectedHandler
                         (filter_id, action_id, action_param) VALUES
                         ('$filter_id', '$action_id', '$action_param')";
 
-                    $this->dbh->query($query);
+                    \SmallSmallRSS\Database::query($query);
                 }
             }
         }
@@ -636,40 +636,40 @@ class Pref_Filters extends ProtectedHandler
 
         $enabled = checkbox_to_sql_bool($_REQUEST["enabled"]);
         $match_any_rule = checkbox_to_sql_bool($_REQUEST["match_any_rule"]);
-        $title = $this->dbh->escape_string($_REQUEST["title"]);
+        $title = \SmallSmallRSS\Database::escape_string($_REQUEST["title"]);
 
-        $this->dbh->query("BEGIN");
+        \SmallSmallRSS\Database::query("BEGIN");
 
         /* create base filter */
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "INSERT INTO ttrss_filters2
             (owner_uid, match_any_rule, enabled, title) VALUES
             (".$_SESSION["uid"].",$match_any_rule,$enabled, '$title')"
         );
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT MAX(id) AS id FROM ttrss_filters2
             WHERE owner_uid = ".$_SESSION["uid"]
         );
 
-        $filter_id = $this->dbh->fetch_result($result, 0, "id");
+        $filter_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
         $this->saveRulesAndActions($filter_id);
 
-        $this->dbh->query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
     }
 
     function index()
     {
 
-        $sort = $this->dbh->escape_string($_REQUEST["sort"]);
+        $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);
 
         if (!$sort || $sort == "undefined") {
             $sort = "reg_exp";
         }
 
-        $filter_search = $this->dbh->escape_string($_REQUEST["search"]);
+        $filter_search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
         if (array_key_exists("search", $_REQUEST)) {
             $_SESSION["prefs_filter_search"] = $filter_search;
@@ -681,7 +681,7 @@ class Pref_Filters extends ProtectedHandler
         print "<div id=\"pref-filter-header\" dojoType=\"dijit.layout.ContentPane\" region=\"top\">";
         print "<div id=\"pref-filter-toolbar\" dojoType=\"dijit.Toolbar\">";
 
-        $filter_search = $this->dbh->escape_string($_REQUEST["search"]);
+        $filter_search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
         if (array_key_exists("search", $_REQUEST)) {
             $_SESSION["prefs_filter_search"] = $filter_search;
@@ -890,14 +890,14 @@ class Pref_Filters extends ProtectedHandler
 
         print "<form name='filter_new_rule_form' id='filter_new_rule_form'>";
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id,description
             FROM ttrss_filter_types WHERE id != 5 ORDER BY description"
         );
 
         $filter_types = array();
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $filter_types[$line["id"]] = __($line["description"]);
         }
 
@@ -953,7 +953,7 @@ class Pref_Filters extends ProtectedHandler
         $action = json_decode($_REQUEST["action"], true);
 
         if ($action) {
-            $action_param = $this->dbh->escape_string($action["action_param"]);
+            $action_param = \SmallSmallRSS\Database::escape_string($action["action_param"]);
             $action_id = (int) $action["action_id"];
         } else {
             $action_param = "";
@@ -969,12 +969,12 @@ class Pref_Filters extends ProtectedHandler
         print "<select name=\"action_id\" dojoType=\"dijit.form.Select\"
             onchange=\"filterDlgCheckAction(this)\">";
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id,description FROM ttrss_filter_actions
             ORDER BY name"
         );
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $is_selected = ($line["id"] == $action_id) ? "selected='1'" : "";
             printf("<option $is_selected value='%d'>%s</option>", $line["id"], __($line["description"]));
         }
@@ -1023,7 +1023,7 @@ class Pref_Filters extends ProtectedHandler
     private function getFilterName($id)
     {
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT title,COUNT(DISTINCT r.id) AS num_rules,COUNT(DISTINCT a.id) AS num_actions
                 FROM ttrss_filters2 AS f LEFT JOIN ttrss_filters2_rules AS r
                     ON (r.filter_id = f.id)
@@ -1031,23 +1031,23 @@ class Pref_Filters extends ProtectedHandler
                             ON (a.filter_id = f.id) WHERE f.id = '$id' GROUP BY f.title"
         );
 
-        $title = $this->dbh->fetch_result($result, 0, "title");
-        $num_rules = $this->dbh->fetch_result($result, 0, "num_rules");
-        $num_actions = $this->dbh->fetch_result($result, 0, "num_actions");
+        $title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
+        $num_rules = \SmallSmallRSS\Database::fetch_result($result, 0, "num_rules");
+        $num_actions = \SmallSmallRSS\Database::fetch_result($result, 0, "num_actions");
 
         if (!$title) {  $title = __("[No caption]");
         }
 
         $title = sprintf(_ngettext("%s (%d rule)", "%s (%d rules)", $num_rules), $title, $num_rules);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2_actions WHERE filter_id = '$id' ORDER BY id LIMIT 1"
         );
 
         $actions = "";
 
-        if ($this->dbh->num_rows($result) > 0) {
-            $line = $this->dbh->fetch_assoc($result);
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+            $line = \SmallSmallRSS\Database::fetch_assoc($result);
             $actions = $this->getActionName($line);
 
             $num_actions -= 1;
@@ -1062,26 +1062,26 @@ class Pref_Filters extends ProtectedHandler
 
     function join()
     {
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
         if (count($ids) > 1) {
             $base_id = array_shift($ids);
             $ids_str = join(",", $ids);
 
-            $this->dbh->query("BEGIN");
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query("BEGIN");
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_filters2_rules
                 SET filter_id = '$base_id' WHERE filter_id IN ($ids_str)"
             );
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_filters2_actions
                 SET filter_id = '$base_id' WHERE filter_id IN ($ids_str)"
             );
 
-            $this->dbh->query("DELETE FROM ttrss_filters2 WHERE id IN ($ids_str)");
-            $this->dbh->query("UPDATE ttrss_filters2 SET match_any_rule = true WHERE id = '$base_id'");
+            \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2 WHERE id IN ($ids_str)");
+            \SmallSmallRSS\Database::query("UPDATE ttrss_filters2 SET match_any_rule = true WHERE id = '$base_id'");
 
-            $this->dbh->query("COMMIT");
+            \SmallSmallRSS\Database::query("COMMIT");
 
             $this->optimizeFilter($base_id);
 
@@ -1090,8 +1090,8 @@ class Pref_Filters extends ProtectedHandler
 
     private function optimizeFilter($id)
     {
-        $this->dbh->query("BEGIN");
-        $result = $this->dbh->query(
+        \SmallSmallRSS\Database::query("BEGIN");
+        $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2_actions
             WHERE filter_id = '$id'"
         );
@@ -1099,7 +1099,7 @@ class Pref_Filters extends ProtectedHandler
         $tmp = array();
         $dupe_ids = array();
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line["id"];
             unset($line["id"]);
 
@@ -1112,13 +1112,13 @@ class Pref_Filters extends ProtectedHandler
 
         if (count($dupe_ids) > 0) {
             $ids_str = join(",", $dupe_ids);
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_filters2_actions
                 WHERE id IN ($ids_str)"
             );
         }
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2_rules
             WHERE filter_id = '$id'"
         );
@@ -1126,7 +1126,7 @@ class Pref_Filters extends ProtectedHandler
         $tmp = array();
         $dupe_ids = array();
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line["id"];
             unset($line["id"]);
 
@@ -1139,12 +1139,12 @@ class Pref_Filters extends ProtectedHandler
 
         if (count($dupe_ids) > 0) {
             $ids_str = join(",", $dupe_ids);
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_filters2_rules
                 WHERE id IN ($ids_str)"
             );
         }
 
-        $this->dbh->query("COMMIT");
+        \SmallSmallRSS\Database::query("COMMIT");
     }
 }

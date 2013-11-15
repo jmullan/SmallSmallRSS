@@ -8,7 +8,7 @@ class Feeds extends ProtectedHandler
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
-            $value = $this->dbh->escape_string($_REQUEST[$key]);
+            $value = \SmallSmallRSS\Database::escape_string($_REQUEST[$key]);
         }
         return $value;
     }
@@ -191,20 +191,20 @@ class Feeds extends ProtectedHandler
         if ($method == "ForceUpdate" && $feed > 0 && is_numeric($feed)) {
             // Update the feed if required with some basic flood control
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT cache_images,".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
                     FROM ttrss_feeds WHERE id = '$feed'"
             );
 
-            if ($this->dbh->num_rows($result) != 0) {
-                $last_updated = strtotime($this->dbh->fetch_result($result, 0, "last_updated"));
-                $cache_images = sql_bool_to_bool($this->dbh->fetch_result($result, 0, "cache_images"));
+            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                $last_updated = strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, "last_updated"));
+                $cache_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "cache_images"));
 
                 if (!$cache_images && time() - $last_updated > 120 || isset($_REQUEST['DevForceUpdate'])) {
                     include "rssfuncs.php";
                     update_rss_feed($feed, true);
                 } else {
-                    $this->dbh->query(
+                    \SmallSmallRSS\Database::query(
                         'UPDATE ttrss_feeds'
                         . "SET last_updated = '1970-01-01', last_update_started = '1970-01-01' WHERE id = '$feed'"
                     );
@@ -218,11 +218,11 @@ class Feeds extends ProtectedHandler
 
         // FIXME: might break tag display?
         if (is_numeric($feed) && $feed > 0 && !$cat_view) {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_feeds WHERE id = '$feed' LIMIT 1"
             );
 
-            if ($this->dbh->num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
                 $reply['content'] = "<div align='center'>".__('Feed not found.')."</div>";
             }
         }
@@ -312,8 +312,8 @@ class Feeds extends ProtectedHandler
             $last_updated
         );
 
-        $headlines_count = $this->dbh->num_rows($result);
-        if ($this->dbh->num_rows($result) > 0) {
+        $headlines_count = \SmallSmallRSS\Database::num_rows($result);
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
             $lnum = $offset;
             $num_unread = 0;
             $cur_feed_title = '';
@@ -324,7 +324,7 @@ class Feeds extends ProtectedHandler
 
             $expand_cdm = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
 
-            while ($line = $this->dbh->fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $id = $line["id"];
                 $feed_id = $line["feed_id"];
                 $label_cache = $line["label_cache"];
@@ -655,19 +655,19 @@ class Feeds extends ProtectedHandler
 
                     if ($line["orig_feed_id"]) {
 
-                        $tmp_result = $this->dbh->query(
+                        $tmp_result = \SmallSmallRSS\Database::query(
                             "SELECT * FROM ttrss_archived_feeds
                     WHERE id = ".$line["orig_feed_id"]
                         );
 
-                        if ($this->dbh->num_rows($tmp_result) != 0) {
+                        if (\SmallSmallRSS\Database::num_rows($tmp_result) != 0) {
 
                             $reply['content'] .= "<div clear='both'>";
                             $reply['content'] .= __("Originally from:");
 
                             $reply['content'] .= "&nbsp;";
 
-                            $tmp_line = $this->dbh->fetch_assoc($tmp_result);
+                            $tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result);
 
                             $reply['content'] .= "<a target='_blank'
                                 href=' " . htmlspecialchars($tmp_line['site_url']) . "'>" .
@@ -783,22 +783,22 @@ class Feeds extends ProtectedHandler
 
                 $reply['content'] .= "<p><span class=\"insensitive\">";
 
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT ".SUBSTRING_FOR_DATE."(MAX(last_updated), 1, 19) AS last_updated FROM ttrss_feeds
                     WHERE owner_uid = " . $_SESSION['uid']
                 );
 
-                $last_updated = $this->dbh->fetch_result($result, 0, "last_updated");
+                $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, "last_updated");
                 $last_updated = make_local_datetime($last_updated, false);
 
                 $reply['content'] .= sprintf(__("Feeds last updated at %s"), $last_updated);
 
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT COUNT(id) AS num_errors
                     FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
                 );
 
-                $num_errors = $this->dbh->fetch_result($result, 0, "num_errors");
+                $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, "num_errors");
 
                 if ($num_errors > 0) {
                     $reply['content'] .= "<br/>";
@@ -818,7 +818,7 @@ class Feeds extends ProtectedHandler
 
     public function catchupAll()
     {
-        $this->dbh->query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries SET
                         last_read = NOW(), unread = false WHERE unread = true AND owner_uid = " . $_SESSION["uid"]
         );
@@ -860,23 +860,23 @@ class Feeds extends ProtectedHandler
 
         if ($feed < LABEL_BASE_INDEX) {
             $label_feed = feed_to_label_id($feed);
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_labels2 WHERE
                             id = '$label_feed' AND owner_uid = " . $_SESSION['uid']
             );
         } elseif (!$cat_view && is_numeric($feed) && $feed > 0) {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_feeds WHERE
                             id = '$feed' AND owner_uid = " . $_SESSION['uid']
             );
         } elseif ($cat_view && is_numeric($feed) && $feed > 0) {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_feed_categories WHERE
                             id = '$feed' AND owner_uid = " . $_SESSION['uid']
             );
         }
 
-        if ($result && $this->dbh->num_rows($result) == 0) {
+        if ($result && \SmallSmallRSS\Database::num_rows($result) == 0) {
             print json_encode($this->generate_error_feed(__("Feed not found.")));
             return;
         }
@@ -893,7 +893,7 @@ class Feeds extends ProtectedHandler
 
         /* bump login timestamp if needed */
         if (time() - $_SESSION["last_login_update"] > 3600) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_users SET last_login = NOW() WHERE id = " .
                 $_SESSION["uid"]
             );
@@ -901,7 +901,7 @@ class Feeds extends ProtectedHandler
         }
 
         if (!$cat_view && is_numeric($feed) && $feed > 0) {
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds SET last_viewed = NOW()
                             WHERE id = '$feed' AND owner_uid = ".$_SESSION["uid"]
             );
@@ -981,22 +981,22 @@ class Feeds extends ProtectedHandler
 
         $reply['headlines']['content'] .= "<p><span class=\"insensitive\">";
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT ".SUBSTRING_FOR_DATE."(MAX(last_updated), 1, 19) AS last_updated FROM ttrss_feeds
             WHERE owner_uid = " . $_SESSION['uid']
         );
 
-        $last_updated = $this->dbh->fetch_result($result, 0, "last_updated");
+        $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, "last_updated");
         $last_updated = make_local_datetime($last_updated, false);
 
         $reply['headlines']['content'] .= sprintf(__("Feeds last updated at %s"), $last_updated);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(id) AS num_errors
             FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
         );
 
-        $num_errors = $this->dbh->fetch_result($result, 0, "num_errors");
+        $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, "num_errors");
 
         if ($num_errors > 0) {
             $reply['headlines']['content'] .= "<br/>";

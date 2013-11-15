@@ -296,8 +296,7 @@ if (isset($options["convert-filters"])) {
 if (isset($options["update-schema"])) {
     _debug("checking for updates (" . DB_TYPE . ")...");
 
-    $updater = new DbUpdater(Db::get(), DB_TYPE, \SmallSmallRSS\Constants::SCHEMA_VERSION);
-
+    $updater = new \SmallSmallRSS\Database\Updater();
     if ($updater->isUpdateRequired()) {
         _debug(
             "schema update required, version " . $updater->getSchemaVersion()

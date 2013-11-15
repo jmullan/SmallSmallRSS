@@ -5,8 +5,7 @@ class Logger_SQL extends Logger_Abstract implements Logger_Interface
 {
     public static function logError($errno, $errstr, $file, $line, $context)
     {
-        if (\Db::get() && \SmallSmallRSS\Sanity::getSchemaVersion() > 117) {
-
+        if (\SmallSmallRSS\Sanity::getSchemaVersion() > 117) {
             $errno = \SmallSmallRSS\Database::escape_string($errno);
             $errstr = \SmallSmallRSS\Database::escape_string($errstr);
             $file = \SmallSmallRSS\Database::escape_string($file);

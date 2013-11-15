@@ -26,7 +26,7 @@ class Pref_Users extends ProtectedHandler
 
         $uid = sprintf("%d", $_REQUEST["id"]);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT login,
                 ".SUBSTRING_FOR_DATE."(last_login,1,16) AS last_login,
                 access_level,
@@ -37,37 +37,37 @@ class Pref_Users extends ProtectedHandler
                 WHERE id = '$uid'"
         );
 
-        if ($this->dbh->num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
             print "<h1>".__('User not found')."</h1>";
             return;
         }
 
         // print "<h1>User Details</h1>";
 
-        $login = $this->dbh->fetch_result($result, 0, "login");
+        $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
 
         print "<table width='100%'>";
 
         $last_login = make_local_datetime(
-            $this->dbh->fetch_result($result, 0, "last_login"), true
+            \SmallSmallRSS\Database::fetch_result($result, 0, "last_login"), true
         );
 
         $created = make_local_datetime(
-            $this->dbh->fetch_result($result, 0, "created"), true
+            \SmallSmallRSS\Database::fetch_result($result, 0, "created"), true
         );
 
-        $access_level = $this->dbh->fetch_result($result, 0, "access_level");
-        $stored_articles = $this->dbh->fetch_result($result, 0, "stored_articles");
+        $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, "access_level");
+        $stored_articles = \SmallSmallRSS\Database::fetch_result($result, 0, "stored_articles");
 
         print "<tr><td>".__('Registered')."</td><td>$created</td></tr>";
         print "<tr><td>".__('Last logged in')."</td><td>$last_login</td></tr>";
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(id) as num_feeds FROM ttrss_feeds
                 WHERE owner_uid = '$uid'"
         );
 
-        $num_feeds = $this->dbh->fetch_result($result, 0, "num_feeds");
+        $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "num_feeds");
 
         print "<tr><td>".__('Subscribed feeds count')."</td><td>$num_feeds</td></tr>";
 
@@ -75,7 +75,7 @@ class Pref_Users extends ProtectedHandler
 
         print "<h1>".__('Subscribed feeds')."</h1>";
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id,title,site_url FROM ttrss_feeds
                 WHERE owner_uid = '$uid' ORDER BY title"
         );
@@ -83,7 +83,7 @@ class Pref_Users extends ProtectedHandler
 
         print "<ul class=\"userFeedList\">";
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             $icon_file = ICONS_URL."/".$line["id"].".ico";
 
@@ -97,7 +97,7 @@ class Pref_Users extends ProtectedHandler
 
         }
 
-        if ($this->dbh->num_rows($result) < $num_feeds) {
+        if (\SmallSmallRSS\Database::num_rows($result) < $num_feeds) {
             // FIXME - add link to show ALL subscribed feeds here somewhere
             print "<li><img
                     class=\"tinyFeedIcon\" src=\"images/blank_icon.gif\">&nbsp;...</li>";
@@ -116,18 +116,18 @@ class Pref_Users extends ProtectedHandler
     {
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
 
-        $id = $this->dbh->escape_string($_REQUEST["id"]);
+        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
         print "<form id=\"user_edit_form\" onsubmit='return false' dojoType=\"dijit.form.Form\">";
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$id\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-users\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"editSave\">";
 
-        $result = $this->dbh->query("SELECT * FROM ttrss_users WHERE id = '$id'");
+        $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_users WHERE id = '$id'");
 
-        $login = $this->dbh->fetch_result($result, 0, "login");
-        $access_level = $this->dbh->fetch_result($result, 0, "access_level");
-        $email = $this->dbh->fetch_result($result, 0, "email");
+        $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
+        $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, "access_level");
+        $email = \SmallSmallRSS\Database::fetch_result($result, 0, "email");
 
         $sel_disabled = ($id == $_SESSION["uid"]) ? "disabled" : "";
 
@@ -193,10 +193,10 @@ class Pref_Users extends ProtectedHandler
 
     function editSave()
     {
-        $login = $this->dbh->escape_string(trim($_REQUEST["login"]));
-        $uid = $this->dbh->escape_string($_REQUEST["id"]);
+        $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["login"]));
+        $uid = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
         $access_level = (int) $_REQUEST["access_level"];
-        $email = $this->dbh->escape_string(trim($_REQUEST["email"]));
+        $email = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["email"]));
         $password = $_REQUEST["password"];
 
         if ($password) {
@@ -207,7 +207,7 @@ class Pref_Users extends ProtectedHandler
             $pass_query_part = "";
         }
 
-        $this->dbh->query(
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users SET $pass_query_part login = '$login',
                 access_level = '$access_level', email = '$email', otp_enabled = false
                 WHERE id = '$uid'"
@@ -217,13 +217,13 @@ class Pref_Users extends ProtectedHandler
 
     function remove()
     {
-        $ids = explode(",", $this->dbh->escape_string($_REQUEST["ids"]));
+        $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
             if ($id != $_SESSION["uid"] && $id != 1) {
-                $this->dbh->query("DELETE FROM ttrss_tags WHERE owner_uid = '$id'");
-                $this->dbh->query("DELETE FROM ttrss_feeds WHERE owner_uid = '$id'");
-                $this->dbh->query("DELETE FROM ttrss_users WHERE id = '$id'");
+                \SmallSmallRSS\Database::query("DELETE FROM ttrss_tags WHERE owner_uid = '$id'");
+                \SmallSmallRSS\Database::query("DELETE FROM ttrss_feeds WHERE owner_uid = '$id'");
+                \SmallSmallRSS\Database::query("DELETE FROM ttrss_users WHERE id = '$id'");
             }
         }
     }
@@ -231,33 +231,33 @@ class Pref_Users extends ProtectedHandler
     function add()
     {
 
-        $login = $this->dbh->escape_string(trim($_REQUEST["login"]));
+        $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["login"]));
         $tmp_user_pwd = make_password(8);
         $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
         $pwd_hash = encrypt_password($tmp_user_pwd, $salt, true);
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_users WHERE
                 login = '$login'"
         );
 
-        if ($this->dbh->num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_users
                     (login,pwd_hash,access_level,last_login,created, salt)
                     VALUES ('$login', '$pwd_hash', 0, null, NOW(), '$salt')"
             );
 
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_users WHERE
                     login = '$login' AND pwd_hash = '$pwd_hash'"
             );
 
-            if ($this->dbh->num_rows($result) == 1) {
+            if (\SmallSmallRSS\Database::num_rows($result) == 1) {
 
-                $new_uid = $this->dbh->fetch_result($result, 0, "id");
+                $new_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
                     T_sprintf("Added user <b>%s</b> with password <b>%s</b>", $login, $tmp_user_pwd)
@@ -341,7 +341,7 @@ class Pref_Users extends ProtectedHandler
 
     function resetPass()
     {
-        $uid = $this->dbh->escape_string($_REQUEST["id"]);
+        $uid = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
         Pref_Users::resetUserPassword($uid, true);
     }
 
@@ -355,7 +355,7 @@ class Pref_Users extends ProtectedHandler
 
         print "<div id=\"pref-user-toolbar\" dojoType=\"dijit.Toolbar\">";
 
-        $user_search = $this->dbh->escape_string($_REQUEST["search"]);
+        $user_search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
         if (array_key_exists("search", $_REQUEST)) {
             $_SESSION["prefs_user_search"] = $user_search;
@@ -370,7 +370,7 @@ class Pref_Users extends ProtectedHandler
             __('Search')."</button>
                 </div>";
 
-        $sort = $this->dbh->escape_string($_REQUEST["sort"]);
+        $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);
 
         if (!$sort || $sort == "undefined") {
             $sort = "login";
@@ -424,7 +424,7 @@ class Pref_Users extends ProtectedHandler
             $user_search_query = "";
         }
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT
                     id,login,access_level,email,
                     ".SUBSTRING_FOR_DATE."(last_login,1,16) as last_login,
@@ -437,7 +437,7 @@ class Pref_Users extends ProtectedHandler
                 ORDER BY $sort"
         );
 
-        if ($this->dbh->num_rows($result) > 0) {
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
 
             print "<p><table width=\"100%\" cellspacing=\"0\"
                 class=\"prefUserList\" id=\"prefUserList\">";
@@ -451,7 +451,7 @@ class Pref_Users extends ProtectedHandler
 
             $lnum = 0;
 
-            while ($line = $this->dbh->fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
                 $uid = $line["id"];
 

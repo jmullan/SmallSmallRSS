@@ -9,7 +9,6 @@ class Plugin
 
     function init($host)
     {
-        $this->dbh = $host->get_dbh();
         $this->host = $host;
     }
 

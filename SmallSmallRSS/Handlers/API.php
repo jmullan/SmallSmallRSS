@@ -23,7 +23,7 @@ class API extends Handler
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
-            $value = $this->dbh->escape_string($_REQUEST[$key]);
+            $value = \SmallSmallRSS\Database::escape_string($_REQUEST[$key]);
         }
         return $value;
     }
@@ -77,9 +77,9 @@ class API extends Handler
             $login = "admin";
         }
 
-        $result = $this->dbh->query("SELECT id FROM ttrss_users WHERE login = '$login'");
-        if ($this->dbh->num_rows($result) != 0) {
-            $uid = $this->dbh->fetch_result($result, 0, "id");
+        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE login = '$login'");
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            $uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
         }
         if (!$uid) {
             \SmallSmallRss\Logger::log("Could not find user: '$login'");
@@ -164,7 +164,7 @@ class API extends Handler
             $nested_qpart = "true";
         }
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT
                 id, title, order_id, (SELECT COUNT(id) FROM
                 ttrss_feeds WHERE
@@ -179,7 +179,7 @@ class API extends Handler
 
         $cats = array();
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             if ($include_empty || $line["num_feeds"] > 0 || $line["num_cats"] > 0) {
                 $unread = getFeedUnread($line["id"], true);
 
@@ -309,17 +309,17 @@ class API extends Handler
 
             $article_ids = join(", ", $article_ids);
 
-            $result = $this->dbh->query("UPDATE ttrss_user_entries SET $field = $set_to $additional_fields WHERE ref_id IN ($article_ids) AND owner_uid = " . $_SESSION["uid"]);
+            $result = \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries SET $field = $set_to $additional_fields WHERE ref_id IN ($article_ids) AND owner_uid = " . $_SESSION["uid"]);
 
-            $num_updated = $this->dbh->affected_rows($result);
+            $num_updated = \SmallSmallRSS\Database::affected_rows($result);
 
             if ($num_updated > 0 && $field == "unread") {
-                $result = $this->dbh->query(
+                $result = \SmallSmallRSS\Database::query(
                     "SELECT DISTINCT feed_id FROM ttrss_user_entries
                     WHERE ref_id IN ($article_ids)"
                 );
 
-                while ($line = $this->dbh->fetch_assoc($result)) {
+                while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                     \SmallSmallRSS\CounterCache::update($line["feed_id"], $_SESSION["uid"]);
                 }
             }
@@ -359,13 +359,13 @@ class API extends Handler
                 WHERE    id IN ($article_id) AND ref_id = id AND owner_uid = " .
                 $_SESSION["uid"];
 
-            $result = $this->dbh->query($query);
+            $result = \SmallSmallRSS\Database::query($query);
 
             $articles = array();
 
-            if ($this->dbh->num_rows($result) != 0) {
+            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
 
-                while ($line = $this->dbh->fetch_assoc($result)) {
+                while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
                     $attachments = get_article_enclosures($line['id']);
 
@@ -411,12 +411,12 @@ class API extends Handler
 
         $config["daemon_is_running"] = file_is_locked("update_daemon.lock");
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(*) AS cf FROM
             ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]
         );
 
-        $num_feeds = $this->dbh->fetch_result($result, 0, "cf");
+        $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "cf");
 
         $config["num_feeds"] = (int) $num_feeds;
 
@@ -454,7 +454,7 @@ class API extends Handler
 
         $rv = array();
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id, caption, fg_color, bg_color
             FROM ttrss_labels2
             WHERE owner_uid = '".$_SESSION['uid']."' ORDER BY caption"
@@ -467,7 +467,7 @@ class API extends Handler
             $article_labels = array();
         }
 
-        while ($line = $this->dbh->fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
             $checked = false;
             foreach ($article_labels as $al) {
@@ -495,7 +495,7 @@ class API extends Handler
         $label_id = (int) $this->escape_from_request('label_id');
         $assign = (bool) $this->escape_from_request('assign') == "true";
 
-        $label = $this->dbh->escape_string(\SmallSmallRSS\Labels::findCaption(
+        $label = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Labels::findCaption(
             $label_id, $_SESSION["uid"]
         ));
 
@@ -549,9 +549,9 @@ class API extends Handler
 
     function shareToPublished()
     {
-        $title = $this->dbh->escape_string(strip_tags($_REQUEST["title"]));
-        $url = $this->dbh->escape_string(strip_tags($_REQUEST["url"]));
-        $content = $this->dbh->escape_string(strip_tags($_REQUEST["content"]));
+        $title = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["title"]));
+        $url = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["url"]));
+        $content = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["content"]));
 
         if (Article::create_published_article($title, $url, $content, "", $_SESSION["uid"])) {
             $this->wrap(self::STATUS_OK, array("status" => 'OK'));
@@ -795,12 +795,12 @@ class API extends Handler
     {
         $feed_id = (int) $this->escape_from_request("feed_id");
 
-        $result = $this->dbh->query(
+        $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_feeds WHERE
             id = '$feed_id' AND owner_uid = ".$_SESSION["uid"]
         );
 
-        if ($this->dbh->num_rows($result) != 0) {
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
             Pref_Feeds::remove_feed($feed_id, $_SESSION["uid"]);
             $this->wrap(self::STATUS_OK, array("status" => "OK"));
         } else {
@@ -848,20 +848,20 @@ class API extends Handler
     {
 
         if ($id == -2) {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT COUNT(*) AS count FROM ttrss_labels2
                 WHERE owner_uid = " . $_SESSION["uid"]
             );
 
-            return $this->dbh->fetch_result($result, 0, "count") == 0;
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "count") == 0;
 
         } elseif ($id == 0) {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT COUNT(*) AS count FROM ttrss_feeds
                 WHERE cat_id IS NULL AND owner_uid = " . $_SESSION["uid"]
             );
 
-            return $this->dbh->fetch_result($result, 0, "count") == 0;
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "count") == 0;
 
         }
 

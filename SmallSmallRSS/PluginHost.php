@@ -47,8 +47,6 @@ class PluginHost
 
     function __construct()
     {
-        $this->dbh = \Db::get();
-
         $this->storage = array();
     }
 
@@ -73,11 +71,6 @@ class PluginHost
     function get_link()
     {
         return false;
-    }
-
-    function get_dbh()
-    {
-        return $this->dbh;
     }
 
     function get_plugins()
@@ -290,12 +283,12 @@ class PluginHost
     function load_data($force = false)
     {
         if ($this->owner_uid)  {
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT name, content FROM ttrss_plugin_storage
                 WHERE owner_uid = '".$this->owner_uid."'"
             );
 
-            while ($line = $this->dbh->fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $this->storage[$line["name"]] = unserialize($line["content"]);
             }
         }
@@ -304,11 +297,11 @@ class PluginHost
     private function save_data($plugin)
     {
         if ($this->owner_uid) {
-            $plugin = $this->dbh->escape_string($plugin);
+            $plugin = \SmallSmallRSS\Database::escape_string($plugin);
 
-            $this->dbh->query("BEGIN");
+            \SmallSmallRSS\Database::query("BEGIN");
 
-            $result = $this->dbh->query(
+            $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_plugin_storage WHERE
                 owner_uid= '".$this->owner_uid."' AND name = '$plugin'"
             );
@@ -317,26 +310,26 @@ class PluginHost
                 $this->storage[$plugin] = array();
             }
 
-            $content = $this->dbh->escape_string(
+            $content = \SmallSmallRSS\Database::escape_string(
                 serialize($this->storage[$plugin]),
                 false
             );
 
-            if ($this->dbh->num_rows($result) != 0) {
-                $this->dbh->query(
+            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_plugin_storage SET content = '$content'
                     WHERE owner_uid= '".$this->owner_uid."' AND name = '$plugin'"
                 );
 
             } else {
-                $this->dbh->query(
+                \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_plugin_storage
                     (name,owner_uid,content) VALUES
                     ('$plugin','".$this->owner_uid."','$content')"
                 );
             }
 
-            $this->dbh->query("COMMIT");
+            \SmallSmallRSS\Database::query("COMMIT");
         }
     }
 
@@ -381,7 +374,7 @@ class PluginHost
 
             unset($this->storage[$idx]);
 
-            $this->dbh->query(
+            \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_plugin_storage WHERE name = '$idx'
                 AND owner_uid = " . $this->owner_uid
             );

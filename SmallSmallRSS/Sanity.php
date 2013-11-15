@@ -111,7 +111,10 @@ class Sanity
             }
 
             if (strlen(FEED_CRYPT_KEY) > 0 && !function_exists("mcrypt_decrypt")) {
-                array_push($errors, "FEED_CRYPT_KEY requires mcrypt functions which are not found.");
+                array_push(
+                    $errors,
+                    "FEED_CRYPT_KEY requires mcrypt functions which are not found."
+                );
             }
 
             if (SINGLE_USER_MODE) {
@@ -198,8 +201,8 @@ class Sanity
         }
 
         if (count($errors) > 0 && $_SERVER['REQUEST_URI']) {
-            $insane = \SmallSmallRSS\Renderers\Insane($errors);
-
+            $insane = new \SmallSmallRSS\Renderers\Insane($errors);
+            $insane->render();
             exit;
         } elseif (count($errors) > 0) {
             echo "Tiny Tiny RSS was unable to start properly. This usually means a misconfiguration";

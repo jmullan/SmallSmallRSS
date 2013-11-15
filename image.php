@@ -2,22 +2,18 @@
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
-                 get_include_path());
-
-@$hash = basename($_GET['hash']);
-
+$hash = null;
+if (isset($_GET['hash'])) {
+  $hash = basename($_GET['hash']);
+}
 if ($hash) {
-
     $filename = CACHE_DIR . '/images/' . $hash . '.png';
-
     if (file_exists($filename)) {
         /* See if we can use X-Sendfile */
         $xsendfile = false;
-        if (function_exists('apache_get_modules') && 
-            array_search('mod_xsendfile', apache_get_modules()))
+        if (function_exists('apache_get_modules')
+            && array_search('mod_xsendfile', apache_get_modules()))
             $xsendfile = true;
-
         if ($xsendfile) {
             header("X-Sendfile: $filename");
             header("Content-type: application/octet-stream");
@@ -29,7 +25,7 @@ if ($hash) {
             readfile($filename);
         }
     } else {
-        header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found");
+        header($_SERVER["SERVER_PROTOCOL"] . " 404 Not Found");
         echo "File not found.";
     }
 }

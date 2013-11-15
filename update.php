@@ -3,13 +3,11 @@
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR . get_include_path());
-
 define('DISABLE_SESSIONS', true);
 
 chdir(dirname(__FILE__));
 
-require_once "rssfuncs.php";
+require_once __DIR__ . "/include/rssfuncs.php";
 \SmallSmallRSS\Sanity::initialCheck();
 
 if (!defined('PHP_EXECUTABLE')) {
@@ -136,6 +134,7 @@ if (isset($options["force-update"])) {
 }
 
 if (isset($options["feeds"])) {
+    $op = '';
     update_daemon_common();
     housekeeping_common(true);
     \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
@@ -160,6 +159,7 @@ if (isset($options["daemon"])) {
 }
 
 if (isset($options["daemon-loop"])) {
+    $op = null;
     if (!make_stampfile('update_daemon.stamp')) {
         _debug("warning: unable to create stampfile\n");
     }
@@ -207,7 +207,7 @@ if (isset($options["indexes"])) {
         );
     }
 
-    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
         if (DB_TYPE == "pgsql") {
             $statement = "DROP INDEX " . $line["relname"];
             _debug($statement);
@@ -222,7 +222,7 @@ if (isset($options["indexes"])) {
 
     $fp = fopen("schema/ttrss_schema_" . DB_TYPE . ".sql", "r");
     if ($fp) {
-        while ($line = fgets($fp)) {
+      while (($line = fgets($fp))) {
             $matches = array();
 
             if (preg_match("/^create index ([^ ]+) on ([^ ]+)$/i", $line, $matches)) {
@@ -255,7 +255,7 @@ if (isset($options["convert-filters"])) {
 
     $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_filters ORDER BY id");
 
-    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
         $owner_uid = $line["owner_uid"];
 
         // date filters are removed

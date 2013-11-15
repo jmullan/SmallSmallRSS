@@ -3,12 +3,9 @@ if (file_exists("install") && !file_exists("config.php")) {
     header("Location: install/");
 }
 
-set_include_path(dirname(__FILE__) ."/include" . PATH_SEPARATOR .
-                 get_include_path());
-
 if (!file_exists("config.php")) {
-    print "<b>Fatal Error</b>: You forgot to copy
-		<b>config.php-dist</b> to <b>config.php</b> and edit it.\n";
+    print "<b>Fatal Error</b>:";
+    print "You forgot to copy <b>config.php-dist</b> to <b>config.php</b> and edit it.\n";
     exit;
 }
 require_once __DIR__ . '/config.php';

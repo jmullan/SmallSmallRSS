@@ -3,8 +3,7 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 $op = (isset($_REQUEST['op']) ? $_REQUEST["op"] : '');
-@$method = (!empty($_REQUEST['subop']) ? $_REQUEST['subop'] : $_REQUEST["method"]);
-
+$method = (!empty($_REQUEST['subop']) ? $_REQUEST['subop'] : $_REQUEST["method"]);
 if (!$method) {
     $method = 'index';
 } else {

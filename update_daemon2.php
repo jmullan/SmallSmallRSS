@@ -3,17 +3,9 @@
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-set_include_path(
-    dirname(__FILE__) ."/include" . PATH_SEPARATOR . get_include_path()
-);
 
-declare (ticks = 1);
-chdir(dirname(__FILE__));
-
+chdir(__DIR__);
 define('DISABLE_SESSIONS', true);
-
-require_once "rssfuncs.php";
-
 // defaults
 define_default('PURGE_INTERVAL', 3600); // seconds
 define_default('MAX_CHILD_RUNTIME', 1800); // seconds
@@ -27,14 +19,13 @@ if (!function_exists('pcntl_fork')) {
 }
 
 $master_handlers_installed = false;
-
-
 $last_checkpoint = -1;
 
 function sigchld_handler($signal)
 {
     $running_jobs = \SmallSmallRSS\Daemon::reap_children();
     _debug("[SIGCHLD] jobs left: $running_jobs");
+    $status = null;
     pcntl_waitpid(-1, $status, WNOHANG);
 }
 

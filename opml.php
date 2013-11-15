@@ -1,10 +1,6 @@
 <?php
-require_once __DIR__ . "/../config.php";
+require_once __DIR__ . "/config.php";
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
-
-set_include_path(
-    dirname(__FILE__) ."/include" . PATH_SEPARATOR . get_include_path()
-);
 
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initialCheck();

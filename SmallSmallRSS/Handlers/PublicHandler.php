@@ -945,9 +945,7 @@ class PublicHandler extends Handler
 
         <?php
                                   @$op = $_REQUEST["subop"];
-                                  $updater = new DbUpdater(
-                                      \Db::get(), DB_TYPE, \SmallSmallRSS\Constants::SCHEMA_VERSION
-                                  );
+                                  $updater = new \SmallSmallRSS\Database\Updater();
 
         if ($op == "performupdate") {
             if ($updater->isUpdateRequired()) {

@@ -1,3 +1,14 @@
 AddType image/svg+xml svg
 AddType image/svg+xml svgz
-
+<Files ~ "^\.htaccess">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files ~ "~$">
+  Order allow,deny
+  Deny from all
+</Files>
+<Files ~ ".bak$">
+  Order allow,deny
+  Deny from all
+</Files>

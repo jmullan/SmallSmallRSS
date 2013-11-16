@@ -9,18 +9,18 @@ class Database
         if (!self::$adapter) {
             $er = error_reporting(E_ALL);
             if (defined('_ENABLE_PDO') && _ENABLE_PDO && class_exists("PDO")) {
-                self::$adapter = new \Db_PDO();
+                self::$adapter = new \SmallSmallRSS\Database\PDOWrapper();
             } else {
                 switch (DB_TYPE) {
                     case "mysql":
                         if (function_exists("mysqli_connect")) {
-                            self::$adapter = new \Db_Mysqli();
+                            self::$adapter = new \SmallSmallRSS\Database\MySQLi();
                         } else {
-                            self::$adapter = new \Db_Mysql();
+                            self::$adapter = new \SmallSmallRSS\Database\MySQL();
                         }
                         break;
                     case "pgsql":
-                        self::$adapter = new \Db_Pgsql();
+                        self::$adapter = new \SmallSmallRSS\Database\PostgreSQL();
                         break;
                     default:
                         die("Unknown DB_TYPE: " . DB_TYPE);

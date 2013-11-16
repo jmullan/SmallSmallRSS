@@ -1,5 +1,7 @@
 <?php
-class Db_Mysqli implements IDb
+namespace SmallSmallRSS\Database;
+
+class MySQLi implements DatabaseInterface
 {
     private $link;
 

@@ -1,5 +1,7 @@
 <?php
-interface IDb
+namespace SmallSmallRSS\Database;
+
+interface DatabaseInterface
 {
     function connect($host, $user, $pass, $db, $port);
     function escape_string($s, $strip_tags = true);

@@ -21,24 +21,25 @@ if [ ! -d "dojo" ]; then
 fi
 
 if [ -d util/buildscripts/ ]; then
-	rm -rf release/dojo
+    rm -rf release/dojo
 
-	pushd util/buildscripts
-	    ./build.sh profile=../../tt-rss action=release optimize=shrinksafe cssOptimize=comments
-	popd
+    pushd util/buildscripts
+    # ./build.sh profile=../../tt-rss action=release optimize=shrinksafe cssOptimize=comments
+    ./build.sh profile=../../tt-rss action=release cssOptimize=comments
+    popd
 
-	if [ -d release/dojo ]; then
-		rm -rf ../dojo ../dijit
-		cp -r release/dojo/dojo ..
-		cp -r release/dojo/dijit ..
+    if [ -d release/dojo ]; then
+	rm -rf ../dojo ../dijit
+	cp -r release/dojo/dojo ..
+	cp -r release/dojo/dijit ..
 
-		cd ..
+	cd ..
 
-		find dojo -name '*uncompressed*' -exec rm -- {} \;
-		find dijit -name '*uncompressed*' -exec rm -- {} \;
-	else
-		echo $0: ERROR: Dojo build seems to have failed.
-	fi
+	find dojo -name '*uncompressed*' -delete
+	find dijit -name '*uncompressed*' -delete
+    else
+	echo $0: ERROR: Dojo build seems to have failed.
+    fi
 else
-	echo $0: ERROR: Please unpack Dojo source release into current directory.
+    echo $0: ERROR: Please unpack Dojo source release into current directory.
 fi

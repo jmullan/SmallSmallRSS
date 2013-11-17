@@ -848,27 +848,29 @@ function file_is_locked($filename)
 
 function make_lockfile($filename)
 {
-    $fp = fopen(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename", "w");
-
-    if ($fp && flock($fp, LOCK_EX | LOCK_NB)) {
-        $stat_h = fstat($fp);
-        $stat_f = stat(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename");
-
-        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-            if ($stat_h["ino"] != $stat_f["ino"] ||
-                $stat_h["dev"] != $stat_f["dev"]) {
-
-                return false;
-            }
-        }
-
-        if (function_exists('posix_getpid')) {
-            fwrite($fp, posix_getpid() . "\n");
-        }
-        return $fp;
-    } else {
+    $file = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename";
+    $fp = fopen($file, "w");
+    if (!$fp) {
+        \SmallSmallRSS\Logger::Log("Could not get lockfile pointer to $file");
         return false;
     }
+    if (!flock($fp, LOCK_EX | LOCK_NB)) {
+        \SmallSmallRSS\Logger::Log("Could not get lock on $file");
+        return false;
+    }
+    $stat_h = fstat($fp);
+    $stat_f = stat(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename");
+    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
+        if ($stat_h["ino"] != $stat_f["ino"] ||
+            $stat_h["dev"] != $stat_f["dev"]) {
+            \SmallSmallRSS\Logger::log('lockfile stats do not match.');
+            return false;
+        }
+    }
+    if (function_exists('posix_getpid')) {
+        fwrite($fp, posix_getpid() . "\n");
+    }
+    return $fp;
 }
 
 function make_stampfile($filename)

@@ -133,6 +133,9 @@ class PluginHost
         $this->owner_uid = (int) $owner_uid;
         foreach ($plugins as $class) {
             $class = trim($class);
+            if (!$class) {
+                continue;
+            }
             $class_file = strtolower(basename($class));
             $class_dir = __DIR__ . "/../plugins/$class_file";
             if (!is_dir($class_dir)) {

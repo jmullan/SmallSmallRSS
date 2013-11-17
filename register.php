@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Sanity::initialCheck();
 \SmallSmallRSS\Session::init();
@@ -8,7 +7,7 @@ startup_gettext();
 
 $action = $_REQUEST["action"];
 
-if (!init_plugins()) {
+if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
 
@@ -16,16 +15,16 @@ if ($_REQUEST["format"] == "feed") {
     header("Content-Type: text/xml");
     print '<?xml version="1.0" encoding="utf-8"?>';
     print "<feed xmlns=\"http://www.w3.org/2005/Atom\">
-            <id>".htmlspecialchars(SELF_URL_PATH . "/register.php")."</id>
+            <id>".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php")."</id>
             <title>Tiny Tiny RSS registration slots</title>
-            <link rel=\"self\" href=\"".htmlspecialchars(SELF_URL_PATH . "/register.php?format=feed")."\"/>
-            <link rel=\"alternate\" href=\"".htmlspecialchars(SELF_URL_PATH)."\"/>";
+            <link rel=\"self\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php?format=feed")."\"/>
+            <link rel=\"alternate\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'))."\"/>";
 
-    if (ENABLE_REGISTRATION) {
+    if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
         $result = \SmallSmallRSS\Database::query("SELECT COUNT(*) AS cu FROM ttrss_users");
         $num_users = \SmallSmallRSS\Database::fetch_result($result, 0, "cu");
 
-        $num_users = REG_MAX_USERS - $num_users;
+        $num_users = \SmallSmallRSS\Config::get('REG_MAX_USERS') - $num_users;
         if ($num_users < 0) $num_users = 0;
         $reg_suffix = "enabled";
     } else {
@@ -34,8 +33,8 @@ if ($_REQUEST["format"] == "feed") {
     }
 
     print "<entry>
-            <id>".htmlspecialchars(SELF_URL_PATH)."/register.php?$num_users"."</id>
-            <link rel=\"alternate\" href=\"".htmlspecialchars(SELF_URL_PATH . "/register.php")."\"/>";
+            <id>".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'))."/register.php?$num_users"."</id>
+            <link rel=\"alternate\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php")."\"/>";
 
     print "<title>$num_users slots are currently available, registration $reg_suffix</title>";
     print "<summary>$num_users slots are currently available, registration $reg_suffix</summary>";
@@ -49,7 +48,7 @@ if ($_REQUEST["format"] == "feed") {
 
 /* Remove users which didn't login after receiving their registration information */
 
-if (DB_TYPE == "pgsql") {
+if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
     \SmallSmallRSS\Database::query(
         "DELETE FROM ttrss_users WHERE last_login IS NULL
          AND created < NOW() - INTERVAL '1 day' AND access_level = 0"
@@ -172,7 +171,7 @@ function validateRegForm() {
     <div class="content">
 
 <?php
-    if (!ENABLE_REGISTRATION) {
+    if (!\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
         \SmallSmallRSS\Renderers\Messages::renderError(
             __("New user registrations are administratively disabled."));
 
@@ -184,12 +183,15 @@ function validateRegForm() {
     }
 ?>
 
-<?php if (REG_MAX_USERS > 0) {
+<?php if (\SmallSmallRSS\Config::get('REG_MAX_USERS') > 0) {
 $result = \SmallSmallRSS\Database::query("SELECT COUNT(*) AS cu FROM ttrss_users");
 $num_users = \SmallSmallRSS\Database::fetch_result($result, 0, "cu");
 } ?>
 
-<?php if (!REG_MAX_USERS || $num_users < REG_MAX_USERS) { ?>
+<?php
+if (!\SmallSmallRSS\Config::get('REG_MAX_USERS')
+    || $num_users < \SmallSmallRSS\Config::get('REG_MAX_USERS')) {
+?>
     <?php if (!$action) { ?>
 
     <p><?php echo __('Your temporary password will be sent to the specified email. Accounts, which were not logged in once, are erased automatically 24 hours after temporary password is sent.') ?></p>
@@ -299,23 +301,33 @@ $num_users = \SmallSmallRSS\Database::fetch_result($result, 0, "cu");
                     unset($reg_text);
                     unset($mail);
                     unset($rc);
-                    $reg_text = "Hi!\n".
-                        "\n".
-                        "New user had registered at your Tiny Tiny RSS installation.\n".
-                        "\n".
-                        "Login: $login\n".
-                        "Email: $email\n";
+                    $reg_text = "Hi!\n"
+                        . "\n"
+                        . "A new user has registered at your Tiny Tiny RSS installation.\n"
+                        . "\n"
+                        . "Login: $login\n"
+                        . "Email: $email\n";
 
 
                     $mail = new \SmallSmallRSS\Mailer();
                     $mail->IsHTML(false);
-                    $rc = $mail->quickMail(REG_NOTIFY_ADDRESS, "", "Registration notice for Tiny Tiny RSS", $reg_text, false);
-                    if (!$rc) {
-                                            \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
-                                        }
+                    $reg_notify_address = \SmallSmallRSS\Config::get('REG_NOTIFY_ADDRESS');
+                    if (strlen($reg_notify_address)) {
+                        $rc = $mail->quickMail(
+                            $reg_notify_address,
+                            '',
+                            "Registration notice for Tiny Tiny RSS",
+                            $reg_text,
+                            false
+                        );
+                        if (!$rc) {
+                            \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
+                        }
+                    }
 
                     \SmallSmallRSS\Renderers\Messages::renderNotice(
-                                            __("Account created successfully."));
+                        __("Account created successfully.")
+                    );
 
                     print "<p><form method=\"GET\" action=\"index.php\">
                     <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
@@ -327,26 +339,21 @@ $num_users = \SmallSmallRSS\Database::fetch_result($result, 0, "cu");
 
                 } else {
                     \SmallSmallRSS\Renderers\Messages::renderError(
-                        'Plese check the form again, you have failed the robot test.');
+                        'Plese check the form again, you have failed the robot test.'
+                    );
                     print "<p><form method=\"GET\" action=\"index.php\">
-                <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                </form>";
+                           <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />
+                           </form>";
 
-                }
-}
-    ?>
-
-<?php } else { ?>
-
-    <?php \SmallSmallRSS\Renderers\Messages::renderNotice(__('New user registrations are currently closed.')) ?>
-
-    <?php print "<p><form method=\"GET\" action=\"index.php\">
-                <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                </form>"; ?>
-
-<?php } ?>
+         }
+    }
+} else {
+    \SmallSmallRSS\Renderers\Messages::renderNotice(__('New user registrations are currently closed.'));
+    print "<p><form method=\"GET\" action=\"index.php\">
+           <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />
+           </form>";
+} ?>
 
     </div>
-
 </body>
 </html>

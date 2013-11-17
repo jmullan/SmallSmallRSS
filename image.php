@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 $hash = null;
@@ -7,7 +6,7 @@ if (isset($_GET['hash'])) {
   $hash = basename($_GET['hash']);
 }
 if ($hash) {
-    $filename = CACHE_DIR . '/images/' . $hash . '.png';
+    $filename = \SmallSmallRSS\Config::get('CACHE_DIR') . '/images/' . $hash . '.png';
     if (file_exists($filename)) {
         /* See if we can use X-Sendfile */
         $xsendfile = false;

@@ -251,8 +251,7 @@ class Pref_Prefs extends ProtectedHandler
         print "<tr><td width=\"40%\">".__('E-mail')."</td>";
         print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" name=\"email\" required=\"1\" value=\"$email\"></td></tr>";
 
-        if (!SINGLE_USER_MODE && empty($_SESSION["hide_hello"])) {
-
+        if (!\SmallSmallRSS\Auth::is_single_user_mode() && empty($_SESSION["hide_hello"])) {
             $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, "access_level");
             print "<tr><td width=\"40%\">".__('Access level')."</td>";
             print "<td>" . $access_level_names[$access_level] . "</td></tr>";
@@ -635,7 +634,7 @@ class Pref_Prefs extends ProtectedHandler
 
                 $checked = ($value == "true") ? "checked=\"checked\"" : "";
 
-                if ($pref_name == "PURGE_UNREAD_ARTICLES" && FORCE_ARTICLE_PURGE != 0) {
+                if ($pref_name == "PURGE_UNREAD_ARTICLES" && \SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') != 0) {
                     $disabled = "disabled=\"1\"";
                     $checked = "checked=\"checked\"";
                 } else {
@@ -650,9 +649,9 @@ class Pref_Prefs extends ProtectedHandler
 
                 $regexp = ($type_name == 'integer') ? 'regexp="^\d*$"' : '';
 
-                if ($pref_name == "PURGE_OLD_DAYS" && FORCE_ARTICLE_PURGE != 0) {
+                if ($pref_name == "PURGE_OLD_DAYS" && \SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') != 0) {
                     $disabled = "disabled=\"1\"";
-                    $value = FORCE_ARTICLE_PURGE;
+                    $value = \SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE');
                 } else {
                     $disabled = "";
                 }
@@ -794,8 +793,8 @@ class Pref_Prefs extends ProtectedHandler
                 <td width='5%'>".__('Version')."</td>
                 <td width='10%'>".__('Author')."</td></tr>";
 
-        $system_enabled = array_map("trim", explode(",", PLUGINS));
-        $user_enabled = array_map("trim", explode(",", \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS")));
+        $system_enabled = array_map('trim', explode(",", \SmallSmallRSS\Config::get('PLUGINS')));
+        $user_enabled = array_map('trim', explode(",", \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS")));
 
         $tmppluginhost = new \SmallSmallRSS\PluginHost();
         $tmppluginhost->load_all($tmppluginhost::KIND_ALL, $_SESSION["uid"]);

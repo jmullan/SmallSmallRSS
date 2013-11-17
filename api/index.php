@@ -1,6 +1,5 @@
 <?php
 chdir("..");
-define('TTRSS_SESSION_NAME', 'ttrss_api_sid');
 define('AUTH_DISABLE_OTP', true);
 
 $input = file_get_contents("php://input");
@@ -22,13 +21,12 @@ if (!empty($_REQUEST["sid"])) {
     session_id($_REQUEST["sid"]);
 }
 
-require_once __DIR__ . "/../config.php";
 require_once __DIR__ . '/../SmallSmallRSS/bootstrap.php';
 
-\SmallSmallRSS\Session::init();
+\SmallSmallRSS\Session::init('ttrss_api_sid');
 \SmallSmallRSS\Sanity::initialCheck();
 
-if (!init_plugins()) {
+if (!\SmallSmallRSS\PluginHost::init_all()) {
     Logger::log('Error initializing plugins');
     return;
 }

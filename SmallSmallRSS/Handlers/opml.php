@@ -534,7 +534,7 @@ class Opml extends ProtectedHandler
         $tmp_file = false;
 
         if (is_uploaded_file($_FILES['opml_file']['tmp_name'])) {
-            $tmp_file = tempnam(CACHE_DIR . '/upload', 'opml');
+            $tmp_file = tempnam(\SmallSmallRSS\Config::get('CACHE_DIR') . '/upload', 'opml');
 
             $result = move_uploaded_file(
                 $_FILES['opml_file']['tmp_name'],

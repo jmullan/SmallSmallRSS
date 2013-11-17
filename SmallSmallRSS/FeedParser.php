@@ -64,13 +64,13 @@ class FeedParser
             if ($root) {
                 switch (mb_strtolower($root->tagName)) {
                     case "rdf:rdf":
-                        $this->type = $this::FEED_RDF;
+                        $this->type = self::FEED_RDF;
                         break;
                     case "channel":
-                        $this->type = $this::FEED_RSS;
+                        $this->type = self::FEED_RSS;
                         break;
                     case "feed":
-                        $this->type = $this::FEED_ATOM;
+                        $this->type = self::FEED_ATOM;
                         break;
                     default:
                         if (!isset($this->error)) {
@@ -81,7 +81,7 @@ class FeedParser
             }
 
             switch ($this->type) {
-                case $this::FEED_ATOM:
+                case self::FEED_ATOM:
 
                     $title = $xpath->query("//atom:feed/atom:title")->item(0);
 
@@ -113,7 +113,7 @@ class FeedParser
                     }
 
                     break;
-                case $this::FEED_RSS:
+                case self::FEED_RSS:
                     $title = $xpath->query("//channel/title")->item(0);
 
                     if ($title) {
@@ -137,7 +137,7 @@ class FeedParser
                     }
 
                     break;
-                case $this::FEED_RDF:
+                case self::FEED_RDF:
                     $xpath->registerNamespace('rssfake', 'http://purl.org/rss/1.0/');
 
                     $title = $xpath->query("//rssfake:channel/rssfake:title")->item(0);
@@ -209,7 +209,7 @@ class FeedParser
         $rv = array();
 
         switch ($this->type) {
-            case $this::FEED_ATOM:
+            case self::FEED_ATOM:
                 $links = $this->xpath->query("//atom:feed/atom:link");
 
                 foreach ($links as $link) {
@@ -218,7 +218,7 @@ class FeedParser
                     }
                 }
                 break;
-            case $this::FEED_RSS:
+            case self::FEED_RSS:
                 $links = $this->xpath->query("//atom:link");
 
                 foreach ($links as $link) {

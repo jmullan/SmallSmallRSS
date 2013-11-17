@@ -586,7 +586,7 @@ class RPC extends ProtectedHandler
     public function updaterandomfeed()
     {
         // Test if the feed need a update (update interval exceded).
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $update_limit_qpart = "AND ((
                     ttrss_feeds.update_interval = 0
                     AND ttrss_feeds.last_updated < NOW() - CAST((ttrss_user_prefs.value || ' minutes') AS INTERVAL)
@@ -609,7 +609,7 @@ class RPC extends ProtectedHandler
         }
 
         // Test if feed is currently being updated by another process.
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $updstart_thresh_qpart = "
                  AND (
                      ttrss_feeds.last_update_started IS NULL

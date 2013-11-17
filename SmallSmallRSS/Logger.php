@@ -46,7 +46,7 @@ class Logger
 
     public function __construct()
     {
-        switch (LOG_DESTINATION) {
+        switch (\SmallSmallRSS\Config::get('LOG_DESTINATION')) {
             case "sql":
                 $this->adapter = new Logger_SQL();
                 break;

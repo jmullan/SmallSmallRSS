@@ -71,7 +71,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
             $tmp_file = false;
 
             if (is_uploaded_file($_FILES['starred_file']['tmp_name'])) {
-                $tmp_file = tempnam(CACHE_DIR . '/upload', 'starred');
+                $tmp_file = tempnam(\SmallSmallRSS\Config::get('CACHE_DIR') . '/upload', 'starred');
 
                 $result = move_uploaded_file($_FILES['starred_file']['tmp_name'],
                                              $tmp_file);

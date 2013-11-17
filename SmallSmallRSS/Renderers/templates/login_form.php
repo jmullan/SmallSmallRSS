@@ -53,7 +53,8 @@ if (!empty($login_error_msg)) {
       <input type="password" name="password" required="1"
         style="width : 220px" class="input"
         value="<?php echo $fake_password ?>"/>
-    <?php if (strpos(PLUGINS, "auth_internal") !== false) { ?>
+<?php
+if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_internal") !== false) { ?>
       <a class='forgotpass' href="public.php?op=forgotpass"><?php echo __("I forgot my password") ?></a>
     <?php } ?>
     </div>
@@ -79,7 +80,7 @@ if (!empty($login_error_msg)) {
 <?php echo __("Does not display images in articles, reduces automatic refreshes."); ?>
     </div>
 
-    <?php if (SESSION_COOKIE_LIFETIME > 0) { ?>
+    <?php if (\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') > 0) { ?>
 
     <div class="row">
       <label>&nbsp;</label>
@@ -91,7 +92,7 @@ if (!empty($login_error_msg)) {
 
       <div class="row" style='text-align : right'>
         <button dojoType="dijit.form.Button" type="submit"><?php echo __('Log in') ?></button>
-        <?php if (defined('ENABLE_REGISTRATION') && ENABLE_REGISTRATION) { ?>
+        <?php if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) { ?>
         <button onclick="return gotoRegForm()" dojoType="dijit.form.Button">
           <?php echo __("Create new account") ?>
         </button>
@@ -143,7 +144,7 @@ function gotoRegForm() {
 function bwLimitChange(elem) {
     try {
         var limit_set = elem.checked;
-        setCookie("ttrss_bwlimit", limit_set, <?php print SESSION_COOKIE_LIFETIME ?>);
+        setCookie("ttrss_bwlimit", limit_set, <?php print \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') ?>);
             } catch (e) {
         exception_error("bwLimitChange", e);
     }

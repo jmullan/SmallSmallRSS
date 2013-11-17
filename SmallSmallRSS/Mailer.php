@@ -1,6 +1,7 @@
 <?php
 namespace SmallSmallRSS;
-require_once 'lib/phpmailer/class.phpmailer.php';
+
+require_once __DIR__ . '/../lib/phpmailer/class.phpmailer.php';
 
 /**
  * @class Mailer
@@ -12,20 +13,20 @@ require_once 'lib/phpmailer/class.phpmailer.php';
 class Mailer extends PHPMailer
 {
     //define all items that we want to override with defaults in PHPMailer
-    public $From = SMTP_FROM_ADDRESS;
-    public $FromName = SMTP_FROM_NAME;
     public $CharSet = "UTF-8";
     public $PluginDir = "lib/phpmailer/";
     public $ContentType = "text/html"; //default email type is HTML
 
     function __construct()
     {
+        $this->From = \SmallSmallRSS\Config::get('SMTP_FROM_ADDRESS');
+        $this->FromName = \SmallSmallRSS\Config::get('SMTP_FROM_NAME');
+
         $this->SetLanguage("en", "lib/phpmailer/language/");
 
-        if (SMTP_SERVER) {
-            $pair = explode(":", SMTP_SERVER, 2);
+        if (\SmallSmallRSS\Config::get('SMTP_SERVER')) {
+            $pair = explode(":", \SmallSmallRSS\Config::get('SMTP_SERVER'), 2);
             $this->Mailer = "smtp";
-
             $this->Host = $pair[0];
             $this->Port = $pair[1];
 
@@ -39,15 +40,16 @@ class Mailer extends PHPMailer
 
 
         //if SMTP_LOGIN is specified, set credentials and enable auth
-        if (SMTP_LOGIN) {
+        if (\SmallSmallRSS\Config::get('SMTP_LOGIN')) {
             $this->SMTPAuth = true;
-            $this->Username = SMTP_LOGIN;
-            $this->Password = SMTP_PASSWORD;
+            $this->Username = \SmallSmallRSS\Config::get('SMTP_LOGIN');
+            $this->Password = \SmallSmallRSS\Config::get('SMTP_PASSWORD');
         }
-        if (SMTP_SECURE) {
-            $this->SMTPSecure = SMTP_SECURE;
+        if (\SmallSmallRSS\Config::get('SMTP_SECURE')) {
+            $this->SMTPSecure = \SmallSmallRSS\Config::get('SMTP_SECURE');
         }
     }
+
     /**
      * A simple mail function to send email using the defaults
      * This will send an HTML email using the configured defaults

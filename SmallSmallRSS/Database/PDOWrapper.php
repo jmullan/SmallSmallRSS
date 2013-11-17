@@ -7,8 +7,9 @@ class PDOWrapper implements DatabaseInterface
 
     function connect($host, $user, $pass, $db, $port)
     {
-        $connstr = DB_TYPE . ":host=$host;dbname=$db";
-        if (DB_TYPE == "mysql") {  $connstr .= ";charset=utf8";
+        $connstr = \SmallSmallRSS\Config::get('DB_TYPE') . ":host=$host;dbname=$db";
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
+            $connstr .= ";charset=utf8";
         }
         try {
             $this->pdo = new PDO($connstr, $user, $pass);
@@ -93,7 +94,7 @@ class PDOWrapper implements DatabaseInterface
 
     function init()
     {
-        switch (DB_TYPE) {
+        switch (\SmallSmallRSS\Config::get('DB_TYPE')) {
             case "pgsql":
                 $this->query("set client_encoding = 'UTF-8'");
                 $this->query("set datestyle = 'ISO, european'");

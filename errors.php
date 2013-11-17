@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 if (isset($_REQUEST['mode']) && $_REQUEST['mode'] == 'js') {
     header("Content-Type: text/javascript; charset=UTF-8");

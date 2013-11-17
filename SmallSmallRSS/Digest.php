@@ -18,9 +18,9 @@ class Digest
 
         _debug("Sending digests, batch of max $user_limit users, headline limit = $limit", true, $debug);
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $interval_query = "last_digest_sent < NOW() - INTERVAL '1 days'";
-        } elseif (DB_TYPE == "mysql") {
+        } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
             $interval_query = "last_digest_sent < DATE_SUB(NOW(), INTERVAL 1 DAY)";
         }
 
@@ -30,7 +30,6 @@ class Digest
         );
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
             if (@\SmallSmallRSS\DBPrefs::read('DIGEST_ENABLE', $line['id'], false)) {
                 $preferred_ts = strtotime(\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME', $line['id'], '00:00'));
                 $since = time() - $preferred_ts;
@@ -48,13 +47,17 @@ class Digest
 
                         $mail = new \SmallSmallRSS\Mailer();
 
-                        $rc = $mail->quickMail($line["email"], $line["login"], DIGEST_SUBJECT, $digest, $digest_text);
-
+                        $rc = $mail->quickMail(
+                            $line["email"],
+                            $line["login"],
+                            \SmallSmallRSS\Config::get('DIGEST_SUBJECT'),
+                            $digest,
+                            $digest_text
+                        );
                         if (!$rc) {
                             _debug("ERROR: " . $mail->ErrorInfo, true, $debug);
                         }
                         _debug("RC=$rc", true, $debug);
-
                         if ($rc && $do_catchup) {
                             _debug("Marking affected articles as read...", true, $debug);
                             catchupArticlesById($affected_ids, 0, $line["id"]);
@@ -96,9 +99,9 @@ class Digest
 
         $affected_ids = array();
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $interval_query = "ttrss_entries.date_updated > NOW() - INTERVAL '$days days'";
-        } elseif (DB_TYPE == "mysql") {
+        } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
             $interval_query = "ttrss_entries.date_updated > DATE_SUB(NOW(), INTERVAL $days DAY)";
         }
 

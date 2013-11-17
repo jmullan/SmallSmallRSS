@@ -42,59 +42,39 @@ class Pref_Users extends ProtectedHandler
             return;
         }
 
-        // print "<h1>User Details</h1>";
-
         $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
-
         print "<table width='100%'>";
-
         $last_login = make_local_datetime(
             \SmallSmallRSS\Database::fetch_result($result, 0, "last_login"), true
         );
-
         $created = make_local_datetime(
             \SmallSmallRSS\Database::fetch_result($result, 0, "created"), true
         );
-
         $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, "access_level");
         $stored_articles = \SmallSmallRSS\Database::fetch_result($result, 0, "stored_articles");
-
         print "<tr><td>".__('Registered')."</td><td>$created</td></tr>";
         print "<tr><td>".__('Last logged in')."</td><td>$last_login</td></tr>";
-
         $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(id) as num_feeds FROM ttrss_feeds
                 WHERE owner_uid = '$uid'"
         );
-
         $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "num_feeds");
-
         print "<tr><td>".__('Subscribed feeds count')."</td><td>$num_feeds</td></tr>";
-
         print "</table>";
-
         print "<h1>".__('Subscribed feeds')."</h1>";
-
         $result = \SmallSmallRSS\Database::query(
             "SELECT id,title,site_url FROM ttrss_feeds
                 WHERE owner_uid = '$uid' ORDER BY title"
         );
-
-
         print "<ul class=\"userFeedList\">";
-
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
-            $icon_file = ICONS_URL."/".$line["id"].".ico";
-
+            $icon_file = \SmallSmallRSS\Config::get('ICONS_URL') . "/" . $line["id"] . ".ico";
             if (file_exists($icon_file) && filesize($icon_file) > 0) {
                 $feed_icon = "<img class=\"tinyFeedIcon\" src=\"$icon_file\">";
             } else {
                 $feed_icon = "<img class=\"tinyFeedIcon\" src=\"images/blank_icon.gif\">";
             }
-
             print "<li>$feed_icon&nbsp;<a href=\"".$line["site_url"]."\">".$line["title"]."</a></li>";
-
         }
 
         if (\SmallSmallRSS\Database::num_rows($result) < $num_feeds) {

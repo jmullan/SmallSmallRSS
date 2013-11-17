@@ -1,18 +1,13 @@
 <?php
-define('EXPECTED_CONFIG_VERSION', 26);
-
-define('LABEL_BASE_INDEX', -1024);
-define('PLUGIN_FEED_BASE_INDEX', -128);
-
-define('COOKIE_LIFETIME_LONG', 86400*365);
-
+\SmallSmallRSS\Config::set('EXPECTED_CONFIG_VERSION', 26);
+\SmallSmallRSS\Config::set('LABEL_BASE_INDEX', -1024);
+\SmallSmallRSS\Config::set('PLUGIN_FEED_BASE_INDEX', -128);
+\SmallSmallRSS\Config::set('COOKIE_LIFETIME_LONG', 86400*365);
 mb_internal_encoding("UTF-8");
 date_default_timezone_set('UTC');
 if (defined('E_DEPRECATED')) {
     error_reporting(-1);
 }
-
-require_once __DIR__ . "/../config.php";
 
 \SmallSmallRSS\Session::init();
 
@@ -25,7 +20,7 @@ require_once __DIR__ . "/../config.php";
  * @return boolean True if defined successfully or not.
  */
 function define_default($name, $value) {
-    defined($name) or define($name, $value);
+    defined($name) or \SmallSmallRSS\Config::set($name, $value);
 }
 
 ///// Some defaults that you can override in config.php //////
@@ -41,10 +36,10 @@ define_default('FILE_FETCH_CONNECT_TIMEOUT', 15);
 // How many seconds to wait for initial response from website when
 // fetching files from remote sites
 
-if (DB_TYPE == "pgsql") {
-    define('SUBSTRING_FOR_DATE', 'SUBSTRING_FOR_DATE');
+if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+    \SmallSmallRSS\Config::set('SUBSTRING_FOR_DATE', 'SUBSTRING_FOR_DATE');
 } else {
-    define('SUBSTRING_FOR_DATE', 'SUBSTRING');
+    \SmallSmallRSS\Config::set('SUBSTRING_FOR_DATE', 'SUBSTRING');
 }
 
 /**
@@ -116,7 +111,7 @@ function startup_gettext()
     }
 }
 
-define(
+\SmallSmallRSS\Config::set(
     'SELF_USER_AGENT',
     'Tiny Tiny RSS/' . \SmallSmallRSS\Constants::VERSION . ' (http://tt-rss.org/)'
 );
@@ -149,7 +144,7 @@ function _debug($msg, $show=true, $is_debug=true)
         $message = '' . $file . ':' . $rawcalls[0]['line'] . ' ';
     }
     $message .= "[$ts] $msg";
-    if ($show && !(defined('QUIET') && QUIET)) {
+    if ($show && !\SmallSmallRSS\Config::get('VERBOSITY')) {
         print "$message\n";
     }
 
@@ -198,12 +193,11 @@ function purge_feed($feed_id, $purge_interval, $debug = false)
 
     if (!$owner_uid) return;
 
-    if (FORCE_ARTICLE_PURGE == 0) {
-        $purge_unread = \SmallSmallRSS\DBPrefs::read("PURGE_UNREAD_ARTICLES",
-                                 $owner_uid, false);
+    if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
+        $purge_unread = \SmallSmallRSS\DBPrefs::read("PURGE_UNREAD_ARTICLES", $owner_uid, false);
     } else {
         $purge_unread = true;
-        $purge_interval = FORCE_ARTICLE_PURGE;
+        $purge_interval = \SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE');
     }
 
     if (!$purge_unread) {
@@ -212,7 +206,7 @@ function purge_feed($feed_id, $purge_interval, $debug = false)
         $query_limit = '';
     }
 
-    if (DB_TYPE == "pgsql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $pg_version = get_pgsql_version();
 
         if (preg_match("/^7\./", $pg_version) || preg_match("/^8\.0/", $pg_version)) {
@@ -360,7 +354,7 @@ function get_favicon_url($url)
 
 function check_feed_favicon($site_url, $feed)
 {
-    $icon_file = ICONS_DIR . "/$feed.ico";
+    $icon_file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed.ico";
 
     if (!file_exists($icon_file)) {
         $favicon_url = get_favicon_url($site_url);
@@ -524,7 +518,7 @@ function get_ssl_certificate_id()
 
 function authenticate_user($login, $password, $check_only = false)
 {
-    if (!SINGLE_USER_MODE) {
+    if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
         $user_id = false;
         $plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_AUTH_USER);
         if (!$plugins) {
@@ -647,7 +641,7 @@ function load_user_plugins($owner_uid)
 
 function login_sequence()
 {
-    if (SINGLE_USER_MODE) {
+    if (\SmallSmallRSS\Auth::is_single_user_mode()) {
         authenticate_user("admin", null);
         load_user_plugins($_SESSION["uid"]);
     } else {
@@ -655,7 +649,7 @@ function login_sequence()
 
         if (!$_SESSION["uid"]) {
 
-            if (AUTH_AUTO_LOGIN && authenticate_user(null, null)) {
+            if (\SmallSmallRSS\Config::get('AUTH_AUTO_LOGIN') && authenticate_user(null, null)) {
                 $_SESSION["ref_schema_version"] = \SmallSmallRSS\Sanity::getSchemaVersion(true);
             } else {
                 authenticate_user(null, null, true);
@@ -811,7 +805,7 @@ function sanity_check()
         $error_code = 5;
     }
 
-    if (DB_TYPE == "mysql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
         $result = \SmallSmallRSS\Database::query("SELECT true", false);
         if (\SmallSmallRSS\Database::num_rows($result) != 1) {
             $error_code = 10;
@@ -830,9 +824,9 @@ function sanity_check()
 
 function file_is_locked($filename)
 {
-    if (file_exists(LOCK_DIRECTORY . "/$filename")) {
+    if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename")) {
         if (function_exists('flock')) {
-            $fp = @fopen(LOCK_DIRECTORY . "/$filename", "r");
+            $fp = @fopen(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename", "r");
             if ($fp) {
                 if (flock($fp, LOCK_EX | LOCK_NB)) {
                     flock($fp, LOCK_UN);
@@ -854,11 +848,11 @@ function file_is_locked($filename)
 
 function make_lockfile($filename)
 {
-    $fp = fopen(LOCK_DIRECTORY . "/$filename", "w");
+    $fp = fopen(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename", "w");
 
     if ($fp && flock($fp, LOCK_EX | LOCK_NB)) {
         $stat_h = fstat($fp);
-        $stat_f = stat(LOCK_DIRECTORY . "/$filename");
+        $stat_f = stat(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename");
 
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             if ($stat_h["ino"] != $stat_f["ino"] ||
@@ -879,7 +873,7 @@ function make_lockfile($filename)
 
 function make_stampfile($filename)
 {
-    $fp = fopen(LOCK_DIRECTORY . "/$filename", "w");
+    $fp = fopen(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename", "w");
 
     if (flock($fp, LOCK_EX | LOCK_NB)) {
         fwrite($fp, time() . "\n");
@@ -892,7 +886,7 @@ function make_stampfile($filename)
 }
 
 function sql_random_function() {
-    if (DB_TYPE == "mysql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
         return "RAND()";
     } else {
         return "RANDOM()";
@@ -912,21 +906,21 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
 
     switch ($mode) {
         case "1day":
-            if (DB_TYPE == "pgsql") {
+            if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
                 $date_qpart = "date_entered < NOW() - INTERVAL '1 day' ";
             } else {
                 $date_qpart = "date_entered < DATE_SUB(NOW(), INTERVAL 1 DAY) ";
             }
             break;
         case "1week":
-            if (DB_TYPE == "pgsql") {
+            if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
                 $date_qpart = "date_entered < NOW() - INTERVAL '1 week' ";
             } else {
                 $date_qpart = "date_entered < DATE_SUB(NOW(), INTERVAL 1 WEEK) ";
             }
             break;
         case "2weeks":
-            if (DB_TYPE == "pgsql") {
+            if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
                 $date_qpart = "date_entered < NOW() - INTERVAL '2 week' ";
             } else {
                 $date_qpart = "date_entered < DATE_SUB(NOW(), INTERVAL 2 WEEK) ";
@@ -997,7 +991,7 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
 
                 $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE");
 
-                if (DB_TYPE == "pgsql") {
+                if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
                     $match_part = "date_entered > NOW() - INTERVAL '$intl hour' ";
                 } else {
                     $match_part = "date_entered > DATE_SUB(NOW(),
@@ -1252,7 +1246,7 @@ function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_ui
 
         $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE", $owner_uid);
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $match_part .= " AND updated > NOW() - INTERVAL '$intl hour' ";
         } else {
             $match_part .= " AND updated > DATE_SUB(NOW(), INTERVAL $intl HOUR) ";
@@ -1525,7 +1519,7 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
         "SELECT id FROM ttrss_feeds
             WHERE feed_url = '$url' AND owner_uid = ".$_SESSION["uid"]);
 
-    if (strlen(FEED_CRYPT_KEY) > 0) {
+    if (\SmallSmallRSS\Crypt::is_enabled()) {
         $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
         $auth_pass_encrypted = 'true';
     } else {
@@ -1761,8 +1755,9 @@ function getFeedIcon($id)
             if ($id < LABEL_BASE_INDEX) {
                 return "images/label.png";
             } else {
-                if (file_exists(ICONS_DIR . "/$id.ico"))
-                    return ICONS_URL . "/$id.ico";
+                if (file_exists(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico")) {
+                    return \SmallSmallRSS\Config::get('ICONS_URL') . "/$id.ico";
+                }
             }
             break;
     }
@@ -1811,42 +1806,42 @@ function make_init_params()
 {
     $params = array();
 
-    foreach (array("ON_CATCHUP_SHOW_NEXT_FEED", "HIDE_READ_FEEDS",
-                   "ENABLE_FEED_CATS", "FEEDS_SORT_BY_UNREAD", "CONFIRM_FEED_CATCHUP",
-                   "CDM_AUTO_CATCHUP", "FRESH_ARTICLE_MAX_AGE",
-                   "HIDE_READ_SHOWS_SPECIAL", "COMBINED_DISPLAY_MODE") as $param) {
+    foreach (
+        array("ON_CATCHUP_SHOW_NEXT_FEED", "HIDE_READ_FEEDS",
+              "ENABLE_FEED_CATS", "FEEDS_SORT_BY_UNREAD", "CONFIRM_FEED_CATCHUP",
+              "CDM_AUTO_CATCHUP", "FRESH_ARTICLE_MAX_AGE",
+              "HIDE_READ_SHOWS_SPECIAL", "COMBINED_DISPLAY_MODE") as $param) {
 
         $params[strtolower($param)] = (int) \SmallSmallRSS\DBPrefs::read($param);
     }
 
-    $params["icons_url"] = ICONS_URL;
-    $params["cookie_lifetime"] = SESSION_COOKIE_LIFETIME;
+    $params["icons_url"] = \SmallSmallRSS\Config::get('ICONS_URL');
+    $params["cookie_lifetime"] = \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME');
     $params["default_view_mode"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_MODE");
     $params["default_view_limit"] = (int) \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_LIMIT");
     $params["default_view_order_by"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_ORDER_BY");
     $params["bw_limit"] = (int) $_SESSION["bw_limit"];
     $params["label_base_index"] = (int) LABEL_BASE_INDEX;
 
-    $result = \SmallSmallRSS\Database::query("SELECT MAX(id) AS mid, COUNT(*) AS nf FROM
-            ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]);
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT
+             MAX(id) AS mid,
+             COUNT(*) AS nf
+         FROM ttrss_feeds
+         WHERE owner_uid = " . $_SESSION["uid"]
+    );
     $max_feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "mid");
     $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "nf");
-
     $params["max_feed_id"] = (int) $max_feed_id;
     $params["num_feeds"] = (int) $num_feeds;
-
     $params["hotkeys"] = get_hotkeys_map();
-
     $params["csrf_token"] = $_SESSION["csrf_token"];
     if (!empty($_COOKIE["ttrss_widescreen"])) {
         $params["widescreen"] = (int) $_COOKIE["ttrss_widescreen"];
     } else {
         $params["widescreen"] = 0;
     }
-
-    $params['simple_update'] = defined('SIMPLE_UPDATE_MODE') && SIMPLE_UPDATE_MODE;
-
+    $params['simple_update'] = \SmallSmallRSS\Config::get('SIMPLE_UPDATE_MODE');
     return $params;
 }
 
@@ -2029,10 +2024,10 @@ function make_runtime_info()
     $data['dependency_timestamp'] = calculate_dep_timestamp();
     $data['reload_on_ts_change'] = !defined('_NO_RELOAD_ON_TS_CHANGE');
 
-    if (file_exists(LOCK_DIRECTORY . "/update_daemon.lock")) {
+    if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.lock")) {
         $data['daemon_is_running'] = (int) file_is_locked("update_daemon.lock");
         if (time() - $_SESSION["daemon_stamp_check"] > 30) {
-            $stamp = (int) @file_get_contents(LOCK_DIRECTORY . "/update_daemon.stamp");
+            $stamp = (int) @file_get_contents(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.stamp");
             if ($stamp) {
                 $stamp_delta = time() - $stamp;
                 if ($stamp_delta > 1800) {
@@ -2184,14 +2179,13 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
 
     if ($search) {
 
-        if (SPHINX_ENABLED) {
+        if (\SmallSmallRSS\Config::get('SPHINX_ENABLED')) {
             $ids = join(",", @sphinx_search($search, 0, 500));
-
-            if ($ids)
+            if ($ids) {
                 $search_query_part = "ref_id IN ($ids) AND ";
-            else
+            } else {
                 $search_query_part = "ref_id = -1 AND ";
-
+            }
         } else {
             $search_query_part = search_to_sql($search);
             $search_query_part .= " AND ";
@@ -2203,7 +2197,7 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
 
     if ($filter) {
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $query_strategy_part .= " AND updated > NOW() - INTERVAL '14 days' ";
         } else {
             $query_strategy_part .= " AND updated > DATE_SUB(NOW(), INTERVAL 14 DAY) ";
@@ -2383,7 +2377,7 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
 
         $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE", $owner_uid);
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $query_strategy_part .= " AND date_entered > NOW() - INTERVAL '$intl hour' ";
         } else {
             $query_strategy_part .= " AND date_entered > DATE_SUB(NOW(), INTERVAL $intl HOUR) ";
@@ -2624,10 +2618,10 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
             if ($entry->hasAttribute('src')) {
                 $src = rewrite_relative_url($site_url, $entry->getAttribute('src'));
 
-                $cached_filename = CACHE_DIR . '/images/' . sha1($src) . '.png';
+                $cached_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . '/images/' . sha1($src) . '.png';
 
                 if (file_exists($cached_filename)) {
-                    $src = SELF_URL_PATH . '/image.php?hash=' . sha1($src);
+                    $src = \SmallSmallRSS\Config::get('SELF_URL_PATH') . '/image.php?hash=' . sha1($src);
                 }
 
                 $entry->setAttribute('src', $src);
@@ -3109,10 +3103,11 @@ function sanitize_tag($tag) {
 }
 
 function get_self_url_prefix() {
-    if (strrpos(SELF_URL_PATH, "/") === strlen(SELF_URL_PATH)-1) {
-        return substr(SELF_URL_PATH, 0, strlen(SELF_URL_PATH)-1);
+    $self_url_path = \SmallSmallRSS\Config::get('SELF_URL_PATH');
+    if (strrpos($self_url_path, "/") === strlen($self_url_path) - 1) {
+        return substr($self_url_path, 0, strlen($self_url_path) - 1);
     } else {
-        return SELF_URL_PATH;
+        return $self_url_path;
     }
 }
 
@@ -3230,13 +3225,10 @@ function get_score_pic($score) {
 }
 
 function feed_has_icon($id) {
-    return is_file(ICONS_DIR . "/$id.ico") && filesize(ICONS_DIR . "/$id.ico") > 0;
-}
-
-function init_plugins() {
-    \SmallSmallRSS\PluginHost::getInstance()->load(
-        PLUGINS, \SmallSmallRSS\PluginHost::KIND_ALL);
-    return true;
+    return (
+        is_file(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico")
+        && filesize(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico") > 0
+    );
 }
 
 function format_tags_string($tags, $id) {
@@ -3638,24 +3630,27 @@ function rewrite_relative_url($url, $rel_url) {
 
 function sphinx_search($query, $offset = 0, $limit = 30) {
     require_once __DIR__ . '/../lib/sphinxapi.php';
-
     $sphinxClient = new SphinxClient();
-
-    $sphinxpair = explode(":", SPHINX_SERVER, 2);
-
+    $sphinxpair = explode(":", \SmallSmallRSS\Config::get('SPHINX_SERVER'), 2);
     $sphinxClient->SetServer($sphinxpair[0], (int) $sphinxpair[1]);
     $sphinxClient->SetConnectTimeout(1);
-
-    $sphinxClient->SetFieldWeights(array('title' => 70, 'content' => 30,
-                                         'feed_title' => 20));
-
+    $sphinxClient->SetFieldWeights(
+        array(
+            'title' => 70,
+            'content' => 30,
+            'feed_title' => 20
+        )
+    );
     $sphinxClient->SetMatchMode(SPH_MATCH_EXTENDED2);
     $sphinxClient->SetRankingMode(SPH_RANK_PROXIMITY_BM25);
     $sphinxClient->SetLimits($offset, $limit, 1000);
     $sphinxClient->SetArrayResult(false);
     $sphinxClient->SetFilter('owner_uid', array($_SESSION['uid']));
 
-    $result = $sphinxClient->Query($query, SPHINX_INDEX);
+    $result = $sphinxClient->Query(
+        $query,
+        \SmallSmallRSS\Config::get('SPHINX_INDEX')
+    );
 
     $ids = array();
 
@@ -3671,9 +3666,9 @@ function sphinx_search($query, $offset = 0, $limit = 30) {
 
 function cleanup_tags($days = 14, $limit = 1000) {
 
-    if (DB_TYPE == "pgsql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $interval_query = "date_updated < NOW() - INTERVAL '$days days'";
-    } elseif (DB_TYPE == "mysql") {
+    } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
         $interval_query = "date_updated < DATE_SUB(NOW(), INTERVAL $days DAY)";
     }
 
@@ -3770,7 +3765,7 @@ function rewrite_urls($html) {
 function filter_to_sql($filter, $owner_uid) {
     $query = array();
 
-    if (DB_TYPE == "pgsql")
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql")
         $reg_qpart = "~";
     else
         $reg_qpart = "REGEXP";
@@ -3913,7 +3908,7 @@ function get_minified_js($files) {
 
     foreach ($files as $js) {
         if (!isset($_GET['debug'])) {
-            $cached_file = CACHE_DIR . "/js/".basename($js).".js";
+            $cached_file = \SmallSmallRSS\Config::get('CACHE_DIR') . "/js/".basename($js).".js";
 
             if (file_exists($cached_file) &&
                 is_readable($cached_file) &&

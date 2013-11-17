@@ -79,9 +79,7 @@ class MySQLi implements DatabaseInterface
     function init()
     {
         $this->query("SET time_zone = '+0:0'");
-        if (defined('MYSQL_CHARSET') && MYSQL_CHARSET) {
-            $this->query("SET NAMES " . MYSQL_CHARSET);
-        }
+        $this->query("SET NAMES " . \SmallSmallRSS\Config::get('MYSQL_CHARSET'));
         return true;
     }
 }

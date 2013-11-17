@@ -12,3 +12,7 @@ AddType image/svg+xml svgz
   Order allow,deny
   Deny from all
 </Files>
+<Files ~ ".ini$">
+  Order allow,deny
+  Deny from all
+</Files>

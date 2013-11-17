@@ -68,11 +68,9 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
 {
     // Process all other feeds using last_updated and interval parameters
     \SmallSmallRSS\Sanity::schemaOrDie();
-    define('PREFS_NO_CACHE', true);
-
     // Test if the user has loggued in recently. If not, it does not update its feeds.
-    if (!SINGLE_USER_MODE && DAEMON_UPDATE_LOGIN_LIMIT > 0) {
-        if (DB_TYPE == "pgsql") {
+    if (!\SmallSmallRSS\Auth::is_single_user_mode() && DAEMON_UPDATE_LOGIN_LIMIT > 0) {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $login_thresh_qpart = (
                 "AND ttrss_users.last_login >= NOW() - INTERVAL"
                 . " '" . DAEMON_UPDATE_LOGIN_LIMIT . " days'"
@@ -89,7 +87,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
     }
 
     // Test if the feed need a update (update interval exceded).
-    if (DB_TYPE == "pgsql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $update_limit_qpart = "
             AND
             (
@@ -128,7 +126,7 @@ function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $d
     }
 
     // Test if feed is currently being updated by another process.
-    if (DB_TYPE == "pgsql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $updstart_thresh_qpart = "
              AND (
                  ttrss_feeds.last_update_started IS NULL
@@ -287,15 +285,12 @@ function update_rss_feed($feed, $no_cache = false)
 
     $date_feed_processed = date('Y-m-d H:i');
 
-    $cache_filename = CACHE_DIR . "/simplepie/" . sha1($fetch_url) . ".xml";
+    $cache_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . "/simplepie/" . sha1($fetch_url) . ".xml";
 
     $pluginhost = new \SmallSmallRSS\PluginHost();
     $pluginhost->set_debug(true);
-
-    $user_plugins = \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS", $owner_uid);
-
-    $pluginhost->load(PLUGINS, \SmallSmallRSS\PluginHost::KIND_ALL);
-    $pluginhost->load($user_plugins, \SmallSmallRSS\PluginHost::KIND_USER, $owner_uid);
+    $pluginhost->init_all();
+    $pluginhost->init_user($owner_uid);
     $pluginhost->load_data();
 
     $rss = false;
@@ -395,7 +390,7 @@ function update_rss_feed($feed, $no_cache = false)
 
     // cache data for later
     if (!$auth_pass && !$auth_login) {
-        if (is_writable(CACHE_DIR . "/simplepie")) {
+        if (is_writable(\SmallSmallRSS\Config::get('CACHE_DIR') . "/simplepie")) {
             $new_rss_hash = md5($feed_data);
             if ($new_rss_hash != $rss_hash && count($rss->get_items()) > 0) {
                 _debug("saving $cache_filename");
@@ -411,7 +406,7 @@ function update_rss_feed($feed, $no_cache = false)
 
     _debug("processing feed data...");
 
-    if (DB_TYPE == "pgsql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $favicon_interval_qpart = "favicon_last_checked < NOW() - INTERVAL '12 hour'";
     } else {
         $favicon_interval_qpart = "favicon_last_checked < DATE_SUB(NOW(), INTERVAL 12 HOUR)";
@@ -444,7 +439,7 @@ function update_rss_feed($feed, $no_cache = false)
         /* terrible hack: if we crash on floicon shit here, we won't check
          * the icon avgcolor again (unless the icon got updated) */
 
-        $favicon_file = ICONS_DIR . "/$feed.ico";
+        $favicon_file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed.ico";
         $favicon_modified = @filemtime($favicon_file);
 
         _debug("checking favicon...");
@@ -519,7 +514,7 @@ function update_rss_feed($feed, $no_cache = false)
         return;
     }
 
-    if ($pubsub_state != 2 && PUBSUBHUBBUB_ENABLED) {
+    if ($pubsub_state != 2 && \SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED')) {
         _debug("checking for PUSH hub...");
         $feed_hub_url = false;
         $links = $rss->get_links('hub');
@@ -710,7 +705,7 @@ function update_rss_feed($feed, $no_cache = false)
 
         _debug("plugin data: $entry_plugin_data");
 
-        if ($cache_images && is_writable(CACHE_DIR . '/images')) {
+        if ($cache_images && is_writable(\SmallSmallRSS\Config::get('CACHE_DIR') . '/images')) {
             cache_images($entry_content, $site_url);
         }
 
@@ -889,7 +884,7 @@ function update_rss_feed($feed, $no_cache = false)
 
                 // N-grams
 
-                if (DB_TYPE == "pgsql" and defined('_NGRAM_TITLE_DUPLICATE_THRESHOLD')) {
+                if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql" and defined('_NGRAM_TITLE_DUPLICATE_THRESHOLD')) {
 
                     $result = \SmallSmallRSS\Database::query(
                         "SELECT COUNT(*) AS similar
@@ -923,20 +918,23 @@ function update_rss_feed($feed, $no_cache = false)
                                 '', $last_marked, $last_published)"
                 );
 
-                if (PUBSUBHUBBUB_HUB && $published == 'true') {
+                if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB') && $published == 'true') {
                     $rss_link = get_self_url_prefix() .
                         "/public.php?op=rss&id=-2&key=" .
                         get_feed_access_key(-2, false, $owner_uid);
 
-                    $p = new Publisher(PUBSUBHUBBUB_HUB);
-
+                    $p = new Publisher(\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB'));
                     $pubsub_result = $p->publish_update($rss_link);
                 }
 
                 $result = \SmallSmallRSS\Database::query(
-                    "SELECT int_id FROM ttrss_user_entries WHERE
-                                ref_id = '$ref_id' AND owner_uid = '$owner_uid' AND
-                                feed_id = '$feed' LIMIT 1"
+                    "SELECT int_id
+                     FROM ttrss_user_entries
+                     WHERE
+                         ref_id = '$ref_id'
+                         AND owner_uid = '$owner_uid'
+                         AND feed_id = '$feed'
+                     LIMIT 1"
                 );
 
                 if (\SmallSmallRSS\Database::num_rows($result) == 1) {
@@ -1186,7 +1184,7 @@ function update_rss_feed($feed, $no_cache = false)
 
 function cache_images($html, $site_url, $debug)
 {
-    $cache_dir = CACHE_DIR . "/images";
+    $cache_dir = \SmallSmallRSS\Config::get('CACHE_DIR') . "/images";
     libxml_use_internal_errors(true);
     $charset_hack = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head>';
     $doc = new DOMDocument();
@@ -1196,7 +1194,7 @@ function cache_images($html, $site_url, $debug)
     foreach ($entries as $entry) {
         if ($entry->hasAttribute('src')) {
             $src = rewrite_relative_url($site_url, $entry->getAttribute('src'));
-            $local_filename = CACHE_DIR . "/images/" . sha1($src) . ".png";
+            $local_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . "/images/" . sha1($src) . ".png";
             _debug("cache_images: downloading: $src to $local_filename", $debug, $debug);
             if (!file_exists($local_filename)) {
                 $file_content = \SmallSmallRSS\Fetcher::fetch($src);
@@ -1206,7 +1204,7 @@ function cache_images($html, $site_url, $debug)
             }
             if (file_exists($local_filename)) {
                 $entry->setAttribute(
-                    'src', SELF_URL_PATH . '/image.php?url=' .
+                    'src', \SmallSmallRSS\Config::get('SELF_URL_PATH') . '/image.php?url=' .
                     base64_encode($src)
                 );
             }
@@ -1219,7 +1217,7 @@ function cache_images($html, $site_url, $debug)
 function expire_error_log($debug)
 {
     _debug("Removing old error log entries...", $debug, $debug);
-    if (DB_TYPE == "pgsql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_error_log
              WHERE created_at < NOW() - INTERVAL '7 days'"
@@ -1237,11 +1235,11 @@ function expire_lock_files($debug)
 {
     $num_deleted = 0;
 
-    if (!is_writable(LOCK_DIRECTORY)) {
-        _debug(LOCK_DIRECTORY . " is not writable");
+    if (!is_writable(\SmallSmallRSS\Config::get('LOCK_DIRECTORY'))) {
+        _debug(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . " is not writable");
         return;
     }
-    $files = glob(LOCK_DIRECTORY . "/*.lock");
+    $files = glob(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/*.lock");
     if ($files) {
         foreach ($files as $file) {
             if (!file_is_locked(basename($file)) && time() - filemtime($file) > 86400*2) {
@@ -1256,7 +1254,7 @@ function expire_lock_files($debug)
 function expire_cached_files($debug)
 {
     foreach (array("simplepie", "images", "export", "upload") as $dir) {
-        $cache_dir = CACHE_DIR . "/$dir";
+        $cache_dir = \SmallSmallRSS\Config::get('CACHE_DIR') . "/$dir";
         $num_deleted = 0;
         if (!is_writable($cache_dir)) {
             _debug("$cache_dir is not writable");

@@ -76,7 +76,7 @@ class Dlg extends ProtectedHandler
         if ($this->param == 1) {
             print __("Update daemon is enabled in configuration, but daemon process is not running, which prevents all feeds from updating. Please start the daemon process or contact instance owner.");
 
-            $stamp = (int) file_get_contents(LOCK_DIRECTORY . "/update_daemon.stamp");
+            $stamp = (int) file_get_contents(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.stamp");
 
             print "<p>" . __("Last update:") . " " . date("Y.m.d, G:i", $stamp);
 
@@ -85,7 +85,7 @@ class Dlg extends ProtectedHandler
         if ($this->param == 3) {
             print __("Update daemon is taking too long to perform a feed update. This could indicate a problem like crash or a hang. Please check the daemon process or contact instance owner.");
 
-            $stamp = (int) file_get_contents(LOCK_DIRECTORY . "/update_daemon.stamp");
+            $stamp = (int) file_get_contents(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.stamp");
 
             print "<p>" . __("Last update:") . " " . date("Y.m.d, G:i", $stamp);
 

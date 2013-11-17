@@ -2,7 +2,6 @@
 namespace SmallSmallRSS;
 
 // Original from http://www.daniweb.com/code/snippet43.html
-require_once __DIR__ . "/../config.php";
 require_once __DIR__ . "/../lib/accept-to-gettext.php";
 require_once __DIR__ . "/../lib/gettext/gettext.inc";
 
@@ -13,11 +12,11 @@ class Session
     public static $session_expire = 86400;
     public static $session_name = 'ttrss_sid';
 
-    public static function init()
+    public static function init($session_name = null)
     {
-        self::$session_expire = max(SESSION_COOKIE_LIFETIME, 86400);
-        if (defined('TTRSS_SESSION_NAME')) {
-            self::$session_name = TTRSS_SESSION_NAME;
+        self::$session_expire = max(\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'), 86400);
+        if (!is_null($session_name)) {
+            self::$session_name = $session_name;
         }
 
         if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
@@ -30,8 +29,11 @@ class Session
         ini_set("session.name", self::$session_name);
         ini_set("session.use_only_cookies", true);
         ini_set("session.gc_maxlifetime", self::$session_expire);
-        ini_set("session.cookie_lifetime", min(0, SESSION_COOKIE_LIFETIME));
-        if (!SINGLE_USER_MODE) {
+        ini_set(
+            "session.cookie_lifetime",
+            min(0, \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'))
+        );
+        if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
             session_set_save_handler(
                 '\SmallSmallRSS\Session::open',
                 '\SmallSmallRSS\Session::close',
@@ -47,7 +49,7 @@ class Session
 
     public static function validate()
     {
-        if (SINGLE_USER_MODE) {
+        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             return true;
         }
 
@@ -61,7 +63,7 @@ class Session
 
         $check_ip = $_SESSION['ip_address'];
 
-        switch (SESSION_CHECK_ADDRESS) {
+        switch (\SmallSmallRSS\Config::get('SESSION_CHECK_ADDRESS')) {
             case 0:
                 $check_ip = '';
                 break;

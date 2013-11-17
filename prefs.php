@@ -1,19 +1,18 @@
 <?php
-if (file_exists("install") && !file_exists("config.php")) {
+if (file_exists("install") && !file_exists("config.ini")) {
     header("Location: install/");
 }
 
-if (!file_exists("config.php")) {
+if (!file_exists("config.ini")) {
     print "<b>Fatal Error</b>:";
-    print "You forgot to copy <b>config.php-dist</b> to <b>config.php</b> and edit it.\n";
+    print "You forgot to copy <b>config.ini-dist</b> to <b>config.ini</b> and edit it.\n";
     exit;
 }
-require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initialCheck();
 
-if (!init_plugins()) {
+if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
 login_sequence();

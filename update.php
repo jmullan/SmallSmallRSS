@@ -1,19 +1,13 @@
 #!/usr/bin/env php
 <?php
-require_once __DIR__ . "/config.php";
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
-
-define('DISABLE_SESSIONS', true);
 
 chdir(dirname(__FILE__));
 
 require_once __DIR__ . "/include/rssfuncs.php";
 \SmallSmallRSS\Sanity::initialCheck();
 
-if (!defined('PHP_EXECUTABLE')) {
-    define('PHP_EXECUTABLE', '/usr/bin/php');
-}
-init_plugins();
+\SmallSmallRSS\PluginHost::init_all();
 
 $longopts = array(
     "feeds",
@@ -79,7 +73,7 @@ if (!isset($options['update-schema'])) {
     \SmallSmallRSS\Sanity::schemaOrDie();
 }
 
-define('QUIET', isset($options['quiet']));
+\SmallSmallRSS\Config::set('VERBOSITY', isset($options['quiet']) ? 0 : 1);
 
 if (isset($options["log"])) {
     _debug("Logging to " . $options["log"]);
@@ -152,7 +146,7 @@ if (isset($options["feedbrowser"])) {
 if (isset($options["daemon"])) {
     while (true) {
         $quiet = (isset($options["quiet"])) ? "--quiet" : "";
-        passthru(PHP_EXECUTABLE . " " . $argv[0] ." --daemon-loop $quiet");
+        passthru(\SmallSmallRSS\Config::get('PHP_EXECUTABLE') . " " . $argv[0] ." --daemon-loop $quiet");
         _debug("Sleeping for " . DAEMON_SLEEP_INTERVAL . " seconds...");
         sleep(DAEMON_SLEEP_INTERVAL);
     }
@@ -190,7 +184,7 @@ if (isset($options["indexes"])) {
     }
     _debug("clearing existing indexes...");
 
-    if (DB_TYPE == "pgsql") {
+    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $result = \SmallSmallRSS\Database::query(
             "SELECT relname
              FROM pg_catalog.pg_class
@@ -208,7 +202,7 @@ if (isset($options["indexes"])) {
     }
 
     while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $statement = "DROP INDEX " . $line["relname"];
             _debug($statement);
         } else {
@@ -218,11 +212,11 @@ if (isset($options["indexes"])) {
         \SmallSmallRSS\Database::query($statement, false);
     }
 
-    _debug("reading indexes from schema for: " . DB_TYPE);
+    _debug("reading indexes from schema for: " . \SmallSmallRSS\Config::get('DB_TYPE'));
 
-    $fp = fopen("schema/ttrss_schema_" . DB_TYPE . ".sql", "r");
+    $fp = fopen("schema/ttrss_schema_" . \SmallSmallRSS\Config::get('DB_TYPE') . ".sql", "r");
     if ($fp) {
-      while (($line = fgets($fp))) {
+        while (($line = fgets($fp))) {
             $matches = array();
 
             if (preg_match("/^create index ([^ ]+) on ([^ ]+)$/i", $line, $matches)) {
@@ -276,10 +270,14 @@ if (isset($options["convert-filters"])) {
                                 "filter_type" => $line["filter_type"])));
 
             $filter["action"] = array(
-                json_encode(array(
-                                "action_id" => $line["action_id"],
-                                "action_param_label" => $line["action_param"],
-                                "action_param" => $line["action_param"])));
+                json_encode(
+                    array(
+                        "action_id" => $line["action_id"],
+                        "action_param_label" => $line["action_param"],
+                        "action_param" => $line["action_param"]
+                    )
+                )
+            );
 
             // Oh god it's full of hacks
 
@@ -294,7 +292,7 @@ if (isset($options["convert-filters"])) {
 }
 
 if (isset($options["update-schema"])) {
-    _debug("checking for updates (" . DB_TYPE . ")...");
+    _debug("checking for updates (" . \SmallSmallRSS\Config::get('DB_TYPE') . ")...");
 
     $updater = new \SmallSmallRSS\Database\Updater();
     if ($updater->isUpdateRequired()) {
@@ -325,7 +323,7 @@ if (isset($options["update-schema"])) {
 if (isset($options["list-plugins"])) {
     $tmppluginhost = new \SmallSmallRSS\PluginHost();
     $tmppluginhost->load_all($tmppluginhost::KIND_ALL);
-    $enabled = array_map("trim", explode(",", PLUGINS));
+    $enabled = array_map('trim', explode(',', \SmallSmallRSS\Config::get('PLUGINS')));
     echo "List of all available plugins:\n";
     foreach ($tmppluginhost->get_plugins() as $name => $plugin) {
         $about = $plugin->about();
@@ -347,6 +345,6 @@ if (isset($options["list-plugins"])) {
 
 \SmallSmallRSS\PluginHost::getInstance()->run_commands($options);
 
-if (file_exists(LOCK_DIRECTORY . "/$lock_filename")) {
-    unlink(LOCK_DIRECTORY . "/$lock_filename");
+if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lock_filename")) {
+    unlink(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lock_filename");
 }

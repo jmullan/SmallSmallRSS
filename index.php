@@ -1,11 +1,11 @@
 <?php
-if (file_exists("install") && !file_exists("config.php")) {
+if (file_exists("install") && !file_exists("config.ini")) {
     header("Location: install/");
 }
 
-if (!file_exists("config.php")) {
+if (!file_exists("config.ini")) {
     print "<b>Fatal Error</b>: You forgot to copy
-                <b>config.php-dist</b> to <b>config.php</b> and edit it.\n";
+           <b>config.ini-dist</b> to <b>config.ini</b> and edit it.\n";
     exit;
 }
 
@@ -13,7 +13,6 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     print "<b>Fatal Error</b>: PHP version 5.3.0 or newer required.\n";
     exit;
 }
-require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 \SmallSmallRSS\Session::init();
@@ -22,7 +21,7 @@ require_once "lib/Mobile_Detect.php";
 
 $mobile = new Mobile_Detect();
 
-if (!init_plugins()) {
+if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
 
@@ -46,9 +45,7 @@ login_sequence();
 
 header('Content-Type: text/html; charset=utf-8');
 
-
-
-require 'lib/jshrink/Minifier.php';
+require __DIR__ . '/lib/jshrink/Minifier.php';
 
 
 $theme_css = 'themes/default.css';

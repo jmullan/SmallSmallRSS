@@ -17,7 +17,7 @@ class Auth_Base implements Auth_Interface
     // Can be used instead of find_user_by_login() by external auth modules
     function auto_create_user($login, $password = false)
     {
-        if ($login && defined('AUTH_AUTO_CREATE') && AUTH_AUTO_CREATE) {
+        if ($login && \SmallSmallRSS\Config::get('AUTH_AUTO_CREATE')) {
             $user_id = $this->find_user_by_login($login);
 
             if (!$password) {  $password = make_password();

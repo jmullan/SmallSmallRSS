@@ -29,7 +29,7 @@ class Pref_Feeds extends ProtectedHandler
     function batch_edit_cbox($elem, $label = false)
     {
         print "<input type=\"checkbox\" title=\"".__("Check to enable field")."\"
-            onchange=\"dijit.byId('feedEditDlg').toggleField(this, '$elem', '$label')\">";
+               onchange=\"dijit.byId('feedEditDlg').toggleField(this, '$elem', '$label')\">";
     }
 
     function renamecat()
@@ -39,8 +39,9 @@ class Pref_Feeds extends ProtectedHandler
 
         if ($title) {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_feed_categories SET
-                title = '$title' WHERE id = '$id' AND owner_uid = " . $_SESSION["uid"]
+                "UPDATE ttrss_feed_categories
+                 SET title = '$title'
+                 WHERE id = '$id' AND owner_uid = " . $_SESSION["uid"]
             );
         }
         return;
@@ -538,7 +539,7 @@ class Pref_Feeds extends ProtectedHandler
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            @unlink(ICONS_DIR . "/$feed_id.ico");
+            @unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico");
 
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds SET favicon_avg_color = NULL
@@ -556,7 +557,7 @@ class Pref_Feeds extends ProtectedHandler
         $tmp_file = false;
 
         if (is_uploaded_file($_FILES['icon_file']['tmp_name'])) {
-            $tmp_file = tempnam(CACHE_DIR . '/upload', 'icon');
+            $tmp_file = tempnam(\SmallSmallRSS\Config::get('CACHE_DIR') . '/upload', 'icon');
 
             $result = move_uploaded_file(
                 $_FILES['icon_file']['tmp_name'],
@@ -582,8 +583,8 @@ class Pref_Feeds extends ProtectedHandler
                 );
 
                 if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                    @unlink(ICONS_DIR . "/$feed_id.ico");
-                    if (rename($icon_file, ICONS_DIR . "/$feed_id.ico")) {
+                    @unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico");
+                    if (rename($icon_file, \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico")) {
                         \SmallSmallRSS\Database::query(
                             "UPDATE ttrss_feeds SET
                             favicon_avg_color = ''
@@ -709,7 +710,8 @@ class Pref_Feeds extends ProtectedHandler
             "purge_interval",
             $purge_interval,
             \SmallSmallRSS\Constants::purge_intervals(),
-            'dojoType="dijit.form.Select" ' . ((FORCE_ARTICLE_PURGE == 0) ? "" : 'disabled="1"')
+            'dojoType="dijit.form.Select" '
+            . ((\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) ? "" : 'disabled="1"')
         );
 
         print "</div>";
@@ -853,7 +855,7 @@ class Pref_Feeds extends ProtectedHandler
             <button dojoType=\"dijit.form.Button\" onclick='return unsubscribeFeed($feed_id, \"$title\")'>".
             __('Unsubscribe')."</button>";
 
-        if (PUBSUBHUBBUB_ENABLED) {
+        if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED')) {
             $pubsub_state = \SmallSmallRSS\Database::fetch_result($result, 0, "pubsub_state");
             $pubsub_btn_disabled = ($pubsub_state == 2) ? "" : "disabled=\"1\"";
 
@@ -946,7 +948,7 @@ class Pref_Feeds extends ProtectedHandler
 
         /* Purge intl */
 
-        if (FORCE_ARTICLE_PURGE == 0) {
+        if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
 
             print "<br/>";
 
@@ -1075,7 +1077,7 @@ class Pref_Feeds extends ProtectedHandler
             \SmallSmallRSS\Database::escape_string($_POST["mark_unread_on_update"])
         );
 
-        if (strlen(FEED_CRYPT_KEY) > 0) {
+        if (\SmallSmallRSS\Crypt::is_enabled()) {
             $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
             $auth_pass_encrypted = 'true';
         } else {
@@ -1431,7 +1433,7 @@ class Pref_Feeds extends ProtectedHandler
                 __("Feeds with errors") . "</button>";
         }
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $interval_qpart = "NOW() - INTERVAL '3 months'";
         } else {
             $interval_qpart = "DATE_SUB(NOW(), INTERVAL 3 MONTH)";
@@ -1518,9 +1520,8 @@ class Pref_Feeds extends ProtectedHandler
             print "<select id=\"feedActionChooser\" onchange=\"feedActionChange()\">
                 <option value=\"facDefault\" selected>".__('More actions...')."</option>";
 
-            if (FORCE_ARTICLE_PURGE == 0) {
-                print
-                    "<option value=\"facPurge\">".__('Manual purge')."</option>";
+            if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
+                print "<option value=\"facPurge\">".__('Manual purge')."</option>";
             }
 
             print "
@@ -1741,7 +1742,7 @@ class Pref_Feeds extends ProtectedHandler
     function inactiveFeeds()
     {
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $interval_qpart = "NOW() - INTERVAL '3 months'";
         } else {
             $interval_qpart = "DATE_SUB(NOW(), INTERVAL 3 MONTH)";
@@ -1997,8 +1998,8 @@ class Pref_Feeds extends ProtectedHandler
 
             \SmallSmallRSS\Database::query("COMMIT");
 
-            if (file_exists(ICONS_DIR . "/$id.ico")) {
-                unlink(ICONS_DIR . "/$id.ico");
+            if (file_exists(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico")) {
+                unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico");
             }
 
             \SmallSmallRSS\CounterCache::remove($id, $owner_uid);
@@ -2082,7 +2083,7 @@ class Pref_Feeds extends ProtectedHandler
                     WHERE feed_url = '$feed' AND owner_uid = ".$_SESSION["uid"]
                 );
 
-                if (strlen(FEED_CRYPT_KEY) > 0) {
+                if (\SmallSmallRSS\Crypt::is_enabled()) {
                     $pass = substr(\SmallSmallRSS\Crypt::en($pass), 0, 250);
                     $auth_pass_encrypted = 'true';
                 } else {

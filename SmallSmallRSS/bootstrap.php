@@ -15,4 +15,4 @@ $include_paths = array(
     get_include_path(),
 );
 set_include_path(join(PATH_SEPARATOR, $include_paths));
-require 'functions.php';
+require __DIR__ . '/../include/functions.php';

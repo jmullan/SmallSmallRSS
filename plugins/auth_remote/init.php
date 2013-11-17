@@ -54,7 +54,7 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
                 $_SESSION["hide_logout"] = true;
 
                 // LemonLDAP can send user informations via HTTP HEADER
-                if (defined('AUTH_AUTO_CREATE') && AUTH_AUTO_CREATE) {
+                if (\SmallSmallRSS\Config::get('AUTH_AUTO_CREATE')) {
                     // update user name
                     $fullname = $_SERVER['HTTP_USER_NAME'] ? $_SERVER['HTTP_USER_NAME'] : $_SERVER['AUTHENTICATE_CN'];
                     if ($fullname) {

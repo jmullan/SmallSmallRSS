@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class PublicHandler extends Handler
 {
 
@@ -90,8 +91,8 @@ class PublicHandler extends Handler
             $tpl->setVariable('VERSION', VERSION, true);
             $tpl->setVariable('FEED_URL', htmlspecialchars($feed_self_url), true);
 
-            if (PUBSUBHUBBUB_HUB && $feed == -2) {
-                $tpl->setVariable('HUB_URL', htmlspecialchars(PUBSUBHUBBUB_HUB), true);
+            if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB') && $feed == -2) {
+                $tpl->setVariable('HUB_URL', htmlspecialchars(\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB')), true);
                 $tpl->addBlock('feed_hub');
             }
 
@@ -172,8 +173,8 @@ class PublicHandler extends Handler
             $feed['version'] = VERSION;
             $feed['feed_url'] = $feed_self_url;
 
-            if (PUBSUBHUBBUB_HUB && $feed == -2) {
-                $feed['hub_url'] = PUBSUBHUBBUB_HUB;
+            if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB') && $feed == -2) {
+                $feed['hub_url'] = \SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB');
             }
 
             $feed['self_url'] = get_self_url_prefix();
@@ -282,7 +283,7 @@ class PublicHandler extends Handler
         $feed_id = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
         $feed_url = \SmallSmallRSS\Database::escape_string($_REQUEST['hub_topic']);
 
-        if (!PUBSUBHUBBUB_ENABLED) {
+        if (!\SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED')) {
             header('HTTP/1.0 404 Not Found');
             echo "404 Not found";
             return;
@@ -371,7 +372,7 @@ class PublicHandler extends Handler
         if (!$format) {  $format = 'atom';
         }
 
-        if (SINGLE_USER_MODE) {
+        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             authenticate_user("admin", null);
         }
 
@@ -414,7 +415,7 @@ class PublicHandler extends Handler
 
     function sharepopup()
     {
-        if (SINGLE_USER_MODE) {
+        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             login_sequence();
         }
 
@@ -540,13 +541,13 @@ class PublicHandler extends Handler
         $password = $_POST["password"];
         $remember_me = !empty($_POST["remember_me"]);
 
-        if (SINGLE_USER_MODE) {
+        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             $login = "admin";
         }
 
-        if (!SINGLE_USER_MODE) {
+        if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
             if ($remember_me) {
-                session_set_cookie_params(SESSION_COOKIE_LIFETIME);
+                session_set_cookie_params(\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'));
             } else {
                 session_set_cookie_params(0);
             }
@@ -581,14 +582,14 @@ class PublicHandler extends Handler
             if ($_REQUEST['return']) {
                 header("Location: " . $_REQUEST['return']);
             } else {
-                header("Location: " . SELF_URL_PATH);
+                header("Location: " . \SmallSmallRSS\Config::get('SELF_URL_PATH'));
             }
         }
     }
 
     function subscribe()
     {
-        if (SINGLE_USER_MODE) {
+        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             login_sequence();
         }
         $feed_urls = false;
@@ -913,7 +914,7 @@ class PublicHandler extends Handler
     {
         startup_gettext();
 
-        if (!SINGLE_USER_MODE && $_SESSION["access_level"] < 10) {
+        if (!\SmallSmallRSS\Auth::is_single_user_mode() && $_SESSION["access_level"] < 10) {
             $_SESSION["login_error_msg"] = __("Your access level is insufficient to run this script.");
             $renderer = new \SmallSmallRSS\Renderers\LoginPage();
             $renderer->render();

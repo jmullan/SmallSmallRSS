@@ -43,7 +43,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         else
             $instance_qpart = "";
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $date_qpart = "last_connected < NOW() - INTERVAL '6 hours'";
         } else {
             $date_qpart = "last_connected < DATE_SUB(NOW(), INTERVAL 6 HOUR)";
@@ -135,16 +135,17 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     }
 
     function hook_prefs_tabs($args) {
-        if ($_SESSION["access_level"] >= 10 || SINGLE_USER_MODE) {
-?><div id="instanceConfigTab" dojoType="dijit.layout.ContentPane"
-            href="backend.php?op=pref-instances"
-                title="<?php echo __('Linked') ?>"></div><?php
-		}
+        if ($_SESSION["access_level"] >= 10 || \SmallSmallRSS\Auth::is_single_user_mode()) {
+            echo '<div id="instanceConfigTab" dojoType="dijit.layout.ContentPane"';
+            echo 'href="backend.php?op=pref-instances"';
+            echo 'title="';
+            echo __('Linked');
+            echo '"></div>';
+        }
     }
 
     function csrf_ignore($method) {
         $csrf_ignored = array("index", "edit");
-
         return array_search($method, $csrf_ignored) !== false;
     }
 

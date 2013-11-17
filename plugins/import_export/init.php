@@ -101,7 +101,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
     }
 
     function exportget() {
-        $exportname = CACHE_DIR . "/export/" .
+        $exportname = \SmallSmallRSS\Config::get('CACHE_DIR') . "/export/" .
             sha1($_SESSION['uid'] . $_SESSION['login']) . ".xml";
 
         if (file_exists($exportname)) {
@@ -124,7 +124,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         $exported = 0;
         $limit = 250;
 
-        if ($offset < 10000 && is_writable(CACHE_DIR . "/export")) {
+        if ($offset < 10000 && is_writable(\SmallSmallRSS\Config::get('CACHE_DIR') . "/export")) {
             $result = \SmallSmallRSS\Database::query("SELECT
 					ttrss_entries.guid,
 					ttrss_entries.title,
@@ -151,10 +151,10 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
             $exportname = sha1($_SESSION['uid'] . $_SESSION['login']);
 
             if ($offset == 0) {
-                $fp = fopen(CACHE_DIR . "/export/$exportname.xml", "w");
+                $fp = fopen(\SmallSmallRSS\Config::get('CACHE_DIR') . "/export/$exportname.xml", "w");
                 fputs($fp, '<articles schema-version="' . \SmallSmallRSS\Constants::SCHEMA_VERSION . '">');
             } else {
-                $fp = fopen(CACHE_DIR . "/export/$exportname.xml", "a");
+                $fp = fopen(\SmallSmallRSS\Config::get('CACHE_DIR') . "/export/$exportname.xml", "a");
             }
 
             if ($fp) {
@@ -419,7 +419,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         $tmp_file = false;
 
         if (is_uploaded_file($_FILES['export_file']['tmp_name'])) {
-            $tmp_file = tempnam(CACHE_DIR . '/upload', 'export');
+            $tmp_file = tempnam(\SmallSmallRSS\Config::get('CACHE_DIR') . '/upload', 'export');
 
             $result = move_uploaded_file($_FILES['export_file']['tmp_name'],
                                          $tmp_file);

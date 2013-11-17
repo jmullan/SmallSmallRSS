@@ -75,9 +75,9 @@ class CounterCache
             $table = "ttrss_cat_counters_cache";
         }
 
-        if (DB_TYPE == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $date_qpart = "updated > NOW() - INTERVAL '15 minutes'";
-        } elseif (DB_TYPE == "mysql") {
+        } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
             $date_qpart = "updated > DATE_SUB(NOW(), INTERVAL 15 MINUTE)";
         }
 

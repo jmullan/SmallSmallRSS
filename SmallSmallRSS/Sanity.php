@@ -52,25 +52,25 @@ class Sanity
     {
         $errors = array();
 
-        if (!file_exists("config.php")) {
+        if (!file_exists("config.ini")) {
             array_push(
                 $errors,
                 "Configuration file not found."
-                . " Looks like you forgot to copy config.php-dist to config.php and edit it."
+                . " Looks like you forgot to copy config.ini-dist to config.ini and edit it."
             );
         } else {
 
-            if (file_exists("install") && !file_exists("config.php")) {
+            if (file_exists("install") && !file_exists("config.ini")) {
                 array_push(
                     $errors,
-                    "Please copy config.php-dist to config.php or run the installer in install/"
+                    "Please copy config.ini-dist to config.ini or run the installer in install/"
                 );
             }
 
-            if (strpos(PLUGINS, "auth_") === false) {
+            if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_") === false) {
                 array_push(
                     $errors,
-                    "Please enable at least one authentication module via PLUGINS constant in config.php"
+                    "Please enable at least one authentication module via PLUGINS constant in config.ini"
                 );
             }
 
@@ -82,53 +82,67 @@ class Sanity
                 array_push($errors, "PHP version 5.3.0 or newer required.");
             }
 
-            if (CONFIG_VERSION != EXPECTED_CONFIG_VERSION) {
+            if (\SmallSmallRSS\Config::get('CONFIG_VERSION') != \SmallSmallRSS\Config::get('EXPECTED_CONFIG_VERSION')) {
                 array_push(
                     $errors,
-                    "Configuration file (config.php) has incorrect version."
-                    . " Update it with new options from config.php-dist and set CONFIG_VERSION to the correct value."
+                    "Configuration file (config.ini) has incorrect version."
+                    . " Update it with new options from config.ini-dist and set CONFIG_VERSION to the correct value."
                 );
             }
 
-            if (!is_writable(CACHE_DIR . "/images")) {
-                array_push($errors, "Image cache is not writable (chmod -R 777 ".CACHE_DIR."/images)");
-            }
-
-            if (!is_writable(CACHE_DIR . "/upload")) {
-                array_push($errors, "Upload cache is not writable (chmod -R 777 ".CACHE_DIR."/upload)");
-            }
-
-            if (!is_writable(CACHE_DIR . "/export")) {
-                array_push($errors, "Data export cache is not writable (chmod -R 777 ".CACHE_DIR."/export)");
-            }
-
-            if (!is_writable(CACHE_DIR . "/js")) {
-                array_push($errors, "Javascript cache is not writable (chmod -R 777 ".CACHE_DIR."/js)");
-            }
-
-            if (strlen(FEED_CRYPT_KEY) > 0 && strlen(FEED_CRYPT_KEY) != 24) {
-                array_push($errors, "FEED_CRYPT_KEY should be exactly 24 characters in length.");
-            }
-
-            if (strlen(FEED_CRYPT_KEY) > 0 && !function_exists("mcrypt_decrypt")) {
+            $cache_dir = \SmallSmallRSS\Config::get('CACHE_DIR');
+            if (!is_writable($cache_dir . "/images")) {
                 array_push(
                     $errors,
-                    "FEED_CRYPT_KEY requires mcrypt functions which are not found."
+                    "Image cache is not writable (chmod -R 777 ".$cache_dir."/images)"
                 );
             }
 
-            if (SINGLE_USER_MODE) {
+            if (!is_writable($cache_dir . "/upload")) {
+                array_push(
+                    $errors,
+                    "Upload cache is not writable (chmod -R 777 ".$cache_dir."/upload)"
+                );
+            }
+
+            if (!is_writable($cache_dir . "/export")) {
+                array_push(
+                    $errors,
+                    "Data export cache is not writable (chmod -R 777 ".$cache_dir."/export)"
+                );
+            }
+
+            if (!is_writable($cache_dir . "/js")) {
+                array_push(
+                    $errors,
+                    "Javascript cache is not writable (chmod -R 777 ".$cache_dir."/js)"
+                );
+            }
+
+            $feed_crypt_key = \SmallSmallRSS\Config::get('FEED_CRYPT_KEY');
+            if (strlen($feed_crypt_key) > 0 && strlen($feed_crypt_key) != 24) {
+                array_push($errors, "$feed_crypt_key should be exactly 24 characters in length.");
+            }
+
+            if (strlen($feed_crypt_key) > 0 && !function_exists("mcrypt_decrypt")) {
+                array_push(
+                    $errors,
+                    "$feed_crypt_key requires mcrypt functions which are not found."
+                );
+            }
+
+            if (\SmallSmallRSS\Auth::is_single_user_mode()) {
                 $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE id = 1");
 
                 if (\SmallSmallRSS\Database::num_rows($result) != 1) {
                     array_push(
                         $errors,
-                        "SINGLE_USER_MODE is enabled in config.php but default admin account is not found."
+                        "SINGLE_USER_MODE is enabled in config.ini but default admin account is not found."
                     );
                 }
             }
 
-            if (SELF_URL_PATH == "http://yourserver/tt-rss/") {
+            if (\SmallSmallRSS\Config::get('SELF_URL_PATH') == "http://yourserver/tt-rss/") {
                 $urlpath = preg_replace("/\w+\.php$/", "", self::makeSelfURLPath());
 
                 array_push(
@@ -137,17 +151,19 @@ class Sanity
                 );
             }
 
-            if (!is_writable(ICONS_DIR)) {
+            if (!is_writable(\SmallSmallRSS\Config::get('ICONS_DIR'))) {
                 array_push(
                     $errors,
-                    "ICONS_DIR defined in config.php is not writable (chmod -R 777 ".ICONS_DIR.").\n"
+                    "ICONS_DIR defined in config.ini is not writable (chmod -R 777 "
+                    . \SmallSmallRSS\Config::get('ICONS_DIR') . ").\n"
                 );
             }
 
-            if (!is_writable(LOCK_DIRECTORY)) {
+            if (!is_writable(\SmallSmallRSS\Config::get('LOCK_DIRECTORY'))) {
                 array_push(
                     $errors,
-                    "LOCK_DIRECTORY defined in config.php is not writable (chmod -R 777 ".LOCK_DIRECTORY.").\n"
+                    "\SmallSmallRSS\Config::get('LOCK_DIRECTORY') defined in config.ini is not writable (chmod -R 777 "
+                    . \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . ").\n"
                 );
             }
 
@@ -163,12 +179,15 @@ class Sanity
                 array_push($errors, "PHP support for JSON is required, but was not found.");
             }
 
-            if (DB_TYPE == "mysql" && !function_exists("mysql_connect") && !function_exists("mysqli_connect")) {
-                array_push($errors, "PHP support for MySQL is required for configured DB_TYPE in config.php.");
+            if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql"
+                && !function_exists("mysql_connect")
+                && !function_exists("mysqli_connect")) {
+                array_push($errors, "PHP support for MySQL is required for configured DB_TYPE in config.ini.");
             }
 
-            if (DB_TYPE == "pgsql" && !function_exists("pg_connect")) {
-                array_push($errors, "PHP support for PostgreSQL is required for configured DB_TYPE in config.php");
+            if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql"
+                && !function_exists("pg_connect")) {
+                array_push($errors, "PHP support for PostgreSQL is required for configured DB_TYPE in config.ini");
             }
 
             if (!function_exists("mb_strlen")) {
@@ -191,7 +210,8 @@ class Sanity
                 array_push($errors, "PHP safe mode setting is not supported.");
             }
 
-            if ((PUBSUBHUBBUB_HUB || PUBSUBHUBBUB_ENABLED) && !function_exists("curl_init")) {
+            if ((\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB') || \SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED'))
+                && !function_exists("curl_init")) {
                 array_push($errors, "PHP support for CURL is required for PubSubHubbub.");
             }
 

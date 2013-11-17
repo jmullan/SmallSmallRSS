@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 $op = (isset($_REQUEST['op']) ? $_REQUEST["op"] : '');
@@ -36,12 +35,12 @@ startup_gettext();
 
 $script_started = microtime(true);
 
-if (!init_plugins()) {
+if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
 header("Content-Type: application/json; charset=utf-8");
 
-if (SINGLE_USER_MODE) {
+if (\SmallSmallRSS\Auth::is_single_user_mode()) {
     authenticate_user("admin", null);
 }
 

@@ -32,11 +32,11 @@ function sanity_check($db_type) {
     }
 
     if ($db_type == "mysql" && !function_exists("mysql_connect") && !function_exists("mysqli_connect")) {
-        array_push($errors, "PHP support for MySQL is required for configured $db_type in config.php.");
+        array_push($errors, "PHP support for MySQL is required for configured $db_type in config.ini.");
     }
 
     if ($db_type == "pgsql" && !function_exists("pg_connect")) {
-        array_push($errors, "PHP support for PostgreSQL is required for configured $db_type in config.php");
+        array_push($errors, "PHP support for PostgreSQL is required for configured $db_type in config.ini");
     }
 
     if (!function_exists("mb_strlen")) {
@@ -100,48 +100,32 @@ function db_connect($host, $user, $pass, $db, $type, $port = false) {
 function make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS,
                      $DB_PORT, $SELF_URL_PATH) {
 
-    $data = explode("\n", file_get_contents("../config.php-dist"));
-
     $rv = "";
-
     $finished = false;
-
     if (function_exists("mcrypt_decrypt")) {
         $crypt_key = make_password(24);
     } else {
         $crypt_key = "";
     }
-
-    foreach ($data as $line) {
-        if (preg_match("/define\('DB_TYPE'/", $line)) {
-            $rv .= "\tdefine('DB_TYPE', '$DB_TYPE');\n";
-        } elseif (preg_match("/define\('DB_HOST'/", $line)) {
-            $rv .= "\tdefine('DB_HOST', '$DB_HOST');\n";
-        } elseif (preg_match("/define\('DB_USER'/", $line)) {
-            $rv .= "\tdefine('DB_USER', '$DB_USER');\n";
-        } elseif (preg_match("/define\('DB_NAME'/", $line)) {
-            $rv .= "\tdefine('DB_NAME', '$DB_NAME');\n";
-        } elseif (preg_match("/define\('DB_PASS'/", $line)) {
-            $rv .= "\tdefine('DB_PASS', '$DB_PASS');\n";
-        } elseif (preg_match("/define\('DB_PORT'/", $line)) {
-            $rv .= "\tdefine('DB_PORT', '$DB_PORT');\n";
-        } elseif (preg_match("/define\('SELF_URL_PATH'/", $line)) {
-            $rv .= "\tdefine('SELF_URL_PATH', '$SELF_URL_PATH');\n";
-        } elseif (preg_match("/define\('FEED_CRYPT_KEY'/", $line)) {
-            $rv .= "\tdefine('FEED_CRYPT_KEY', '$crypt_key');\n";
-        } elseif (!$finished) {
-            $rv .= "$line\n";
-        }
-
-        if (preg_match("/\?\>/", $line)) {
-            $finished = true;
-        }
+    $data = array(
+        'DB_TYPE' => $DB_TYPE,
+        'DB_HOST' => $DB_HOST,
+        'DB_USER' => $DB_USER,
+        'DB_NAME' => $DB_NAME,
+        'DB_PASS' => $DB_PASS,
+        'DB_PORT' => $DB_PORT,
+        'SELF_URL_PATH' => $SELF_URL_PATH
+    );
+    foreach ($data as $key => $value) {
+        $rv .= "$key = ";
+        $rv .= var_export($value, true);
+        $rv .= "\n";
     }
 
     return $rv;
 }
 
-function \SmallSmallRSS\Database::query($link, $query, $type, $die_on_error = true) {
+function db_query($link, $query, $type, $die_on_error = true) {
     if ($type == "pgsql") {
         $result = pg_query($link, $query);
         if (!$result) {
@@ -181,12 +165,10 @@ function makeSelfURLPath() {
 
 
 
-if (file_exists("../config.php")) {
-    require "../config.php";
-
+if (file_exists("../config.ini")) {
     if (!defined('_INSTALLER_IGNORE_CONFIG_CHECK')) {
         \SmallSmallRSS\Renderers\Messages::renderError(
-            "Error: config.php already exists in tt-rss directory; aborting.");
+            "Error: config.ini already exists in tt-rss directory; aborting.");
         exit;
     }
 }
@@ -421,7 +403,7 @@ if ($op == 'testconfig') {
 
     print "<h2>Generated configuration file</h2>";
 
-    print "<p>Copy following text and save as <code>config.php</code> in tt-rss main directory. It is suggested to read through the file to the end in case you need any options changed fom default values.</p>";
+    print "<p>Copy following text and save as <code>config.ini</code> in tt-rss main directory. It is suggested to read through the file to the end in case you need any options changed fom default values.</p>";
 
     print "<p>After copying the file, you will be able to login with default username and password combination: <code>admin</code> and <code>password</code>. Don't forget to change the password immediately!</p>";
 
@@ -444,7 +426,7 @@ echo make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS, $DB_PORT, $SE
 <?php
 } else {
     \SmallSmallRSS\Renderers\Messages::renderError(
-        "Unfortunately, parent directory is not writable, so we're unable to save config.php automatically.");
+        "Unfortunately, parent directory is not writable, so we're unable to save config.ini automatically.");
 }
 \SmallSmallRSS\Renderers\Messages::renderNotice(
     "You can generate the file again by changing the form above.");
@@ -453,35 +435,28 @@ echo make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS, $DB_PORT, $SE
 <?php
 
 } elseif ($op == "saveconfig") {
-
     print "<h2>Saving configuration file to parent directory...</h2>";
-
-    if (!file_exists("../config.php")) {
-
-        $fp = fopen("../config.php", "w");
-
+    if (!file_exists("../config.ini")) {
+        $fp = fopen("../config.ini", "w");
         if ($fp) {
             $written = fwrite($fp, make_config($DB_TYPE, $DB_HOST,
                                                $DB_USER, $DB_NAME, $DB_PASS,
                                                $DB_PORT, $SELF_URL_PATH));
-
             if ($written > 0) {
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
-                    "Successfully saved config.php. You can try <a href=\"..\">loading tt-rss now</a>.");
-
+                    "Successfully saved config.ini. You can try <a href=\"..\">loading tt-rss now</a>.");
             } else {
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
-                    "Unable to write into config.php in tt-rss directory.");
+                    "Unable to write into config.ini in tt-rss directory.");
             }
-
             fclose($fp);
         } else {
             \SmallSmallRSS\Renderers\Messages::renderError(
-                "Unable to open config.php in tt-rss directory for writing.");
+                "Unable to open config.ini in tt-rss directory for writing.");
         }
     } else {
         \SmallSmallRSS\Renderers\Messages::renderError(
-            "config.php already present in tt-rss directory, refusing to overwrite.");
+            "config.ini already present in tt-rss directory, refusing to overwrite.");
     }
 }
 ?>

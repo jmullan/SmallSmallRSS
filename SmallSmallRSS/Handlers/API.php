@@ -1,10 +1,10 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class API extends Handler
 {
 
     const API_LEVEL = 7;
-
     const STATUS_OK = 0;
     const STATUS_ERR = 1;
 
@@ -73,7 +73,7 @@ class API extends Handler
         $login = $this->escape_from_request("user");
         $password = $_REQUEST["password"];
         $password_base64 = base64_decode($password);
-        if (SINGLE_USER_MODE) {
+        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             $login = "admin";
         }
 
@@ -92,7 +92,7 @@ class API extends Handler
             return;
         }
 
-        session_set_cookie_params(SESSION_COOKIE_LIFETIME);
+        session_set_cookie_params(\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'));
         if (authenticate_user($login, $password)) {
             // try login with normal password
             $this->wrap(self::STATUS_OK, array("session_id" => session_id(),
@@ -406,8 +406,9 @@ class API extends Handler
     function getConfig()
     {
         $config = array(
-            "icons_dir" => ICONS_DIR,
-            "icons_url" => ICONS_URL);
+            "icons_dir" => \SmallSmallRSS\Config::get('ICONS_DIR'),
+            "icons_url" => \SmallSmallRSS\Config::get('ICONS_URL')
+        );
 
         $config["daemon_is_running"] = file_is_locked("update_daemon.lock");
 

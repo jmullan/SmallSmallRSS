@@ -421,7 +421,7 @@ class Feeds extends ProtectedHandler
                 $has_feed_icon = feed_has_icon($feed_id);
 
                 if ($has_feed_icon) {
-                    $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"".ICONS_URL."/$feed_id.ico\" alt=\"\">";
+                    $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"".\SmallSmallRSS\Config::get('ICONS_URL')."/$feed_id.ico\" alt=\"\">";
                 } else {
                     $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"images/pub_set.svg\" alt=\"\">";
                 }
@@ -555,7 +555,7 @@ class Feeds extends ProtectedHandler
                             $has_feed_icon = feed_has_icon($feed_id);
 
                             if ($has_feed_icon) {
-                                $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"".ICONS_URL."/$feed_id.ico\" alt=\"\">";
+                                $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"".\SmallSmallRSS\Config::get('ICONS_URL')."/$feed_id.ico\" alt=\"\">";
                             } else {
                                 //$feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"images/blank_icon.gif\" alt=\"\">";
                             }
@@ -1178,33 +1178,24 @@ class Feeds extends ProtectedHandler
         } else {
             $feed_cat_title = getCategoryTitle($active_feed_id);
         }
-
         if ($active_feed_id && !$is_cat) {
             print "<option selected=\"1\" value=\"this_feed\">$feed_title</option>";
         } else {
             print "<option disabled=\"1\" value=\"false\">".__('This feed')."</option>";
         }
-
         if ($is_cat) {
             $cat_preselected = "selected=\"1\"";
         }
-
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS') && ($active_feed_id > 0 || $is_cat)) {
             print "<option $cat_preselected value=\"this_cat\">$feed_cat_title</option>";
-        } else {
-            //print "<option disabled>".__('This category')."</option>";
         }
-
         print "</select>";
-
         print "</div>";
-
         print "<div class=\"dlgButtons\">";
-
-        if (!SPHINX_ENABLED) {
+        if (!\SmallSmallRSS\Config::get('SPHINX_ENABLED')) {
             print "<div style=\"float : left\">
-                <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/wiki/SearchSyntax\">Search syntax</a>
-                </div>";
+                   <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/wiki/SearchSyntax\">Search syntax</a>
+                   </div>";
         }
 
         print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').execute()\">".__('Search')."</button>

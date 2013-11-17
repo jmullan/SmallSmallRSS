@@ -16,7 +16,7 @@ class Updater
 
     function getSchemaLines($version)
     {
-        $filename = "schema/versions/" . DB_TYPE . "/$version.sql";
+        $filename = "schema/versions/" . \SmallSmallRSS\Config::get('DB_TYPE') . "/$version.sql";
         if (file_exists($filename)) {
             return explode(";", preg_replace("/[\r\n]/", "", file_get_contents($filename)));
         } else {

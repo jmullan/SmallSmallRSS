@@ -11,7 +11,7 @@ class Database
             if (defined('_ENABLE_PDO') && _ENABLE_PDO && class_exists("PDO")) {
                 self::$adapter = new \SmallSmallRSS\Database\PDOWrapper();
             } else {
-                switch (DB_TYPE) {
+                switch (\SmallSmallRSS\Config::get('DB_TYPE')) {
                     case "mysql":
                         if (function_exists("mysqli_connect")) {
                             self::$adapter = new \SmallSmallRSS\Database\MySQLi();
@@ -23,18 +23,18 @@ class Database
                         self::$adapter = new \SmallSmallRSS\Database\PostgreSQL();
                         break;
                     default:
-                        die("Unknown DB_TYPE: " . DB_TYPE);
+                        die("Unknown DB_TYPE: " . \SmallSmallRSS\Config::get('DB_TYPE'));
                 }
             }
             if (!self::adapter()) {
-                die("Error initializing database adapter for " . DB_TYPE);
+                die("Error initializing database adapter for " . \SmallSmallRSS\Config::get('DB_TYPE'));
             }
             self::$link = self::adapter()->connect(
-                DB_HOST,
-                DB_USER,
-                DB_PASS,
-                DB_NAME,
-                defined('DB_PORT') ? DB_PORT : ""
+                \SmallSmallRSS\Config::get('DB_HOST'),
+                \SmallSmallRSS\Config::get('DB_USER'),
+                \SmallSmallRSS\Config::get('DB_PASS'),
+                \SmallSmallRSS\Config::get('DB_NAME'),
+                \SmallSmallRSS\Config::get('DB_PORT')
             );
             if (!self::$link) {
                 die("Error connecting through adapter: " . self::adapter()->last_error());

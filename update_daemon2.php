@@ -1,11 +1,8 @@
 #!/usr/bin/env php
 <?php
-require_once __DIR__ . "/config.php";
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
-
 chdir(__DIR__);
-define('DISABLE_SESSIONS', true);
 // defaults
 define_default('PURGE_INTERVAL', 3600); // seconds
 define_default('MAX_CHILD_RUNTIME', 1800); // seconds
@@ -32,9 +29,9 @@ function sigchld_handler($signal)
 function shutdown($caller_pid)
 {
     if ($caller_pid == posix_getpid()) {
-        if (file_exists(LOCK_DIRECTORY . "/update_daemon.lock")) {
+        if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.lock")) {
             _debug("removing lockfile (master)...");
-            unlink(LOCK_DIRECTORY . "/update_daemon.lock");
+            unlink(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.lock");
         }
     }
 }
@@ -42,9 +39,9 @@ function shutdown($caller_pid)
 function task_shutdown()
 {
     $pid = posix_getpid();
-    if (file_exists(LOCK_DIRECTORY . "/update_daemon-$pid.lock")) {
+    if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon-$pid.lock")) {
         _debug("removing lockfile ($pid)...");
-        unlink(LOCK_DIRECTORY . "/update_daemon-$pid.lock");
+        unlink(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon-$pid.lock");
     }
 }
 
@@ -80,7 +77,7 @@ if (isset($options["help"])) {
     return;
 }
 
-define('QUIET', isset($options['quiet']));
+\SmallSmallRSS\Config::set('VERBOSITY', isset($options['quiet']) ? 0 : 1);
 
 if (isset($options["tasks"])) {
     _debug("Set to spawn " . $options["tasks"] . " children.");
@@ -158,8 +155,10 @@ while (true) {
 
                 $my_pid = posix_getpid();
 
-                passthru(PHP_EXECUTABLE . " update.php --daemon-loop $quiet --task $j --pidlock $my_pid");
-
+                passthru(
+                    \SmallSmallRSS\Config::get('PHP_EXECUTABLE')
+                    . " update.php --daemon-loop $quiet --task $j --pidlock $my_pid"
+                );
                 sleep(1);
 
                 // We exit in order to avoid fork bombing.

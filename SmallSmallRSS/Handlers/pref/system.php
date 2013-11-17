@@ -32,7 +32,7 @@ class Pref_System extends ProtectedHandler
         print "<div dojoType=\"dijit.layout.AccordionContainer\" region=\"center\">";
         print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Error Log')."\">";
 
-        if (LOG_DESTINATION == "sql") {
+        if (\SmallSmallRSS\Config::get('LOG_DESTINATION') == "sql") {
 
             $result = \SmallSmallRSS\Database::query(
                 "SELECT errno, errstr, filename, lineno,

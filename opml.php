@@ -1,11 +1,10 @@
 <?php
-require_once __DIR__ . "/config.php";
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initialCheck();
 
-if (!init_plugins()) {
+if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
 $op = $_REQUEST['op'];

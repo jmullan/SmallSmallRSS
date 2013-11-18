@@ -109,7 +109,7 @@ function _debug($msg, $show=true, $is_debug=true)
         $message = '' . $file . ':' . $rawcalls[0]['line'] . ' ';
     }
     $message .= "[$ts] $msg";
-    if ($show && !\SmallSmallRSS\Config::get('VERBOSITY')) {
+    if ($show && \SmallSmallRSS\Config::get('VERBOSITY')) {
         print "$message\n";
     }
 

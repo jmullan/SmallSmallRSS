@@ -65,4 +65,40 @@ class Logger
         }
         return self::$instance;
     }
+
+    /**
+     * Print a timestamped debug message.
+     *
+     * @param string $msg The debug message.
+     * @return void
+     */
+    public static function debug($message, $show=true, $is_debug=true) {
+        if (!$is_debug) {
+            return;
+        }
+
+        $ts = strftime("%H:%M:%S", time());
+        if (function_exists('posix_getpid')) {
+            $ts = "$ts/" . posix_getpid();
+        }
+        $rawcalls = debug_backtrace();
+        $message = '';
+        if ('_debug' == $rawcalls[0]['function'] || 'debug' == $rawcalls[0]['function']) {
+            $file = str_replace(dirname(__DIR__) . '/', '', $rawcalls[0]['file']);
+            $message = '' . $file . ':' . $rawcalls[0]['line'] . ' ';
+        }
+        $message .= "[$ts] $msg";
+        if ($show && \SmallSmallRSS\Config::get('VERBOSITY')) {
+            print "$message\n";
+        }
+
+        if (defined('LOGFILE'))  {
+            $fp = fopen(LOGFILE, 'a+');
+            if ($fp) {
+                fputs($fp, "$message\n");
+                fclose($fp);
+            }
+        }
+
+    }
 }

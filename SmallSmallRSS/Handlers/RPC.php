@@ -396,6 +396,74 @@ class RPC extends ProtectedHandler
         return ($value === 'true') || ($value === true);
     }
 
+    private static function checkDatabase()
+    {
+        $error_code = 0;
+        $schema_version = \SmallSmallRSS\Sanity::getSchemaVersion(true);
+        if (!\SmallSmallRSS\Sanity::isSchemaCorrect()) {
+            $error_code = 5;
+        }
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
+            $result = \SmallSmallRSS\Database::query("SELECT true", false);
+            if (\SmallSmallRSS\Database::num_rows($result) != 1) {
+                $error_code = 10;
+            }
+        }
+        if (\SmallSmallRSS\Database::escape_string("testTEST") != "testTEST") {
+            $error_code = 12;
+        }
+        return array(
+            "code" => $error_code,
+            "message" => \SmallSmallRSS\Constants::error_description($error_code)
+        );
+    }
+
+    private function makeInitParams() {
+        $prefs = array(
+            "ON_CATCHUP_SHOW_NEXT_FEED",
+            "HIDE_READ_FEEDS",
+            "ENABLE_FEED_CATS",
+            "FEEDS_SORT_BY_UNREAD",
+            "CONFIRM_FEED_CATCHUP",
+            "CDM_AUTO_CATCHUP",
+            "FRESH_ARTICLE_MAX_AGE",
+            "HIDE_READ_SHOWS_SPECIAL",
+            "COMBINED_DISPLAY_MODE"
+        );
+        $params = array();
+        foreach ($prefs as $param) {
+            $params[strtolower($param)] = (int) \SmallSmallRSS\DBPrefs::read($param);
+        }
+        $params["icons_url"] = \SmallSmallRSS\Config::get('ICONS_URL');
+        $params["cookie_lifetime"] = \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME');
+        $params["default_view_mode"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_MODE");
+        $params["default_view_limit"] = (int) \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_LIMIT");
+        $params["default_view_order_by"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_ORDER_BY");
+        $params["bw_limit"] = (int) $_SESSION["bw_limit"];
+        $params["label_base_index"] = (int) \SmallSmallRSS\Constants::LABEL_BASE_INDEX;
+
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT
+             MAX(id) AS mid,
+             COUNT(*) AS nf
+             FROM ttrss_feeds
+             WHERE owner_uid = " . $_SESSION["uid"]
+        );
+        $max_feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "mid");
+        $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "nf");
+        $params["max_feed_id"] = (int) $max_feed_id;
+        $params["num_feeds"] = (int) $num_feeds;
+        $params["hotkeys"] = get_hotkeys_map();
+        $params["csrf_token"] = $_SESSION["csrf_token"];
+        if (!empty($_COOKIE["ttrss_widescreen"])) {
+            $params["widescreen"] = (int) $_COOKIE["ttrss_widescreen"];
+        } else {
+            $params["widescreen"] = 0;
+        }
+        $params['simple_update'] = (bool) \SmallSmallRSS\Config::get('SIMPLE_UPDATE_MODE');
+        return $params;
+    }
+
     public function sanityCheck()
     {
         $_SESSION['hasAudio'] = self::get_bool_from_request('hasAudio');
@@ -406,9 +474,9 @@ class RPC extends ProtectedHandler
             ? $_REQUEST["clientTzOffset"] : null
         );
         $reply = array();
-        $reply['error'] = sanity_check();
+        $reply['error'] = self::checkDatabase();
         if ($reply['error']['code'] == 0) {
-            $reply['init-params'] = make_init_params();
+            $reply['init-params'] = self::makeInitParams();
             $reply['runtime-info'] = make_runtime_info();
         }
         print json_encode($reply);

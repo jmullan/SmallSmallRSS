@@ -243,6 +243,18 @@ class DefaultConfigs {
     const AUTH_DISABLE_OTP = false;
     const ENABLE_PDO = false;
 
+    /**
+     * Should the application reload if the timestamp changes on any
+     * javascript file?
+     */
+    const RELOAD_ON_TS_CHANGE = false;
+
+    /**
+     * Override the default translation with this
+     * example: en_US
+     */
+    const FORCED_LOCALE = '';
+
     // TODO: Swap these out as well
     const _API_DEBUG_HTTP_ENABLED = false;
     const _ENABLE_FEED_DEBUGGING = false;
@@ -250,8 +262,6 @@ class DefaultConfigs {
     const _DISABLE_HTTP_304 = false;
     const _NGRAM_TITLE_DUPLICATE_THRESHOLD = false;
     const DAEMON_EXTENDED_DEBUG = false;
-    const _TRANSLATION_OVERRIDE_DEFAULT = false;
-    const _NO_RELOAD_ON_TS_CHANGE = false;
     const _INSTALLER_IGNORE_CONFIG_CHECK = false;
 
     public static function has($key) {

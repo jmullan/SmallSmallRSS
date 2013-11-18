@@ -28,8 +28,8 @@ function get_translations()
         "pt_BR" => "Portuguese/Brazil",
         "zh_CN" => "Simplified Chinese",
         "sv_SE" => "Svenska",
-        "fi_FI" => "Suomi");
-
+        "fi_FI" => "Suomi"
+    );
     return $tr;
 }
 
@@ -40,26 +40,23 @@ function startup_gettext()
 {
 
     # Get locale from Accept-Language header
-    $lang = al2gt(array_keys(get_translations()), "text/html");
-
-    if (defined('_TRANSLATION_OVERRIDE_DEFAULT')) {
-        $lang = _TRANSLATION_OVERRIDE_DEFAULT;
+    $locale = al2gt(array_keys(get_translations()), "text/html");
+    $forced_locale = \SmallSmallRSS\Config::get('FORCE_LOCALE');
+    if ($forced_locale and $force_local != 'auto') {
+        $locale = $forced_locale;
     }
-
     if (!empty($_SESSION["uid"])
         && \SmallSmallRSS\Sanity::getSchemaVersion() >= 120) {
-        $pref_lang = \SmallSmallRSS\DBPrefs::read("USER_LANGUAGE", $_SESSION["uid"]);
-
-        if ($pref_lang && $pref_lang != 'auto') {
-            $lang = $pref_lang;
+        $pref_locale = \SmallSmallRSS\DBPrefs::read("USER_LANGUAGE", $_SESSION["uid"]);
+        if ($pref_locale && $pref_locale != 'auto') {
+            $locale = $pref_locale;
         }
     }
-
-    if ($lang) {
+    if ($locale) {
         if (defined('LC_MESSAGES')) {
-            _setlocale(LC_MESSAGES, $lang);
+            _setlocale(LC_MESSAGES, $locale);
         } elseif (defined('LC_ALL')) {
-            _setlocale(LC_ALL, $lang);
+            _setlocale(LC_ALL, $locale);
         }
         _bindtextdomain("messages", "locale");
         _textdomain("messages");
@@ -67,42 +64,9 @@ function startup_gettext()
     }
 }
 
-$schema_version = false;
-
-/**
- * Print a timestamped debug message.
- *
- * @param string $msg The debug message.
- * @return void
- */
 function _debug($msg, $show=true, $is_debug=true)
 {
-    if (!$is_debug) {
-        return;
-    }
-
-    $ts = strftime("%H:%M:%S", time());
-    if (function_exists('posix_getpid')) {
-        $ts = "$ts/" . posix_getpid();
-    }
-    $rawcalls = debug_backtrace();
-    $message = '';
-    if ('_debug' == $rawcalls[0]['function']) {
-        $file = str_replace(dirname(__DIR__) . '/', '', $rawcalls[0]['file']);
-        $message = '' . $file . ':' . $rawcalls[0]['line'] . ' ';
-    }
-    $message .= "[$ts] $msg";
-    if ($show && \SmallSmallRSS\Config::get('VERBOSITY')) {
-        print "$message\n";
-    }
-
-    if (defined('LOGFILE'))  {
-        $fp = fopen(LOGFILE, 'a+');
-        if ($fp) {
-            fputs($fp, "$message\n");
-            fclose($fp);
-        }
-    }
+    \SmallSmallRSS\Logger::debug($msg, $show, $is_debug);
 }
 
 /**
@@ -742,32 +706,6 @@ function bool_to_sql_bool($s)
     } else {
         return "false";
     }
-}
-
-function sanity_check()
-{
-    $error_code = 0;
-    $schema_version = \SmallSmallRSS\Sanity::getSchemaVersion(true);
-
-    if (!\SmallSmallRSS\Sanity::isSchemaCorrect()) {
-        $error_code = 5;
-    }
-
-    if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
-        $result = \SmallSmallRSS\Database::query("SELECT true", false);
-        if (\SmallSmallRSS\Database::num_rows($result) != 1) {
-            $error_code = 10;
-        }
-    }
-
-    if (\SmallSmallRSS\Database::escape_string("testTEST") != "testTEST") {
-        $error_code = 12;
-    }
-
-    return array(
-        "code" => $error_code,
-        "message" => \SmallSmallRSS\Constants::error_description($error_code)
-    );
 }
 
 function file_is_locked($filename)
@@ -1716,47 +1654,6 @@ function getFeedIcon($id)
     return false;
 }
 
-function make_init_params()
-{
-    $params = array();
-    foreach (
-        array("ON_CATCHUP_SHOW_NEXT_FEED", "HIDE_READ_FEEDS",
-              "ENABLE_FEED_CATS", "FEEDS_SORT_BY_UNREAD", "CONFIRM_FEED_CATCHUP",
-              "CDM_AUTO_CATCHUP", "FRESH_ARTICLE_MAX_AGE",
-              "HIDE_READ_SHOWS_SPECIAL", "COMBINED_DISPLAY_MODE") as $param) {
-
-        $params[strtolower($param)] = (int) \SmallSmallRSS\DBPrefs::read($param);
-    }
-    $params["icons_url"] = \SmallSmallRSS\Config::get('ICONS_URL');
-    $params["cookie_lifetime"] = \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME');
-    $params["default_view_mode"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_MODE");
-    $params["default_view_limit"] = (int) \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_LIMIT");
-    $params["default_view_order_by"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_ORDER_BY");
-    $params["bw_limit"] = (int) $_SESSION["bw_limit"];
-    $params["label_base_index"] = (int) \SmallSmallRSS\Constants::LABEL_BASE_INDEX;
-
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT
-             MAX(id) AS mid,
-             COUNT(*) AS nf
-         FROM ttrss_feeds
-         WHERE owner_uid = " . $_SESSION["uid"]
-    );
-    $max_feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "mid");
-    $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "nf");
-    $params["max_feed_id"] = (int) $max_feed_id;
-    $params["num_feeds"] = (int) $num_feeds;
-    $params["hotkeys"] = get_hotkeys_map();
-    $params["csrf_token"] = $_SESSION["csrf_token"];
-    if (!empty($_COOKIE["ttrss_widescreen"])) {
-        $params["widescreen"] = (int) $_COOKIE["ttrss_widescreen"];
-    } else {
-        $params["widescreen"] = 0;
-    }
-    $params['simple_update'] = (bool) \SmallSmallRSS\Config::get('SIMPLE_UPDATE_MODE');
-    return $params;
-}
-
 function get_hotkeys_info()
 {
     $hotkeys = array(
@@ -1920,9 +1817,12 @@ function get_hotkeys_map() {
 function make_runtime_info()
 {
     $data = array();
-
-    $result = \SmallSmallRSS\Database::query("SELECT MAX(id) AS mid, COUNT(*) AS nf FROM
-            ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]);
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT
+             MAX(id) AS mid,
+             COUNT(*) AS nf
+         FROM ttrss_feeds
+         WHERE owner_uid = " . $_SESSION["uid"]);
 
     $max_feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "mid");
     $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "nf");
@@ -1934,7 +1834,7 @@ function make_runtime_info()
     $data['cdm_expanded'] = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
 
     $data['dependency_timestamp'] = calculate_dep_timestamp();
-    $data['reload_on_ts_change'] = !defined('_NO_RELOAD_ON_TS_CHANGE');
+    $data['reload_on_ts_change'] = \SmallSmallRSS\Config::get('RELOAD_ON_TS_CHANGE');
 
     if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.lock")) {
         $data['daemon_is_running'] = (int) file_is_locked("update_daemon.lock");

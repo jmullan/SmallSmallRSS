@@ -241,10 +241,10 @@ class DefaultConfigs {
     const MAX_JOBS = 2;
 
     const AUTH_DISABLE_OTP = false;
+    const ENABLE_PDO = false;
 
     // TODO: Swap these out as well
     const _API_DEBUG_HTTP_ENABLED = false;
-    const _ENABLE_PDO = false;
     const _ENABLE_FEED_DEBUGGING = false;
     const _DISABLE_FEED_BROWSER = false;
     const _DISABLE_HTTP_304 = false;

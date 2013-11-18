@@ -8,7 +8,7 @@ class Database
     private static function adapter() {
         if (!self::$adapter) {
             $er = error_reporting(E_ALL);
-            if (defined('_ENABLE_PDO') && _ENABLE_PDO && class_exists("PDO")) {
+            if (\SmallSmallRSS\Config::get('ENABLE_PDO') && class_exists("\PDO")) {
                 self::$adapter = new \SmallSmallRSS\Database\PDOWrapper();
             } else {
                 switch (\SmallSmallRSS\Config::get('DB_TYPE')) {

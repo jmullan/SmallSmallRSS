@@ -66,10 +66,16 @@ $js_renderer = new \SmallSmallRSS\Renderers\JS();
 <html>
 <head>
   <title>Small Small RSS</title>
-  <?php stylesheet_tag("lib/dijit/themes/claro/claro.css"); ?>
-  <?php stylesheet_tag("css/layout.css"); ?>
-  <?php stylesheet_tag($theme_css); ?>
-  <?php print_user_stylesheet() ?>
+<?php
+$stylesheet_tag_renderer = new \SmallSmallRSS\Renderers\CSS();
+$stylesheet_tag_renderer->renderStylesheetTag("lib/dijit/themes/claro/claro.css");
+$stylesheet_tag_renderer->renderStylesheetTag("css/layout.css");
+$stylesheet_tag_renderer->renderStylesheetTag($theme_css);
+
+$stylesheet_renderer = new \SmallSmallRSS\Renderers\CSS();
+$stylesheet_renderer->renderUserStyleSheet();
+?>
+
   <style type="text/css">
 <?php
 foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {

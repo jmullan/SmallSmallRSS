@@ -421,8 +421,8 @@ class PublicHandler extends Handler
 
         header('Content-Type: text/html; charset=utf-8');
         print "<html><head><title>Tiny Tiny RSS</title>";
-
-        stylesheet_tag("css/utility.css");
+        $renderer = new \SmallSmallRSS\Renderers\CSS();
+        $renderer->renderStylesheetTag("css/utility.css");
         $js_renderer = new \SmallSmallRSS\Renderers\JS();
         $js_renderer->render_script_tag("lib/prototype.js");
         $js_renderer->render_script_tag("lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls");
@@ -814,8 +814,8 @@ class PublicHandler extends Handler
 
         header('Content-Type: text/html; charset=utf-8');
         print "<html><head><title>Tiny Tiny RSS</title>";
-
-        stylesheet_tag("css/utility.css");
+        $renderer = new \SmallSmallRSS\Renderers\CSS();
+        $renderer->renderStylesheetTag("css/utility.css");
         $js_renderer = new \SmallSmallRSS\Renderers\JS();
         $js_renderer->render_script_tag("lib/prototype.js");
 

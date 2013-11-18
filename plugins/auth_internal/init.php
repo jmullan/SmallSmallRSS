@@ -41,25 +41,31 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
                             }
                         } else {
                             $return = urlencode($_REQUEST["return"]);
-?><html>
-                            <head><title>Tiny Tiny RSS</title></head>
-<?php stylesheet_tag("css/utility.css") ?>
-                                 <body class="otp"><div class="content">
-                                 <form action="public.php?return=<?php echo $return ?>"
-                                 method="POST" class="otpform">
-                                 <input type="hidden" name="op" value="login">
-                                 <input type="hidden" name="login" value="<?php echo htmlspecialchars($login) ?>">
-                                 <input type="hidden" name="password" value="<?php echo htmlspecialchars($password) ?>">
-
-                                 <label><?php echo __("Please enter your one time password:") ?></label>
-                                 <input autocomplete="off" size="6" name="otp" value=""/>
-                                 <input type="submit" value="Continue"/>
-                                 </form></div>
-                                 <script type="text/javascript">
-                                 document.forms[0].otp.focus();
-                            </script>
+?>
+<html>
+  <head><title>Tiny Tiny RSS</title>
 <?php
-                                  exit;
+
+     $renderer = new \SmallSmallRSS\Renderers\CSS();
+     $renderer->renderStylesheetTag("css/utility.css")
+?>
+</head>
+<body class="otp">
+  <div class="content">
+  <form action="public.php?return=<?php echo $return ?>" method="POST" class="otpform">
+    <input type="hidden" name="op" value="login" />
+    <input type="hidden" name="login" value="<?php echo htmlspecialchars($login) ?>" />
+    <input type="hidden" name="password" value="<?php echo htmlspecialchars($password) ?>" />
+    <label for="otp"><?php echo __("Please enter your one time password:") ?></label>
+    <input autocomplete="off" size="6" name="otp" value="" />
+    <input type="submit" value="Continue" />
+  </form>
+</div>
+<script type="text/javascript">
+  document.forms[0].otp.focus();
+</script>
+<?php
+                            exit;
                         }
                     }
                 }

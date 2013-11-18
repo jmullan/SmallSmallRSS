@@ -22,26 +22,24 @@ header('Content-Type: text/html; charset=utf-8');
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-<title>Tiny Tiny RSS : <?php echo __("Preferences") ?></title>
-
-<?php stylesheet_tag("lib/dijit/themes/claro/claro.css"); ?>
-<?php stylesheet_tag("css/layout.css"); ?>
-
-<?php if ($_SESSION["uid"]) {
-$theme = \SmallSmallRSS\DBPrefs::read("USER_CSS_THEME", $_SESSION["uid"], false);
-if ($theme && file_exists("themes/$theme")) {
-    stylesheet_tag("themes/$theme");
-} else {
-    stylesheet_tag("themes/default.css");
+  <title>Tiny Tiny RSS : <?php echo __("Preferences") ?></title>
+<?php
+$renderer = new \SmallSmallRSS\Renderers\CSS();
+$renderer->renderStylesheetTag("lib/dijit/themes/claro/claro.css");
+$renderer->renderStylesheetTag("css/layout.css");
+$theme_css = 'default.css';
+if ($_SESSION["uid"]) {
+    $theme = \SmallSmallRSS\DBPrefs::read("USER_CSS_THEME", $_SESSION["uid"], false);
+    if ($theme && file_exists("themes/$theme")) {
+        $theme_css = "themes/$theme";
+    }
 }
-}
+$renderer->renderStylesheetTag("themes/$theme");
+$stylesheet_renderer = new \SmallSmallRSS\Renderers\CSS();
+$stylesheet_renderer->renderUserStyleSheet();
 ?>
-
-<?php print_user_stylesheet() ?>
-
-<link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
-    <link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
-
+  <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
+  <link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
 <?php
 foreach (array("lib/prototype.js",
                "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
@@ -64,32 +62,26 @@ $js_renderer->render_minified_js_files(
     array("../lib/CheckBoxTree", "functions", "deprecated", "prefs", "PrefFeedTree", "PrefFilterTree", "PrefLabelTree")
 );
 
-print get_minified_js();
-
 init_js_translations();
 ?>
 </script>
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-
-    <script type="text/javascript">
-    Event.observe(window, 'load', function() {
-            init();
-        });
+<script type="text/javascript">
+  Event.observe(window, 'load', function() {
+    init();
+  });
 </script>
-
 </head>
-
 <body id="ttrssPrefs" class="claro">
 
-    <div id="notify" class="notify" style="display : none"></div>
-    <div id="cmdline" style="display : none"></div>
-
-    <div id="overlay">
-    <div id="overlay_inner">
+<div id="notify" class="notify" style="display : none"></div>
+<div id="cmdline" style="display : none"></div>
+<div id="overlay">
+  <div id="overlay_inner">
     <div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
     <div dojoType="dijit.ProgressBar" places="0" style="width : 300px" id="loading_bar"
-    progress="0" maximum="100">
+      progress="0" maximum="100">
     </div>
     <noscript><br/><?php  \SmallSmallRSS\Renderers\Messages::renderError('Javascript is disabled. Please enable it.') ?></noscript>
     </div>

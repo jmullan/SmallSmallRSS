@@ -22,4 +22,20 @@ if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
     \SmallSmallRSS\Config::set('SUBSTRING_FOR_DATE', 'SUBSTRING');
 }
 
+mb_internal_encoding("UTF-8");
+date_default_timezone_set('UTC');
+if (defined('E_DEPRECATED')) {
+    error_reporting(-1);
+}
+
+\SmallSmallRSS\Session::init();
+
+
+\SmallSmallRSS\Config::set(
+    'SELF_USER_AGENT',
+    'Tiny Tiny RSS/' . \SmallSmallRSS\Constants::VERSION . ' (http://tt-rss.org/)'
+);
+ini_set('user_agent', SELF_USER_AGENT);
+
+
 require __DIR__ . '/../include/functions.php';

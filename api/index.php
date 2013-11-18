@@ -1,6 +1,5 @@
 <?php
 chdir("..");
-\SmallSmallRSS\Config::set('AUTH_DISABLE_OTP', true);
 
 $input = file_get_contents("php://input");
 if ((defined('_API_DEBUG_HTTP_ENABLED') && _API_DEBUG_HTTP_ENABLED)) {
@@ -22,7 +21,7 @@ if (!empty($_REQUEST["sid"])) {
 }
 
 require_once __DIR__ . '/../SmallSmallRSS/bootstrap.php';
-
+\SmallSmallRSS\Config::set('AUTH_DISABLE_OTP', true);
 \SmallSmallRSS\Session::init('ttrss_api_sid');
 \SmallSmallRSS\Sanity::initialCheck();
 

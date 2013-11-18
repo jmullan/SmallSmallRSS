@@ -1,8 +1,4 @@
 <?php
-define_default('DAEMON_UPDATE_LOGIN_LIMIT', 30);
-define_default('DAEMON_FEED_LIMIT', 50);
-define_default('DAEMON_SLEEP_INTERVAL', 120);
-
 function update_feedbrowser_cache()
 {
     $result = \SmallSmallRSS\Database::query(
@@ -59,26 +55,29 @@ function update_feedbrowser_cache()
  * by another process.
  *
  * @param mixed $link Database link
- * @param integer $limit Maximum number of feeds in update batch. Default to DAEMON_FEED_LIMIT.
+ * @param integer $limit Maximum number of feeds in update batch. Default to \SmallSmallRSS\Config::get('DAEMON_FEED_LIMIT').
  * @param boolean $from_http Set to true if you call this function from http to disable cli specific code.
  * @param boolean $debug Set to false to disable debug output. Default to true.
  * @return void
  */
-function update_daemon_common($limit = DAEMON_FEED_LIMIT, $from_http = false, $debug = true)
+function update_daemon_common($limit = null, $from_http = false, $debug = true)
 {
+    if (is_null($limit)) {
+        $limit = \SmallSmallRSS\Config::get('DAEMON_FEED_LIMIT');
+    }
     // Process all other feeds using last_updated and interval parameters
     \SmallSmallRSS\Sanity::schemaOrDie();
     // Test if the user has loggued in recently. If not, it does not update its feeds.
-    if (!\SmallSmallRSS\Auth::is_single_user_mode() && DAEMON_UPDATE_LOGIN_LIMIT > 0) {
+    if (!\SmallSmallRSS\Auth::is_single_user_mode() && \SmallSmallRSS\Config::get('DAEMON_UPDATE_LOGIN_LIMIT') > 0) {
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $login_thresh_qpart = (
                 "AND ttrss_users.last_login >= NOW() - INTERVAL"
-                . " '" . DAEMON_UPDATE_LOGIN_LIMIT . " days'"
+                . " '" . \SmallSmallRSS\Config::get('DAEMON_UPDATE_LOGIN_LIMIT') . " days'"
             );
         } else {
             $login_thresh_qpart = (
                 "AND ttrss_users.last_login >= DATE_SUB("
-                . "    NOW(), INTERVAL " . DAEMON_UPDATE_LOGIN_LIMIT . " DAY"
+                . " NOW(), INTERVAL " . \SmallSmallRSS\Config::get('DAEMON_UPDATE_LOGIN_LIMIT') . " DAY"
                 . ")"
             );
         }
@@ -333,7 +332,9 @@ function update_rss_feed($feed, $no_cache = false)
             $feed_data = $fetcher->getFileContents(
                 $fetch_url, false,
                 $auth_login, $auth_pass, false,
-                $no_cache ? FEED_FETCH_NO_CACHE_TIMEOUT : FEED_FETCH_TIMEOUT,
+                ($no_cache
+                 ? \SmallSmallRSS\Config::get('FEED_FETCH_NO_CACHE_TIMEOUT')
+                 : \SmallSmallRSS\Config::get('FEED_FETCH_TIMEOUT')),
                 $force_refetch ? 0 : $last_article_timestamp
             );
 
@@ -775,16 +776,19 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
         // now it should exist, if not - bad luck then
-
+        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
         $result = \SmallSmallRSS\Database::query(
             "SELECT
-                id,content_hash,no_orig_date,title,plugin_data,guid,
-                ".SUBSTRING_FOR_DATE."(date_updated,1,19) as date_updated,
-                ".SUBSTRING_FOR_DATE."(updated,1,19) as updated,
+                id,
+                content_hash, no_orig_date, title, plugin_data,guid,
+                " . $substring_for_date . "(date_updated,1,19) as date_updated,
+                " . $substring_for_date . "(updated,1,19) as updated,
                 num_comments
-                FROM
-                    ttrss_entries
-                WHERE guid = '$entry_guid' OR guid = '$entry_guid_hashed'"
+             FROM
+                 ttrss_entries
+             WHERE
+                 guid = '$entry_guid'
+                 OR guid = '$entry_guid_hashed'"
         );
 
         $entry_ref_id = 0;

@@ -45,9 +45,6 @@ login_sequence();
 
 header('Content-Type: text/html; charset=utf-8');
 
-require __DIR__ . '/lib/jshrink/Minifier.php';
-
-
 $theme_css = 'themes/default.css';
 if ($_SESSION["uid"]) {
     $theme = \SmallSmallRSS\DBPrefs::read("USER_CSS_THEME", $_SESSION["uid"], false);
@@ -61,6 +58,8 @@ $toolbar_plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
 $action_items = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
     \SmallSmallRSS\PluginHost::HOOK_ACTION_ITEM
 );
+
+$js_renderer = new \SmallSmallRSS\Renderers\JS();
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -82,13 +81,13 @@ foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
   </style>
   <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
   <link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
-  <?php
+<?php
 foreach (array("lib/prototype.js",
                "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
                "lib/dojo/dojo.js",
                "lib/dojo/tt-rss-layer.js",
                "errors.php?mode=js") as $jsfile) {
-    javascript_tag($jsfile);
+    $js_renderer->render_script_tag($jsfile);
 }
 ?>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -222,11 +221,11 @@ if (empty($_SESSION["hide_logout"])) {
 <script type="text/javascript">
 require({cache:{}});
 <?php
-print get_minified_js(array("tt-rss", "functions", "feedlist", "viewfeed", "FeedTree", "PluginHost"));
+$js_renderer->render_minified_js_files(
+    array("tt-rss", "functions", "feedlist", "viewfeed", "FeedTree", "PluginHost")
+);
 foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
-    if (method_exists($p, "get_js")) {
-        echo JShrink\Minifier::minify($p->get_js());
-    }
+    $js_renderer->render_minified($p->get_js());
 }
 init_js_translations();
 ?>

@@ -32,7 +32,7 @@ class Pref_Labels extends ProtectedHandler
         $fg_color = $line['fg_color'];
         $bg_color = $line['bg_color'];
 
-        print "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color : $fg_color; background-color : $bg_color; margin-bottom : 4px; margin-right : 4px'>&alpha;</span>";
+        print "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color: $fg_color; background-color : $bg_color; margin-bottom : 4px; margin-right : 4px'>&alpha;</span>";
 
         print "<input style=\"font-size : 16px\" name=\"caption\"
             dojoType=\"dijit.form.ValidationTextBox\"
@@ -51,11 +51,11 @@ class Pref_Labels extends ProtectedHandler
         print "<tr><td style='padding-right : 10px'>";
 
         print "<input dojoType=\"dijit.form.TextBox\"
-            style=\"display : none\" id=\"labelEdit_fgColor\"
-            name=\"fg_color\" value=\"$fg_color\">";
+                style=\"display : none\" id=\"labelEdit_fgColor\"
+                name=\"fg_color\" value=\"$fg_color\">";
         print "<input dojoType=\"dijit.form.TextBox\"
-            style=\"display : none\" id=\"labelEdit_bgColor\"
-            name=\"bg_color\" value=\"$bg_color\">";
+                style=\"display : none\" id=\"labelEdit_bgColor\"
+                name=\"bg_color\" value=\"$bg_color\">";
 
         print "<div dojoType=\"dijit.ColorPalette\">
             <script type=\"dojo/method\" event=\"onChange\" args=\"fg_color\">
@@ -103,7 +103,6 @@ class Pref_Labels extends ProtectedHandler
             WHERE owner_uid = ".$_SESSION["uid"]."
             ORDER BY caption"
         );
-
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $label = array();
             $label['id'] = 'LABEL:' . $line['id'];
@@ -113,15 +112,12 @@ class Pref_Labels extends ProtectedHandler
             $label['bg_color'] = $line['bg_color'];
             $label['type'] = 'label';
             $label['checkbox'] = false;
-
             array_push($root['items'], $label);
         }
-
         $fl = array();
         $fl['identifier'] = 'id';
         $fl['label'] = 'name';
         $fl['items'] = array($root);
-
         print json_encode($fl);
         return;
     }
@@ -144,9 +140,13 @@ class Pref_Labels extends ProtectedHandler
                 );
             } else {
                 \SmallSmallRSS\Database::query(
-                    "UPDATE ttrss_labels2 SET
-                    fg_color = '$fg', bg_color = '$bg' WHERE id = '$id'
-                    AND owner_uid = " . $_SESSION["uid"]
+                    "UPDATE ttrss_labels2
+                     SET
+                         fg_color = '$fg',
+                         bg_color = '$bg'
+                     WHERE
+                         id = '$id'
+                         AND owner_uid = " . $_SESSION["uid"]
                 );
             }
 
@@ -155,8 +155,11 @@ class Pref_Labels extends ProtectedHandler
             /* Remove cached data */
 
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET label_cache = ''
-                WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
+                "UPDATE ttrss_user_entries
+                 SET label_cache = ''
+                 WHERE
+                     label_cache LIKE '%$caption%'
+                     AND owner_uid = " . $_SESSION["uid"]
             );
 
         }
@@ -167,12 +170,15 @@ class Pref_Labels extends ProtectedHandler
     function colorreset()
     {
         $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
-
         foreach ($ids as $id) {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_labels2 SET
-                fg_color = '', bg_color = '' WHERE id = '$id'
-                AND owner_uid = " . $_SESSION["uid"]
+                "UPDATE ttrss_labels2
+                 SET
+                     fg_color = '',
+                     bg_color = ''
+                 WHERE
+                     id = '$id'
+                     AND owner_uid = " . $_SESSION["uid"]
             );
 
             $caption = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Labels::findCaption($id, $_SESSION["uid"]));
@@ -180,8 +186,11 @@ class Pref_Labels extends ProtectedHandler
             /* Remove cached data */
 
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET label_cache = ''
-                WHERE label_cache LIKE '%$caption%' AND owner_uid = " . $_SESSION["uid"]
+                "UPDATE ttrss_user_entries
+                 SET label_cache = ''
+                 WHERE
+                     label_cache LIKE '%$caption%'
+                     AND owner_uid = " . $_SESSION["uid"]
             );
         }
 

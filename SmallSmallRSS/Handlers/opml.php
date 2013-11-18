@@ -209,10 +209,11 @@ class Opml extends ProtectedHandler
                     $cat_filter = sql_bool_to_bool($tmp_line["cat_filter"]);
 
                     if ($cat_filter && $tmp_line["cat_id"] || $tmp_line["feed_id"]) {
-                        $tmp_line["feed"] = getFeedTitle(
-                            $cat_filter ? $tmp_line["cat_id"] : $tmp_line["feed_id"],
-                            $cat_filter
-                        );
+                        if ($cat_filter) {
+                            $tmp_line["feed"] = getCategoryTitle($id);
+                        } else {
+                            $tmp_line["feed"] = \SmallSmallRSS\Feeds::getTitle($tmp_line["feed_id"]);
+                        }
                     } else {
                         $tmp_line["feed"] = "";
                     }

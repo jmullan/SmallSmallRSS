@@ -423,10 +423,12 @@ class PublicHandler extends Handler
         print "<html><head><title>Tiny Tiny RSS</title>";
 
         stylesheet_tag("css/utility.css");
-        javascript_tag("lib/prototype.js");
-        javascript_tag("lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls");
-        print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
-            </head><body id='sharepopup'>";
+        $js_renderer = new \SmallSmallRSS\Renderers\JS();
+        $js_renderer->render_script_tag("lib/prototype.js");
+        $js_renderer->render_script_tag("lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls");
+        print "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
+        print "\n</head>";
+        print "\n<body id='sharepopup'>";
 
         $action = $_REQUEST["action"];
 
@@ -814,7 +816,8 @@ class PublicHandler extends Handler
         print "<html><head><title>Tiny Tiny RSS</title>";
 
         stylesheet_tag("css/utility.css");
-        javascript_tag("lib/prototype.js");
+        $js_renderer = new \SmallSmallRSS\Renderers\JS();
+        $js_renderer->render_script_tag("lib/prototype.js");
 
         print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
             </head><body id='forgotpass'>";

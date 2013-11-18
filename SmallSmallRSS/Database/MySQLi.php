@@ -9,8 +9,7 @@ class MySQLi implements DatabaseInterface
     {
         if ($port) {
             $this->link = mysqli_connect($host, $user, $pass, $db, $port);
-        }
-        else {
+        } else {
             $this->link = mysqli_connect($host, $user, $pass, $db);
         }
         if ($this->link) {

@@ -1,6 +1,6 @@
 <?php
 chdir("..");
-define('AUTH_DISABLE_OTP', true);
+\SmallSmallRSS\Config::set('AUTH_DISABLE_OTP', true);
 
 $input = file_get_contents("php://input");
 if ((defined('_API_DEBUG_HTTP_ENABLED') && _API_DEBUG_HTTP_ENABLED)) {

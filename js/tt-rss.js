@@ -11,15 +11,12 @@ function next_seq() {
     _rpc_seq += 1;
     return _rpc_seq;
 }
-
 function get_seq() {
     return _rpc_seq;
 }
-
 function activeFeedIsCat() {
     return _active_feed_is_cat;
 }
-
 function getActiveFeedId() {
     try {
         return _active_feed_id;
@@ -27,7 +24,6 @@ function getActiveFeedId() {
         exception_error("getActiveFeedId", e);
     }
 }
-
 function setActiveFeedId(id, is_cat) {
     try {
         hash_set('f', id);
@@ -46,30 +42,24 @@ function setActiveFeedId(id, is_cat) {
         exception_error("setActiveFeedId", e);
     }
 }
-
-
 function updateFeedList() {
     try {
-
         Element.show("feedlistLoading");
-
         if (dijit.byId("feedTree")) {
             dijit.byId("feedTree").destroyRecursive();
         }
-
         var store = new dojo.data.ItemFileWriteStore({
-                                                         url: "backend.php?op=pref_feeds&method=getfeedtree&mode=2"});
-
+            url: "backend.php?op=pref_feeds&method=getfeedtree&mode=2"
+        });
         var treeModel = new fox.FeedStoreModel({
-                                                   store: store,
-                                                   query: {
-                                                       "type": getInitParam('enable_feed_cats') == 1 ? "category" : "feed"
-                                                   },
-                                                   rootId: "root",
-                                                   rootLabel: "Feeds",
-                                                   childrenAttrs: ["items"]
-                                               });
-
+            store: store,
+            query: {
+                "type": getInitParam('enable_feed_cats') == 1 ? "category" : "feed"
+            },
+            rootId: "root",
+            rootLabel: "Feeds",
+            childrenAttrs: ["items"]
+        });
         var tree = new fox.FeedTree({
             model: treeModel,
             onClick: function (item, node) {
@@ -83,29 +73,17 @@ function updateFeedList() {
             showRoot: false,
             id: "feedTree"
         }, "feedTree");
-
-
-        var tmph = dojo.connect(dijit.byId('feedMenu'), '_openMyself', function (event) {
-            dojo.disconnect(tmph);
+        var feed_menu_handle = dojo.connect(dijit.byId('feedMenu'), '_openMyself', function (event) {
+            dojo.disconnect(feed_menu_handle);
         });
-
         $("feeds-holder").appendChild(tree.domNode);
-
-        var tmph = dojo.connect(tree, 'onLoad', function() {
-                                    dojo.disconnect(tmph);
-                                    Element.hide("feedlistLoading");
-
-                                    feedlist_init();
-
-                                    //                      var node = dijit.byId("feedTree")._itemNodesMap['FEED:-2'][0].domNode
-                                    //                      menu.bindDomNode(node);
-
-                                    loading_set_progress(25);
-                                });
-
+        var on_load_handle = dojo.connect(tree, 'onLoad', function() {
+            dojo.disconnect(on_load_handle);
+            Element.hide("feedlistLoading");
+            feedlist_init();
+            loading_set_progress(25);
+        });
         tree.startup();
-
-
     } catch (e) {
         exception_error("updateFeedList", e);
     }
@@ -314,7 +292,7 @@ function init() {
             if (id) {
                 editArticleTags(id);
             };
-        }
+        };
         hotkey_actions["dismiss_selected"] = function() {
             dismissSelectedArticles();
         };
@@ -520,46 +498,37 @@ function init() {
 }
 
 function init_second_stage() {
-
     try {
         dojo.addOnLoad(function() {
-                           updateFeedList();
-                           closeArticlePanel();
-
-                           _widescreen_mode = getInitParam("widescreen");
-                           switchPanelMode(_widescreen_mode);
-
-                           if (parseInt(getCookie("ttrss_fh_width")) > 0) {
-                               dijit.byId("feeds-holder").domNode.setStyle(
-                                   {width: getCookie("ttrss_fh_width") + "px" });
-                           }
-
-                           if (parseInt(getCookie("ttrss_ci_width")) > 0) {
-                               if (_widescreen_mode) {
-                                   dijit.byId("content-insert").domNode.setStyle(
-                                       {width: getCookie("ttrss_ci_width") + "px" });
-
-                               } else {
-                                   dijit.byId("content-insert").domNode.setStyle(
-                                       {height: getCookie("ttrss_ci_height") + "px" });
-                               }
-                           }
-
-                           dijit.byId("main").resize();
-
-                           var tmph = dojo.connect(dijit.byId('feeds-holder'), 'resize',
-                                                   function (args) {
-                                                       setCookie("ttrss_fh_width", args.w, getInitParam("cookie_lifetime"));
-                                                   });
-
-                           var tmph = dojo.connect(dijit.byId('content-insert'), 'resize',
-                                                   function (args) {
-                                                       setCookie("ttrss_ci_width", args.w, getInitParam("cookie_lifetime"));
-                                                       setCookie("ttrss_ci_height", args.h, getInitParam("cookie_lifetime"));
-                                                   });
-
-                       });
-
+            updateFeedList();
+            closeArticlePanel();
+            _widescreen_mode = getInitParam("widescreen");
+            switchPanelMode(_widescreen_mode);
+            if (parseInt(getCookie("ttrss_fh_width")) > 0) {
+                dijit.byId("feeds-holder").domNode.setStyle({
+                    width: getCookie("ttrss_fh_width") + "px"
+                });
+            }
+            if (parseInt(getCookie("ttrss_ci_width")) > 0) {
+                if (_widescreen_mode) {
+                    dijit.byId("content-insert").domNode.setStyle(
+                        {width: getCookie("ttrss_ci_width") + "px" });
+                } else {
+                    dijit.byId("content-insert").domNode.setStyle(
+                        {height: getCookie("ttrss_ci_height") + "px" });
+                }
+            }
+            dijit.byId("main").resize();
+            var feeds_holder_handle = dojo.connect(dijit.byId('feeds-holder'), 'resize',
+                function (args) {
+                    setCookie("ttrss_fh_width", args.w, getInitParam("cookie_lifetime"));
+                });
+            var content_insert_handle = dojo.connect(dijit.byId('content-insert'), 'resize',
+                function (args) {
+                    setCookie("ttrss_ci_width", args.w, getInitParam("cookie_lifetime"));
+                    setCookie("ttrss_ci_height", args.h, getInitParam("cookie_lifetime"));
+                });
+            });
         delCookie("ttrss_test");
 
         var toolbar = document.forms["main_toolbar_form"];
@@ -567,35 +536,28 @@ function init_second_stage() {
         dijit.getEnclosingWidget(toolbar.view_mode).attr('value',
                                                          getInitParam("default_view_mode"));
 
-        dijit.getEnclosingWidget(toolbar.order_by).attr('value',
-                                                        getInitParam("default_view_order_by"));
-
+        dijit.getEnclosingWidget(toolbar.order_by).attr(
+            'value',
+            getInitParam("default_view_order_by")
+        );
         feeds_sort_by_unread = getInitParam("feeds_sort_by_unread") == 1;
-
         var hash_feed_id = hash_get('f');
         var hash_feed_is_cat = hash_get('c') == "1";
-
         if (hash_feed_id != undefined) {
             setActiveFeedId(hash_feed_id, hash_feed_is_cat);
         }
-
         loading_set_progress(50);
-
         // can't use cache_clear() here because viewfeed might not have initialized yet
         if ('sessionStorage' in window && window['sessionStorage'] !== null)
             sessionStorage.clear();
-
         var hotkeys = getInitParam("hotkeys");
         var tmp = [];
-
         for (sequence in hotkeys[1]) {
             filtered = sequence.replace(/\|.*$/, "");
             tmp[filtered] = hotkeys[1][sequence];
         }
-
         hotkeys[1] = tmp;
         setInitParam("hotkeys", hotkeys);
-
         if (getInitParam("simple_update")) {
             window.setTimeout("update_random_feed()", 30*1000);
         }
@@ -963,6 +925,7 @@ function handle_rpc_json(transport, scheduled_call) {
         Element.show(dijit.byId("net-alert").domNode);
         console.log('Exception when handling rpc json');
         console.log(e);
+        console.log(transport.responseText);
     }
 
     return true;
@@ -1021,12 +984,11 @@ function switchPanelMode(wide) {
 function update_random_feed() {
     try {
         new Ajax.Request("backend.php", {
-                parameters: "op=rpc&method=updateRandomFeed",
-                onComplete: function(transport) {
-                    handle_rpc_json(transport, true);
-                    window.setTimeout("update_random_feed()", 30 * 1000);
-                }});
-
+            parameters: "op=rpc&method=updateRandomFeed",
+            onComplete: function(transport) {
+                handle_rpc_json(transport, true);
+            window.setTimeout("update_random_feed()", 30 * 1000);
+        }});
     } catch (e) {
         exception_error("update_random_feed", e);
     }
@@ -1039,7 +1001,9 @@ function hash_get(key) {
     } catch (e) {
         exception_error("hash_get", e);
     }
+    return undefined;
 }
+
 function hash_set(key, value) {
     try {
         kv = window.location.hash.substring(1).toQueryParams();

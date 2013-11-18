@@ -401,21 +401,16 @@ class RPC extends ProtectedHandler
         $_SESSION['hasAudio'] = self::get_bool_from_request('hasAudio');
         $_SESSION['hasSandbox'] = self::get_bool_from_request('hasSandbox');
         $_SESSION['hasMp3'] = self::get_bool_from_request('hasMp3');
-
         $_SESSION["clientTzOffset"] = (
             isset($_REQUEST["clientTzOffset"])
             ? $_REQUEST["clientTzOffset"] : null
         );
-
         $reply = array();
-
         $reply['error'] = sanity_check();
-
         if ($reply['error']['code'] == 0) {
             $reply['init-params'] = make_init_params();
             $reply['runtime-info'] = make_runtime_info();
         }
-
         print json_encode($reply);
     }
 
@@ -578,7 +573,7 @@ class RPC extends ProtectedHandler
         setcookie(
             "ttrss_widescreen",
             $wide,
-            time() + COOKIE_LIFETIME_LONG
+            time() + \SmallSmallRSS\Constants::COOKIE_LIFETIME_LONG
         );
         print json_encode(array("wide" => $wide));
     }
@@ -643,7 +638,6 @@ class RPC extends ProtectedHandler
         $tstart = time();
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $feed_id = $line["id"];
-
             if (time() - $tstart < ini_get("max_execution_time") * 0.7) {
                 update_rss_feed($feed_id);
                 ++$num_updated;

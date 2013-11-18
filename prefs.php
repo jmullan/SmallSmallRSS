@@ -43,28 +43,28 @@ if ($theme && file_exists("themes/$theme")) {
     <link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
 
 <?php
-    foreach (array("lib/prototype.js",
-                   "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
-                   "lib/dojo/dojo.js",
-                   "lib/dojo/tt-rss-layer.js",
-                   "errors.php?mode=js") as $jsfile) {
-
-javascript_tag($jsfile);
-
-} ?>
+foreach (array("lib/prototype.js",
+               "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
+               "lib/dojo/dojo.js",
+               "lib/dojo/tt-rss-layer.js",
+               "errors.php?mode=js") as $jsfile) {
+    $js_renderer = new \SmallSmallRSS\Renderers\JS();
+    $js_renderer->render_script_tag($jsfile);
+}
+?>
 
 <script type="text/javascript">
     require({cache:{}});
 <?php
-require 'lib/jshrink/Minifier.php';
-
-foreach (\SmallSmallRss\PluginHost::getInstance()->get_plugins() as $n => $p) {
-    if (method_exists($p, "get_prefs_js")) {
-        echo JShrink\Minifier::minify($p->get_prefs_js());
-    }
+$js_renderer = new \SmallSmallRSS\Renderers\JS();
+foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
+    $js_renderer->render_minified($p->get_prefs_js());
 }
+$js_renderer->render_minified_js_files(
+    array("../lib/CheckBoxTree", "functions", "deprecated", "prefs", "PrefFeedTree", "PrefFilterTree", "PrefLabelTree")
+);
 
-print get_minified_js(array("../lib/CheckBoxTree", "functions", "deprecated", "prefs", "PrefFeedTree", "PrefFilterTree", "PrefLabelTree"));
+print get_minified_js();
 
 init_js_translations();
 ?>

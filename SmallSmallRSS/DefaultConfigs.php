@@ -210,4 +210,73 @@ class DefaultConfigs {
      * How verbose to be.
      */
     const VERBOSITY = 0;
+
+    const DAEMON_UPDATE_LOGIN_LIMIT = 30;
+    const DAEMON_FEED_LIMIT = 50;
+    const DAEMON_SLEEP_INTERVAL = 120;
+    const SPAWN_INTERVAL = 120; // seconds
+
+    /**
+     * How many seconds to wait for response when requesting feed from a site
+     */
+    const FEED_FETCH_TIMEOUT = 45;
+    /**
+     * How many seconds to wait for response when requesting feed from a site
+     * when that feed was not cached before
+     */
+    const FEED_FETCH_NO_CACHE_TIMEOUT = 15;
+    /**
+     * Default timeout when fetching files from remote sites
+     */
+    const FILE_FETCH_TIMEOUT = 45;
+
+    /**
+     * How many seconds to wait for initial response from website when fetching
+     * files from remote sites
+     */
+    const FILE_FETCH_CONNECT_TIMEOUT = 15;
+
+    const PURGE_INTERVAL = 3600; // seconds
+    const MAX_CHILD_RUNTIME = 1800; // seconds
+    const MAX_JOBS = 2;
+
+    const AUTH_DISABLE_OTP = false;
+
+    // TODO: Swap these out as well
+    const _API_DEBUG_HTTP_ENABLED = false;
+    const _ENABLE_PDO = false;
+    const _ENABLE_FEED_DEBUGGING = false;
+    const _DISABLE_FEED_BROWSER = false;
+    const _DISABLE_HTTP_304 = false;
+    const _NGRAM_TITLE_DUPLICATE_THRESHOLD = false;
+    const DAEMON_EXTENDED_DEBUG = false;
+    const _TRANSLATION_OVERRIDE_DEFAULT = false;
+    const _NO_RELOAD_ON_TS_CHANGE = false;
+    const _INSTALLER_IGNORE_CONFIG_CHECK = false;
+
+    public static function has($key) {
+        return defined("self::$key");
+    }
+    public static function get($key) {
+        return constant("self::$key");
+    }
+    public static function type($key) {
+        $type = 'string';
+        if (self::has($key)) {
+            $type = gettype(self::get($key));
+        }
+        switch ($type) {
+            case 'double':
+                $type = 'float';
+                break;
+            case 'integer':
+                break;
+            case 'boolean':
+                break;
+            default:
+                $type = 'string';
+                break;
+        }
+        return $type;
+    }
 }

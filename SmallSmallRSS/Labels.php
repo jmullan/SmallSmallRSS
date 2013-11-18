@@ -8,8 +8,10 @@ class Labels
         $result = \SmallSmallRSS\Database::query(
             "SELECT id
              FROM ttrss_labels2
-             WHERE caption = '$label'
-             AND owner_uid = '$owner_uid' LIMIT 1"
+             WHERE
+                 caption = '$label'
+                 AND owner_uid = '$owner_uid'
+             LIMIT 1"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             return \SmallSmallRSS\Database::fetch_result($result, 0, "id");
@@ -26,8 +28,10 @@ class Labels
         }
         $result = \SmallSmallRSS\Database::query(
             "SELECT label_cache
-            FROM ttrss_user_entries
-            WHERE ref_id = '$id' AND owner_uid = '$owner_uid'"
+             FROM ttrss_user_entries
+             WHERE
+                 ref_id = '$id'
+                 AND owner_uid = '$owner_uid'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
             $label_cache = \SmallSmallRSS\Database::fetch_result($result, 0, "label_cache");
@@ -41,8 +45,14 @@ class Labels
             }
         }
         $result = \SmallSmallRSS\Database::query(
-            "SELECT DISTINCT label_id,caption,fg_color,bg_color
-                FROM ttrss_labels2, ttrss_user_labels2
+            "SELECT DISTINCT
+                label_id,
+                caption,
+                fg_color,
+                bg_color
+            FROM
+                ttrss_labels2,
+                ttrss_user_labels2
             WHERE
                 id = label_id
                 AND article_id = '$id'
@@ -50,7 +60,12 @@ class Labels
             ORDER BY caption"
         );
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            $rk = array($line["label_id"], $line["caption"], $line["fg_color"], $line["bg_color"]);
+            $rk = array(
+                $line["label_id"],
+                $line["caption"],
+                $line["fg_color"],
+                $line["bg_color"]
+            );
             array_push($rv, $rk);
         }
         if (count($rv) > 0) {
@@ -79,16 +94,6 @@ class Labels
         }
     }
 
-    public static function getAll($owner_uid)
-    {
-        $rv = array();
-        $result = \SmallSmallRSS\Database::query("SELECT fg_color, bg_color, caption FROM ttrss_labels2 WHERE owner_uid = " . $owner_uid);
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            array_push($rv, $line);
-        }
-        return $rv;
-    }
-
     public static function updateCache($owner_uid, $id, $labels = false, $force = false)
     {
         if ($force) {
@@ -99,8 +104,11 @@ class Labels
         }
         $labels = \SmallSmallRSS\Database::escape_string(json_encode($labels));
         \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_user_entries SET
-            label_cache = '$labels' WHERE ref_id = '$id' AND  owner_uid = '$owner_uid'"
+            "UPDATE ttrss_user_entries
+             SET label_cache = '$labels'
+             WHERE
+                 ref_id = '$id'
+                 AND owner_uid = '$owner_uid'"
         );
     }
 
@@ -175,7 +183,7 @@ class Labels
         );
         if (\SmallSmallRSS\Database::affected_rows($result) != 0 && $caption) {
             /* Remove access key for the label */
-            $ext_id = LABEL_BASE_INDEX - 1 - $id;
+            $ext_id = \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 - $id;
             \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_access_keys
                  WHERE
@@ -220,4 +228,56 @@ class Labels
         \SmallSmallRSS\Database::query("COMMIT");
         return $result;
     }
+
+    public static function getOwnerLabels($owner_id, $article_id = null) {
+        if ($article_id) {
+            $article_labels = \SmallSmallRSS\Labels::getForArticle($article_id);
+        } else {
+            $article_labels = array();
+        }
+
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id, caption, fg_color, bg_color
+             FROM ttrss_labels2
+             WHERE owner_uid = '$owner_id'
+             ORDER BY caption"
+        );
+        $rv = array();
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            $checked = false;
+            foreach ($article_labels as $al) {
+                if ($al[0] == $line['id']) {
+                    $checked = true;
+                    break;
+                }
+            }
+            array_push(
+                $rv,
+                array(
+                    "id" => (int) $line['id'],
+                    "caption" => $line['caption'],
+                    "fg_color" => $line['fg_color'],
+                    "bg_color" => $line['bg_color'],
+                    "checked" => $checked
+                )
+            );
+        }
+
+    }
+    public static function getAll($owner_uid, $order_by='caption')
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT *
+             FROM ttrss_labels2
+             WHERE owner_uid = $owner_uid
+             ORDER BY $order_by"
+        );
+        $rv = array();
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            $rv[] = $line;
+        }
+        return $rv;
+    }
+
+
 }

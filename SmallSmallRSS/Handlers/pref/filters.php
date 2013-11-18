@@ -225,17 +225,19 @@ class Pref_Filters extends ProtectedHandler
             }
 
             if ($line['action_id'] == 7) {
+                $escaped_caption = \SmallSmallRSS\Database::escape_string($line['action_param']);
                 $label_result = \SmallSmallRSS\Database::query(
                     "SELECT fg_color, bg_color
-                    FROM ttrss_labels2 WHERE caption = '".\SmallSmallRSS\Database::escape_string($line['action_param'])."' AND
-                        owner_uid = " . $_SESSION["uid"]
+                     FROM ttrss_labels2
+                     WHERE
+                        caption = '$escaped_caption'
+                        AND owner_uid = " . $_SESSION["uid"]
                 );
-
                 if (\SmallSmallRSS\Database::num_rows($label_result) > 0) {
                     $fg_color = \SmallSmallRSS\Database::fetch_result($label_result, 0, "fg_color");
                     $bg_color = \SmallSmallRSS\Database::fetch_result($label_result, 0, "bg_color");
 
-                    $name[1] = "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color : $fg_color; background-color : $bg_color; margin-right : 4px'>&alpha;</span>" . $name[1];
+                    $name[1] = "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color: $fg_color; background-color: $bg_color; margin-right: 4px'>&alpha;</span>" . $name[1];
                 }
             }
 
@@ -450,11 +452,9 @@ class Pref_Filters extends ProtectedHandler
             $feed = getCategoryTitle($feed_id);
         } else {
             $feed_id = (int) $feed_id;
-
             if ($rule["feed_id"]) {
-                $feed = getFeedTitle((int) $rule["feed_id"]);
-            }
-            else {
+                $feed = \SmallSmallRSS\Feeds::getTitle((int) $rule["feed_id"]);
+            } else {
                 $feed = __("All feeds");
             }
         }

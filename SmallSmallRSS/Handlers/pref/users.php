@@ -25,14 +25,14 @@ class Pref_Users extends ProtectedHandler
     {
 
         $uid = sprintf("%d", $_REQUEST["id"]);
-
+        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
         $result = \SmallSmallRSS\Database::query(
             "SELECT login,
-                ".SUBSTRING_FOR_DATE."(last_login,1,16) AS last_login,
+                ".$substring_for_date."(last_login,1,16) AS last_login,
                 access_level,
                 (SELECT COUNT(int_id) FROM ttrss_user_entries
                     WHERE owner_uid = id) AS stored_articles,
-                ".SUBSTRING_FOR_DATE."(created,1,16) AS created
+                ".$substring_for_date."(created,1,16) AS created
                 FROM ttrss_users
                 WHERE id = '$uid'"
         );
@@ -403,12 +403,12 @@ class Pref_Users extends ProtectedHandler
         } else {
             $user_search_query = "";
         }
-
+        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
         $result = \SmallSmallRSS\Database::query(
             "SELECT
                     id,login,access_level,email,
-                    ".SUBSTRING_FOR_DATE."(last_login,1,16) as last_login,
-                    ".SUBSTRING_FOR_DATE."(created,1,16) as created
+                    ".$substring_for_date."(last_login,1,16) as last_login,
+                    ".$substring_for_date."(created,1,16) as created
                 FROM
                     ttrss_users
                 WHERE

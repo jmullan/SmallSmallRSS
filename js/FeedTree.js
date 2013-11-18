@@ -33,6 +33,7 @@ dojo.declare("fox.FeedStoreModel", dijit.tree.ForestStoreModel, {
         if (treeItem) {
             return this.store.getValue(treeItem, key);
         }
+        return undefined;
     },
     getFeedName: function(feed, is_cat) {
         return this.getFeedValue(feed, is_cat, 'name');
@@ -48,14 +49,18 @@ dojo.declare("fox.FeedStoreModel", dijit.tree.ForestStoreModel, {
         if (!value) {
             value = '';
         }
-        if (!this.store._itemsByIdentity) return undefined;
-        if (is_cat)
-                        treeItem = this.store._itemsByIdentity['CAT:' + feed];
-        else
-                        treeItem = this.store._itemsByIdentity['FEED:' + feed];
-
-        if (treeItem)
+        if (!this.store._itemsByIdentity) {
+            return undefined;
+        }
+        if (is_cat) {
+            treeItem = this.store._itemsByIdentity['CAT:' + feed];
+        } else {
+            treeItem = this.store._itemsByIdentity['FEED:' + feed];
+        }
+        if (treeItem) {
             return this.store.setValue(treeItem, key, value);
+        }
+        return undefined;
     },
     getNextUnreadFeed: function (feed, is_cat) {
         if (!this.store._itemsByIdentity)
@@ -85,11 +90,12 @@ dojo.declare("fox.FeedStoreModel", dijit.tree.ForestStoreModel, {
         return null;
     },
     hasCats: function() {
-        if (this.store && this.store._itemsByIdentity)
+        if (this.store && this.store._itemsByIdentity) {
             return this.store._itemsByIdentity['CAT:-1'] != undefined;
-        else
+        } else {
             return false;
-    },
+        }
+    }
 });
 
 dojo.declare("fox.FeedTree", dijit.Tree, {
@@ -104,16 +110,20 @@ dojo.declare("fox.FeedTree", dijit.Tree, {
         var bare_id = parseInt(id.substr(id.indexOf(':') + 1));
         if (bare_id < _label_base_index) {
             var span = dojo.doc.createElement('span');
-            var fg_color = args.item.fg_color[0];
-            var bg_color = args.item.bg_color[0];
-
-            span.innerHTML = "&alpha;";
-            span.className = 'labelColorIndicator';
-            span.setStyle({
-                color: fg_color,
-                backgroundColor: bg_color
-            });
-            dojo.place(span, tnode.iconNode, 'replace');
+            if (args.item.fg_color && args.item.bg_color) {
+                var fg_color = args.item.fg_color[0];
+                var bg_color = args.item.bg_color[0];
+                span.innerHTML = "&alpha;";
+                span.className = 'labelColorIndicator';
+                span.setStyle({
+                    color: fg_color,
+                    backgroundColor: bg_color
+                });
+                dojo.place(span, tnode.iconNode, 'replace');
+            } else {
+                console.log('No fg_color or no bg_color');
+                console.log(args.item);
+            }
         }
         if (id.match("FEED:")) {
             var menu = new dijit.Menu();

@@ -104,7 +104,7 @@ class Digest
         } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
             $interval_query = "ttrss_entries.date_updated > DATE_SUB(NOW(), INTERVAL $days DAY)";
         }
-
+        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
         $result = \SmallSmallRSS\Database::query(
             "SELECT ttrss_entries.title,
                 ttrss_feeds.title AS feed_title,
@@ -114,7 +114,7 @@ class Digest
                 link,
                 score,
                 content,
-                ".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                ".$substring_for_date."(last_updated,1,19) AS last_updated
             FROM
                 ttrss_user_entries,ttrss_entries,ttrss_feeds
             LEFT JOIN

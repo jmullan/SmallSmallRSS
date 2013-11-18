@@ -167,33 +167,27 @@ class Feeds extends ProtectedHandler
         $override_order = false,
         $include_children = false
     ) {
-
         if (isset($_REQUEST["DevForceUpdate"])) {
             header("Content-Type: text/plain");
         }
         $disable_cache = false;
-
         $reply = array('content' => '');
-
         $rgba_cache = array();
-
         $timing_info = microtime(true);
-
         $topmost_article_ids = array();
-
-        if (!$offset) {  $offset = 0;
+        if (!$offset) {
+            $offset = 0;
         }
-        if ($method == "undefined") {  $method = "";
+        if ($method == "undefined") {
+            $method = "";
         }
-
         $method_split = explode(":", $method);
-
         if ($method == "ForceUpdate" && $feed > 0 && is_numeric($feed)) {
             // Update the feed if required with some basic flood control
-
+            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $result = \SmallSmallRSS\Database::query(
-                "SELECT cache_images,".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
-                    FROM ttrss_feeds WHERE id = '$feed'"
+                "SELECT cache_images, ".$substring_for_date."(last_updated,1,19) AS last_updated
+                 FROM ttrss_feeds WHERE id = '$feed'"
             );
 
             if (\SmallSmallRSS\Database::num_rows($result) != 0) {
@@ -205,8 +199,10 @@ class Feeds extends ProtectedHandler
                     update_rss_feed($feed, true);
                 } else {
                     \SmallSmallRSS\Database::query(
-                        'UPDATE ttrss_feeds'
-                        . "SET last_updated = '1970-01-01', last_update_started = '1970-01-01' WHERE id = '$feed'"
+                        "UPDATE ttrss_feeds'
+                         SET last_updated = '1970-01-01',
+                             last_update_started = '1970-01-01'
+                         WHERE id = '$feed'"
                     );
                 }
             }
@@ -242,7 +238,11 @@ class Feeds extends ProtectedHandler
             $search_mode = $method;
         }
 
-        if (!$cat_view && is_numeric($feed) && $feed < PLUGIN_FEED_BASE_INDEX && $feed > LABEL_BASE_INDEX) {
+        if (!$cat_view
+            && is_numeric($feed)
+            && $feed < \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX
+            && $feed > \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
+
             $handler = \SmallSmallRSS\PluginHost::getInstance()->get_feed_handler(
                 \SmallSmallRSS\PluginHost::feed_to_pfeed_id($feed)
             );
@@ -771,7 +771,7 @@ class Feeds extends ProtectedHandler
                     $message = __("No starred articles found to display.");
                     break;
                 default:
-                    if ($feed < LABEL_BASE_INDEX) {
+                    if ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
                         $message = __("No articles found to display. You can assign articles to labels manually from article header context menu (applies to all selected articles) or use a filter.");
                     } else {
                         $message = __("No articles found to display.");
@@ -782,9 +782,9 @@ class Feeds extends ProtectedHandler
                 $reply['content'] .= "<div class='whiteBox'>$message";
 
                 $reply['content'] .= "<p><span class=\"insensitive\">";
-
+                $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
                 $result = \SmallSmallRSS\Database::query(
-                    "SELECT ".SUBSTRING_FOR_DATE."(MAX(last_updated), 1, 19) AS last_updated FROM ttrss_feeds
+                    "SELECT ".$substring_for_date."(MAX(last_updated), 1, 19) AS last_updated FROM ttrss_feeds
                     WHERE owner_uid = " . $_SESSION['uid']
                 );
 
@@ -830,8 +830,10 @@ class Feeds extends ProtectedHandler
         $timing_info = microtime(true);
 
         $reply = array('content' => '');
+        $reply['headlines'] = array();
 
-        if (!empty($_REQUEST["debug"])) {  $timing_info = print_checkpoint("0", $timing_info);
+        if (!empty($_REQUEST["debug"])) {
+            $timing_info = print_checkpoint("0", $timing_info);
         }
 
         $omode = $this->escape_from_request("omode");
@@ -845,7 +847,8 @@ class Feeds extends ProtectedHandler
         $vgroup_last_feed = $this->escape_from_request("vgrlf");
         $order_by = $this->escape_from_request("order_by");
 
-        if (is_numeric($feed)) {  $feed = (int) $feed;
+        if (is_numeric($feed)) {
+            $feed = (int) $feed;
         }
 
         /* Feed -5 is a special case: it is used to display auxiliary information
@@ -858,25 +861,39 @@ class Feeds extends ProtectedHandler
 
         $result = false;
 
-        if ($feed < LABEL_BASE_INDEX) {
+        $feed_type = 'Unknown';
+        if ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
+            $feed_type = 'labels2';
             $label_feed = feed_to_label_id($feed);
             $result = \SmallSmallRSS\Database::query(
-                "SELECT id FROM ttrss_labels2 WHERE
-                            id = '$label_feed' AND owner_uid = " . $_SESSION['uid']
+                "SELECT id
+                 FROM ttrss_labels2
+                 WHERE
+                     id = '$label_feed'
+                     AND owner_uid = " . $_SESSION['uid']
             );
         } elseif (!$cat_view && is_numeric($feed) && $feed > 0) {
+            $feed_type = 'feeds';
             $result = \SmallSmallRSS\Database::query(
-                "SELECT id FROM ttrss_feeds WHERE
-                            id = '$feed' AND owner_uid = " . $_SESSION['uid']
+                "SELECT id
+                 FROM ttrss_feeds
+                 WHERE
+                     id = '$feed'
+                     AND owner_uid = " . $_SESSION['uid']
             );
         } elseif ($cat_view && is_numeric($feed) && $feed > 0) {
+            $feed_type = 'feed_categories';
             $result = \SmallSmallRSS\Database::query(
-                "SELECT id FROM ttrss_feed_categories WHERE
-                            id = '$feed' AND owner_uid = " . $_SESSION['uid']
+                "SELECT id
+                 FROM ttrss_feed_categories
+                 WHERE
+                     id = '$feed'
+                     AND owner_uid = " . $_SESSION['uid']
             );
         }
 
         if ($result && \SmallSmallRSS\Database::num_rows($result) == 0) {
+            \SmallSmallRSS\Logger::log("Feed not found: $feed_type $feed");
             print json_encode($this->generate_error_feed(__("Feed not found.")));
             return;
         }
@@ -902,24 +919,19 @@ class Feeds extends ProtectedHandler
 
         if (!$cat_view && is_numeric($feed) && $feed > 0) {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_feeds SET last_viewed = NOW()
-                            WHERE id = '$feed' AND owner_uid = ".$_SESSION["uid"]
+                "UPDATE ttrss_feeds
+                 SET last_viewed = NOW()
+                 WHERE id = '$feed' AND owner_uid = ".$_SESSION["uid"]
             );
         }
-
-        $reply['headlines'] = array();
-
         if (!$next_unread_feed) {
             $reply['headlines']['id'] = $feed;
         }
         else {
             $reply['headlines']['id'] = $next_unread_feed;
         }
-
         $reply['headlines']['is_cat'] = (bool) $cat_view;
-
         $override_order = false;
-
         switch ($order_by) {
             case "title":
                 $override_order = "ttrss_entries.title";
@@ -931,7 +943,6 @@ class Feeds extends ProtectedHandler
                 $override_order = "updated DESC";
                 break;
         }
-
         if (!empty($_REQUEST["debug"])) {
             $timing_info = print_checkpoint("04", $timing_info);
         }
@@ -972,17 +983,16 @@ class Feeds extends ProtectedHandler
     private function generate_dashboard_feed()
     {
         $reply = array();
-
+        $reply['headlines']['label'] = __('Dashboard Feed');
         $reply['headlines']['id'] = -5;
         $reply['headlines']['is_cat'] = false;
-
         $reply['headlines']['toolbar'] = '';
         $reply['headlines']['content'] = "<div class='whiteBox'>".__('No feed selected.');
-
         $reply['headlines']['content'] .= "<p><span class=\"insensitive\">";
-
+        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
         $result = \SmallSmallRSS\Database::query(
-            "SELECT ".SUBSTRING_FOR_DATE."(MAX(last_updated), 1, 19) AS last_updated FROM ttrss_feeds
+            "SELECT " . $substring_for_date . "(MAX(last_updated), 1, 19) AS last_updated
+            FROM ttrss_feeds
             WHERE owner_uid = " . $_SESSION['uid']
         );
 
@@ -1016,17 +1026,18 @@ class Feeds extends ProtectedHandler
     private function generate_error_feed($error)
     {
         $reply = array();
-
+        $reply['headlines']['label'] = __('Error Feed');
         $reply['headlines']['id'] = -6;
         $reply['headlines']['is_cat'] = false;
-
         $reply['headlines']['toolbar'] = '';
         $reply['headlines']['content'] = "<div class='whiteBox'>". $error . "</div>";
 
-        $reply['headlines-info'] = array("count" => 0,
-                                         "vgroup_last_feed" => '',
-                                         "unread" => 0,
-                                         "disable_cache" => true);
+        $reply['headlines-info'] = array(
+            "count" => 0,
+            "vgroup_last_feed" => '',
+            "unread" => 0,
+            "disable_cache" => true
+        );
 
         return $reply;
     }
@@ -1172,7 +1183,7 @@ class Feeds extends ProtectedHandler
         print "<hr/>".__('Limit search to:')." ";
         print "<select name=\"search_mode\" dojoType=\"dijit.form.Select\">
             <option value=\"all_feeds\">".__('All feeds')."</option>";
-        $feed_title = getFeedTitle($active_feed_id);
+        $feed_title = \SmallSmallRSS\Feeds::getTitle($active_feed_id);
         if (!$is_cat) {
             $feed_cat_title = getFeedCatTitle($active_feed_id);
         } else {

@@ -23,6 +23,8 @@ class Config {
         }
         $ini_array = parse_ini_file($ini_file);
         foreach ($ini_array as $key => $value) {
+            $type = \SmallSmallRSS\DefaultConfigs::type($key);
+            settype($value, $type);
             self::$values[$key] = $value;
         }
     }
@@ -30,9 +32,8 @@ class Config {
     public static function get($key) {
         self::initialize();
         if (!isset(self::$values[$key])) {
-            $default_key = '\SmallSmallRSS\DefaultConfigs::' . $key;
-            if (defined($default_key)) {
-                self::$values[$key] = constant($default_key);
+            if (\SmallSmallRSS\DefaultConfigs::has($key)) {
+                self::$values[$key] = \SmallSmallRSS\DefaultConfigs::get($key);
             }
             if (defined($key)) {
                 self::$values[$key] = constant($key);

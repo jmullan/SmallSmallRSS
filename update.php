@@ -147,8 +147,9 @@ if (isset($options["daemon"])) {
     while (true) {
         $quiet = (isset($options["quiet"])) ? "--quiet" : "";
         passthru(\SmallSmallRSS\Config::get('PHP_EXECUTABLE') . " " . $argv[0] ." --daemon-loop $quiet");
-        _debug("Sleeping for " . DAEMON_SLEEP_INTERVAL . " seconds...");
-        sleep(DAEMON_SLEEP_INTERVAL);
+        $sleep = \SmallSmallRSS\Config::get('DAEMON_SLEEP_INTERVAL');
+        _debug("Sleeping for $sleep seconds...");
+        sleep($sleep);
     }
 }
 
@@ -158,7 +159,7 @@ if (isset($options["daemon-loop"])) {
         _debug("warning: unable to create stampfile\n");
     }
 
-    update_daemon_common(isset($options["pidlock"]) ? 50 : DAEMON_FEED_LIMIT);
+    update_daemon_common(isset($options["pidlock"]) ? 50 : \SmallSmallRSS\Config::get('DAEMON_FEED_LIMIT'));
 
     if (!isset($options["pidlock"]) || $options["task"] == 0) {
         housekeeping_common(true);

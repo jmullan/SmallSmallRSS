@@ -29,7 +29,7 @@ class Daemon
     {
         foreach (array_keys(self::$ctimes) as $pid) {
             $started = self::$ctimes[$pid];
-            if (time() - $started > MAX_CHILD_RUNTIME) {
+            if (time() - $started > \SmallSmallRSS\Config::get('MAX_CHILD_RUNTIME')) {
                 _debug("[MASTER] child process $pid seems to be stuck, aborting...");
                 posix_kill($pid, SIGKILL);
             }

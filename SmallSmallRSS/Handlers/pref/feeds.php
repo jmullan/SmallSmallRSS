@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class Pref_Feeds extends ProtectedHandler
 {
 
@@ -97,13 +98,16 @@ class Pref_Feeds extends ProtectedHandler
             }
 
         }
-
+        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
         $feed_result = \SmallSmallRSS\Database::query(
             "SELECT id, title, last_error,
-            ".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+            " . $substring_for_date . "(last_updated,1,19) AS last_updated
             FROM ttrss_feeds
-            WHERE cat_id = '$cat_id' AND owner_uid = ".$_SESSION["uid"].
-            "$search_qpart ORDER BY order_id, title"
+            WHERE
+                cat_id = '$cat_id'
+                AND owner_uid = " . $_SESSION["uid"] . "
+                $search_qpart
+            ORDER BY order_id, title"
         );
 
         while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($feed_result)) {
@@ -164,18 +168,15 @@ class Pref_Feeds extends ProtectedHandler
                 $cat['items'] = array();
             }
 
-            foreach (array(-4, -3, -1, -2, 0, -6) as $i) {
+            foreach (\SmallSmallRSS\Feeds::get_special_feed_ids() as $i) {
                 array_push($cat['items'], $this->feedlist_init_feed($i));
             }
 
             /* Plugin feeds for -1 */
-
             $feeds = \SmallSmallRSS\PluginHost::getInstance()->get_feeds(-1);
-
             if ($feeds) {
                 foreach ($feeds as $feed) {
                     $feed_id = \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']);
-
                     $item = array();
                     $item['id'] = 'FEED:' . $feed_id;
                     $item['bare_id'] = (int) $feed_id;
@@ -184,11 +185,9 @@ class Pref_Feeds extends ProtectedHandler
                     $item['checkbox'] = false;
                     $item['error'] = '';
                     $item['icon'] = $feed['icon'];
-
                     $item['param'] = '';
                     $item['unread'] = 0; //$feed['sender']->get_unread($feed['id']);
                     $item['type'] = 'feed';
-
                     array_push($cat['items'], $item);
                 }
             }
@@ -198,32 +197,20 @@ class Pref_Feeds extends ProtectedHandler
             } else {
                 $root['items'] = array_merge($root['items'], $cat['items']);
             }
-
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT * FROM
-                ttrss_labels2 WHERE owner_uid = ".$_SESSION['uid']." ORDER by caption"
-            );
-
-            if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-
+            $labels = \SmallSmallRSS\Labels::getAll($_SESSION['uid']);
+            if ($labels) {
                 if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
                     $cat = $this->feedlist_init_cat(-2);
                 } else {
                     $cat['items'] = array();
                 }
-
-                while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
+                foreach ($labels as $line) {
                     $label_id = label_to_feed_id($line['id']);
-
                     $feed = $this->feedlist_init_feed($label_id, false, 0);
-
                     $feed['fg_color'] = $line['fg_color'];
                     $feed['bg_color'] = $line['bg_color'];
-
                     array_push($cat['items'], $feed);
                 }
-
                 if ($enable_cats) {
                     array_push($root['items'], $cat);
                 } else {
@@ -233,14 +220,18 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         if ($enable_cats) {
-            $show_empty_cats = (!empty($_REQUEST['force_show_empty'])
-                                || ($this->get_mode() != 2 && !$search));
-
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT id, title FROM ttrss_feed_categories
-                WHERE owner_uid = " . $_SESSION["uid"] . " AND parent_cat IS NULL ORDER BY order_id, title"
+            $show_empty_cats = (
+                !empty($_REQUEST['force_show_empty'])
+                || ($this->get_mode() != 2 && !$search)
             );
-
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT id, title
+                 FROM ttrss_feed_categories
+                 WHERE
+                     owner_uid = " . $_SESSION["uid"] . "
+                     AND parent_cat IS NULL
+                 ORDER BY order_id, title"
+            );
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $cat = array();
                 $cat['id'] = 'CAT:' . $line['id'];
@@ -252,16 +243,12 @@ class Pref_Feeds extends ProtectedHandler
                 $cat['type'] = 'category';
                 $cat['unread'] = 0;
                 $cat['child_unread'] = 0;
-
                 $cat['items'] = $this->get_category_items($line['id']);
-
                 $num_children = $this->calculate_children_count($cat);
                 $cat['param'] = vsprintf(_ngettext('(%d feed)', '(%d feeds)', $num_children), $num_children);
-
                 if ($num_children > 0 || $show_empty_cats) {
                     array_push($root['items'], $cat);
                 }
-
                 $root['param'] += count($cat['items']);
             }
 
@@ -277,13 +264,16 @@ class Pref_Feeds extends ProtectedHandler
             $cat['checkbox'] = false;
             $cat['unread'] = 0;
             $cat['child_unread'] = 0;
-
+            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $feed_result = \SmallSmallRSS\Database::query(
                 "SELECT id, title,last_error,
-                ".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                " . $substring_for_date . "(last_updated,1,19) AS last_updated
                 FROM ttrss_feeds
-                WHERE cat_id IS NULL AND owner_uid = ".$_SESSION["uid"].
-                "$search_qpart ORDER BY order_id, title"
+                WHERE
+                    cat_id IS NULL
+                    AND owner_uid = " . $_SESSION["uid"] . "
+                    $search_qpart
+                ORDER BY order_id, title"
             );
 
             while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($feed_result)) {
@@ -314,12 +304,15 @@ class Pref_Feeds extends ProtectedHandler
             $root['param'] = vsprintf(_ngettext('(%d feed)', '(%d feeds)', $num_children), $num_children);
 
         } else {
+            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $feed_result = \SmallSmallRSS\Database::query(
                 "SELECT id, title, last_error,
-                ".SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                " . $substring_for_date . "(last_updated,1,19) AS last_updated
                 FROM ttrss_feeds
-                WHERE owner_uid = ".$_SESSION["uid"].
-                "$search_qpart ORDER BY order_id, title"
+                WHERE
+                    owner_uid = " . $_SESSION["uid"] . "
+                    $search_qpart
+                ORDER BY order_id, title"
             );
 
             while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($feed_result)) {
@@ -1249,24 +1242,21 @@ class Pref_Feeds extends ProtectedHandler
         foreach ($ids as $id) {
 
             $filters = load_filters($id, $_SESSION["uid"], 6);
-
+            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $result = \SmallSmallRSS\Database::query(
                 "SELECT
-                title, content, link, ref_id, author,".
-                SUBSTRING_FOR_DATE."(updated, 1, 19) AS updated
-                  FROM
-                    ttrss_user_entries, ttrss_entries
-                    WHERE ref_id = id AND feed_id = '$id' AND
-                        owner_uid = " .$_SESSION['uid']."
-                    "
+                     title, content, link, ref_id, author,
+                 " . $substring_for_date . "(updated, 1, 19) AS updated
+                 FROM
+                     ttrss_user_entries, ttrss_entries
+                 WHERE
+                     ref_id = id
+                     AND feed_id = '$id'
+                     AND owner_uid = " . $_SESSION['uid']
             );
-
             $scores = array();
-
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
                 $tags = get_article_tags($line["ref_id"]);
-
                 $article_filters = get_article_filters(
                     $filters, $line['title'],
                     $line['content'], $line['link'], strtotime($line['updated']),
@@ -1315,20 +1305,19 @@ class Pref_Feeds extends ProtectedHandler
         );
 
         while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
             $id = $feed_line["id"];
-
             $filters = load_filters($id, $_SESSION["uid"], 6);
-
+            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $tmp_result = \SmallSmallRSS\Database::query(
                 "SELECT
-                title, content, link, ref_id, author,".
-                SUBSTRING_FOR_DATE."(updated, 1, 19) AS updated
-                    FROM
-                    ttrss_user_entries, ttrss_entries
-                    WHERE ref_id = id AND feed_id = '$id' AND
-                        owner_uid = " .$_SESSION['uid']."
-                    "
+                     title, content, link, ref_id, author,
+                 " . $substring_for_date . "(updated, 1, 19) AS updated
+                 FROM
+                     ttrss_user_entries, ttrss_entries
+                 WHERE
+                     ref_id = id
+                     AND feed_id = '$id'
+                     AND owner_uid = " . $_SESSION['uid']
             );
 
             $scores = array();
@@ -1719,7 +1708,7 @@ class Pref_Feeds extends ProtectedHandler
         $feed_id = (int) $feed_id;
 
         if (!$title) {
-            $title = getFeedTitle($feed_id, false);
+            $title = \SmallSmallRSS\Feeds::getTitle($feed_id);
         }
 
         if ($unread === false) {

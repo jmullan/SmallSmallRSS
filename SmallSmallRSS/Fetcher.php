@@ -54,8 +54,16 @@ class Fetcher
                     array("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $timestamp))
                 );
             }
-            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout ? $timeout : FILE_FETCH_CONNECT_TIMEOUT);
-            curl_setopt($ch, CURLOPT_TIMEOUT, $timeout ? $timeout : FILE_FETCH_TIMEOUT);
+            curl_setopt(
+                $ch,
+                CURLOPT_CONNECTTIMEOUT,
+                ($timeout ? $timeout : \SmallSmallRSS\Config::get('FILE_FETCH_CONNECT_TIMEOUT'))
+            );
+            curl_setopt(
+                $ch,
+                CURLOPT_TIMEOUT,
+                ($timeout ? $timeout : \SmallSmallRSS\Config::get('FILE_FETCH_TIMEOUT'))
+            );
             curl_setopt($ch, CURLOPT_FOLLOWLOCATION, !ini_get("safe_mode") && !ini_get("open_basedir"));
             curl_setopt($ch, CURLOPT_MAXREDIRS, 20);
             curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);

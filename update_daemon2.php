@@ -3,11 +3,6 @@
 require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 chdir(__DIR__);
-// defaults
-define_default('PURGE_INTERVAL', 3600); // seconds
-define_default('MAX_CHILD_RUNTIME', 1800); // seconds
-define_default('MAX_JOBS', 2);
-define_default('SPAWN_INTERVAL', DAEMON_SLEEP_INTERVAL); // seconds
 
 \SmallSmallRSS\Sanity::initialCheck();
 
@@ -70,9 +65,9 @@ if (isset($options["help"])) {
     print "Options:\n";
     print "  --log FILE           - log messages to FILE\n";
     print "  --tasks N            - amount of update tasks to spawn\n";
-    print "                         default: " . MAX_JOBS . "\n";
+    print "                         default: " . \SmallSmallRSS\Config::get('MAX_JOBS') . "\n";
     print "  --interval N         - task spawn interval\n";
-    print "                         default: " . SPAWN_INTERVAL . " seconds.\n";
+    print "                         default: " . \SmallSmallRSS\Config::get('SPAWN_INTERVAL') . " seconds.\n";
     print "  --quiet              - don't output messages to stdout\n";
     return;
 }
@@ -81,18 +76,15 @@ if (isset($options["help"])) {
 
 if (isset($options["tasks"])) {
     _debug("Set to spawn " . $options["tasks"] . " children.");
-    $max_jobs = $options["tasks"];
-} else {
-    $max_jobs = MAX_JOBS;
+    \SmallSmallRSS\Config::set('MAX_JOBS', (int) $options["tasks"]);
 }
+$max_jobs = \SmallSmallRSS\Config::get('MAX_JOBS');
 
 if (isset($options["interval"])) {
     _debug("Spawn interval: " . $options["interval"] . " seconds.");
-    $spawn_interval = $options["interval"];
-} else {
-    $spawn_interval = SPAWN_INTERVAL;
+    \SmallSmallRSS\Config::set('SPAWN_INTERVAL', (int) $options["interval"]);
 }
-
+$spawn_interval = \SmallSmallRSS\Config::get('SPAWN_INTERVAL');
 if (isset($options["log"])) {
     _debug("Logging to " . $options["log"]);
     define('LOGFILE', $options["log"]);

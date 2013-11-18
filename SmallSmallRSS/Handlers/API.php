@@ -350,10 +350,10 @@ class API extends Handler
         $article_id = join(",", array_filter(explode(",", $this->escape_from_request("article_id")), 'is_numeric'));
 
         if ($article_id) {
-
+            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $query = "SELECT id,title,link,content,cached_content,feed_id,comments,int_id,
                 marked,unread,published,score,
-                ".SUBSTRING_FOR_DATE."(updated,1,16) as updated,
+                ".$substring_for_date."(updated,1,16) as updated,
                 author,(SELECT title FROM ttrss_feeds WHERE id = feed_id) AS feed_title
                 FROM ttrss_entries,ttrss_user_entries
                 WHERE    id IN ($article_id) AND ref_id = id AND owner_uid = " .
@@ -445,48 +445,17 @@ class API extends Handler
     function getPref()
     {
         $pref_name = $this->escape_from_request("pref_name");
-
         $this->wrap(self::STATUS_OK, array("value" => \SmallSmallRSS\DBPrefs::read($pref_name)));
     }
 
     function getLabels()
     {
+        $owner_id = $_SESSION['uid'];
         $article_id = (int) $_REQUEST['article_id'];
-
-        $rv = array();
-
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT id, caption, fg_color, bg_color
-            FROM ttrss_labels2
-            WHERE owner_uid = '".$_SESSION['uid']."' ORDER BY caption"
+        $this->wrap(
+            self::STATUS_OK,
+            \SmallSmallRSS\Labels::getOwnerLabels($owner_id, $article_id)
         );
-
-        if ($article_id) {
-            $article_labels = \SmallSmallRSS\Labels::getForArticle($article_id);
-        }
-        else {
-            $article_labels = array();
-        }
-
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
-            $checked = false;
-            foreach ($article_labels as $al) {
-                if ($al[0] == $line['id']) {
-                    $checked = true;
-                    break;
-                }
-            }
-
-            array_push($rv, array(
-                           "id" => (int) $line['id'],
-                           "caption" => $line['caption'],
-                           "fg_color" => $line['fg_color'],
-                           "bg_color" => $line['bg_color'],
-                           "checked" => $checked));
-        }
-
-        $this->wrap(self::STATUS_OK, $rv);
     }
 
     function setArticleLabel()
@@ -495,32 +464,24 @@ class API extends Handler
         $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
         $label_id = (int) $this->escape_from_request('label_id');
         $assign = (bool) $this->escape_from_request('assign') == "true";
-
         $label = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Labels::findCaption(
             $label_id, $_SESSION["uid"]
         ));
-
         $num_updated = 0;
-
         if ($label) {
-
             foreach ($article_ids as $id) {
-
                 if ($assign) {
                     \SmallSmallRSS\Labels::addArticle($id, $label, $_SESSION["uid"]);
-                }
-                else {
+                } else {
                     \SmallSmallRSS\Labels::removeArticle($id, $label, $_SESSION["uid"]);
                 }
-
                 $num_updated += 1;
-
             }
         }
-
-        $this->wrap(self::STATUS_OK, array("status" => "OK",
-                                           "updated" => $num_updated));
-
+        $this->wrap(
+            self::STATUS_OK, array("status" => "OK",
+                                   "updated" => $num_updated)
+        );
     }
 
     function index($method)
@@ -596,7 +557,7 @@ class API extends Handler
                 $unread = getFeedUnread($i);
 
                 if ($unread || !$unread_only) {
-                    $title = getFeedTitle($i);
+                    $title = \SmallSmallRSS\Feeds::getTitle($i);
 
                     $row = array(
                         "id" => $i,
@@ -643,12 +604,12 @@ class API extends Handler
         } else {
             $limit_qpart = "";
         }
-
+        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
         if ($cat_id == -4 || $cat_id == -3) {
             $result = \SmallSmallRSS\Database::query(
                 "SELECT
                     id, feed_url, cat_id, title, order_id, ".
-                SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                $substring_for_date . "(last_updated,1,19) AS last_updated
                         FROM ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"] .
                 " ORDER BY cat_id, title " . $limit_qpart
             );
@@ -664,7 +625,7 @@ class API extends Handler
             $result = \SmallSmallRSS\Database::query(
                 "SELECT
                     id, feed_url, cat_id, title, order_id, ".
-                SUBSTRING_FOR_DATE."(last_updated,1,19) AS last_updated
+                $substring_for_date . "(last_updated,1,19) AS last_updated
                         FROM ttrss_feeds WHERE
                         $cat_qpart AND owner_uid = " . $_SESSION["uid"] .
                 " ORDER BY cat_id, title " . $limit_qpart

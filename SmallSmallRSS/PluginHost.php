@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS;
+
 class PluginHost
 {
     private $dbh;
@@ -435,12 +436,12 @@ class PluginHost
 
     static function pfeed_to_feed_id($label)
     {
-        return PLUGIN_FEED_BASE_INDEX - 1 - abs($label);
+        return \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX - 1 - abs($label);
     }
 
     static function feed_to_pfeed_id($feed)
     {
-        return PLUGIN_FEED_BASE_INDEX - 1 + abs($feed);
+        return \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX - 1 + abs($feed);
     }
 
     public function add_api_method($name, $sender)

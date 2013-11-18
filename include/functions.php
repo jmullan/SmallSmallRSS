@@ -1,8 +1,4 @@
 <?php
-\SmallSmallRSS\Config::set('EXPECTED_CONFIG_VERSION', 26);
-\SmallSmallRSS\Config::set('LABEL_BASE_INDEX', -1024);
-\SmallSmallRSS\Config::set('PLUGIN_FEED_BASE_INDEX', -128);
-\SmallSmallRSS\Config::set('COOKIE_LIFETIME_LONG', 86400*365);
 mb_internal_encoding("UTF-8");
 date_default_timezone_set('UTC');
 if (defined('E_DEPRECATED')) {
@@ -10,37 +6,6 @@ if (defined('E_DEPRECATED')) {
 }
 
 \SmallSmallRSS\Session::init();
-
-/**
- * Define a constant if not already defined
- *
- * @param string $name The constant name.
- * @param mixed $value The constant value.
- * @access public
- * @return boolean True if defined successfully or not.
- */
-function define_default($name, $value) {
-    defined($name) or \SmallSmallRSS\Config::set($name, $value);
-}
-
-///// Some defaults that you can override in config.php //////
-
-define_default('FEED_FETCH_TIMEOUT', 45);
-// How may seconds to wait for response when requesting feed from a site
-define_default('FEED_FETCH_NO_CACHE_TIMEOUT', 15);
-// How may seconds to wait for response when requesting feed from a
-// site when that feed wasn't cached before
-define_default('FILE_FETCH_TIMEOUT', 45);
-// Default timeout when fetching files from remote sites
-define_default('FILE_FETCH_CONNECT_TIMEOUT', 15);
-// How many seconds to wait for initial response from website when
-// fetching files from remote sites
-
-if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-    \SmallSmallRSS\Config::set('SUBSTRING_FOR_DATE', 'SUBSTRING_FOR_DATE');
-} else {
-    \SmallSmallRSS\Config::set('SUBSTRING_FOR_DATE', 'SUBSTRING');
-}
 
 /**
  * Return available translations names.
@@ -971,7 +936,7 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
                                 (SELECT id FROM ttrss_entries, ttrss_user_entries WHERE ref_id = id
                                     AND owner_uid = $owner_uid AND unread = true AND feed_id = $feed AND $date_qpart) as tmp)");
 
-        } elseif ($feed < 0 && $feed > LABEL_BASE_INDEX) { // special, like starred
+        } elseif ($feed < 0 && $feed > \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // special, like starred
 
             if ($feed == -1) {
                 \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
@@ -1015,7 +980,7 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
                                         AND owner_uid = $owner_uid AND unread = true AND $date_qpart) as tmp)");
             }
 
-        } elseif ($feed < LABEL_BASE_INDEX) { // label
+        } elseif ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // label
 
             $label_id = feed_to_label_id($feed);
 
@@ -1266,7 +1231,7 @@ function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_ui
             $match_part = "feed_id IS NULL";
         }
 
-    } elseif ($feed < LABEL_BASE_INDEX) {
+    } elseif ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
 
         $label_id = feed_to_label_id($feed);
 
@@ -1413,11 +1378,12 @@ function getLabelCounters($descriptions = false)
 function getFeedCounters($active_feed = false)
 {
     $ret_arr = array();
+    $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
     $query = "
         SELECT
             ttrss_feeds.id,
             ttrss_feeds.title,
-            ".SUBSTRING_FOR_DATE."(ttrss_feeds.last_updated,1,19) AS last_updated,
+            ".$substring_for_date."(ttrss_feeds.last_updated,1,19) AS last_updated,
             last_error,
             value AS count
         FROM ttrss_feeds, ttrss_counters_cache
@@ -1715,7 +1681,7 @@ function getFeedCatTitle($id)
 {
     if ($id == -1) {
         return __("Special");
-    } elseif ($id < LABEL_BASE_INDEX) {
+    } elseif ($id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
         return __("Labels");
     } elseif ($id > 0) {
         $result = \SmallSmallRSS\Database::query("SELECT ttrss_feed_categories.title
@@ -1754,7 +1720,7 @@ function getFeedIcon($id)
             return "images/recently_read.png";
             break;
         default:
-            if ($id < LABEL_BASE_INDEX) {
+            if ($id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
                 return "images/label.png";
             } else {
                 if (file_exists(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico")) {
@@ -1767,47 +1733,9 @@ function getFeedIcon($id)
     return false;
 }
 
-function getFeedTitle($id, $cat = false)
-{
-    if ($cat) {
-        return getCategoryTitle($id);
-    } elseif ($id == -1) {
-        return __("Starred articles");
-    } elseif ($id == -2) {
-        return __("Published articles");
-    } elseif ($id == -3) {
-        return __("Fresh articles");
-    } elseif ($id == -4) {
-        return __("All articles");
-    } elseif ($id === 0 || $id === "0") {
-        return __("Archived articles");
-    } elseif ($id == -6) {
-        return __("Recently read");
-    } elseif ($id < LABEL_BASE_INDEX) {
-        $label_id = feed_to_label_id($id);
-        $result = \SmallSmallRSS\Database::query("SELECT caption FROM ttrss_labels2 WHERE id = '$label_id'");
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "caption");
-        } else {
-            return "Unknown label ($label_id)";
-        }
-
-    } elseif (is_numeric($id) && $id > 0) {
-        $result = \SmallSmallRSS\Database::query("SELECT title FROM ttrss_feeds WHERE id = '$id'");
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "title");
-        } else {
-            return "Unknown feed ($id)";
-        }
-    } else {
-        return $id;
-    }
-}
-
 function make_init_params()
 {
     $params = array();
-
     foreach (
         array("ON_CATCHUP_SHOW_NEXT_FEED", "HIDE_READ_FEEDS",
               "ENABLE_FEED_CATS", "FEEDS_SORT_BY_UNREAD", "CONFIRM_FEED_CATCHUP",
@@ -1816,14 +1744,13 @@ function make_init_params()
 
         $params[strtolower($param)] = (int) \SmallSmallRSS\DBPrefs::read($param);
     }
-
     $params["icons_url"] = \SmallSmallRSS\Config::get('ICONS_URL');
     $params["cookie_lifetime"] = \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME');
     $params["default_view_mode"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_MODE");
     $params["default_view_limit"] = (int) \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_LIMIT");
     $params["default_view_order_by"] = \SmallSmallRSS\DBPrefs::read("_DEFAULT_VIEW_ORDER_BY");
     $params["bw_limit"] = (int) $_SESSION["bw_limit"];
-    $params["label_base_index"] = (int) LABEL_BASE_INDEX;
+    $params["label_base_index"] = (int) \SmallSmallRSS\Constants::LABEL_BASE_INDEX;
 
     $result = \SmallSmallRSS\Database::query(
         "SELECT
@@ -1843,7 +1770,7 @@ function make_init_params()
     } else {
         $params["widescreen"] = 0;
     }
-    $params['simple_update'] = \SmallSmallRSS\Config::get('SIMPLE_UPDATE_MODE');
+    $params['simple_update'] = (bool) \SmallSmallRSS\Config::get('SIMPLE_UPDATE_MODE');
     return $params;
 }
 
@@ -2129,8 +2056,8 @@ function search_to_sql($search)
                     $k = date("Y-m-d", convert_timestamp($orig_ts, $user_tz_string, 'UTC'));
 
                     //$k = date("Y-m-d", strtotime(substr($k, 1)));
-
-                    array_push($query_keywords, "(".SUBSTRING_FOR_DATE."(updated,1,LENGTH('$k')) $not = '$k')");
+                    $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+                    array_push($query_keywords, "(".$substring_for_date."(updated,1,LENGTH('$k')) $not = '$k')");
                 } else {
                     array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
                             OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
@@ -2390,7 +2317,7 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
         $allow_archived = true;
         $query_strategy_part = "true";
         $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
-    } elseif ($feed <= LABEL_BASE_INDEX) { // labels
+    } elseif ($feed <= \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // labels
         $label_id = feed_to_label_id($feed);
 
         $query_strategy_part = "label_id = '$label_id' AND
@@ -2432,7 +2359,7 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
                 $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, "last_error");
                 $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, "last_updated");
             } else {
-                $feed_title = getFeedTitle($feed);
+                $feed_title = \SmallSmallRSS\Feeds::getTitle($feed);
             }
         }
     }
@@ -2903,9 +2830,9 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
 
         \SmallSmallRSS\CounterCache::update($feed_id, $owner_uid);
     }
-
+    $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
     $result = \SmallSmallRSS\Database::query("SELECT id,title,link,content,feed_id,comments,int_id,
-            ".SUBSTRING_FOR_DATE."(updated,1,16) as updated,
+            ".$substring_for_date."(updated,1,16) as updated,
             (SELECT site_url FROM ttrss_feeds WHERE id = feed_id) as site_url,
             (SELECT hide_images FROM ttrss_feeds WHERE id = feed_id) as hide_images,
             (SELECT always_display_enclosures FROM ttrss_feeds WHERE id = feed_id) as always_display_enclosures,
@@ -3903,54 +3830,9 @@ function getFeedCategory($feed) {
 
 }
 
-function get_minified_js($files) {
-    require_once __DIR__ . '/../lib/jshrink/Minifier.php';
-
-    $rv = '';
-
-    foreach ($files as $js) {
-        if (!isset($_GET['debug'])) {
-            $cached_file = \SmallSmallRSS\Config::get('CACHE_DIR') . "/js/".basename($js).".js";
-
-            if (file_exists($cached_file) &&
-                is_readable($cached_file) &&
-                filemtime($cached_file) >= filemtime("js/$js.js")) {
-
-                $rv .= file_get_contents($cached_file);
-
-            } else {
-                $minified = JShrink\Minifier::minify(file_get_contents("js/$js.js"));
-                file_put_contents($cached_file, $minified);
-                $rv .= $minified;
-            }
-        } else {
-            $rv .= file_get_contents("js/$js.js");
-        }
-    }
-
-    return $rv;
-}
-
 function stylesheet_tag($filename) {
     $timestamp = filemtime($filename);
     echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$filename?$timestamp\"/>\n";
-}
-
-function javascript_tag($filename) {
-    $query = "";
-
-    if (!(strpos($filename, "?") === FALSE)) {
-        $query = substr($filename, strpos($filename, "?") + 1);
-        $filename = substr($filename, 0, strpos($filename, "?"));
-    }
-
-    $timestamp = filemtime($filename);
-
-    if ($query) {
-        $timestamp .= "&$query";
-    }
-
-    echo "<script type=\"text/javascript\" charset=\"utf-8\" src=\"$filename?$timestamp\"></script>\n";
 }
 
 function calculate_dep_timestamp() {
@@ -4003,11 +3885,11 @@ function init_js_translations() {
 }
 
 function label_to_feed_id($label) {
-    return LABEL_BASE_INDEX - 1 - abs($label);
+    return \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 - abs($label);
 }
 
 function feed_to_label_id($feed) {
-    return LABEL_BASE_INDEX - 1 + abs($feed);
+    return \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 + abs($feed);
 }
 
 function format_libxml_error($error) {

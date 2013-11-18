@@ -15,4 +15,11 @@ $include_paths = array(
     get_include_path(),
 );
 set_include_path(join(PATH_SEPARATOR, $include_paths));
+
+if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+    \SmallSmallRSS\Config::set('SUBSTRING_FOR_DATE', 'SUBSTRING_FOR_DATE');
+} else {
+    \SmallSmallRSS\Config::set('SUBSTRING_FOR_DATE', 'SUBSTRING');
+}
+
 require __DIR__ . '/../include/functions.php';

@@ -504,17 +504,17 @@ class RPC extends ProtectedHandler
     public function purge()
     {
         $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
-        $days = sprintf("%d", $_REQUEST["days"]);
-
+        $purge_interval = sprintf("%d", $_REQUEST["days"]);
         foreach ($ids as $id) {
-
             $result = \SmallSmallRSS\Database::query(
-                "SELECT id FROM ttrss_feeds WHERE
-                id = '$id' AND owner_uid = ".$_SESSION["uid"]
+                "SELECT id
+                 FROM ttrss_feeds
+                 WHERE
+                     id = '$id'
+                     AND owner_uid = " . $_SESSION["uid"]
             );
-
             if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-                purge_feed($id, $days);
+                \SmallSmallRSS\Feeds::purge($feed_id, $purge_interval);
             }
         }
     }

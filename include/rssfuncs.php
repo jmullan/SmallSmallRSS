@@ -1172,9 +1172,7 @@ function update_rss_feed($feed, $no_cache = false)
     }
 
     _debug("purging feed...");
-
-    purge_feed($feed, 0);
-
+    \SmallSmallRSS\Feeds::purge($feed);
     \SmallSmallRSS\Database::query(
         "UPDATE ttrss_feeds
          SET

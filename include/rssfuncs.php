@@ -1235,22 +1235,7 @@ function expire_error_log($debug)
 
 function expire_lock_files($debug)
 {
-    $num_deleted = 0;
-
-    if (!is_writable(\SmallSmallRSS\Config::get('LOCK_DIRECTORY'))) {
-        _debug(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . " is not writable");
-        return;
-    }
-    $files = glob(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/*.lock");
-    if ($files) {
-        foreach ($files as $file) {
-            if (!file_is_locked(basename($file)) && time() - filemtime($file) > 86400*2) {
-                unlink($file);
-                ++$num_deleted;
-            }
-        }
-    }
-    _debug("Removed $num_deleted old lock files.", $debug, $debug);
+    \SmallSmallRSS\Lockfiles::unlink_expired($debug);
 }
 
 function expire_cached_files($debug)

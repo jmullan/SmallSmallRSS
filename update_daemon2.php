@@ -24,20 +24,16 @@ function sigchld_handler($signal)
 function shutdown($caller_pid)
 {
     if ($caller_pid == posix_getpid()) {
-        if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.lock")) {
-            _debug("removing lockfile (master)...");
-            unlink(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.lock");
-        }
+        _debug("removing lockfile (master)...");
+        \SmallSmallRSS\Lockfiles::unlock("update_daemon.lock");
     }
 }
 
 function task_shutdown()
 {
     $pid = posix_getpid();
-    if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon-$pid.lock")) {
-        _debug("removing lockfile ($pid)...");
-        unlink(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon-$pid.lock");
-    }
+    _debug("removing lockfile ($pid)...");
+    \SmallSmallRSS\Lockfiles::unlock("update_daemon-$pid.lock");
 }
 
 function sigint_handler()
@@ -96,11 +92,9 @@ if (file_is_locked("update_daemon.lock")) {
 }
 
 // Try to lock a file in order to avoid concurrent update.
-$lock_handle = make_lockfile("update_daemon.lock");
-
+$lock_handle = \SmallSmallRSS\Lockfiles::make("update_daemon.lock");
 if (!$lock_handle) {
-    die("error: Can't create lockfile. ".
-        "Maybe another daemon is already running.\n");
+    die("error: Can't create lockfile. Maybe another daemon is already running.\n");
 }
 \SmallSmallRSS\Sanity::schemaOrDie();
 

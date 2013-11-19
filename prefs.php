@@ -61,8 +61,8 @@ foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
 $js_renderer->render_minified_js_files(
     array("../lib/CheckBoxTree", "functions", "deprecated", "prefs", "PrefFeedTree", "PrefFilterTree", "PrefLabelTree")
 );
-
-init_js_translations();
+$translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();
+$translation_renderer->render();
 ?>
 </script>
 

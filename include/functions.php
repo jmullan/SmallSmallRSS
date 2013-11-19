@@ -210,11 +210,11 @@ function print_select_hash($id, $default, $values, $attributes = "")
 {
     print "<select name=\"$id\" id='$id' $attributes>";
     foreach (array_keys($values) as $v) {
-        if ($v == $default)
+        if ($v == $default) {
             $sel = 'selected="selected"';
-        else
+        } else {
             $sel = "";
-
+        }
         $v = trim($v);
 
         print "<option $sel value=\"$v\">".$values[$v]."</option>";
@@ -226,11 +226,11 @@ function print_select_hash($id, $default, $values, $attributes = "")
 function print_radio($id, $default, $true_is, $values, $attributes = "")
 {
     foreach ($values as $v) {
-        if ($v == $default)
+        if ($v == $default) {
             $sel = "checked";
-        else
+        } else {
             $sel = "";
-
+        }
         if ($v == $true_is) {
             $sel .= " value=\"1\"";
         } else {
@@ -609,34 +609,6 @@ function file_is_locked($filename)
     } else {
         return false;
     }
-}
-
-
-function make_lockfile($filename)
-{
-    $file = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename";
-    $fp = fopen($file, "w");
-    if (!$fp) {
-        \SmallSmallRSS\Logger::Log("Could not get lockfile pointer to $file");
-        return false;
-    }
-    if (!flock($fp, LOCK_EX | LOCK_NB)) {
-        \SmallSmallRSS\Logger::Log("Could not get lock on $file");
-        return false;
-    }
-    $stat_h = fstat($fp);
-    $stat_f = stat(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename");
-    if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-        if ($stat_h["ino"] != $stat_f["ino"] ||
-            $stat_h["dev"] != $stat_f["dev"]) {
-            \SmallSmallRSS\Logger::log('lockfile stats do not match.');
-            return false;
-        }
-    }
-    if (function_exists('posix_getpid')) {
-        fwrite($fp, posix_getpid() . "\n");
-    }
-    return $fp;
 }
 
 function make_stampfile($filename)
@@ -3568,11 +3540,6 @@ function calculate_dep_timestamp() {
         }
     }
     return $max_ts;
-}
-
-function init_js_translations() {
-    $translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();
-    $translation_renderer->render();
 }
 
 function label_to_feed_id($label) {

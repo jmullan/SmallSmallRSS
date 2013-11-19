@@ -43,7 +43,7 @@ class Dlg extends ProtectedHandler
 
         print "</div>";
 
-        //return;
+
     }
 
     function pubOPMLUrl()
@@ -66,41 +66,37 @@ class Dlg extends ProtectedHandler
 
         print "</div>";
 
-        //return;
+
     }
 
     function explainError()
     {
         print "<div class=\"errorExplained\">";
-
         if ($this->param == 1) {
-            print __("Update daemon is enabled in configuration, but daemon process is not running, which prevents all feeds from updating. Please start the daemon process or contact instance owner.");
-
-            $stamp = (int) file_get_contents(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.stamp");
-
+            print __(
+                "Update daemon is enabled in configuration, but daemon process is not"
+                . " running, which prevents all feeds from updating. Please start the"
+                . " daemon process or contact instance owner."
+            );
+            $stamp = (int) \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
             print "<p>" . __("Last update:") . " " . date("Y.m.d, G:i", $stamp);
 
         }
-
         if ($this->param == 3) {
-            print __("Update daemon is taking too long to perform a feed update. This could indicate a problem like crash or a hang. Please check the daemon process or contact instance owner.");
-
-            $stamp = (int) file_get_contents(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.stamp");
-
+            print __(
+                "Update daemon is taking too long to perform a feed update."
+                . " This could indicate a problem like crash or a hang. Please"
+                . " check the daemon process or contact instance owner."
+            );
+            $stamp = (int) \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
             print "<p>" . __("Last update:") . " " . date("Y.m.d, G:i", $stamp);
-
         }
-
         print "</div>";
-
         print "<div align='center'>";
-
-        print "<button onclick=\"return closeInfoBox()\">".
-            __('Close this window')."</button>";
-
+        print "<button onclick=\"return closeInfoBox()\">" . __('Close this window') . "</button>";
         print "</div>";
 
-        //return;
+
     }
 
     function printTagCloud()
@@ -156,22 +152,16 @@ class Dlg extends ProtectedHandler
                 $size . "px\" title=\"$value articles tagged with " .
                 $key . '">' . $key . '</a> ';
         }
-
-
-
         print "</div>";
-
         print "<div align='center'>";
         print "<button dojoType=\"dijit.form.Button\"
             onclick=\"return closeInfoBox()\">".
             __('Close this window')."</button>";
         print "</div>";
-
     }
 
     function printTagSelect()
     {
-
         print __("Match:"). "&nbsp;" .
             "<input class=\"noborder\" dojoType=\"dijit.form.RadioButton\" type=\"radio\" checked value=\"any\" name=\"tag_mode\" id=\"tag_mode_any\">";
         print "<label for=\"tag_mode_any\">".__("Any")."</label>";
@@ -184,14 +174,11 @@ class Dlg extends ProtectedHandler
             "SELECT DISTINCT tag_name FROM ttrss_tags WHERE owner_uid = ".$_SESSION['uid']."
             AND LENGTH(tag_name) <= 30 ORDER BY tag_name ASC"
         );
-
         while ($row = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $tmp = htmlspecialchars($row["tag_name"]);
             print "<option value=\"" . str_replace(" ", "%20", $tmp) . "\">$tmp</option>";
         }
-
         print "</select>";
-
         print "<div align='right'>";
         print "<button dojoType=\"dijit.form.Button\" onclick=\"viewfeed(get_all_tags($('all_tags')),
             get_radio_checked($('tag_mode')));\">" . __('Display entries') . "</button>";
@@ -200,36 +187,24 @@ class Dlg extends ProtectedHandler
         onclick=\"return closeInfoBox()\">" .
             __('Close this window') . "</button>";
         print "</div>";
-
     }
 
     function generatedFeed()
     {
-
         $this->params = explode(":", $this->param, 3);
         $feed_id = \SmallSmallRSS\Database::escape_string($this->params[0]);
         $is_cat = (bool) $this->params[1];
-
         $key = get_feed_access_key($feed_id, $is_cat);
-
         $url_path = htmlspecialchars($this->params[2]) . "&key=" . $key;
-
         print "<h2>".__("You can view this feed as RSS using the following URL:")."</h2>";
-
         print "<div class=\"tagCloudContainer\">";
         print "<a id='gen_feed_url' href='$url_path' target='_blank'>$url_path</a>";
         print "</div>";
-
         print "<div align='center'>";
-
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return genUrlChangeKey('$feed_id', '$is_cat')\">".
             __('Generate new URL')."</button> ";
-
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return closeInfoBox()\">".
             __('Close this window')."</button>";
-
         print "</div>";
-
-        //return;
     }
 }

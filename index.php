@@ -233,7 +233,8 @@ $js_renderer->render_minified_js_files(
 foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
     $js_renderer->render_minified($p->get_js());
 }
-init_js_translations();
+$translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();
+$translation_renderer->render();
 ?>
 </script>
 <script type="text/javascript">

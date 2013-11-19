@@ -99,7 +99,14 @@ if (isset($options["pidlock"])) {
 
 _debug("Lock: $lock_filename");
 
-$lock_handle = make_lockfile($lock_filename);
+$lock_handle = \SmallSmallRSS\Lockfiles::make($lock_filename);
+// Try to lock a file in order to avoid concurrent update.
+if (!$lock_handle) {
+    die(
+        "error: Can't create lockfile ($lock_filename)."
+        . "Maybe another update process is already running.\n"
+    );
+}
 $must_exit = false;
 
 if (isset($options["task"]) && isset($options["pidlock"])) {
@@ -108,13 +115,6 @@ if (isset($options["task"]) && isset($options["pidlock"])) {
     sleep($waits);
 }
 
-// Try to lock a file in order to avoid concurrent update.
-if (!$lock_handle) {
-    die(
-        "error: Can't create lockfile ($lock_filename)."
-        . "Maybe another update process is already running.\n"
-    );
-}
 
 if (isset($options["force-update"])) {
     _debug("marking all feeds as needing update...");
@@ -345,7 +345,4 @@ if (isset($options["list-plugins"])) {
 }
 
 \SmallSmallRSS\PluginHost::getInstance()->run_commands($options);
-
-if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lock_filename")) {
-    unlink(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lock_filename");
-}
+\SmallSmallRSS\Lockfiles::unlock($lock_filename);

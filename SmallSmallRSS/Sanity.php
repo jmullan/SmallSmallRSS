@@ -160,12 +160,12 @@ class Sanity
                     . \SmallSmallRSS\Config::get('ICONS_DIR') . ").\n"
                 );
             }
-
-            if (!is_writable(\SmallSmallRSS\Config::get('LOCK_DIRECTORY'))) {
+            $lock_directory = \SmallSmallRSS\Config::get('LOCK_DIRECTORY');
+            if (!is_writable($lock_directory)) {
                 array_push(
                     $errors,
-                    "\SmallSmallRSS\Config::get('LOCK_DIRECTORY') defined in config.ini is not writable (chmod -R 777 "
-                    . \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . ").\n"
+                    "LOCK_DIRECTORY defined in config.ini is not writable:"
+                    . " (chmod -R 777 $lock_directory).\n"
                 );
             }
 

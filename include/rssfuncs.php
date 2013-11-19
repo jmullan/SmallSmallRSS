@@ -307,9 +307,6 @@ function update_rss_feed($feed, $no_cache = false)
     }
     if (!$rss) {
         $feed_fetching_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FETCH_FEED);
-        if (!$feed_fetching_hooks) {
-            _debug('No feed fetching hooks');
-        }
         foreach ($feed_fetching_hooks as $plugin) {
             if (!$feed_data) {
                 $feed_data = $plugin->hook_fetch_feed($feed_data, $fetch_url, $owner_uid, $feed);
@@ -318,7 +315,6 @@ function update_rss_feed($feed, $no_cache = false)
         $fetch_last_error = false;
         if (!$feed_data) {
             _debug("fetching [$fetch_url]...");
-            _debug("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $last_article_timestamp));
             $fetcher = new \SmallSmallRSS\Fetcher();
             $feed_data = $fetcher->getFileContents(
                 $fetch_url, false,
@@ -348,9 +344,6 @@ function update_rss_feed($feed, $no_cache = false)
         }
     }
     $fetched_feed_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_FETCHED);
-    if (!$fetched_feed_hooks) {
-        _debug('No fetched feed hooks');
-    }
     foreach ($fetched_feed_hooks as $plugin) {
         $feed_data = $plugin->hook_feed_fetched($feed_data, $fetch_url, $owner_uid, $feed);
     }

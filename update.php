@@ -129,6 +129,7 @@ if (isset($options["force-update"])) {
 
 if (isset($options["feeds"])) {
     $op = '';
+    \SmallSmallRSS\Lockfiles::make_stamp('update_feeds.stamp');
     update_daemon_common();
     housekeeping_common(true);
     \SmallSmallRSS\PluginHost::getInstance()->run_hooks(

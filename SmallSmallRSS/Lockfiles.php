@@ -79,22 +79,31 @@ class Lockfiles {
             return true; // consider the file always locked and skip the test
         }
         $fp = @fopen($full_path, "r");
-        if ($fp) {
-            if (flock($fp, LOCK_EX | LOCK_NB)) {
-                flock($fp, LOCK_UN);
-                fclose($fp);
-                return false;
-            }
-            fclose($fp);
-            return true;
+        if (!$fp) {
+            return false;
         }
-        return false;
+        if (flock($fp, LOCK_EX | LOCK_NB)) {
+            flock($fp, LOCK_UN);
+            fclose($fp);
+            return false;
+        }
+        fclose($fp);
+        return true;
+    }
+
+    public static function last_modified($lockfile) {
+        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
+        if (!file_exists($full_path)) {
+            return 0;
+        }
+        $stat_f = stat($full_path);
+        return $stat_f['mtime'];
     }
 
     public static function make_stamp($lockfile) {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         $fp = fopen($full_path, "w");
-        if ($fp) {
+        if (!$fp) {
             \SmallSmallRSS\Logger::Log("Could not get write handle on $full_path");
             return false;
         }

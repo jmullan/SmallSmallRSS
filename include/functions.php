@@ -1650,13 +1650,22 @@ function make_runtime_info()
 
     $data['dependency_timestamp'] = calculate_dep_timestamp();
     $data['reload_on_ts_change'] = \SmallSmallRSS\Config::get('RELOAD_ON_TS_CHANGE');
-    $stamp = \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
 
-    $data['daemon_is_running'] = (bool) $stamp;
+    $feeds_stamp = \SmallSmallRSS\Lockfiles::get_contents("update_feeds.stamp");
+    $daemon_stamp = \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
+    $data['daemon_is_running'] = (
+        \SmallSmallRSS\Lockfiles::is_locked("update_daemon.lock")
+        || (bool) $feeds_stamp
+        || (bool) $stamp
+    );
+
+    $last_run = max((int) $daemon_stamp, (int) $feeds_stamp);
+    $data['feeds_stamp'] = $feeds_stamp;
+    $data['daemon_stamp'] = $daemon_stamp;
+    $data['last_run'] = $last_run;
     if ($data['daemon_is_running']) {
         if (time() - $_SESSION["daemon_stamp_check"] > 30) {
-            $stamp = (int) $stamp;
-            $stamp_delta = time() - $stamp;
+            $stamp_delta = time() - $last_run;
             if ($stamp_delta > 1800) {
                 $stamp_check = false;
             } else {
@@ -1664,7 +1673,7 @@ function make_runtime_info()
                 $_SESSION["daemon_stamp_check"] = time();
             }
             $data['daemon_stamp_ok'] = $stamp_check;
-            $stamp_fmt = date("Y.m.d, G:i", $stamp);
+            $stamp_fmt = date("Y.m.d, G:i", $last_run);
             $data['daemon_stamp'] = $stamp_fmt;
         }
     }

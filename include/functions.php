@@ -588,43 +588,6 @@ function bool_to_sql_bool($s)
     }
 }
 
-function file_is_locked($filename)
-{
-    if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename")) {
-        if (function_exists('flock')) {
-            $fp = @fopen(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename", "r");
-            if ($fp) {
-                if (flock($fp, LOCK_EX | LOCK_NB)) {
-                    flock($fp, LOCK_UN);
-                    fclose($fp);
-                    return false;
-                }
-                fclose($fp);
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return true; // consider the file always locked and skip the test
-    } else {
-        return false;
-    }
-}
-
-function make_stampfile($filename)
-{
-    $fp = fopen(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename", "w");
-
-    if (flock($fp, LOCK_EX | LOCK_NB)) {
-        fwrite($fp, time() . "\n");
-        flock($fp, LOCK_UN);
-        fclose($fp);
-        return true;
-    } else {
-        return false;
-    }
-}
-
 function sql_random_function() {
     if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
         return "RAND()";
@@ -1687,23 +1650,22 @@ function make_runtime_info()
 
     $data['dependency_timestamp'] = calculate_dep_timestamp();
     $data['reload_on_ts_change'] = \SmallSmallRSS\Config::get('RELOAD_ON_TS_CHANGE');
+    $stamp = \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
 
-    if (file_exists(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.lock")) {
-        $data['daemon_is_running'] = (int) file_is_locked("update_daemon.lock");
+    $data['daemon_is_running'] = (bool) $stamp;
+    if ($data['daemon_is_running']) {
         if (time() - $_SESSION["daemon_stamp_check"] > 30) {
-            $stamp = (int) @file_get_contents(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/update_daemon.stamp");
-            if ($stamp) {
-                $stamp_delta = time() - $stamp;
-                if ($stamp_delta > 1800) {
-                    $stamp_check = 0;
-                } else {
-                    $stamp_check = 1;
-                    $_SESSION["daemon_stamp_check"] = time();
-                }
-                $data['daemon_stamp_ok'] = $stamp_check;
-                $stamp_fmt = date("Y.m.d, G:i", $stamp);
-                $data['daemon_stamp'] = $stamp_fmt;
+            $stamp = (int) $stamp;
+            $stamp_delta = time() - $stamp;
+            if ($stamp_delta > 1800) {
+                $stamp_check = false;
+            } else {
+                $stamp_check = true;
+                $_SESSION["daemon_stamp_check"] = time();
             }
+            $data['daemon_stamp_ok'] = $stamp_check;
+            $stamp_fmt = date("Y.m.d, G:i", $stamp);
+            $data['daemon_stamp'] = $stamp_fmt;
         }
     }
     return $data;

@@ -409,18 +409,13 @@ class API extends Handler
             "icons_dir" => \SmallSmallRSS\Config::get('ICONS_DIR'),
             "icons_url" => \SmallSmallRSS\Config::get('ICONS_URL')
         );
-
-        $config["daemon_is_running"] = file_is_locked("update_daemon.lock");
-
+        $config["daemon_is_running"] = \SmallSmallRSS\Lockfiles::is_locked("update_daemon.lock");
         $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(*) AS cf FROM
             ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]
         );
-
         $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "cf");
-
         $config["num_feeds"] = (int) $num_feeds;
-
         $this->wrap(self::STATUS_OK, $config);
     }
 

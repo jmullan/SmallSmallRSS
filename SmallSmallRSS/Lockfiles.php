@@ -15,7 +15,7 @@ class Lockfiles {
         $files = glob(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/*.lock");
         if ($files) {
             foreach ($files as $file) {
-                if (!file_is_locked(basename($file)) && time() - filemtime($file) > 86400*2) {
+                if (!self::is_locked(basename($file)) && time() - filemtime($file) > 86400 * 2) {
                     unlink($file);
                     ++$num_deleted;
                 }
@@ -25,23 +25,27 @@ class Lockfiles {
     }
 
     public static function get_contents($lockfile) {
-        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename";
+        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (is_file($full_path) && is_readable($full_path)) {
-            return file_get_contents();
+            return file_get_contents($full_path);
         } else {
             return null;
         }
     }
 
     public static function unlock($lockfile) {
-        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$filename";
+        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (file_exists($full_path)) {
             unlink($full_path);
         }
     }
 
     public static function make($lockfile) {
-        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$full_pathname";
+        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
+        if (!touch($full_path)) {
+            \SmallSmallRSS\Logger::Log("Could not touch $full_path");
+            return false;
+        }
         $fp = fopen($full_path, "w");
         if (!$fp) {
             \SmallSmallRSS\Logger::Log("Could not get lockfile pointer to $full_path");
@@ -52,7 +56,7 @@ class Lockfiles {
             return false;
         }
         $stat_h = fstat($fp);
-        $stat_f = stat(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$full_pathname");
+        $stat_f = stat($full_path);
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             if ($stat_h["ino"] != $stat_f["ino"] ||
                 $stat_h["dev"] != $stat_f["dev"]) {
@@ -64,5 +68,39 @@ class Lockfiles {
             fwrite($fp, posix_getpid() . "\n");
         }
         return $fp;
+    }
+
+    public static function is_locked($lockfile) {
+        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
+        if (!file_exists($full_path)) {
+            return false;
+        }
+        if (!function_exists('flock')) {
+            return true; // consider the file always locked and skip the test
+        }
+        $fp = @fopen($full_path, "r");
+        if ($fp) {
+            if (flock($fp, LOCK_EX | LOCK_NB)) {
+                flock($fp, LOCK_UN);
+                fclose($fp);
+                return false;
+            }
+            fclose($fp);
+            return true;
+        }
+        return false;
+    }
+
+    public static function make_stamp($lockfile) {
+        $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
+        $fp = fopen($full_path, "w");
+        if (flock($fp, LOCK_EX | LOCK_NB)) {
+            fwrite($fp, time() . "\n");
+            flock($fp, LOCK_UN);
+            fclose($fp);
+            return true;
+        } else {
+            return false;
+        }
     }
 }

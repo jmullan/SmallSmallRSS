@@ -86,9 +86,8 @@ if (isset($options["log"])) {
     define('LOGFILE', $options["log"]);
 }
 
-if (file_is_locked("update_daemon.lock")) {
-    die("error: Can't create lockfile. ".
-        "Maybe another daemon is already running.\n");
+if (\SmallSmallRSS\Lockfiles::is_locked("update_daemon.lock")) {
+    die("error: Can't create lockfile. Maybe another daemon is already running.\n");
 }
 
 // Try to lock a file in order to avoid concurrent update.

@@ -202,7 +202,6 @@ function update_daemon_common($limit = null, $from_http = false, $debug = true)
                   $login_thresh_qpart
                   ORDER BY ttrss_feeds.id
                   $query_limit";
-        _debug($query);
         $tmp_result = \SmallSmallRSS\Database::query($query);
         if (\SmallSmallRSS\Database::num_rows($tmp_result) > 0) {
             while ($tline = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
@@ -217,7 +216,6 @@ function update_daemon_common($limit = null, $from_http = false, $debug = true)
 
 function update_rss_feed($feed, $no_cache = false)
 {
-    _debug("start $feed");
     $result = \SmallSmallRSS\Database::query(
         "SELECT
              id,
@@ -301,19 +299,12 @@ function update_rss_feed($feed, $no_cache = false)
         && is_readable($cache_filename)
         && !$auth_login && !$auth_pass
         && filemtime($cache_filename) > time() - 30) {
-
-        _debug("using local cache.");
-
-        @$feed_data = file_get_contents($cache_filename);
-
+        $feed_data = file_get_contents($cache_filename);
         if ($feed_data) {
             $rss_hash = sha1($feed_data);
         }
 
-    } else {
-        _debug("local cache will not be used for this feed");
     }
-
     if (!$rss) {
         $feed_fetching_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FETCH_FEED);
         if (!$feed_fetching_hooks) {
@@ -339,7 +330,6 @@ function update_rss_feed($feed, $no_cache = false)
             );
 
             $feed_data = trim($feed_data);
-            _debug("fetch done.");
             $fetch_last_error = $fetcher->last_error;
             $fetch_last_error_code = $fetcher->last_error_code;
         }
@@ -349,8 +339,6 @@ function update_rss_feed($feed, $no_cache = false)
             // If-Modified-Since
             if ($fetch_last_error_code != 304) {
                 $error_escaped = \SmallSmallRSS\Database::escape_string($fetch_last_error);
-            } else {
-                _debug("source claims data not modified, nothing to do.");
             }
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds
@@ -404,9 +392,6 @@ function update_rss_feed($feed, $no_cache = false)
 
     // We use local pluginhost here because we need to load different per-user feed plugins
     $pluginhost->run_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_PARSED, "hook_feed_parsed", $rss);
-
-    _debug("processing feed data...");
-
     if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $favicon_interval_qpart = "favicon_last_checked < NOW() - INTERVAL '12 hour'";
     } else {
@@ -432,9 +417,6 @@ function update_rss_feed($feed, $no_cache = false)
 
     $site_url = \SmallSmallRSS\Database::escape_string(mb_substr(rewrite_relative_url($fetch_url, $rss->get_link()), 0, 245));
 
-    _debug("site_url: $site_url");
-    _debug("feed_title: " . $rss->get_title());
-
     if ($favicon_needs_check || $force_refetch) {
 
         /* terrible hack: if we crash on floicon shit here, we won't check
@@ -442,9 +424,6 @@ function update_rss_feed($feed, $no_cache = false)
 
         $favicon_file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed.ico";
         $favicon_modified = @filemtime($favicon_file);
-
-        _debug("checking favicon...");
-
         check_feed_favicon($site_url, $feed);
         $favicon_modified_new = @filemtime($favicon_file);
 
@@ -480,33 +459,26 @@ function update_rss_feed($feed, $no_cache = false)
         $feed_title = \SmallSmallRSS\Database::escape_string($rss->get_title());
 
         if ($feed_title) {
-            _debug("registering title: $feed_title");
-
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_feeds SET
-                        title = '$feed_title' WHERE id = '$feed'"
+                "UPDATE ttrss_feeds
+                 SET title = '$feed_title'
+                 WHERE id = '$feed'"
             );
         }
     }
 
     if ($site_url && $orig_site_url != $site_url) {
         \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_feeds SET
-                    site_url = '$site_url' WHERE id = '$feed'"
+            "UPDATE ttrss_feeds
+             SET site_url = '$site_url'
+             WHERE id = '$feed'"
         );
     }
 
-    _debug("loading filters & labels...");
-
     $filters = load_filters($feed, $owner_uid);
     $labels = \SmallSmallRSS\Labels::getAll($owner_uid);
-
-    _debug("" . count($filters) . " filters loaded.");
-
     $items = $rss->get_items();
     if (!is_array($items)) {
-        _debug("no articles found.");
-
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds
              SET last_updated = NOW(), last_error = ''
@@ -538,8 +510,6 @@ function update_rss_feed($feed, $no_cache = false)
         }
     }
 
-    _debug("processing articles...");
-
     foreach ($items as $item) {
         if (!empty($_REQUEST['xdebug']) && $_REQUEST['xdebug'] == 3) {
             print_r($item);
@@ -556,77 +526,42 @@ function update_rss_feed($feed, $no_cache = false)
         foreach ($hooks as $plugin) {
             $entry_guid = $plugin->hook_guid_filter($item, $entry_guid);
         }
-
-
-        _debug("f_guid $entry_guid");
-
         if (!$entry_guid) {
             continue;
         }
 
         $entry_guid = "$owner_uid,$entry_guid";
-
         $entry_guid_hashed = \SmallSmallRSS\Database::escape_string('SHA1:' . sha1($entry_guid));
-
-        _debug("guid $entry_guid / $entry_guid_hashed");
-
-        $entry_timestamp = "";
-
         $entry_timestamp = $item->get_date();
-
-        _debug("orig date: " . $item->get_date());
-
         if ($entry_timestamp == -1 || !$entry_timestamp || $entry_timestamp > time()) {
             $entry_timestamp = time();
             $no_orig_date = 'true';
         } else {
             $no_orig_date = 'false';
         }
-
         $entry_timestamp_fmt = strftime("%Y/%m/%d %H:%M:%S", $entry_timestamp);
-
-        _debug("date $entry_timestamp [$entry_timestamp_fmt]");
-
-        //                $entry_title = html_entity_decode($item->get_title(), ENT_COMPAT, 'UTF-8');
-        //                $entry_title = decode_numeric_entities($entry_title);
         $entry_title = $item->get_title();
-
         $entry_link = rewrite_relative_url($site_url, $item->get_link());
-
-        _debug("title $entry_title");
-        _debug("link $entry_link");
-
         if (!$entry_title) {
             $entry_title = date("Y-m-d H:i:s", $entry_timestamp);
         };
-
         $entry_content = $item->get_content();
         if (!$entry_content) {
             $entry_content = $item->get_description();
         }
-
         if (!empty($_REQUEST['xdebug']) && $_REQUEST["xdebug"] == 2) {
             print "content: ";
             print $entry_content;
             print "\n";
         }
-
         $entry_comments = $item->get_comments_url();
         $entry_author = $item->get_author();
-
         $entry_guid = \SmallSmallRSS\Database::escape_string(mb_substr($entry_guid, 0, 245));
-
         $entry_comments = \SmallSmallRSS\Database::escape_string(mb_substr(trim($entry_comments), 0, 245));
         $entry_author = \SmallSmallRSS\Database::escape_string(mb_substr(trim($entry_author), 0, 245));
-
         $num_comments = (int) $item->get_comments_count();
 
-        _debug("author $entry_author");
-        _debug("num_comments: $num_comments");
-        _debug("looking for tags...");
-
         // parse <category> entries into tags
-
         $additional_tags = array();
 
         $additional_tags_src = $item->get_categories();
@@ -643,14 +578,7 @@ function update_rss_feed($feed, $no_cache = false)
             $entry_tags[$i] = mb_strtolower($entry_tags[$i], 'utf-8');
         }
 
-        _debug("tags found: " . join(",", $entry_tags));
-
-        _debug("done collecting data.");
-
         // TODO: less memory-hungry implementation
-
-        _debug("applying plugin filters..");
-
         // FIXME not sure if owner_uid is a good idea here, we may have a base
         // entry (?)
         $result = \SmallSmallRSS\Database::query(

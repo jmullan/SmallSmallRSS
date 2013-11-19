@@ -72,7 +72,7 @@ class Logger
      * @param string $msg The debug message.
      * @return void
      */
-    public static function debug($message, $show=true, $is_debug=true) {
+    public static function debug($msg, $show=true, $is_debug=true) {
         if (!$is_debug) {
             return;
         }
@@ -83,9 +83,9 @@ class Logger
         }
         $rawcalls = debug_backtrace();
         $message = '';
-        if ('_debug' == $rawcalls[0]['function'] || 'debug' == $rawcalls[0]['function']) {
-            $file = str_replace(dirname(__DIR__) . '/', '', $rawcalls[0]['file']);
-            $message = '' . $file . ':' . $rawcalls[0]['line'] . ' ';
+        if ('_debug' == $rawcalls[1]['function']) {
+            $file = str_replace(dirname(__DIR__) . '/', '', $rawcalls[1]['file']);
+            $message = '' . $file . ':' . $rawcalls[1]['line'] . ' ';
         }
         $message .= "[$ts] $msg";
         if ($show && \SmallSmallRSS\Config::get('VERBOSITY')) {

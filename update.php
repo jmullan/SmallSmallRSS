@@ -155,12 +155,10 @@ if (isset($options["daemon"])) {
 
 if (isset($options["daemon-loop"])) {
     $op = null;
-    if (!make_stampfile('update_daemon.stamp')) {
+    if (!\SmallSmallRSS\Lockfiles::make_stamp('update_daemon.stamp')) {
         _debug("warning: unable to create stampfile\n");
     }
-
     update_daemon_common(isset($options["pidlock"]) ? 50 : \SmallSmallRSS\Config::get('DAEMON_FEED_LIMIT'));
-
     if (!isset($options["pidlock"]) || $options["task"] == 0) {
         housekeeping_common(true);
     }

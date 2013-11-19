@@ -94,13 +94,18 @@ class Lockfiles {
     public static function make_stamp($lockfile) {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         $fp = fopen($full_path, "w");
-        if (flock($fp, LOCK_EX | LOCK_NB)) {
-            fwrite($fp, time() . "\n");
-            flock($fp, LOCK_UN);
-            fclose($fp);
-            return true;
-        } else {
+        if ($fp) {
+            \SmallSmallRSS\Logger::Log("Could not get write handle on $full_path");
             return false;
         }
+        if (!flock($fp, LOCK_EX | LOCK_NB)) {
+            \SmallSmallRSS\Logger::Log("Could not get lock on $full_path");
+            fclose($fp);
+            return false;
+        }
+        fwrite($fp, time() . "\n");
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        return true;
     }
 }

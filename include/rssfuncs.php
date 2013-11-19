@@ -488,7 +488,6 @@ function update_rss_feed($feed, $no_cache = false)
     }
 
     if ($pubsub_state != 2 && \SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED')) {
-        _debug("checking for PUSH hub...");
         $feed_hub_url = false;
         $links = $rss->get_links('hub');
         if ($links && is_array($links)) {
@@ -497,7 +496,6 @@ function update_rss_feed($feed, $no_cache = false)
                 break;
             }
         }
-        _debug("feed hub url: $feed_hub_url");
         if ($feed_hub_url && function_exists('curl_init')
             && !ini_get("open_basedir")) {
             require_once 'lib/pubsubhubbub/subscriber.php';
@@ -505,7 +503,6 @@ function update_rss_feed($feed, $no_cache = false)
                 "/public.php?op=pubsub&id=$feed";
             $s = new Subscriber($feed_hub_url, $callback_url);
             $rc = $s->subscribe($fetch_url);
-            _debug("feed hub url found, subscribe request sent.");
             \SmallSmallRSS\Database::query("UPDATE ttrss_feeds SET pubsub_state = 1 WHERE id = '$feed'");
         }
     }
@@ -631,9 +628,6 @@ function update_rss_feed($feed, $no_cache = false)
         $entry_plugin_data = \SmallSmallRSS\Database::escape_string($article["plugin_data"]);
         $entry_content = $article["content"]; // escaped below
 
-
-        _debug("plugin data: $entry_plugin_data");
-
         if ($cache_images && is_writable(\SmallSmallRSS\Config::get('CACHE_DIR') . '/images')) {
             cache_images($entry_content, $site_url);
         }
@@ -723,9 +717,6 @@ function update_rss_feed($feed, $no_cache = false)
         $entry_int_id = 0;
 
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-
-            _debug("base guid found, checking for user record");
-
             // this will be used below in update handler
             $orig_content_hash = \SmallSmallRSS\Database::fetch_result($result, 0, "content_hash");
             $orig_title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
@@ -738,14 +729,6 @@ function update_rss_feed($feed, $no_cache = false)
 
             $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
             $entry_ref_id = $ref_id;
-
-            /* $stored_guid = \SmallSmallRSS\Database::fetch_result($result, 0, "guid");
-               if ($stored_guid != $entry_guid_hashed) {
-               if ($debug_enabled) _debug("upgrading compat guid to hashed one");
-
-               \SmallSmallRSS\Database::query("UPDATE ttrss_entries SET guid = '$entry_guid_hashed' WHERE
-               id = '$ref_id'");
-               } */
 
             // check for user post link to main table
 
@@ -764,21 +747,12 @@ function update_rss_feed($feed, $no_cache = false)
                 $entry_tags
             );
 
-            if ($debug_enabled) {
-                _debug("article filters: ");
-                if (count($article_filters) != 0) {
-                    print_r($article_filters);
-                }
-            }
-
             if (find_article_filter($article_filters, "filter")) {
                 \SmallSmallRSS\Database::query("COMMIT"); // close transaction in progress
                 continue;
             }
 
             $score = calculate_article_score($article_filters);
-
-            _debug("initial score: $score");
 
             $query = "SELECT ref_id, int_id
                       FROM ttrss_user_entries
@@ -791,8 +765,6 @@ function update_rss_feed($feed, $no_cache = false)
 
             // okay it doesn't exist - create user entry
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-
-                _debug("user record not found, creating...");
 
                 if ($score >= -500 && !find_article_filter($article_filters, 'catchup')) {
                     $unread = 'true';
@@ -829,8 +801,6 @@ function update_rss_feed($feed, $no_cache = false)
                     );
 
                     $ngram_similar = \SmallSmallRSS\Database::fetch_result($result, 0, "similar");
-
-                    _debug("N-gram similar results: $ngram_similar");
 
                     if ($ngram_similar > 0) {
                         $unread = 'false';
@@ -873,14 +843,9 @@ function update_rss_feed($feed, $no_cache = false)
                     $entry_int_id = \SmallSmallRSS\Database::fetch_result($result, 0, "int_id");
                 }
             } else {
-                _debug("user record FOUND");
-
                 $entry_ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "ref_id");
                 $entry_int_id = \SmallSmallRSS\Database::fetch_result($result, 0, "int_id");
             }
-
-            _debug("RID: $entry_ref_id, IID: $entry_int_id");
-
             $post_needs_update = false;
             $update_insignificant = false;
 
@@ -912,8 +877,6 @@ function update_rss_feed($feed, $no_cache = false)
                     _debug("post $entry_guid_hashed needs update...");
                 }
 
-                //                        print "<!-- post $orig_title needs update : $post_needs_update -->";
-
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_entries
                             SET title = '$entry_title', content = '$entry_content',
@@ -934,24 +897,14 @@ function update_rss_feed($feed, $no_cache = false)
                 }
             }
         }
-
         \SmallSmallRSS\Database::query("COMMIT");
-
-        _debug("assigning labels...");
-
         assign_article_to_label_filters(
             $entry_ref_id, $article_filters,
             $owner_uid, $article_labels
         );
-
-        _debug("looking for enclosures...");
-
         // enclosures
-
         $enclosures = array();
-
         $encs = $item->get_enclosures();
-
         if (is_array($encs)) {
             foreach ($encs as $e) {
                 $e_item = array(
@@ -959,29 +912,22 @@ function update_rss_feed($feed, $no_cache = false)
                 array_push($enclosures, $e_item);
             }
         }
-
-        if ($debug_enabled) {
-            _debug("article enclosures:");
-            print_r($enclosures);
-        }
-
         \SmallSmallRSS\Database::query("BEGIN");
-
         foreach ($enclosures as $enc) {
             $enc_url = \SmallSmallRSS\Database::escape_string($enc[0]);
             $enc_type = \SmallSmallRSS\Database::escape_string($enc[1]);
             $enc_dur = \SmallSmallRSS\Database::escape_string($enc[2]);
-
             $result = \SmallSmallRSS\Database::query(
-                "SELECT id FROM ttrss_enclosures
-                        WHERE content_url = '$enc_url' AND post_id = '$entry_ref_id'"
+                "SELECT id
+                 FROM ttrss_enclosures
+                 WHERE content_url = '$enc_url' AND post_id = '$entry_ref_id'"
             );
-
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_enclosures
-                            (content_url, content_type, title, duration, post_id) VALUES
-                            ('$enc_url', '$enc_type', '', '$enc_dur', '$entry_ref_id')"
+                     (content_url, content_type, title, duration, post_id)
+                     VALUES
+                     ('$enc_url', '$enc_type', '', '$enc_dur', '$entry_ref_id')"
                 );
             }
         }
@@ -992,9 +938,7 @@ function update_rss_feed($feed, $no_cache = false)
 
         foreach ($article_filters as $f) {
             if ($f["type"] == "tag") {
-
                 $manual_tags = trim_array(explode(",", $f["param"]));
-
                 foreach ($manual_tags as $tag) {
                     if (tag_is_valid($tag)) {
                         array_push($entry_tags, $tag);
@@ -1004,7 +948,6 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
         // Skip boring tags
-
         $boring_tags = trim_array(explode(",", mb_strtolower(\SmallSmallRSS\DBPrefs::read(
             'BLACKLISTED_TAGS', $owner_uid, ''
         ), 'utf-8')));
@@ -1022,11 +965,6 @@ function update_rss_feed($feed, $no_cache = false)
 
         $filtered_tags = array_unique($filtered_tags);
 
-        if ($debug_enabled) {
-            _debug("filtered article tags:");
-            print_r($filtered_tags);
-        }
-
         // Save article tags in the database
 
         if (count($filtered_tags) > 0) {
@@ -1043,9 +981,12 @@ function update_rss_feed($feed, $no_cache = false)
                 }
 
                 $result = \SmallSmallRSS\Database::query(
-                    "SELECT id FROM ttrss_tags
-                            WHERE tag_name = '$tag' AND post_int_id = '$entry_int_id' AND
-                            owner_uid = '$owner_uid' LIMIT 1"
+                    "SELECT id
+                     FROM ttrss_tags
+                     WHERE
+                         tag_name = '$tag'
+                         AND post_int_id = '$entry_int_id'
+                         AND owner_uid = '$owner_uid' LIMIT 1"
                 );
 
                 if ($result && \SmallSmallRSS\Database::num_rows($result) == 0) {
@@ -1076,7 +1017,6 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
         if (\SmallSmallRSS\DBPrefs::read("AUTO_ASSIGN_LABELS", $owner_uid, false)) {
-            _debug("auto-assigning labels...");
             foreach ($labels as $label) {
                 $caption = preg_quote($label["caption"]);
                 if (strlen($caption)) {
@@ -1090,16 +1030,12 @@ function update_rss_feed($feed, $no_cache = false)
                 }
             }
         }
-
-        _debug("article processed");
     }
 
     if (!$last_updated) {
-        _debug("new feed, catching it up...");
         catchup_feed($feed, false, $owner_uid);
     }
 
-    _debug("purging feed...");
     \SmallSmallRSS\Feeds::purge($feed);
     \SmallSmallRSS\Database::query(
         "UPDATE ttrss_feeds
@@ -1109,7 +1045,6 @@ function update_rss_feed($feed, $no_cache = false)
          WHERE id = '$feed'"
     );
     unset($rss);
-    _debug("done");
 }
 
 function cache_images($html, $site_url, $debug)
@@ -1125,7 +1060,6 @@ function cache_images($html, $site_url, $debug)
         if ($entry->hasAttribute('src')) {
             $src = rewrite_relative_url($site_url, $entry->getAttribute('src'));
             $local_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . "/images/" . sha1($src) . ".png";
-            _debug("cache_images: downloading: $src to $local_filename", $debug, $debug);
             if (!file_exists($local_filename)) {
                 $file_content = \SmallSmallRSS\Fetcher::fetch($src);
                 if ($file_content && strlen($file_content) > 1024) {
@@ -1146,7 +1080,6 @@ function cache_images($html, $site_url, $debug)
 
 function expire_error_log($debug)
 {
-    _debug("Removing old error log entries...", $debug, $debug);
     if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_error_log

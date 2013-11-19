@@ -35,7 +35,7 @@ if (defined('E_DEPRECATED')) {
     'SELF_USER_AGENT',
     'Tiny Tiny RSS/' . \SmallSmallRSS\Constants::VERSION . ' (http://tt-rss.org/)'
 );
-ini_set('user_agent', SELF_USER_AGENT);
+ini_set('user_agent', \SmallSmallRSS\Config::get('SELF_USER_AGENT'));
 
 
 require __DIR__ . '/../include/functions.php';

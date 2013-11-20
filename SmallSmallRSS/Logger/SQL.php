@@ -30,4 +30,20 @@ class Logger_SQL extends Logger_Abstract implements Logger_Interface
         }
         return false;
     }
+
+
+    public static function clearExpired() {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+            \SmallSmallRSS\Database::query(
+                "DELETE FROM ttrss_error_log
+                 WHERE created_at < NOW() - INTERVAL '7 days'"
+            );
+        } else {
+            \SmallSmallRSS\Database::query(
+                "DELETE FROM ttrss_error_log
+                 WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)"
+            );
+        }
+        return true;
+    }
 }

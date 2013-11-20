@@ -1,11 +1,4 @@
 <?php
-function update_feedbrowser_cache()
-{
-    $lines = \SmallSmallRSS\Feeds::countFeedSubscribers();
-    return \SmallSmallRSS\FeedbrowserCache::update($lines);
-}
-
-
 /**
  * Update a feed batch.
  * Used by daemons to update n feeds by run.
@@ -1029,26 +1022,6 @@ function cache_images($html, $site_url, $debug)
     return $doc->saveXML($node);
 }
 
-function expire_error_log($debug)
-{
-    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-        \SmallSmallRSS\Database::query(
-            "DELETE FROM ttrss_error_log
-             WHERE created_at < NOW() - INTERVAL '7 days'"
-        );
-    } else {
-        \SmallSmallRSS\Database::query(
-            "DELETE FROM ttrss_error_log
-             WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)"
-        );
-    }
-
-}
-
-function expire_lock_files($debug)
-{
-    \SmallSmallRSS\Lockfiles::unlink_expired($debug);
-}
 
 function expire_cached_files($debug)
 {
@@ -1239,10 +1212,10 @@ function make_guid_from_title($title)
 function housekeeping_common($debug)
 {
     expire_cached_files($debug);
-    expire_lock_files($debug);
-    expire_error_log($debug);
-
-    $count = update_feedbrowser_cache();
+    \SmallSmallRSS\Lockfiles::unlink_expired($debug);
+    \SmallSmallRSS\Logger::clearExpired();
+    $lines = \SmallSmallRSS\Feeds::countFeedSubscribers();
+    $count = \SmallSmallRSS\FeedbrowserCache::update($lines);
     _debug("Feedbrowser updated, $count feeds processed.");
 
     purge_orphans(true);

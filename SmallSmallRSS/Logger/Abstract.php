@@ -11,4 +11,7 @@ abstract class Logger_Abstract implements Logger_Interface
     {
         return false;
     }
+    public static function clearExpired() {
+        return false;
+    }
 }

@@ -140,7 +140,8 @@ if (isset($options["feeds"])) {
 }
 
 if (isset($options["feedbrowser"])) {
-    $count = update_feedbrowser_cache();
+    $lines = \SmallSmallRSS\Feeds::countFeedSubscribers();
+    $count = \SmallSmallRSS\FeedbrowserCache::update($lines);
     print "Finished, $count feeds processed.\n";
 }
 

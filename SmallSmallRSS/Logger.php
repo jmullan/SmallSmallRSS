@@ -101,4 +101,8 @@ class Logger
         }
 
     }
+
+    public static function clearExpired() {
+        self::get()->adapter->clearExpired();
+    }
 }

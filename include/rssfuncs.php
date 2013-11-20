@@ -1,50 +1,8 @@
 <?php
 function update_feedbrowser_cache()
 {
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT feed_url, site_url, title, COUNT(id) AS subscribers
-         FROM ttrss_feeds
-         WHERE (
-             SELECT COUNT(id) = 0 FROM ttrss_feeds AS tf
-             WHERE tf.feed_url = ttrss_feeds.feed_url
-             AND (
-                 private IS true
-                 OR auth_login != ''
-                 OR auth_pass != ''
-                 OR feed_url LIKE '%:%@%/%'
-             )
-         )
-         GROUP BY feed_url, site_url, title
-         ORDER BY subscribers DESC
-         LIMIT 1000"
-    );
-    \SmallSmallRSS\Database::query("BEGIN");
-    \SmallSmallRSS\Database::query("DELETE FROM ttrss_feedbrowser_cache");
-
-    $count = 0;
-
-    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-        $subscribers = \SmallSmallRSS\Database::escape_string($line["subscribers"]);
-        $feed_url = \SmallSmallRSS\Database::escape_string($line["feed_url"]);
-        $title = \SmallSmallRSS\Database::escape_string($line["title"]);
-        $site_url = \SmallSmallRSS\Database::escape_string($line["site_url"]);
-
-        $tmp_result = \SmallSmallRSS\Database::query(
-            "SELECT subscribers FROM
-                ttrss_feedbrowser_cache WHERE feed_url = '$feed_url'"
-        );
-
-        if (\SmallSmallRSS\Database::num_rows($tmp_result) == 0) {
-            \SmallSmallRSS\Database::query(
-                "INSERT INTO ttrss_feedbrowser_cache
-                 (feed_url, site_url, title, subscribers)
-                 VALUES ('$feed_url', '$site_url', '$title', '$subscribers')"
-            );
-            $count += 1;
-        }
-    }
-    \SmallSmallRSS\Database::query("COMMIT");
-    return $count;
+    $lines = \SmallSmallRSS\Feeds::countFeedSubscribers();
+    return \SmallSmallRSS\FeedbrowserCache::update($lines);
 }
 
 

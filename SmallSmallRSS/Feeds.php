@@ -151,4 +151,32 @@ class Feeds {
         return $rows;
 
     }
+
+    static public function countFeedSubscribers()
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT feed_url, site_url, title, COUNT(id) AS subscribers
+             FROM ttrss_feeds
+             WHERE (
+                 SELECT COUNT(id) = 0
+                 FROM ttrss_feeds AS tf
+                 WHERE
+                     tf.feed_url = ttrss_feeds.feed_url
+                     AND (
+                         private IS true
+                         OR auth_login != ''
+                         OR auth_pass != ''
+                         OR feed_url LIKE '%:%@%/%'
+                     )
+             )
+             GROUP BY feed_url, site_url, title
+             ORDER BY subscribers DESC
+             LIMIT 1000"
+        );
+        $lines = array();
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            $lines[] = $line;
+        }
+        return $lines;
+    }
 }

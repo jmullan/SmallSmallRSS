@@ -1023,27 +1023,6 @@ function cache_images($html, $site_url, $debug)
 }
 
 
-function expire_cached_files($debug)
-{
-    foreach (array("simplepie", "images", "export", "upload") as $dir) {
-        $cache_dir = \SmallSmallRSS\Config::get('CACHE_DIR') . "/$dir";
-        $num_deleted = 0;
-        if (!is_writable($cache_dir)) {
-            _debug("$cache_dir is not writable");
-            return;
-        }
-        $files = glob("$cache_dir/*");
-        if ($files) {
-            foreach ($files as $file) {
-                if (time() - filemtime($file) > 86400*7) {
-                    unlink($file);
-                    ++$num_deleted;
-                }
-            }
-        }
-    }
-}
-
 /**
  * Source: http://www.php.net/manual/en/function.parse-url.php#104527
  * Returns the url query as associative array
@@ -1208,10 +1187,10 @@ function make_guid_from_title($title)
     );
 }
 
-function housekeeping_common($debug)
+function housekeeping_common()
 {
-    expire_cached_files($debug);
-    \SmallSmallRSS\Lockfiles::unlink_expired($debug);
+    \SmallSmallRSS\FileCache::clearExpired();
+    \SmallSmallRSS\Lockfiles::unlinkExpired();
     \SmallSmallRSS\Logger::clearExpired();
     $lines = \SmallSmallRSS\Feeds::countFeedSubscribers();
     $count = \SmallSmallRSS\FeedbrowserCache::update($lines);

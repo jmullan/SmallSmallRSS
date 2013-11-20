@@ -264,6 +264,11 @@ class DefaultConfigs {
     const DAEMON_EXTENDED_DEBUG = false;
     const _INSTALLER_IGNORE_CONFIG_CHECK = false;
 
+    /**
+     * Expire cached files after one week
+     */
+    const CACHE_LIFETIME = 604800;
+
     public static function has($key) {
         return defined("self::$key");
     }

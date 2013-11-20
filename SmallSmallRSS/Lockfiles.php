@@ -2,13 +2,11 @@
 namespace SmallSmallRSS;
 
 class Lockfiles {
-    public static function unlink_expired($debug) {
+    public static function unlinkExpired() {
         $num_deleted = 0;
         if (!is_writable(\SmallSmallRSS\Config::get('LOCK_DIRECTORY'))) {
             \SmallSmallRSS\Logger::debug(
-                \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . " is not writable",
-                $debug,
-                $debug
+                \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . " is not writable"
             );
             return;
         }
@@ -21,7 +19,6 @@ class Lockfiles {
                 }
             }
         }
-        \SmallSmallRSS\Logger::debug("Removed $num_deleted old lock files.", $debug, $debug);
     }
 
     public static function get_contents($lockfile) {

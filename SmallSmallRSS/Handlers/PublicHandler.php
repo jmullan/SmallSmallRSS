@@ -407,7 +407,7 @@ class PublicHandler extends Handler
         include "rssfuncs.php";
         // Update all feeds needing a update.
         update_daemon_common(0, true, false);
-        housekeeping_common(false);
+        housekeeping_common();
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
 

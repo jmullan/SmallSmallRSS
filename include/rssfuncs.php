@@ -1041,7 +1041,6 @@ function expire_cached_files($debug)
                 }
             }
         }
-        _debug("$cache_dir: removed $num_deleted files.", $debug, $debug);
     }
 }
 

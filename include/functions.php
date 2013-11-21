@@ -166,55 +166,21 @@ function check_feed_favicon($site_url, $feed)
 
 function print_select($id, $default, $values, $attributes = "")
 {
-    print "<select name=\"$id\" id=\"$id\" $attributes>";
-    foreach ($values as $v) {
-        if ($v == $default)
-            $sel = "selected=\"1\"";
-        else
-            $sel = "";
-
-        $v = trim($v);
-
-        print "<option value=\"$v\" $sel>$v</option>";
-    }
-    print "</select>";
+    $values = array_combine(array_values($values), array_values($values));
+    $renderer = new \SmallSmallRSS\Renderers\FormElements();
+    $renderer->renderSelectHash($id, $default, $values, $attributes);
 }
 
 function print_select_hash($id, $default, $values, $attributes = "")
 {
-    print "<select name=\"$id\" id='$id' $attributes>";
-    foreach (array_keys($values) as $v) {
-        if ($v == $default) {
-            $sel = 'selected="selected"';
-        } else {
-            $sel = "";
-        }
-        $v = trim($v);
-
-        print "<option $sel value=\"$v\">".$values[$v]."</option>";
-    }
-
-    print "</select>";
+    $renderer = new \SmallSmallRSS\Renderers\FormElements();
+    $renderer->renderSelectHash($id, $default, $values, $attributes);
 }
 
 function print_radio($id, $default, $true_is, $values, $attributes = "")
 {
-    foreach ($values as $v) {
-        if ($v == $default) {
-            $sel = "checked";
-        } else {
-            $sel = "";
-        }
-        if ($v == $true_is) {
-            $sel .= " value=\"1\"";
-        } else {
-            $sel .= " value=\"0\"";
-        }
-
-        print "<input class=\"noborder\" dojoType=\"dijit.form.RadioButton\"
-                type=\"radio\" $sel $attributes name=\"$id\">&nbsp;$v&nbsp;";
-
-    }
+    $renderer = new \SmallSmallRSS\Renderers\FormElements();
+    $renderer->renderRadio($id, $default, $true_is, $values, $attributes);
 }
 
 function initialize_user_prefs($uid, $profile = false)

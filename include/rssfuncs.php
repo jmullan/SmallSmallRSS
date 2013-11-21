@@ -442,7 +442,7 @@ function update_rss_feed($feed, $no_cache = false)
         }
         if ($feed_hub_url && function_exists('curl_init')
             && !ini_get("open_basedir")) {
-            require_once 'lib/pubsubhubbub/subscriber.php';
+            require_once __DIR__ . '/../lib/pubsubhubbub/subscriber.php';
             $callback_url = get_self_url_prefix() . "/public.php?op=pubsub&id=$feed";
             $s = new Subscriber($feed_hub_url, $callback_url);
             $rc = $s->subscribe($fetch_url);

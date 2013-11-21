@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Renderers;
 
 class FormElements extends \SmallSmallRSS\Renderers\Base
 {
-    function renderSelectHash($id, $default, $values, $attributes = "")
+    function renderSelect($id, $default, $values, $attributes = "")
     {
         print "<select name=\"$id\" id='$id' $attributes>";
         foreach ($values as $k => $v) {

@@ -916,7 +916,8 @@ class Pref_Filters extends ProtectedHandler
         print "<label for=\"filterDlg_inverse\">".__("Inverse regular expression matching")."</label>";
 
         print "<hr/>" .  __("on field") . " ";
-        print_select_hash(
+        $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
+        $form_elements_renderer->renderSelect(
             "filter_type", $filter_type, $filter_types,
             'dojoType="dijit.form.Select"'
         );

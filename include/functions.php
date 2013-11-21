@@ -164,19 +164,6 @@ function check_feed_favicon($site_url, $feed)
     }
 }
 
-function print_select($id, $default, $values, $attributes = "")
-{
-    $values = array_combine(array_values($values), array_values($values));
-    $renderer = new \SmallSmallRSS\Renderers\FormElements();
-    $renderer->renderSelectHash($id, $default, $values, $attributes);
-}
-
-function print_select_hash($id, $default, $values, $attributes = "")
-{
-    $renderer = new \SmallSmallRSS\Renderers\FormElements();
-    $renderer->renderSelectHash($id, $default, $values, $attributes);
-}
-
 function print_radio($id, $default, $true_is, $values, $attributes = "")
 {
     $renderer = new \SmallSmallRSS\Renderers\FormElements();

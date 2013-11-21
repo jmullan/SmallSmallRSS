@@ -195,7 +195,7 @@ class Pref_Prefs extends ProtectedHandler
 
     function index()
     {
-
+        $form_element_renderer = new \SmallSmallRSS\Renderers\FormElements();
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
         $prefs_blacklist = array("STRIP_UNSAFE_TAGS", "REVERSE_HEADLINES",
                                  "SORT_HEADLINES_BY_FEED_DATE", "DEFAULT_ARTICLE_LIMIT");
@@ -595,33 +595,43 @@ class Pref_Prefs extends ProtectedHandler
             print "<td class=\"prefValue\">";
 
             if ($pref_name == "USER_LANGUAGE") {
-                print_select_hash(
-                    $pref_name, $value, get_translations(),
+                $form_element_renderer->renderSelect(
+                    $pref_name,
+                    $value,
+                    get_translations(),
                     "style='width : 220px; margin : 0px' dojoType='dijit.form.Select'"
                 );
 
             } elseif ($pref_name == "USER_TIMEZONE") {
 
                 $timezones = explode("\n", file_get_contents("lib/timezones.txt"));
-
-                print_select($pref_name, $value, $timezones, 'dojoType="dijit.form.FilteringSelect"');
+                $timezone_array = array_combine($timezones, $timezones);
+                $form_element_renderer->renderSelect(
+                    $pref_name,
+                    $value,
+                    $timezone_array,
+                    'dojoType="dijit.form.FilteringSelect"'
+                );
             } elseif ($pref_name == "USER_STYLESHEET") {
 
                 print "<button dojoType=\"dijit.form.Button\"
                     onclick=\"customizeCSS()\">" . __('Customize') . "</button>";
 
             } elseif ($pref_name == "USER_CSS_THEME") {
-
-                $themes = array_map("basename", glob("themes/*.css"));
-
-                print_select(
-                    $pref_name, $value, $themes,
+                $themes = array();
+                foreach (glob("themes/*.css") as $theme) {
+                    $themes[$theme] = $theme;
+                }
+                $form_element_renderer->renderSelect(
+                    $pref_name,
+                    $value,
+                    $themes,
                     'dojoType="dijit.form.Select"'
                 );
 
 
             } elseif ($pref_name == "DEFAULT_UPDATE_INTERVAL") {
-                print_select_hash(
+                $form_element_renderer->renderSelect(
                     $pref_name,
                     $value,
                     \SmallSmallRSS\Constants::update_intervals_nodefault(),

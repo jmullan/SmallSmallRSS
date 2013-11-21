@@ -685,7 +685,8 @@ class Pref_Feeds extends ProtectedHandler
 
         $update_interval = \SmallSmallRSS\Database::fetch_result($result, 0, "update_interval");
 
-        print_select_hash(
+        $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
+        $form_elements_renderer->renderSelect(
             "update_interval",
             $update_interval,
             \SmallSmallRSS\Constants::update_intervals(),
@@ -699,7 +700,7 @@ class Pref_Feeds extends ProtectedHandler
         print "<hr/>";
         print __('Article purging:') . " ";
 
-        print_select_hash(
+        $form_elements_renderer->renderSelect(
             "purge_interval",
             $purge_interval,
             \SmallSmallRSS\Constants::purge_intervals(),
@@ -930,7 +931,8 @@ class Pref_Feeds extends ProtectedHandler
 
         /* Update Interval */
 
-        print_select_hash(
+        $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
+        $form_elements_renderer->renderSelect(
             "update_interval",
             "",
             \SmallSmallRSS\Constants::update_intervals(),
@@ -942,12 +944,10 @@ class Pref_Feeds extends ProtectedHandler
         /* Purge intl */
 
         if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
-
             print "<br/>";
-
             print __('Article purging:') . " ";
-
-            print_select_hash(
+            $renderer = new \SmallSmallRSS\Renderers\FormElements();
+            $renderer->renderSelect(
                 "purge_interval",
                 "",
                 \SmallSmallRSS\Constants::purge_intervals(),

@@ -130,13 +130,14 @@ class Pref_Users extends ProtectedHandler
 
         print __('Access level: ') . " ";
 
+        $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
         if (!$sel_disabled) {
-            print_select_hash(
+            $form_elements_renderer->renderSelect(
                 "access_level", $access_level, $access_level_names,
                 "dojoType=\"dijit.form.Select\" $sel_disabled"
             );
         } else {
-            print_select_hash(
+            $form_elements_renderer->renderSelect(
                 "", $access_level, $access_level_names,
                 "dojoType=\"dijit.form.Select\" $sel_disabled"
             );

@@ -42,7 +42,7 @@ function startup_gettext()
     # Get locale from Accept-Language header
     $locale = al2gt(array_keys(get_translations()), "text/html");
     $forced_locale = \SmallSmallRSS\Config::get('FORCE_LOCALE');
-    if ($forced_locale and $force_local != 'auto') {
+    if ($forced_locale and $forced_locale != 'auto') {
         $locale = $forced_locale;
     }
     if (!empty($_SESSION["uid"])
@@ -220,64 +220,60 @@ function print_radio($id, $default, $true_is, $values, $attributes = "")
 function initialize_user_prefs($uid, $profile = false)
 {
     $uid = \SmallSmallRSS\Database::escape_string($uid);
-
     if (!$profile) {
         $profile = "NULL";
         $profile_qpart = "AND profile IS NULL";
     } else {
         $profile_qpart = "AND profile = '$profile'";
     }
-
     if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
         $profile_qpart = "";
     }
-
     \SmallSmallRSS\Database::query("BEGIN");
-
     $result = \SmallSmallRSS\Database::query("SELECT pref_name,def_value FROM ttrss_prefs");
-
-    $u_result = \SmallSmallRSS\Database::query("SELECT pref_name
-            FROM ttrss_user_prefs WHERE owner_uid = '$uid' $profile_qpart");
-
+    $u_result = \SmallSmallRSS\Database::query(
+         "SELECT pref_name
+          FROM ttrss_user_prefs
+          WHERE owner_uid = '$uid'
+          $profile_qpart"
+    );
     $active_prefs = array();
-
     while ($line = \SmallSmallRSS\Database::fetch_assoc($u_result)) {
         array_push($active_prefs, $line["pref_name"]);
     }
-
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         if (array_search($line["pref_name"], $active_prefs) === FALSE) {
-            //                print "adding " . $line["pref_name"] . "<br>";
-
             $line["def_value"] = \SmallSmallRSS\Database::escape_string($line["def_value"]);
             $line["pref_name"] = \SmallSmallRSS\Database::escape_string($line["pref_name"]);
-
             if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
-                \SmallSmallRSS\Database::query("INSERT INTO ttrss_user_prefs
-              (owner_uid,pref_name,value) VALUES
-              ('$uid', '".$line["pref_name"]."','".$line["def_value"]."')");
-
+                \SmallSmallRSS\Database::query(
+                    "INSERT INTO ttrss_user_prefs
+                     (owner_uid,pref_name,value)
+                     VALUES
+                     ('$uid', '" . $line["pref_name"] . "','" . $line["def_value"] . "')"
+                );
             } else {
-                \SmallSmallRSS\Database::query("INSERT INTO ttrss_user_prefs
-                        (owner_uid,pref_name,value, profile) VALUES
-                        ('$uid', '".$line["pref_name"]."','".$line["def_value"]."', $profile)");
+                \SmallSmallRSS\Database::query(
+                    "INSERT INTO ttrss_user_prefs
+                     (owner_uid,pref_name,value, profile)
+                     VALUES
+                     ('$uid', '".$line["pref_name"]."','".$line["def_value"]."', $profile)"
+                );
             }
-
         }
     }
-
     \SmallSmallRSS\Database::query("COMMIT");
-
 }
 
 function get_ssl_certificate_id()
 {
-
     if (!empty($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"])) {
-        return sha1($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"] .
-                    $_SERVER["REDIRECT_SSL_CLIENT_V_START"] .
-                    $_SERVER["REDIRECT_SSL_CLIENT_V_END"] .
-                    $_SERVER["REDIRECT_SSL_CLIENT_S_DN"]);
+        return sha1(
+            $_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"]
+            . $_SERVER["REDIRECT_SSL_CLIENT_V_START"]
+            . $_SERVER["REDIRECT_SSL_CLIENT_V_END"]
+            . $_SERVER["REDIRECT_SSL_CLIENT_S_DN"]
+        );
     }
     return "";
 }
@@ -297,26 +293,26 @@ function authenticate_user($login, $password, $check_only = false)
                 break;
             }
         }
-
         if ($user_id && !$check_only) {
             $_SESSION["auth_module"] = $auth_module;
             $_SESSION["uid"] = $user_id;
             $_SESSION["version"] = \SmallSmallRSS\Constants::VERSION;
-
-            $result = \SmallSmallRSS\Database::query("SELECT login,access_level,pwd_hash FROM ttrss_users WHERE id = '$user_id'");
-
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT
+                     login,
+                     access_level,
+                     pwd_hash
+                 FROM ttrss_users
+                 WHERE id = '$user_id'"
+            );
             $_SESSION["name"] = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
             $_SESSION["access_level"] = \SmallSmallRSS\Database::fetch_result($result, 0, "access_level");
             $_SESSION["csrf_token"] = sha1(uniqid(rand(), true));
-
             \SmallSmallRSS\Database::query("UPDATE ttrss_users SET last_login = NOW() WHERE id = " . $_SESSION["uid"]);
-
             $_SESSION["ip_address"] = $_SERVER["REMOTE_ADDR"];
             $_SESSION["user_agent"] = sha1($_SERVER['HTTP_USER_AGENT']);
             $_SESSION["pwd_hash"] = \SmallSmallRSS\Database::fetch_result($result, 0, "pwd_hash");
-
             $_SESSION["last_version_check"] = time();
-
             initialize_user_prefs($_SESSION["uid"]);
             return true;
         }
@@ -325,35 +321,25 @@ function authenticate_user($login, $password, $check_only = false)
         $_SESSION["uid"] = 1;
         $_SESSION["name"] = "admin";
         $_SESSION["access_level"] = 10;
-
         $_SESSION["hide_hello"] = true;
         $_SESSION["hide_logout"] = true;
-
         $_SESSION["auth_module"] = false;
-
         if (!$_SESSION["csrf_token"]) {
             $_SESSION["csrf_token"] = sha1(uniqid(rand(), true));
         }
-
         $_SESSION["ip_address"] = $_SERVER["REMOTE_ADDR"];
-
         initialize_user_prefs($_SESSION["uid"]);
-
         return true;
     }
 }
 
 function make_password($length = 8)
 {
-
     $password = "";
     $possible = "0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ";
-
     $i = 0;
-
     while ($i < $length) {
         $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
-
         if (!strstr($password, $char)) {
             $password .= $char;
             $i++;
@@ -364,19 +350,28 @@ function make_password($length = 8)
 
 // this is called after user is created to initialize default feeds, labels
 // or whatever else
-
 // user preferences are checked on every login, not here
 
 function initialize_user($uid)
 {
+    \SmallSmallRSS\Database::query(
+        "INSERT INTO ttrss_feeds
+         (owner_uid,title,feed_url)
+         VALUES (
+             '$uid',
+             'Tiny Tiny RSS: New Releases',
+             'http://tt-rss.org/releases.rss'
+         )"
+    );
 
-    \SmallSmallRSS\Database::query("insert into ttrss_feeds (owner_uid,title,feed_url)
-            values ('$uid', 'Tiny Tiny RSS: New Releases',
-            'http://tt-rss.org/releases.rss')");
-
-    \SmallSmallRSS\Database::query("insert into ttrss_feeds (owner_uid,title,feed_url)
-            values ('$uid', 'Tiny Tiny RSS: Forum',
-                'http://tt-rss.org/forum/rss.php')");
+    \SmallSmallRSS\Database::query(
+        "INSERT INTO ttrss_feeds
+         (owner_uid,title,feed_url)
+         VALUES (
+             '$uid',
+             'Tiny Tiny RSS: Forum',
+             'http://tt-rss.org/forum/rss.php')"
+    );
 }
 
 function logout_user()
@@ -396,9 +391,11 @@ function load_user_plugins($owner_uid)
 {
     if ($owner_uid) {
         $plugins = \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS", $owner_uid);
-
-        \SmallSmallRSS\PluginHost::getInstance()->load($plugins, \SmallSmallRSS\PluginHost::KIND_USER, $owner_uid);
-
+        \SmallSmallRSS\PluginHost::getInstance()->load(
+             $plugins,
+             \SmallSmallRSS\PluginHost::KIND_USER,
+             $owner_uid
+        );
         if (\SmallSmallRSS\Sanity::getSchemaVersion() > 100) {
             \SmallSmallRSS\PluginHost::getInstance()->load_data();
         }
@@ -411,29 +408,29 @@ function login_sequence()
         authenticate_user("admin", null);
         load_user_plugins($_SESSION["uid"]);
     } else {
-        if (!\SmallSmallRSS\Session::validate()) $_SESSION["uid"] = false;
-
+        if (!\SmallSmallRSS\Session::validate()) {
+            $_SESSION["uid"] = false;
+        }
         if (!$_SESSION["uid"]) {
-
             if (\SmallSmallRSS\Config::get('AUTH_AUTO_LOGIN') && authenticate_user(null, null)) {
                 $_SESSION["ref_schema_version"] = \SmallSmallRSS\Sanity::getSchemaVersion(true);
             } else {
                 authenticate_user(null, null, true);
             }
-
             if (!$_SESSION["uid"]) {
                 @session_destroy();
                 setcookie(session_name(), '', time()-42000, '/');
-
                 $renderer = new \SmallSmallRSS\Renderers\LoginPage();
                 $renderer->render();
                 exit;
             }
-
         } else {
             /* bump login timestamp */
-            \SmallSmallRSS\Database::query("UPDATE ttrss_users SET last_login = NOW() WHERE id = " .
-                     $_SESSION["uid"]);
+            \SmallSmallRSS\Database::query(
+                "UPDATE ttrss_users
+                 SET last_login = NOW()
+                 WHERE id = " . $_SESSION["uid"]
+            );
             $_SESSION["last_login_update"] = time();
         }
 
@@ -442,20 +439,27 @@ function login_sequence()
             load_user_plugins($_SESSION["uid"]);
 
             /* cleanup ccache */
-
             \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_counters_cache WHERE owner_uid = ".
-                $_SESSION["uid"]
-                . " AND                    (SELECT COUNT(id) FROM ttrss_feeds WHERE
-                            ttrss_feeds.id = feed_id) = 0");
-
-            \SmallSmallRSS\Database::query("DELETE FROM ttrss_cat_counters_cache WHERE owner_uid = ".
-                     $_SESSION["uid"] . " AND
-                        (SELECT COUNT(id) FROM ttrss_feed_categories WHERE
-                            ttrss_feed_categories.id = feed_id) = 0");
-
+                "DELETE FROM ttrss_counters_cache
+                WHERE
+                    owner_uid = " . $_SESSION["uid"] . "
+                    AND (
+                       SELECT COUNT(id)
+                       FROM ttrss_feeds
+                       WHERE ttrss_feeds.id = feed_id
+                    ) = 0"
+            );
+            \SmallSmallRSS\Database::query(
+                "DELETE FROM ttrss_cat_counters_cache
+                 WHERE
+                     owner_uid = " . $_SESSION["uid"] . "
+                     AND (
+                         SELECT COUNT(id)
+                         FROM ttrss_feed_categories
+                         WHERE ttrss_feed_categories.id = feed_id
+                     ) = 0"
+            );
         }
-
     }
 }
 
@@ -496,12 +500,9 @@ function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt
     if (!$timestamp) {
         $timestamp = '1970-01-01 0:00';
     }
-
     $timestamp = substr($timestamp, 0, 19);
-
-    # We store date in UTC internally
+    // We store date in UTC internally
     $dt = new DateTime($timestamp, $utc_tz);
-
     $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $owner_uid);
     if ($user_tz_string != 'Automatic') {
         try {
@@ -573,14 +574,11 @@ function sql_random_function() {
 function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mode = 'all')
 {
 
-    if (!$owner_uid) $owner_uid = $_SESSION['uid'];
-
-    //if (preg_match("/^-?[0-9][0-9]*$/", $feed) != false) {
-
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION['uid'];
+    }
     // Todo: all this interval stuff needs some generic generator function
-
     $date_qpart = "false";
-
     switch ($mode) {
         case "1day":
             if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
@@ -609,91 +607,149 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
 
     if (is_numeric($feed)) {
         if ($cat_view) {
-
             if ($feed >= 0) {
-
                 if ($feed > 0) {
                     $children = getChildCategories($feed, $owner_uid);
                     array_push($children, $feed);
-
                     $children = join(",", $children);
-
                     $cat_qpart = "cat_id IN ($children)";
                 } else {
                     $cat_qpart = "cat_id IS NULL";
                 }
-
-                \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                            SET unread = false, last_read = NOW() WHERE ref_id IN
-                                (SELECT id FROM
-                                    (SELECT id FROM ttrss_entries, ttrss_user_entries WHERE ref_id = id
-                                        AND owner_uid = $owner_uid AND unread = true AND feed_id IN
-                                            (SELECT id FROM ttrss_feeds WHERE $cat_qpart) AND $date_qpart) as tmp)");
-
+                \SmallSmallRSS\Database::query(
+                    "UPDATE ttrss_user_entries
+                     SET unread = false, last_read = NOW()
+                     WHERE ref_id IN (
+                         SELECT id FROM (
+                             SELECT id
+                             FROM ttrss_entries, ttrss_user_entries
+                             WHERE
+                                 ref_id = id
+                                 AND owner_uid = $owner_uid
+                                 AND unread = true
+                                 AND feed_id IN (
+                                     SELECT id
+                                         FROM ttrss_feeds
+                                         WHERE $cat_qpart
+                                 )
+                             AND $date_qpart
+                         ) as tmp
+                    )"
+                );
             } elseif ($feed == -2) {
-
-                \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                            SET unread = false,last_read = NOW() WHERE (SELECT COUNT(*)
-                                FROM ttrss_user_labels2 WHERE article_id = ref_id) > 0
-                                AND unread = true AND $date_qpart AND owner_uid = $owner_uid");
+                \SmallSmallRSS\Database::query(
+                    "UPDATE ttrss_user_entries
+                     SET unread = false,last_read = NOW()
+                     WHERE
+                         unread = true
+                         AND $date_qpart
+                         AND owner_uid = $owner_uid
+                         AND (
+                             SELECT COUNT(*)
+                             FROM ttrss_user_labels2
+                             WHERE article_id = ref_id
+                         ) > 0"
+                );
             }
-
         } elseif ($feed > 0) {
-
-            \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                        SET unread = false, last_read = NOW() WHERE ref_id IN
-                            (SELECT id FROM
-                                (SELECT id FROM ttrss_entries, ttrss_user_entries WHERE ref_id = id
-                                    AND owner_uid = $owner_uid AND unread = true AND feed_id = $feed AND $date_qpart) as tmp)");
+            \SmallSmallRSS\Database::query(
+                "UPDATE ttrss_user_entries
+                 SET unread = false, last_read = NOW()
+                 WHERE ref_id IN (
+                     SELECT id
+                     FROM (
+                         SELECT id
+                         FROM ttrss_entries, ttrss_user_entries
+                         WHERE
+                             ref_id = id
+                             AND owner_uid = $owner_uid
+                             AND unread = true
+                             AND feed_id = $feed
+                             AND $date_qpart
+                     ) as tmp
+                 )");
 
         } elseif ($feed < 0 && $feed > \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // special, like starred
-
             if ($feed == -1) {
-                \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                            SET unread = false, last_read = NOW() WHERE ref_id IN
-                                (SELECT id FROM
-                                    (SELECT id FROM ttrss_entries, ttrss_user_entries WHERE ref_id = id
-                                        AND owner_uid = $owner_uid AND unread = true AND marked = true AND $date_qpart) as tmp)");
+                \SmallSmallRSS\Database::query(
+                    "UPDATE ttrss_user_entries
+                     SET unread = false, last_read = NOW()
+                     WHERE
+                         ref_id IN (
+                             SELECT id
+                             FROM (
+                                 SELECT id
+                                 FROM ttrss_entries, ttrss_user_entries
+                                 WHERE
+                                     ref_id = id
+                                     AND owner_uid = $owner_uid
+                                     AND unread = true
+                                     AND marked = true
+                                     AND $date_qpart
+                             ) as tmp
+                         )");
             }
-
             if ($feed == -2) {
-                \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                            SET unread = false, last_read = NOW() WHERE ref_id IN
-                                (SELECT id FROM
-                                    (SELECT id FROM ttrss_entries, ttrss_user_entries WHERE ref_id = id
-                                        AND owner_uid = $owner_uid AND unread = true AND published = true AND $date_qpart) as tmp)");
+                \SmallSmallRSS\Database::query(
+                    "UPDATE ttrss_user_entries
+                     SET unread = false, last_read = NOW()
+                     WHERE ref_id IN (
+                         SELECT id
+                         FROM (
+                             SELECT id
+                             FROM ttrss_entries, ttrss_user_entries
+                             WHERE
+                                 ref_id = id
+                                 AND owner_uid = $owner_uid
+                                 AND unread = true
+                                 AND published = true
+                                 AND $date_qpart
+                         ) as tmp
+                     )");
             }
-
             if ($feed == -3) {
-
                 $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE");
-
                 if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
                     $match_part = "date_entered > NOW() - INTERVAL '$intl hour' ";
                 } else {
-                    $match_part = "date_entered > DATE_SUB(NOW(),
-                                INTERVAL $intl HOUR) ";
+                    $match_part = "date_entered > DATE_SUB(NOW(), INTERVAL $intl HOUR) ";
                 }
-
-                \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                            SET unread = false, last_read = NOW() WHERE ref_id IN
-                                (SELECT id FROM
-                                    (SELECT id FROM ttrss_entries, ttrss_user_entries WHERE ref_id = id
-                                        AND owner_uid = $owner_uid AND unread = true AND $date_qpart AND $match_part) as tmp)");
+                \SmallSmallRSS\Database::query(
+                    "UPDATE ttrss_user_entries
+                     SET unread = false, last_read = NOW()
+                     WHERE ref_id IN (
+                         SELECT id FROM (
+                             SELECT id
+                             FROM ttrss_entries, ttrss_user_entries
+                             WHERE
+                                 ref_id = id
+                                 AND owner_uid = $owner_uid
+                                 AND unread = true
+                                 AND $date_qpart
+                                 AND $match_part
+                         ) as tmp
+                     )");
             }
-
             if ($feed == -4) {
-                \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                            SET unread = false, last_read = NOW() WHERE ref_id IN
-                                (SELECT id FROM
-                                    (SELECT id FROM ttrss_entries, ttrss_user_entries WHERE ref_id = id
-                                        AND owner_uid = $owner_uid AND unread = true AND $date_qpart) as tmp)");
+                \SmallSmallRSS\Database::query(
+                    "UPDATE ttrss_user_entries
+                     SET unread = false, last_read = NOW()
+                     WHERE ref_id IN (
+                         SELECT id
+                         FROM (
+                             SELECT id
+                             FROM ttrss_entries, ttrss_user_entries
+                             WHERE
+                                 ref_id = id
+                                 AND owner_uid = $owner_uid
+                                 AND unread = true
+                                 AND $date_qpart
+                         ) as tmp
+                     )");
             }
 
         } elseif ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // label
-
             $label_id = feed_to_label_id($feed);
-
             \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
                         SET unread = false, last_read = NOW() WHERE ref_id IN
                             (SELECT id FROM
@@ -728,16 +784,12 @@ function getAllCounters()
 
 function getCategoryTitle($cat_id)
 {
-
     if ($cat_id == -1) {
         return __("Special");
     } elseif ($cat_id == -2) {
         return __("Labels");
     } else {
-
-        $result = \SmallSmallRSS\Database::query("SELECT title FROM ttrss_feed_categories WHERE
-                id = '$cat_id'");
-
+        $result = \SmallSmallRSS\Database::query("SELECT title FROM ttrss_feed_categories WHERE id = '$cat_id'");
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             return \SmallSmallRSS\Database::fetch_result($result, 0, "title");
         } else {
@@ -746,48 +798,48 @@ function getCategoryTitle($cat_id)
     }
 }
 
-
 function getCategoryCounters()
 {
     $ret_arr = array();
-
     /* Labels category */
-
-    $cv = array("id" => -2, "kind" => "cat",
-                "counter" => getCategoryUnread(-2));
-
+    $cv = array("id" => -2, "kind" => "cat", "counter" => getCategoryUnread(-2));
     array_push($ret_arr, $cv);
-
-    $result = \SmallSmallRSS\Database::query("SELECT id AS cat_id, value AS unread,
-            (SELECT COUNT(id) FROM ttrss_feed_categories AS c2
-                WHERE c2.parent_cat = ttrss_feed_categories.id) AS num_children
-            FROM ttrss_feed_categories, ttrss_cat_counters_cache
-            WHERE ttrss_cat_counters_cache.feed_id = id AND
-            ttrss_cat_counters_cache.owner_uid = ttrss_feed_categories.owner_uid AND
-            ttrss_feed_categories.owner_uid = " . $_SESSION["uid"]);
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT
+            id AS cat_id,
+            value AS unread,
+            (
+                 SELECT COUNT(id)
+                 FROM ttrss_feed_categories AS c2
+                 WHERE c2.parent_cat = ttrss_feed_categories.id
+            ) AS num_children
+            FROM
+                ttrss_feed_categories,
+                ttrss_cat_counters_cache
+            WHERE
+                ttrss_cat_counters_cache.feed_id = id
+                AND ttrss_cat_counters_cache.owner_uid = ttrss_feed_categories.owner_uid
+                AND ttrss_feed_categories.owner_uid = " . $_SESSION["uid"]
+    );
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         $line["cat_id"] = (int) $line["cat_id"];
-
         if ($line["num_children"] > 0) {
             $child_counter = getCategoryChildrenUnread($line["cat_id"], $_SESSION["uid"]);
         } else {
             $child_counter = 0;
         }
-
-        $cv = array("id" => $line["cat_id"], "kind" => "cat",
-                    "counter" => $line["unread"] + $child_counter);
-
+        $cv = array("id" => $line["cat_id"], "kind" => "cat", "counter" => $line["unread"] + $child_counter);
         array_push($ret_arr, $cv);
     }
 
     /* Special case: NULL category doesn't actually exist in the DB */
 
-    $cv = array("id" => 0, "kind" => "cat",
-                "counter" => (int) \SmallSmallRSS\CounterCache::find(0, $_SESSION["uid"], true));
-
+    $cv = array(
+        "id" => 0,
+        "kind" => "cat",
+        "counter" => (int) \SmallSmallRSS\CounterCache::find(0, $_SESSION["uid"], true)
+    );
     array_push($ret_arr, $cv);
-
     return $ret_arr;
 }
 
@@ -797,16 +849,18 @@ function getCategoryChildrenUnread($cat, $owner_uid = false)
     if (!$owner_uid) {
         $owner_uid = $_SESSION["uid"];
     }
-    $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_feed_categories WHERE parent_cat = '$cat'
-                AND owner_uid = $owner_uid");
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT id
+         FROM ttrss_feed_categories
+         WHERE
+             parent_cat = '$cat'
+             AND owner_uid = $owner_uid"
+    );
     $unread = 0;
-
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         $unread += getCategoryUnread($line["id"], $owner_uid);
         $unread += getCategoryChildrenUnread($line["id"], $owner_uid);
     }
-
     return $unread;
 }
 
@@ -837,14 +891,16 @@ function getCategoryUnread($cat, $owner_uid = false)
 
         $match_part = implode(" OR ", $cat_feeds);
 
-        $result = \SmallSmallRSS\Database::query("SELECT COUNT(int_id) AS unread
-                FROM ttrss_user_entries
-                WHERE    unread = true AND ($match_part)
-                AND owner_uid = " . $owner_uid);
-
+        $result = \SmallSmallRSS\Database::query("
+            SELECT COUNT(int_id) AS unread
+            FROM ttrss_user_entries
+            WHERE
+                unread = true
+                AND ($match_part)
+                AND owner_uid = " . $owner_uid
+        );
         $unread = 0;
-
-        # this needs to be rewritten
+        // this needs to be rewritten
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $unread += $line["unread"];
         }
@@ -853,17 +909,16 @@ function getCategoryUnread($cat, $owner_uid = false)
     } elseif ($cat == -1) {
         return getFeedUnread(-1) + getFeedUnread(-2) + getFeedUnread(-3) + getFeedUnread(0);
     } elseif ($cat == -2) {
-
-        $result = \SmallSmallRSS\Database::query("
-                SELECT COUNT(unread) AS unread FROM
-                    ttrss_user_entries, ttrss_user_labels2
-                WHERE article_id = ref_id AND unread = true
-                    AND ttrss_user_entries.owner_uid = '$owner_uid'");
-
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT COUNT(unread) AS unread
+             FROM ttrss_user_entries, ttrss_user_labels2
+             WHERE
+                 article_id = ref_id
+                 AND unread = true
+                 AND ttrss_user_entries.owner_uid = '$owner_uid'"
+        );
         $unread = \SmallSmallRSS\Database::fetch_result($result, 0, "unread");
-
         return $unread;
-
     }
 }
 
@@ -876,9 +931,15 @@ function getLabelUnread($label_id, $owner_uid = false)
 {
     if (!$owner_uid) $owner_uid = $_SESSION["uid"];
 
-    $result = \SmallSmallRSS\Database::query("SELECT COUNT(ref_id) AS unread FROM ttrss_user_entries, ttrss_user_labels2
-            WHERE owner_uid = '$owner_uid' AND unread = true AND label_id = '$label_id' AND article_id = ref_id");
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT COUNT(ref_id) AS unread
+         FROM ttrss_user_entries, ttrss_user_labels2
+         WHERE
+             owner_uid = '$owner_uid'
+             AND unread = true
+             AND label_id = '$label_id'
+             AND article_id = ref_id"
+    );
     if (\SmallSmallRSS\Database::num_rows($result) != 0) {
         return \SmallSmallRSS\Database::fetch_result($result, 0, "unread");
     } else {
@@ -888,95 +949,93 @@ function getLabelUnread($label_id, $owner_uid = false)
 
 function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_uid = false)
 {
-
     $n_feed = (int) $feed;
     $need_entries = false;
-
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
-
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
     if ($unread_only) {
         $unread_qpart = "unread = true";
     } else {
         $unread_qpart = "true";
     }
-
     if ($is_cat) {
         return getCategoryUnread($n_feed, $owner_uid);
     } elseif ($n_feed == -6) {
         return 0;
     } elseif ($feed != "0" && $n_feed == 0) {
-
         $feed = \SmallSmallRSS\Database::escape_string($feed);
-
-        $result = \SmallSmallRSS\Database::query("SELECT SUM((SELECT COUNT(int_id)
-                FROM ttrss_user_entries,ttrss_entries WHERE int_id = post_int_id
-                    AND ref_id = id AND $unread_qpart)) AS count FROM ttrss_tags
-                WHERE owner_uid = $owner_uid AND tag_name = '$feed'");
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT SUM(
+                 (
+                      SELECT COUNT(int_id)
+                      FROM ttrss_user_entries, ttrss_entries
+                      WHERE
+                          int_id = post_int_id
+                          AND ref_id = id
+                          AND $unread_qpart
+                 )
+             ) AS count
+             FROM ttrss_tags
+             WHERE
+                 owner_uid = $owner_uid
+                 AND tag_name = '$feed'"
+        );
         return \SmallSmallRSS\Database::fetch_result($result, 0, "count");
-
     } elseif ($n_feed == -1) {
         $match_part = "marked = true";
     } elseif ($n_feed == -2) {
         $match_part = "published = true";
     } elseif ($n_feed == -3) {
         $match_part = "unread = true AND score >= 0";
-
         $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE", $owner_uid);
-
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $match_part .= " AND updated > NOW() - INTERVAL '$intl hour' ";
         } else {
             $match_part .= " AND updated > DATE_SUB(NOW(), INTERVAL $intl HOUR) ";
         }
-
         $need_entries = true;
-
     } elseif ($n_feed == -4) {
         $match_part = "true";
     } elseif ($n_feed >= 0) {
-
         if ($n_feed != 0) {
             $match_part = "feed_id = '$n_feed'";
         } else {
             $match_part = "feed_id IS NULL";
         }
-
     } elseif ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
-
         $label_id = feed_to_label_id($feed);
-
         return getLabelUnread($label_id, $owner_uid);
-
     }
-
     if ($match_part) {
-
         if ($need_entries) {
-            $from_qpart = "ttrss_user_entries,ttrss_entries";
-            $from_where = "ttrss_entries.id = ttrss_user_entries.ref_id AND";
+            $from_qpart = "ttrss_user_entries, ttrss_entries";
+            $from_where = "ttrss_entries.id = ttrss_user_entries.ref_id AND ";
         } else {
             $from_qpart = "ttrss_user_entries";
             $from_where = '';
         }
 
         $query = "SELECT count(int_id) AS unread
-                FROM $from_qpart WHERE
-                $unread_qpart AND $from_where ($match_part) AND ttrss_user_entries.owner_uid = $owner_uid";
-
-        //echo "[$feed/$query]\n";
-
+                  FROM $from_qpart
+                  WHERE
+                      $unread_qpart
+                      AND $from_where ($match_part)
+                      AND ttrss_user_entries.owner_uid = $owner_uid";
         $result = \SmallSmallRSS\Database::query($query);
-
     } else {
-
-        $result = \SmallSmallRSS\Database::query("SELECT COUNT(post_int_id) AS unread
-                FROM ttrss_tags,ttrss_user_entries,ttrss_entries
-                WHERE tag_name = '$feed' AND post_int_id = int_id AND ref_id = ttrss_entries.id
-                AND $unread_qpart AND ttrss_tags.owner_uid = " . $owner_uid);
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT COUNT(post_int_id) AS unread
+             FROM ttrss_tags,ttrss_user_entries,ttrss_entries
+             WHERE
+                 tag_name = '$feed'
+                 AND post_int_id = int_id
+                 AND ref_id = ttrss_entries.id
+                 AND $unread_qpart
+                 AND ttrss_tags.owner_uid = " . $owner_uid
+        );
     }
-
     $unread = \SmallSmallRSS\Database::fetch_result($result, 0, "unread");
-
     return $unread;
 }
 
@@ -985,38 +1044,33 @@ function getGlobalUnread($user_id = false)
     if (!$user_id) {
         $user_id = $_SESSION["uid"];
     }
-
-    $result = \SmallSmallRSS\Database::query("SELECT SUM(value) AS c_id FROM ttrss_counters_cache
-            WHERE owner_uid = '$user_id' AND feed_id > 0");
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT SUM(value) AS c_id
+         FROM ttrss_counters_cache
+         WHERE
+             owner_uid = '$user_id'
+             AND feed_id > 0"
+    );
     $c_id = \SmallSmallRSS\Database::fetch_result($result, 0, "c_id");
-
     return $c_id;
 }
 
 function getGlobalCounters($global_unread = -1)
 {
     $ret_arr = array();
-
     if ($global_unread == -1) {
         $global_unread = getGlobalUnread();
     }
-
-    $cv = array("id" => "global-unread",
-                "counter" => (int) $global_unread);
-
+    $cv = array("id" => "global-unread", "counter" => (int) $global_unread);
     array_push($ret_arr, $cv);
-
-    $result = \SmallSmallRSS\Database::query("SELECT COUNT(id) AS fn FROM
-            ttrss_feeds WHERE owner_uid = " . $_SESSION["uid"]);
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT COUNT(id) AS fn
+         FROM ttrss_feeds
+         WHERE owner_uid = " . $_SESSION["uid"]
+    );
     $subscribed_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "fn");
-
-    $cv = array("id" => "subscribed-feeds",
-                "counter" => (int) $subscribed_feeds);
-
+    $cv = array("id" => "subscribed-feeds", "counter" => (int) $subscribed_feeds);
     array_push($ret_arr, $cv);
-
     return $ret_arr;
 }
 
@@ -1025,26 +1079,28 @@ function getVirtCounters()
     $ret_arr = array();
     for ($i = 0; $i >= -4; $i--) {
         $count = getFeedUnread($i);
-        if ($i == 0 || $i == -1 || $i == -2)
+        if ($i == 0 || $i == -1 || $i == -2) {
             $auxctr = getFeedArticles($i, false);
-        else
+        } else {
             $auxctr = 0;
-        $cv = array("id" => $i,
-                    "counter" => (int) $count,
-                    "auxcounter" => $auxctr);
+        }
+        $cv = array(
+            "id" => $i,
+            "counter" => (int) $count,
+            "auxcounter" => $auxctr
+        );
         array_push($ret_arr, $cv);
     }
-
     $feeds = \SmallSmallRSS\PluginHost::getInstance()->get_feeds(-1);
-
     if (is_array($feeds)) {
         foreach ($feeds as $feed) {
-            $cv = array("id" => \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']),
-                        "counter" => $feed['sender']->get_unread($feed['id']));
+            $cv = array(
+                "id" => \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']),
+                "counter" => $feed['sender']->get_unread($feed['id'])
+            );
             array_push($ret_arr, $cv);
         }
     }
-
     return $ret_arr;
 }
 
@@ -1104,38 +1160,29 @@ function getFeedCounters($active_feed = false)
 
     $result = \SmallSmallRSS\Database::query($query);
     $fctrs_modified = false;
-
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
         $id = $line["id"];
         $count = $line["count"];
         $last_error = htmlspecialchars($line["last_error"]);
-
         $last_updated = make_local_datetime($line['last_updated'], false);
-
         $has_img = feed_has_icon($id);
-
-        if (date('Y') - date('Y', strtotime($line['last_updated'])) > 2)
+        if (date('Y') - date('Y', strtotime($line['last_updated'])) > 2) {
             $last_updated = '';
-
-        $cv = array("id" => $id,
-                    "updated" => $last_updated,
-                    "counter" => (int) $count,
-                    "has_img" => (int) $has_img);
-
-        if ($last_error)
+        }
+        $cv = array(
+            "id" => $id,
+            "updated" => $last_updated,
+            "counter" => (int) $count,
+            "has_img" => (int) $has_img
+        );
+        if ($last_error) {
             $cv["error"] = $last_error;
-
-        //            if (\SmallSmallRSS\DBPrefs::read('EXTENDED_FEEDLIST'))
-        //                $cv["xmsg"] = getFeedArticles($id)." ".__("total");
-
-        if ($active_feed && $id == $active_feed)
+        }
+        if ($active_feed && $id == $active_feed) {
             $cv["title"] = truncate_string($line["title"], 30);
-
+        }
         array_push($ret_arr, $cv);
-
     }
-
     return $ret_arr;
 }
 
@@ -1166,18 +1213,14 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
     if (!$url || !validate_feed_url($url)) {
         return array("code" => 2);
     }
-
     $fetcher = new \SmallSmallRSS\Fetcher();
     $contents = $fetcher->getFileContents($url, false, $auth_login, $auth_pass);
     $fetch_last_error = $fetcher->last_error;
-
     if (!$contents) {
         return array("code" => 5, "message" => $fetch_last_error);
     }
-
     if (is_html($contents)) {
         $feedUrls = get_feeds_from_html($url, $contents);
-
         if (count($feedUrls) == 0) {
             return array("code" => 3);
         } elseif (count($feedUrls) > 1) {
@@ -1186,37 +1229,39 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
         //use feed url as new URL
         $url = key($feedUrls);
     }
-
     if ($cat_id == "0" || !$cat_id) {
         $cat_qpart = "NULL";
     } else {
         $cat_qpart = "'$cat_id'";
     }
-
     $result = \SmallSmallRSS\Database::query(
-        "SELECT id FROM ttrss_feeds
-            WHERE feed_url = '$url' AND owner_uid = ".$_SESSION["uid"]);
-
+        "SELECT id
+         FROM ttrss_feeds
+         WHERE
+             feed_url = '$url'
+             AND owner_uid = " . $_SESSION["uid"]
+    );
     if (\SmallSmallRSS\Crypt::is_enabled()) {
         $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
         $auth_pass_encrypted = 'true';
     } else {
         $auth_pass_encrypted = 'false';
     }
-
     $auth_pass = \SmallSmallRSS\Database::escape_string($auth_pass);
-
     if (\SmallSmallRSS\Database::num_rows($result) == 0) {
         $result = \SmallSmallRSS\Database::query(
             "INSERT INTO ttrss_feeds
-                    (owner_uid,feed_url,title,cat_id, auth_login,auth_pass,update_method,auth_pass_encrypted)
-                VALUES ('".$_SESSION["uid"]."', '$url',
-                '[Unknown]', $cat_qpart, '$auth_login', '$auth_pass', 0, $auth_pass_encrypted)");
-
+             (owner_uid,feed_url,title,cat_id, auth_login,auth_pass,update_method,auth_pass_encrypted)
+             VALUES (
+                 '".$_SESSION["uid"]."', '$url',
+                 '[Unknown]', $cat_qpart, '$auth_login', '$auth_pass', 0, $auth_pass_encrypted)"
+        );
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id FROM ttrss_feeds WHERE feed_url = '$url'
-                    AND owner_uid = " . $_SESSION["uid"]);
-
+            "SELECT id FROM ttrss_feeds
+             WHERE
+                 feed_url = '$url'
+                 AND owner_uid = " . $_SESSION["uid"]
+        );
         $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
         if ($feed_id) {
             update_rss_feed($feed_id);
@@ -1240,86 +1285,98 @@ function print_feed_select(
             print "<option $is_selected value=\"0\">".__('All feeds')."</option>";
         }
     }
-
     if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
-
-        if ($root_id)
+        if ($root_id) {
             $parent_qpart = "parent_cat = '$root_id'";
-        else
+        } else {
             $parent_qpart = "parent_cat IS NULL";
-
-        $result = \SmallSmallRSS\Database::query("SELECT id,title,
-                (SELECT COUNT(id) FROM ttrss_feed_categories AS c2 WHERE
-                    c2.parent_cat = ttrss_feed_categories.id) AS num_children
-                FROM ttrss_feed_categories
-                WHERE owner_uid = ".$_SESSION["uid"]." AND $parent_qpart ORDER BY title");
-
+        }
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT
+                 id,
+                 title,
+                 (
+                      SELECT COUNT(id)
+                      FROM ttrss_feed_categories AS c2
+                      WHERE c2.parent_cat = ttrss_feed_categories.id
+                 ) AS num_children
+                 FROM ttrss_feed_categories
+                 WHERE
+                     owner_uid = " . $_SESSION["uid"] . "
+                     AND $parent_qpart ORDER BY title"
+        );
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
-            for ($i = 0; $i < $nest_level; $i++)
+            for ($i = 0; $i < $nest_level; $i++) {
                 $line["title"] = " - " . $line["title"];
-
+            }
             $is_selected = ("CAT:".$line["id"] == $default_id) ? "selected=\"1\"" : "";
-
-            printf("<option $is_selected value='CAT:%d'>%s</option>",
-                   $line["id"], htmlspecialchars($line["title"]));
-
-            if ($line["num_children"] > 0)
+            printf(
+                "<option $is_selected value='CAT:%d'>%s</option>",
+                $line["id"], htmlspecialchars($line["title"])
+            );
+            if ($line["num_children"] > 0) {
                 print_feed_select($id, $default_id, $attributes,
                                   $include_all_feeds, $line["id"], $nest_level+1);
-
-            $feed_result = \SmallSmallRSS\Database::query("SELECT id,title FROM ttrss_feeds
-                    WHERE cat_id = '".$line["id"]."' AND owner_uid = ".$_SESSION["uid"] . " ORDER BY title");
-
+            }
+            $feed_result = \SmallSmallRSS\Database::query(
+                "SELECT id, title
+                 FROM ttrss_feeds
+                 WHERE
+                     cat_id = '" . $line["id"] . "'
+                     AND owner_uid = ".$_SESSION["uid"] . "
+                 ORDER BY title"
+            );
             while ($fline = \SmallSmallRSS\Database::fetch_assoc($feed_result)) {
                 $is_selected = ($fline["id"] == $default_id) ? "selected=\"1\"" : "";
-
                 $fline["title"] = " + " . $fline["title"];
-
-                for ($i = 0; $i < $nest_level; $i++)
+                for ($i = 0; $i < $nest_level; $i++) {
                     $fline["title"] = " - " . $fline["title"];
-
-                printf("<option $is_selected value='%d'>%s</option>",
-                       $fline["id"], htmlspecialchars($fline["title"]));
+                }
+                printf(
+                    "<option $is_selected value='%d'>%s</option>",
+                    $fline["id"], htmlspecialchars($fline["title"])
+                );
             }
         }
-
         if (!$root_id) {
             $default_is_cat = ($default_id == "CAT:0");
             $is_selected = $default_is_cat ? "selected=\"1\"" : "";
-
-            printf("<option $is_selected value='CAT:0'>%s</option>",
-                   __("Uncategorized"));
-
-            $feed_result = \SmallSmallRSS\Database::query("SELECT id,title FROM ttrss_feeds
-                    WHERE cat_id IS NULL AND owner_uid = ".$_SESSION["uid"] . " ORDER BY title");
-
+            printf("<option $is_selected value='CAT:0'>%s</option>", __("Uncategorized"));
+            $feed_result = \SmallSmallRSS\Database::query(
+                "SELECT id, title
+                 FROM ttrss_feeds
+                 WHERE
+                     cat_id IS NULL
+                     AND owner_uid = ".$_SESSION["uid"] . "
+                 ORDER BY title"
+            );
             while ($fline = \SmallSmallRSS\Database::fetch_assoc($feed_result)) {
                 $is_selected = ($fline["id"] == $default_id && !$default_is_cat) ? "selected=\"1\"" : "";
-
                 $fline["title"] = " + " . $fline["title"];
-
-                for ($i = 0; $i < $nest_level; $i++)
+                for ($i = 0; $i < $nest_level; $i++) {
                     $fline["title"] = " - " . $fline["title"];
-
-                printf("<option $is_selected value='%d'>%s</option>",
-                       $fline["id"], htmlspecialchars($fline["title"]));
+                }
+                printf(
+                    "<option $is_selected value='%d'>%s</option>",
+                    $fline["id"], htmlspecialchars($fline["title"])
+                );
             }
         }
-
     } else {
-        $result = \SmallSmallRSS\Database::query("SELECT id,title FROM ttrss_feeds
-                WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY title");
-
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id, title
+             FROM ttrss_feeds
+             WHERE owner_uid = " . $_SESSION["uid"] . "
+             ORDER BY title"
+        );
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
             $is_selected = ($line["id"] == $default_id) ? "selected=\"1\"" : "";
-
-            printf("<option $is_selected value='%d'>%s</option>",
-                   $line["id"], htmlspecialchars($line["title"]));
+            printf(
+                "<option $is_selected value='%d'>%s</option>",
+                $line["id"], htmlspecialchars($line["title"])
+            );
         }
     }
-
     if (!$root_id) {
         print "</select>";
     }
@@ -1329,21 +1386,29 @@ function print_feed_cat_select(
     $id, $default_id,
     $attributes, $include_all_cats = true, $root_id = false, $nest_level = 0
 ) {
-
     if (!$root_id) {
         print "<select id=\"$id\" name=\"$id\" default=\"$default_id\" onchange=\"catSelectOnChange(this)\" $attributes>";
     }
-
-    if ($root_id)
+    if ($root_id) {
         $parent_qpart = "parent_cat = '$root_id'";
-    else
+    } else {
         $parent_qpart = "parent_cat IS NULL";
-
-    $result = \SmallSmallRSS\Database::query("SELECT id,title,
-                (SELECT COUNT(id) FROM ttrss_feed_categories AS c2 WHERE
-                    c2.parent_cat = ttrss_feed_categories.id) AS num_children
-                FROM ttrss_feed_categories
-                WHERE owner_uid = ".$_SESSION["uid"]." AND $parent_qpart ORDER BY title");
+    }
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT
+             id,
+             title,
+             (
+                  SELECT COUNT(id)
+                  FROM ttrss_feed_categories AS c2
+                  WHERE
+                      c2.parent_cat = ttrss_feed_categories.id
+             ) AS num_children
+             FROM ttrss_feed_categories
+             WHERE
+                 owner_uid = " . $_SESSION["uid"] . "
+                 AND $parent_qpart ORDER BY title"
+    );
 
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         if ($line["id"] == $default_id) {
@@ -1351,17 +1416,17 @@ function print_feed_cat_select(
         } else {
             $is_selected = "";
         }
-
-        for ($i = 0; $i < $nest_level; $i++)
+        for ($i = 0; $i < $nest_level; $i++) {
             $line["title"] = " - " . $line["title"];
-
-        if ($line["title"])
+        }
+        if ($line["title"]) {
             printf("<option $is_selected value='%d'>%s</option>",
                    $line["id"], htmlspecialchars($line["title"]));
-
-        if ($line["num_children"] > 0)
+        }
+        if ($line["num_children"] > 0) {
             print_feed_cat_select($id, $default_id, $attributes,
                                   $include_all_cats, $line["id"], $nest_level+1);
+        }
     }
 
     if (!$root_id) {
@@ -1369,13 +1434,11 @@ function print_feed_cat_select(
             if (\SmallSmallRSS\Database::num_rows($result) > 0) {
                 print "<option disabled=\"1\">--------</option>";
             }
-
             if ($default_id == 0) {
                 $is_selected = "selected=\"1\"";
             } else {
                 $is_selected = "";
             }
-
             print "<option $is_selected value=\"0\">".__('Uncategorized')."</option>";
         }
         print "</select>";
@@ -1394,9 +1457,15 @@ function getFeedCatTitle($id)
     } elseif ($id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
         return __("Labels");
     } elseif ($id > 0) {
-        $result = \SmallSmallRSS\Database::query("SELECT ttrss_feed_categories.title
-                FROM ttrss_feeds, ttrss_feed_categories WHERE ttrss_feeds.id = '$id' AND
-                    cat_id = ttrss_feed_categories.id");
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT ttrss_feed_categories.title
+             FROM
+                 ttrss_feeds,
+                 ttrss_feed_categories
+             WHERE
+                 ttrss_feeds.id = '$id'
+                 AND cat_id = ttrss_feed_categories.id"
+        );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             return \SmallSmallRSS\Database::fetch_result($result, 0, "title");
         } else {
@@ -1439,7 +1508,6 @@ function getFeedIcon($id)
             }
             break;
     }
-
     return false;
 }
 
@@ -1512,7 +1580,6 @@ function get_hotkeys_info()
     foreach ($hotkey_hooks as $plugin) {
         $hotkeys = $plugin->hook_hotkey_info($hotkeys);
     }
-
     return $hotkeys;
 }
 
@@ -1615,22 +1682,18 @@ function make_runtime_info()
 
     $max_feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "mid");
     $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "nf");
-
     $data["max_feed_id"] = (int) $max_feed_id;
     $data["num_feeds"] = (int) $num_feeds;
-
     $data['last_article_id'] = getLastArticleId();
     $data['cdm_expanded'] = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
-
     $data['dependency_timestamp'] = calculate_dep_timestamp();
     $data['reload_on_ts_change'] = \SmallSmallRSS\Config::get('RELOAD_ON_TS_CHANGE');
-
     $feeds_stamp = \SmallSmallRSS\Lockfiles::get_contents("update_feeds.stamp");
     $daemon_stamp = \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
     $data['daemon_is_running'] = (
         \SmallSmallRSS\Lockfiles::is_locked("update_daemon.lock")
         || (bool) $feeds_stamp
-        || (bool) $stamp
+        || (bool) $daemon_stamp
     );
 
     $last_run = max((int) $daemon_stamp, (int) $feeds_stamp);
@@ -1657,10 +1720,8 @@ function make_runtime_info()
 function search_to_sql($search)
 {
     $search_query_part = "";
-
     $keywords = explode(" ", $search);
     $query_keywords = array();
-
     foreach ($keywords as $k) {
         if (strpos($k, "-") === 0) {
             $k = substr($k, 1);
@@ -1668,9 +1729,7 @@ function search_to_sql($search)
         } else {
             $not = "";
         }
-
         $commandpair = explode(":", mb_strtolower($k), 2);
-
         switch ($commandpair[0]) {
             case "title":
                 if ($commandpair[1]) {
@@ -1744,37 +1803,40 @@ function search_to_sql($search)
                 }
         }
     }
-
     $search_query_part = implode("AND", $query_keywords);
-
     return $search_query_part;
 }
 
 function getParentCategories($cat, $owner_uid) {
     $rv = array();
-
-    $result = \SmallSmallRSS\Database::query("SELECT parent_cat FROM ttrss_feed_categories
-            WHERE id = '$cat' AND parent_cat IS NOT NULL AND owner_uid = $owner_uid");
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT parent_cat
+         FROM ttrss_feed_categories
+         WHERE
+              id = '$cat'
+              AND parent_cat IS NOT NULL
+              AND owner_uid = $owner_uid"
+    );
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         array_push($rv, $line["parent_cat"]);
         $rv = array_merge($rv, getParentCategories($line["parent_cat"], $owner_uid));
     }
-
     return $rv;
 }
 
 function getChildCategories($cat, $owner_uid) {
     $rv = array();
-
-    $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_feed_categories
-            WHERE parent_cat = '$cat' AND owner_uid = $owner_uid");
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT id
+         FROM ttrss_feed_categories
+         WHERE
+             parent_cat = '$cat'
+             AND owner_uid = $owner_uid"
+    );
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         array_push($rv, $line["id"]);
         $rv = array_merge($rv, getChildCategories($line["id"], $owner_uid));
     }
-
     return $rv;
 }
 
@@ -1782,12 +1844,12 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
     $last_updated = 0;
     $last_error = 0;
     $feed_site_url = '';
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
-
+    $query_strategy_part = '';
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
     $ext_tables_part = "";
-
     if ($search) {
-
         if (\SmallSmallRSS\Config::get('SPHINX_ENABLED')) {
             $ids = join(",", @sphinx_search($search, 0, 500));
             if ($ids) {
@@ -1799,33 +1861,28 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
             $search_query_part = search_to_sql($search);
             $search_query_part .= " AND ";
         }
-
     } else {
         $search_query_part = "";
     }
-
     if ($filter) {
-
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $query_strategy_part .= " AND updated > NOW() - INTERVAL '14 days' ";
         } else {
             $query_strategy_part .= " AND updated > DATE_SUB(NOW(), INTERVAL 14 DAY) ";
         }
-
         $override_order = "updated DESC";
-
         $filter_query_part = filter_to_sql($filter, $owner_uid);
 
         // Try to check if SQL regexp implementation chokes on a valid regexp
 
-
-        $result = \SmallSmallRSS\Database::query("SELECT true AS true_val FROM ttrss_entries,
-                    ttrss_user_entries, ttrss_feeds
-                    WHERE $filter_query_part LIMIT 1", false);
-
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT true AS true_val
+             FROM ttrss_entries, ttrss_user_entries, ttrss_feeds
+             WHERE $filter_query_part
+             LIMIT 1", false
+        );
         if ($result) {
             $test = \SmallSmallRSS\Database::fetch_result($result, 0, "true_val");
-
             if (!$test) {
                 $filter_query_part = "false AND";
             } else {
@@ -1834,59 +1891,45 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
         } else {
             $filter_query_part = "false AND";
         }
-
     } else {
         $filter_query_part = "";
     }
-
     if ($since_id) {
         $since_id_part = "ttrss_entries.id > $since_id AND ";
     } else {
         $since_id_part = "";
     }
-
     $view_query_part = "";
-
     if ($view_mode == "adaptive") {
         if ($search) {
             $view_query_part = " ";
         } elseif ($feed != -1) {
-
             $unread = getFeedUnread($feed, $cat_view);
-
-            if ($cat_view && $feed > 0 && $include_children)
+            if ($cat_view && $feed > 0 && $include_children) {
                 $unread += getCategoryChildrenUnread($feed);
-
-            if ($unread > 0)
+            }
+            if ($unread > 0) {
                 $view_query_part = " unread = true AND ";
-
+            }
         }
     }
-
     if ($view_mode == "marked") {
         $view_query_part = " marked = true AND ";
     }
-
     if ($view_mode == "has_note") {
         $view_query_part = " (note IS NOT NULL AND note != '') AND ";
     }
-
     if ($view_mode == "published") {
         $view_query_part = " published = true AND ";
     }
-
     if ($view_mode == "unread" && $feed != -6) {
         $view_query_part = " unread = true AND ";
     }
-
     if ($limit > 0) {
         $limit_query_part = "LIMIT " . $limit;
     }
-
     $allow_archived = false;
-
     $vfeed_query_part = "";
-
     // override query strategy and enable feed display when searching globally
     if ($search && $search_mode == "all_feeds") {
         $query_strategy_part = "true";
@@ -1898,7 +1941,6 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
                     id = feed_id) as feed_title,";
     } elseif ($search && $search_mode == "this_cat") {
         $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
-
         if ($feed > 0) {
             if ($include_children) {
                 $subcats = getChildCategories($feed, $owner_uid);
@@ -1907,36 +1949,25 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
             } else {
                 $cats_qpart = $feed;
             }
-
             $query_strategy_part = "ttrss_feeds.cat_id IN ($cats_qpart)";
-
         } else {
             $query_strategy_part = "ttrss_feeds.cat_id IS NULL";
         }
-
     } elseif ($feed > 0) {
-
         if ($cat_view) {
-
             if ($feed > 0) {
                 if ($include_children) {
-                    # sub-cats
+                    // sub-cats
                     $subcats = getChildCategories($feed, $owner_uid);
-
                     array_push($subcats, $feed);
-                    $query_strategy_part = "cat_id IN (".
-                        implode(",", $subcats).")";
-
+                    $query_strategy_part = "cat_id IN (" . implode(",", $subcats) . ")";
                 } else {
                     $query_strategy_part = "cat_id = '$feed'";
                 }
-
             } else {
                 $query_strategy_part = "cat_id IS NULL";
             }
-
             $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
-
         } else {
             $query_strategy_part = "feed_id = '$feed'";
         }
@@ -1950,48 +1981,38 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
         $query_strategy_part = "marked = true";
         $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
         $allow_archived = true;
-
         if (!$override_order) {
             $override_order = "last_marked DESC, date_entered DESC, updated DESC";
         }
-
     } elseif ($feed == -2) { // published virtual feed OR labels category
-
         if (!$cat_view) {
             $query_strategy_part = "published = true";
             $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
             $allow_archived = true;
-
             if (!$override_order) {
                 $override_order = "last_published DESC, date_entered DESC, updated DESC";
             }
-
         } else {
             $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
-
             $ext_tables_part = ",ttrss_labels2,ttrss_user_labels2";
-
-            $query_strategy_part = "ttrss_labels2.id = ttrss_user_labels2.label_id AND
-                        ttrss_user_labels2.article_id = ref_id";
-
+            $query_strategy_part = "ttrss_labels2.id = ttrss_user_labels2.label_id
+                                    AND ttrss_user_labels2.article_id = ref_id";
         }
     } elseif ($feed == -6) { // recently read
         $query_strategy_part = "unread = false AND last_read IS NOT NULL";
         $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
         $allow_archived = true;
-
-        if (!$override_order) $override_order = "last_read DESC";
+        if (!$override_order) {
+            $override_order = "last_read DESC";
+        }
     } elseif ($feed == -3) { // fresh virtual feed
         $query_strategy_part = "unread = true AND score >= 0";
-
         $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE", $owner_uid);
-
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $query_strategy_part .= " AND date_entered > NOW() - INTERVAL '$intl hour' ";
         } else {
             $query_strategy_part .= " AND date_entered > DATE_SUB(NOW(), INTERVAL $intl HOUR) ";
         }
-
         $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
     } elseif ($feed == -4) { // all articles virtual feed
         $allow_archived = true;
@@ -1999,10 +2020,9 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
         $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
     } elseif ($feed <= \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // labels
         $label_id = feed_to_label_id($feed);
-
-        $query_strategy_part = "label_id = '$label_id' AND
-                    ttrss_labels2.id = ttrss_user_labels2.label_id AND
-                    ttrss_user_labels2.article_id = ref_id";
+        $query_strategy_part = "label_id = '$label_id'
+                    AND ttrss_labels2.id = ttrss_user_labels2.label_id
+                    AND ttrss_user_labels2.article_id = ref_id";
 
         $vfeed_query_part = "ttrss_feeds.title AS feed_title,";
         $ext_tables_part = ",ttrss_labels2,ttrss_user_labels2";
@@ -2031,9 +2051,11 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
             $feed_title = getCategoryTitle($feed);
         } else {
             if (is_numeric($feed) && $feed > 0) {
-                $result = \SmallSmallRSS\Database::query("SELECT title,site_url,last_error,last_updated
-                            FROM ttrss_feeds WHERE id = '$feed' AND owner_uid = $owner_uid");
-
+                $result = \SmallSmallRSS\Database::query(
+                    "SELECT title,site_url,last_error,last_updated
+                     FROM ttrss_feeds
+                     WHERE id = '$feed' AND owner_uid = $owner_uid"
+                );
                 $feed_title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
                 $feed_site_url = \SmallSmallRSS\Database::fetch_result($result, 0, "site_url");
                 $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, "last_error");
@@ -2043,21 +2065,16 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
             }
         }
     }
-
     $content_query_part = "content as content_preview, cached_content, ";
-
     if (is_numeric($feed)) {
-
         if ($feed >= 0) {
             $feed_kind = "Feeds";
         } else {
             $feed_kind = "Labels";
         }
-
         if ($limit_query_part) {
             $offset_query_part = "OFFSET $offset";
         }
-
         // proper override_order applied above
         if ($vfeed_query_part && !$ignore_vfeed_group && \SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED', $owner_uid)) {
             if (!$override_order) {
@@ -2185,15 +2202,9 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
             $from_qpart = " FROM " . implode(", ", $sub_selects) . ", ttrss_user_entries, ttrss_entries";
             $where_qpart = " WHERE " . implode(" AND ", $sub_ands);
         }
-        //                error_log("TAG SQL: " . $tag_sql);
-        // $tag_sql = "tag_name = '$feed'";   DEFAULT way
-
-        //                error_log("[". $select_qpart . "][" . $from_qpart . "][" .$where_qpart . "]");
         $result = \SmallSmallRSS\Database::query($select_qpart . $from_qpart . $where_qpart);
     }
-
     return array($result, $feed_title, $feed_site_url, $last_error, $last_updated);
-
 }
 
 function sanitize($str, $force_remove_images = false, $owner = false, $site_url = false) {
@@ -2204,7 +2215,6 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     if (!$res) {
         return '';
     }
-
     if (strpos($res, "href=") === false) {
         $res = rewrite_urls($res);
     }
@@ -2298,7 +2308,6 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
             $doc = $retval;
         }
     }
-
     $doc->removeChild($doc->firstChild); //remove doctype
     $doc = strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes);
     $res = $doc->saveHTML();
@@ -2308,32 +2317,25 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
 function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes) {
     $xpath = new DOMXPath($doc);
     $entries = $xpath->query('//*');
-
     foreach ($entries as $entry) {
         if (!in_array($entry->nodeName, $allowed_elements)) {
             $entry->parentNode->removeChild($entry);
         }
-
         if ($entry->hasAttributes()) {
             $attrs_to_remove = array();
-
             foreach ($entry->attributes as $attr) {
-
                 if (strpos($attr->nodeName, 'on') === 0) {
                     array_push($attrs_to_remove, $attr);
                 }
-
                 if (in_array($attr->nodeName, $disallowed_attributes)) {
                     array_push($attrs_to_remove, $attr);
                 }
             }
-
             foreach ($attrs_to_remove as $attr) {
                 $entry->removeAttributeNode($attr);
             }
         }
     }
-
     return $doc;
 }
 
@@ -2342,22 +2344,23 @@ function check_for_update() {
 }
 
 function catchupArticlesById($ids, $cmode, $owner_uid = false) {
-
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
-    if (count($ids) == 0) return;
-
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
+    if (count($ids) == 0) {
+        return;
+    }
     $tmp_ids = array();
-
     foreach ($ids as $id) {
         array_push($tmp_ids, "ref_id = '$id'");
     }
-
     $ids_qpart = join(" OR ", $tmp_ids);
-
     if ($cmode == 0) {
-        \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries SET
-            unread = false,last_read = NOW()
-            WHERE ($ids_qpart) AND owner_uid = $owner_uid");
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET unread = false, last_read = NOW()
+             WHERE ($ids_qpart) AND owner_uid = $owner_uid"
+    );
     } elseif ($cmode == 1) {
         \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries SET
             unread = true

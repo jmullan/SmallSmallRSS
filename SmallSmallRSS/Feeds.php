@@ -179,4 +179,23 @@ class Feeds {
         }
         return $lines;
     }
+
+    function getFeedUpdateInterval($feed_id)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT owner_uid, update_interval
+             FROM ttrss_feeds WHERE id = '$feed_id'"
+        );
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            $update_interval = \SmallSmallRSS\Database::fetch_result($result, 0, "update_interval");
+            $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
+            if ($update_interval != 0) {
+                return $update_interval;
+            } else {
+                return \SmallSmallRSS\DBPrefs::read('DEFAULT_UPDATE_INTERVAL', $owner_uid, false);
+            }
+        } else {
+            return -1;
+        }
+    }
 }

@@ -13,7 +13,7 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
 
     function init($host) {
         $this->host = $host;
-        $this->base = new Auth_Base();
+        $this->base = new \SmallSmallRSS\Auth_Base();
 
         $host->add_hook($host::HOOK_AUTH_USER, $this);
     }

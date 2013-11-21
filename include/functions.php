@@ -71,18 +71,7 @@ function _debug($msg, $show=true, $is_debug=true)
 
 function purge_orphans($do_output = false)
 {
-    // purge orphaned posts in main content table
-    $result = \SmallSmallRSS\Database::query(
-        "DELETE FROM ttrss_entries
-         WHERE (
-             SELECT COUNT(int_id)
-             FROM ttrss_user_entries
-             WHERE ref_id = id
-         ) = 0");
-    if ($do_output) {
-        $rows = \SmallSmallRSS\Database::affected_rows($result);
-        _debug("Purged $rows orphaned posts.");
-    }
+    \SmallSmallRSS\Entries::purgeOrphans();
 }
 
 function get_feed_update_interval($feed_id)
@@ -2189,7 +2178,12 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
             $sub_selects = array();
             $sub_ands = array();
             foreach ($all_tags as $term) {
-                array_push($sub_selects, "(SELECT post_int_id from ttrss_tags WHERE tag_name = " . \SmallSmallRSS\Database::quote($term) . " AND owner_uid = $owner_uid) as A$i");
+                array_push(
+                    $sub_selects,
+                    "(SELECT post_int_id from ttrss_tags WHERE tag_name = "
+                    . \SmallSmallRSS\Database::quote($term)
+                    . " AND owner_uid = $owner_uid) as A$i"
+                );
                 $i++;
             }
             if ($i > 2) {
@@ -2218,9 +2212,13 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
 }
 
 function sanitize($str, $force_remove_images = false, $owner = false, $site_url = false) {
-    if (!$owner) $owner = $_SESSION["uid"];
-
-    $res = trim($str); if (!$res) return '';
+    if (!$owner) {
+        $owner = $_SESSION["uid"];
+    }
+    $res = trim($str);
+    if (!$res) {
+        return '';
+    }
 
     if (strpos($res, "href=") === false) {
         $res = rewrite_urls($res);
@@ -2229,8 +2227,10 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
             <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         </head>';
 
-    $res = trim($res); if (!$res) return '';
-
+    $res = trim($res);
+    if (!$res) {
+        return '';
+    }
     libxml_use_internal_errors(true);
 
     $doc = new DOMDocument();
@@ -2240,25 +2240,20 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     $entries = $xpath->query('(//a[@href]|//img[@src])');
 
     foreach ($entries as $entry) {
-
         if ($site_url) {
-
             if ($entry->hasAttribute('href')) {
-                $entry->setAttribute('href',
-                                     rewrite_relative_url($site_url, $entry->getAttribute('href')));
-
+                $entry->setAttribute(
+                    'href',
+                    rewrite_relative_url($site_url, $entry->getAttribute('href'))
+                );
                 $entry->setAttribute('rel', 'noreferrer');
             }
-
             if ($entry->hasAttribute('src')) {
                 $src = rewrite_relative_url($site_url, $entry->getAttribute('src'));
-
                 $cached_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . '/images/' . sha1($src) . '.png';
-
                 if (file_exists($cached_filename)) {
                     $src = \SmallSmallRSS\Config::get('SELF_URL_PATH') . '/image.php?hash=' . sha1($src);
                 }
-
                 $entry->setAttribute('src', $src);
             }
 

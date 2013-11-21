@@ -228,13 +228,9 @@ function update_rss_feed($feed, $no_cache = false)
 
     $cache_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "cache_images"));
     $fetch_url = \SmallSmallRSS\Database::fetch_result($result, 0, "feed_url");
-
     $feed = \SmallSmallRSS\Database::escape_string($feed);
-
     $date_feed_processed = date('Y-m-d H:i');
-
     $cache_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . "/simplepie/" . sha1($fetch_url) . ".xml";
-
     $pluginhost = new \SmallSmallRSS\PluginHost();
     $pluginhost->set_debug(true);
     $pluginhost->init_all();
@@ -343,10 +339,14 @@ function update_rss_feed($feed, $no_cache = false)
     }
 
     $result = \SmallSmallRSS\Database::query(
-        "SELECT title,site_url,owner_uid,favicon_avg_color,
+        "SELECT
+             title,
+             site_url,
+             owner_uid,
+             favicon_avg_color,
              (favicon_last_checked IS NULL OR $favicon_interval_qpart) AS favicon_needs_check
-             FROM ttrss_feeds
-             WHERE id = '$feed'"
+         FROM ttrss_feeds
+         WHERE id = '$feed'"
     );
 
     $registered_title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
@@ -359,7 +359,9 @@ function update_rss_feed($feed, $no_cache = false)
 
     $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
 
-    $site_url = \SmallSmallRSS\Database::escape_string(mb_substr(rewrite_relative_url($fetch_url, $rss->get_link()), 0, 245));
+    $site_url = \SmallSmallRSS\Database::escape_string(
+        mb_substr(rewrite_relative_url($fetch_url, $rss->get_link()), 0, 245)
+    );
 
     if ($favicon_needs_check || $force_refetch) {
 
@@ -378,30 +380,28 @@ function update_rss_feed($feed, $no_cache = false)
         $favicon_colorstring = '';
         if (file_exists($favicon_file) && function_exists("imagecreatefromstring") && $favicon_avg_color == '') {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_feeds SET favicon_avg_color = 'fail' WHERE
-                            id = '$feed'"
+                "UPDATE ttrss_feeds
+                 SET favicon_avg_color = 'fail'
+                 WHERE id = '$feed'"
             );
-
             $favicon_color = \SmallSmallRSS\Database::escape_string(
                 \SmallSmallRSS\Colors::calculateAverage($favicon_file)
             );
-
             $favicon_colorstring = ",favicon_avg_color = '".$favicon_color."'";
         } elseif ($favicon_avg_color == 'fail') {
             _debug("floicon failed on this file, not trying to recalculate avg color");
         }
 
         \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_feeds SET favicon_last_checked = NOW()
-                    $favicon_colorstring
-                    WHERE id = '$feed'"
+            "UPDATE ttrss_feeds
+             SET favicon_last_checked = NOW()
+                 $favicon_colorstring
+             WHERE id = '$feed'"
         );
     }
 
     if (!$registered_title || $registered_title == "[Unknown]") {
-
         $feed_title = \SmallSmallRSS\Database::escape_string($rss->get_title());
-
         if ($feed_title) {
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds
@@ -443,8 +443,7 @@ function update_rss_feed($feed, $no_cache = false)
         if ($feed_hub_url && function_exists('curl_init')
             && !ini_get("open_basedir")) {
             require_once 'lib/pubsubhubbub/subscriber.php';
-            $callback_url = get_self_url_prefix() .
-                "/public.php?op=pubsub&id=$feed";
+            $callback_url = get_self_url_prefix() . "/public.php?op=pubsub&id=$feed";
             $s = new Subscriber($feed_hub_url, $callback_url);
             $rc = $s->subscribe($fetch_url);
             \SmallSmallRSS\Database::query("UPDATE ttrss_feeds SET pubsub_state = 1 WHERE id = '$feed'");
@@ -1022,24 +1021,6 @@ function cache_images($html, $site_url, $debug)
     return $doc->saveXML($node);
 }
 
-
-/**
- * Source: http://www.php.net/manual/en/function.parse-url.php#104527
- * Returns the url query as associative array
- *
- * @param    string    query
- * @return    array    params
- */
-function convertUrlQuery($query)
-{
-    $queryParts = explode('&', $query);
-    $params = array();
-    foreach ($queryParts as $param) {
-        $item = explode('=', $param);
-        $params[$item[0]] = $item[1];
-    }
-    return $params;
-}
 
 function get_article_filters($filters, $title, $content, $link, $timestamp, $author, $tags)
 {

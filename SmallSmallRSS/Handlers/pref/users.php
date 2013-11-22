@@ -14,7 +14,7 @@ class Pref_Users extends ProtectedHandler
         return false;
     }
 
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "edit", "userdetails");
 
@@ -99,9 +99,9 @@ class Pref_Users extends ProtectedHandler
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
         print "<form id=\"user_edit_form\" onsubmit='return false' dojoType=\"dijit.form.Form\">";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-users\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"editSave\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$id\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-users\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
 
         $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_users WHERE id = '$id'");
 
@@ -115,10 +115,10 @@ class Pref_Users extends ProtectedHandler
         print "<div class=\"dlgSecCont\">";
 
         if ($sel_disabled) {
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"login\" value=\"$login\">";
+            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"login\" value=\"$login\">";
         }
 
-        print "<input size=\"30\" style=\"font-size : 16px\"
+        print "<input size=\"30\" style=\"font-size: 16px\"
                 dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
                 onkeypress=\"return filterCR(event, userEditSave)\" $sel_disabled
                 name=\"login\" value=\"$login\">";
@@ -141,7 +141,7 @@ class Pref_Users extends ProtectedHandler
                 "", $access_level, $access_level_names,
                 "dojoType=\"dijit.form.Select\" $sel_disabled"
             );
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"access_level\" value=\"$access_level\">";
+            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"access_level\" value=\"$access_level\">";
         }
 
         print "<hr/>";

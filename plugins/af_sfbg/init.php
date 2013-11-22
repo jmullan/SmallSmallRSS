@@ -33,7 +33,7 @@ class Af_SFBG extends \SmallSmallRSS\Plugin {
         return 'http://www.sfbg.com' . $parts['path'];
     }
 
-    public function hook_guid_filter($item, $guid)
+    public function hookGuidFilter($item, $guid)
     {
         $link = $item->get_link();
         if (self::should_run_against($link)) {

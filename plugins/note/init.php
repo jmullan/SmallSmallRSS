@@ -41,15 +41,15 @@ class Note extends \SmallSmallRSS\Plugin {
 
         $note = \SmallSmallRSS\Database::fetch_result($result, 0, "note");
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$param\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pluginhandler\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"setNote\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"plugin\" value=\"note\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setNote\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"note\">";
 
         print "<table width='100%'><tr><td>";
         print "<textarea dojoType=\"dijit.form.SimpleTextarea\"
-            style='font-size : 12px; width : 100%; height: 100px;'
-            placeHolder='body#ttrssMain { font-size : 14px; };'
+            style='font-size: 12px; width: 100%; height: 100px;'
+            placeHolder='body#ttrssMain { font-size: 14px; };'
             name='note'>$note</textarea>";
         print "</td></tr></table>";
 

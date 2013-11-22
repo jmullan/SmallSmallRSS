@@ -18,7 +18,7 @@ class Pref_Feeds extends ProtectedHandler
         return $value;
     }
 
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "getfeedtree", "add", "editcats", "editfeed",
                               "savefeedorder", "uploadicon", "feedswitherrors", "inactivefeeds",
@@ -173,7 +173,7 @@ class Pref_Feeds extends ProtectedHandler
             }
 
             /* Plugin feeds for -1 */
-            $feeds = \SmallSmallRSS\PluginHost::getInstance()->get_feeds(-1);
+            $feeds = \SmallSmallRSS\PluginHost::getInstance()->getFeeds(-1);
             if ($feeds) {
                 foreach ($feeds as $feed) {
                     $feed_id = \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']);
@@ -623,9 +623,9 @@ class Pref_Feeds extends ProtectedHandler
             0, "title"
         ));
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$feed_id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-feeds\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"editSave\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
 
         print "<div class=\"dlgSec\">".__("Feed")."</div>";
         print "<div class=\"dlgSecCont\">";
@@ -634,7 +634,7 @@ class Pref_Feeds extends ProtectedHandler
 
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Feed Title")."\"
-            style=\"font-size : 16px; width: 20em\" name=\"title\" value=\"$title\">";
+            style=\"font-size: 16px; width: 20em\" name=\"title\" value=\"$title\">";
 
         /* Feed URL */
 
@@ -649,7 +649,7 @@ class Pref_Feeds extends ProtectedHandler
         print __('URL:') . " ";
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Feed URL")."\"
-            regExp='^(http|https)://.*' style=\"width : 20em\"
+            regExp='^(http|https)://.*' style=\"width: 20em\"
             name=\"feed_url\" value=\"$feed_url\">";
 
         $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, "last_error");
@@ -881,9 +881,9 @@ class Pref_Feeds extends ProtectedHandler
 
         print "<p>";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"ids\" value=\"$feed_ids\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-feeds\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"batchEditSave\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"ids\" value=\"$feed_ids\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchEditSave\">";
 
         print "<div class=\"dlgSec\">".__("Feed")."</div>";
         print "<div class=\"dlgSecCont\">";
@@ -891,7 +891,7 @@ class Pref_Feeds extends ProtectedHandler
         /* Title */
 
         print "<input dojoType=\"dijit.form.ValidationTextBox\"
-            disabled=\"1\" style=\"font-size : 16px; width : 20em;\" required=\"1\"
+            disabled=\"1\" style=\"font-size: 16px; width: 20em;\" required=\"1\"
             name=\"title\" value=\"\">";
 
         $this->batch_edit_cbox("title");
@@ -902,7 +902,7 @@ class Pref_Feeds extends ProtectedHandler
 
         print __('URL:') . " ";
         print "<input dojoType=\"dijit.form.ValidationTextBox\" disabled=\"1\"
-            required=\"1\" regExp='^(http|https)://.*' style=\"width : 20em\"
+            required=\"1\" regExp='^(http|https)://.*' style=\"width: 20em\"
             name=\"feed_url\" value=\"\">";
 
         $this->batch_edit_cbox("feed_url");
@@ -2000,8 +2000,8 @@ class Pref_Feeds extends ProtectedHandler
 
     function batchSubscribe()
     {
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-feeds\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"batchaddfeeds\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchaddfeeds\">";
 
         print "<table width='100%'><tr><td>
             ".__("Add one valid RSS feed per line (no feed detection is done)")."
@@ -2012,21 +2012,21 @@ class Pref_Feeds extends ProtectedHandler
         }
         print "</td></tr><tr><td colspan='2'>";
         print "<textarea
-            style='font-size : 12px; width : 100%; height: 200px;'
+            style='font-size: 12px; width: 100%; height: 200px;'
             placeHolder=\"".__("Feeds to subscribe, One per line")."\"
             dojoType=\"dijit.form.SimpleTextarea\" required=\"1\" name=\"feeds\"></textarea>";
 
         print "</td></tr><tr><td colspan='2'>";
 
-        print "<div id='feedDlg_loginContainer' style='display : none'>
+        print "<div id='feedDlg_loginContainer' style='display: none'>
                 " .
             " <input dojoType=\"dijit.form.TextBox\" name='login'\"
                     placeHolder=\"".__("Login")."\"
-                    style=\"width : 10em;\"> ".
+                    style=\"width: 10em;\"> ".
             " <input
                     placeHolder=\"".__("Password")."\"
                     dojoType=\"dijit.form.TextBox\" type='password'
-                    style=\"width : 10em;\" name='pass'\">".
+                    style=\"width: 10em;\" name='pass'\">".
             "</div>";
 
         print "</td></tr><tr><td colspan='2'>";

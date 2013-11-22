@@ -75,12 +75,12 @@ $translation_renderer->render();
 </head>
 <body id="ttrssPrefs" class="claro">
 
-<div id="notify" class="notify" style="display : none"></div>
-<div id="cmdline" style="display : none"></div>
+<div id="notify" class="notify" style="display: none"></div>
+<div id="cmdline" style="display: none"></div>
 <div id="overlay">
   <div id="overlay_inner">
     <div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
-    <div dojoType="dijit.ProgressBar" places="0" style="width : 300px" id="loading_bar"
+    <div dojoType="dijit.ProgressBar" places="0" style="width: 300px" id="loading_bar"
       progress="0" maximum="100">
     </div>
     <noscript><br/><?php  \SmallSmallRSS\Renderers\Messages::renderError('Javascript is disabled. Please enable it.') ?></noscript>

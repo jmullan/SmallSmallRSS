@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Handlers;
 class Pref_Labels extends ProtectedHandler
 {
 
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "getlabeltree", "edit");
 
@@ -21,9 +21,9 @@ class Pref_Labels extends ProtectedHandler
 
         $line = \SmallSmallRSS\Database::fetch_assoc($result);
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$label_id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-labels\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"save\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$label_id\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-labels\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"save\">";
 
         print "<div class=\"dlgSec\">".__("Caption")."</div>";
 
@@ -34,7 +34,7 @@ class Pref_Labels extends ProtectedHandler
 
         print "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color: $fg_color; background-color : $bg_color; margin-bottom : 4px; margin-right : 4px'>&alpha;</span>";
 
-        print "<input style=\"font-size : 16px\" name=\"caption\"
+        print "<input style=\"font-size: 16px\" name=\"caption\"
             dojoType=\"dijit.form.ValidationTextBox\"
             required=\"true\"
             value=\"".htmlspecialchars($line['caption'])."\">";
@@ -51,10 +51,10 @@ class Pref_Labels extends ProtectedHandler
         print "<tr><td style='padding-right : 10px'>";
 
         print "<input dojoType=\"dijit.form.TextBox\"
-                style=\"display : none\" id=\"labelEdit_fgColor\"
+                style=\"display: none\" id=\"labelEdit_fgColor\"
                 name=\"fg_color\" value=\"$fg_color\">";
         print "<input dojoType=\"dijit.form.TextBox\"
-                style=\"display : none\" id=\"labelEdit_bgColor\"
+                style=\"display: none\" id=\"labelEdit_bgColor\"
                 name=\"bg_color\" value=\"$bg_color\">";
 
         print "<div dojoType=\"dijit.ColorPalette\">

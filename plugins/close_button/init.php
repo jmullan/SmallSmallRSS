@@ -1,5 +1,6 @@
 <?php
-class Close_Button extends \SmallSmallRSS\Plugin {
+class Close_Button extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;
@@ -13,7 +14,7 @@ class Close_Button extends \SmallSmallRSS\Plugin {
         \SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON
     );
 
-    function hookArticleButton($line)
+    public function hookArticleButton($line)
     {
         if (!\SmallSmallRSS\DBPrefs::read("COMBINED_DISPLAY_MODE")) {
             $rv = "<img src=\"plugins/close_button/button.png\"

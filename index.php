@@ -78,10 +78,8 @@ $stylesheet_renderer->renderUserStyleSheet();
 
   <style type="text/css">
 <?php
-foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
-    if (method_exists($p, "get_css")) {
-        echo $p->get_css();
-    }
+foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $p) {
+    echo $p->getCSS();
 }
 ?>
   </style>
@@ -104,15 +102,15 @@ foreach (array("lib/prototype.js",
 <div id="overlay" style="display: block">
   <div id="overlay_inner">
     <div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
-    <div dojoType="dijit.ProgressBar" places="0" style="width : 300px" id="loading_bar" progress="0" maximum="100"></div>
+    <div dojoType="dijit.ProgressBar" places="0" style="width: 300px" id="loading_bar" progress="0" maximum="100"></div>
     <noscript><br/><?php \SmallSmallRSS\Renderers\Messages::renderError('Javascript is disabled. Please enable it.') ?></noscript>
   </div>
 </div>
-<div id="notify" class="notify" style="display : none"></div>
-<div id="cmdline" style="display : none"></div>
-<div id="headlines-tmp" style="display : none"></div>
+<div id="notify" class="notify" style="display: none"></div>
+<div id="cmdline" style="display: none"></div>
+<div id="headlines-tmp" style="display: none"></div>
 <div id="main" dojoType="dijit.layout.BorderContainer">
-  <div id="feeds-holder" dojoType="dijit.layout.ContentPane" region="leading" style="width : 20%" splitter="true">
+  <div id="feeds-holder" dojoType="dijit.layout.ContentPane" region="leading" style="width: 20%" splitter="true">
     <div id="feedlistLoading">
       <img src="images/indicator_tiny.gif" />
       <?php echo  __("Loading, please wait..."); ?>
@@ -169,7 +167,7 @@ foreach ($toolbar_plugins as $p) {
     echo $p->hook_toolbar_button();
 }
 ?>
-          <button id="net-alert" dojoType="dijit.form.Button" style="display : none" disabled="true"
+          <button id="net-alert" dojoType="dijit.form.Button" style="display: none" disabled="true"
             title="<?php echo __("Communication problem with server.") ?>">
           <img src="images/alert.png" />
         </button>
@@ -209,7 +207,7 @@ if (empty($_SESSION["hide_logout"])) {
   </div> <!-- toolbar pane -->
   <div id="headlines-wrap-inner" dojoType="dijit.layout.BorderContainer" region="center">
     <div id="headlines-toolbar" dojoType="dijit.layout.ContentPane" region="top"></div>
-      <div id="floatingTitle" style="display : none"></div>
+      <div id="floatingTitle" style="display: none"></div>
         <div id="headlines-frame" dojoType="dijit.layout.ContentPane"
           onscroll="headlines_scroll_handler(this)" region="center">
           <div id="headlinesInnerContainer">

@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Handlers;
 class Pref_Filters extends ProtectedHandler
 {
 
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "getfiltertree", "edit", "newfilter", "newrule",
                               "newaction", "savefilterorder");
@@ -285,14 +285,14 @@ class Pref_Filters extends ProtectedHandler
 
         print "<form id=\"filter_edit_form\" onsubmit='return false'>";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-filters\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$filter_id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"editSave\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"csrf_token\" value=\"".$_SESSION['csrf_token']."\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-filters\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$filter_id\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"csrf_token\" value=\"".$_SESSION['csrf_token']."\">";
 
         print "<div class=\"dlgSec\">".__("Caption")."</div>";
 
-        print "<input required=\"true\" dojoType=\"dijit.form.ValidationTextBox\" style=\"width : 20em;\" name=\"title\" value=\"$title\">";
+        print "<input required=\"true\" dojoType=\"dijit.form.ValidationTextBox\" style=\"width: 20em;\" name=\"title\" value=\"$title\">";
 
         print "</div>";
 
@@ -775,13 +775,13 @@ class Pref_Filters extends ProtectedHandler
 
         print "<form name='filter_new_form' id='filter_new_form'>";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-filters\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"add\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"csrf_token\" value=\"".$_SESSION['csrf_token']."\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-filters\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"add\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"csrf_token\" value=\"".$_SESSION['csrf_token']."\">";
 
         print "<div class=\"dlgSec\">".__("Caption")."</div>";
 
-        print "<input required=\"true\" dojoType=\"dijit.form.ValidationTextBox\" style=\"width : 20em;\" name=\"title\" value=\"\">";
+        print "<input required=\"true\" dojoType=\"dijit.form.ValidationTextBox\" style=\"width: 20em;\" name=\"title\" value=\"\">";
 
         print "<div class=\"dlgSec\">".__("Match")."</div>";
 
@@ -907,7 +907,7 @@ class Pref_Filters extends ProtectedHandler
 
         print "<input dojoType=\"dijit.form.ValidationTextBox\"
              required=\"true\" id=\"filterDlg_regExp\"
-             style=\"font-size : 16px; width : 20em;\"
+             style=\"font-size: 16px; width: 20em;\"
              name=\"reg_exp\" value=\"$reg_exp\"/>";
 
         print "<hr/>";
@@ -983,12 +983,12 @@ class Pref_Filters extends ProtectedHandler
         print "</select>";
 
         $param_box_hidden = ($action_id == 7 || $action_id == 4 || $action_id == 6) ?
-            "" : "display : none";
+            "" : "display: none";
 
         $param_hidden = ($action_id == 4 || $action_id == 6) ?
-            "" : "display : none";
+            "" : "display: none";
 
-        $label_param_hidden = ($action_id == 7) ?    "" : "display : none";
+        $label_param_hidden = ($action_id == 7) ?    "" : "display: none";
 
         print "<span id=\"filterDlg_paramBox\" style=\"$param_box_hidden\">";
         print " " . __("with parameters:") . " ";

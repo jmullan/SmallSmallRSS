@@ -15,7 +15,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
 
     public function addCommands()
     {
-        $this->host->add_command(
+        $this->host->addCommand(
             "greader-import",
             "import data in Google Reader JSON format",
             $this,
@@ -25,9 +25,9 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
 
     }
 
-    public function greader_import($args)
+    public function greaderImport($args)
     {
-        $file = $args['greader_import'];
+        $file = $args['greaderImport'];
         if (!file_exists($file)) {
             _debug("file not found: $file");
             return;
@@ -166,7 +166,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
 
                     $processed++;
 
-                    $imported += (int) $this->create_article(
+                    $imported += (int) $this->createArticle(
                         $owner_uid,
                         $guid,
                         $title,
@@ -210,7 +210,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
     }
 
     // expects ESCAPED data
-    private function create_article(
+    private function createArticle(
         $owner_uid,
         $guid,
         $title,

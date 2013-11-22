@@ -219,14 +219,20 @@ class PluginHost
         return false;
     }
 
-    public function add_command($command, $description, $sender, $suffix = "", $arghelp = "")
+    public function addCommand($command, $description, $sender, $suffix = "", $arghelp = "")
     {
-        $command = str_replace("-", "_", strtolower($command));
-
-        $this->commands[$command] = array("description" => $description,
-                                          "suffix" => $suffix,
-                                          "arghelp" => $arghelp,
-                                          "class" => $sender);
+        // turn the command from foo-bar to fooBar
+        $parts = explode("-", $command);
+        $command = array_shift($parts);
+        foreach ($parts as $part) {
+            $command .= ucfirst($part);
+        }
+        $this->commands[$command] = array(
+            "description" => $description,
+            "suffix" => $suffix,
+            "arghelp" => $arghelp,
+            "class" => $sender
+        );
     }
 
     public function del_command($command)
@@ -394,7 +400,7 @@ class PluginHost
         return $id;
     }
 
-    public function get_feeds($cat_id)
+    public function getFeeds($cat_id)
     {
         if (!isset($this->feeds[$cat_id])) {
             $this->feeds[$cat_id] = array();

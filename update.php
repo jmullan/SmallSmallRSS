@@ -134,7 +134,7 @@ if (isset($options["feeds"])) {
     housekeeping_common();
     \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
         \SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK,
-        "hook_update_task",
+        "hookUpdateTask",
         $op
     );
 }
@@ -166,7 +166,7 @@ if (isset($options["daemon-loop"])) {
     }
     \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
         \SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK,
-        "hook_update_task",
+        "hookUpdateTask",
         $op
     );
 }

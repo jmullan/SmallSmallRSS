@@ -2,7 +2,7 @@
 namespace SmallSmallRSS\Handlers;
 class PluginHandler extends ProtectedHandler
 {
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         return true;
     }

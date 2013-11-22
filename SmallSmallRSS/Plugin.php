@@ -47,11 +47,16 @@ abstract class Plugin
 
     public function getJavascript()
     {
-        return "";
+        return '';
     }
 
     public function getPreferencesJavascript()
     {
-        return "";
+        return '';
+    }
+
+    public function getCSS()
+    {
+        return '';
     }
 }

@@ -1,7 +1,8 @@
 <?php
 require __DIR__ . '/../../lib/jshrink/Minifier.php';
 
-class Bookmarklets extends \SmallSmallRSS\Plugin {
+class Bookmarklets extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;

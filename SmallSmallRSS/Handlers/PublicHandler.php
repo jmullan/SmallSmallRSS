@@ -267,7 +267,7 @@ class PublicHandler extends Handler
                  AND login = '$login'
              ORDER BY title"
         );
-        print "<select dojoType='dijit.form.Select' style='width : 220px; margin : 0px' name='profile'>";
+        print "<select dojoType='dijit.form.Select' style='width: 220px; margin : 0px' name='profile'>";
         print "<option value='0'>" . __("Default profile") . "</option>";
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line["id"];
@@ -409,7 +409,7 @@ class PublicHandler extends Handler
         update_daemon_common(0, true, false);
         housekeeping_common();
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hook_update_task", $op);
+        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hookUpdateTask", $op);
 
     }
 

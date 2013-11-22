@@ -1,5 +1,6 @@
 <?php
-class Embed_Original extends \SmallSmallRSS\Plugin {
+class Embed_Original extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;
@@ -18,7 +19,7 @@ class Embed_Original extends \SmallSmallRSS\Plugin {
         return file_get_contents(__DIR__ . "/init.js");
     }
 
-    public function get_css()
+    public function getCSS()
     {
         return file_get_contents(__DIR__ . "/init.css");
     }

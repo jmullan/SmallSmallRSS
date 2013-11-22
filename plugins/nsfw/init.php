@@ -1,4 +1,5 @@
 <?php
+
 class NSFW extends \SmallSmallRSS\Plugin
 {
     private $host;
@@ -29,7 +30,7 @@ class NSFW extends \SmallSmallRSS\Plugin
                 "<div class='nswf wrapper'><button onclick=\"nsfwShow(this)\">"
                 . __("Not work safe (click to toggle)")
                 . "</button>"
-                . "<div class='nswf content' style='display : none'>"
+                . "<div class='nswf content' style='display: none'>"
                 . $article["content"]
                 . "</div></div>"
             );
@@ -47,7 +48,7 @@ class NSFW extends \SmallSmallRSS\Plugin
                 "<div class='nswf wrapper'><button onclick=\"nsfwShow(this)\">"
                 . __("Not work safe (click to toggle)")
                 . "</button>"
-                . "<div class='nswf content' style='display : none'>"
+                . "<div class='nswf content' style='display: none'>"
                 .$article["content"]."</div></div>"
             );
         }
@@ -74,12 +75,15 @@ class NSFW extends \SmallSmallRSS\Plugin
                    });
                  }
                </script>";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pluginhandler\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"save\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"plugin\" value=\"nsfw\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"save\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"nsfw\">";
         print "<table width=\"100%\" class=\"prefPrefsList\">";
         print "<tr><td width=\"40%\">".__("Tags to consider NSFW (comma-separated)")."</td>";
-        print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"tags\" value=\"$tags\"></td></tr>";
+        print "<td class=\"prefValue\">";
+        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"tags\" value=\"$tags\">";
+        print "</td>";
+        print "</tr>";
         print "</table>";
         print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">";
         print __("Save");

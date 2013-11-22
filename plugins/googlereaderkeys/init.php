@@ -15,7 +15,7 @@ class GoogleReaderKeys extends \SmallSmallRSS\Plugin
         \SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP
     );
 
-    public function hook_hotkey_map($hotkeys)
+    public function hookHotkeyMap($hotkeys)
     {
         $hotkeys["j"] = "next_article_noscroll";
         $hotkeys["k"] = "prev_article_noscroll";

@@ -14,7 +14,7 @@ class Pref_System extends ProtectedHandler
         return false;
     }
 
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         $csrf_ignored = array("index");
 

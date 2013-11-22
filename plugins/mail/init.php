@@ -29,9 +29,9 @@ class Mail extends \SmallSmallRSS\Plugin
     public function emailArticle()
     {
         $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pluginhandler\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"plugin\" value=\"mail\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"sendEmail\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"mail\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"sendEmail\">";
         $result = \SmallSmallRSS\Database::query(
             "SELECT email, full_name FROM ttrss_users WHERE id = " . $_SESSION["uid"]
         );
@@ -40,8 +40,8 @@ class Mail extends \SmallSmallRSS\Plugin
         if (!$user_name) {
             $user_name = $_SESSION['name'];
         }
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"from_email\" value=\"$user_email\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"from_name\" value=\"$user_name\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_email\" value=\"$user_email\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_name\" value=\"$user_name\">";
         require_once "lib/MiniTemplator.class.php";
         $tpl = new MiniTemplator;
         $tpl_t = new MiniTemplator;
@@ -79,24 +79,24 @@ class Mail extends \SmallSmallRSS\Plugin
         print "<table width='100%'><tr><td>";
         print __('From:');
         print "</td><td>";
-        print "<input dojoType=\"dijit.form.TextBox\" disabled=\"1\" style=\"width : 30em;\"
+        print "<input dojoType=\"dijit.form.TextBox\" disabled=\"1\" style=\"width: 30em;\"
                 value=\"$user_name <$user_email>\">";
         print "</td></tr><tr><td>";
         print __('To:');
         print "</td><td>";
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"true\"
-                style=\"width : 30em;\"
+                style=\"width: 30em;\"
                 name=\"destination\" id=\"emailArticleDlg_destination\">";
         print "<div class=\"autocomplete\" id=\"emailArticleDlg_dst_choices\"
-                style=\"z-index: 30; display : none\"></div>";
+                style=\"z-index: 30; display: none\"></div>";
         print "</td></tr><tr><td>";
         print __('Subject:');
         print "</td><td>";
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"true\"
-                style=\"width : 30em;\"
+                style=\"width: 30em;\"
                 name=\"subject\" value=\"$subject\" id=\"subject\">";
         print "</td></tr>";
-        print "<tr><td colspan='2'><textarea dojoType=\"dijit.form.SimpleTextarea\" style='font-size : 12px; width : 100%' rows=\"20\"
+        print "<tr><td colspan='2'><textarea dojoType=\"dijit.form.SimpleTextarea\" style='font-size: 12px; width: 100%' rows=\"20\"
             name='content'>$content</textarea>";
         print "</td></tr></table>";
         print "<div class='dlgButtons'>";

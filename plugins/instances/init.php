@@ -1,4 +1,5 @@
 <?php
+
 class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers\IHandler {
     private $host;
 
@@ -24,10 +25,10 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     {
         $this->host->add_handler("pref-instances", "*", $this);
         $this->host->add_handler("public", "fbexport", $this);
-        $this->host->add_command("get-feeds", "receive popular feeds from linked instances", $this);
+        $this->host->addCommand("get-feeds", "receive popular feeds from linked instances", $this);
     }
 
-    public function hook_update_task($args)
+    public function hookUpdateTask($args)
     {
         _debug("Get linked feeds...");
         $this->get_linked_feeds();
@@ -123,7 +124,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         }
     }
 
-    public function get_feeds()
+    public function getFeeds()
     {
         $this->get_linked_feeds(false);
     }
@@ -144,7 +145,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         }
     }
 
-    public function CRSFIgnore($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "edit");
         return array_search($method, $csrf_ignored) !== false;
@@ -183,14 +184,18 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         \SmallSmallRSS\Database::query("BEGIN");
 
-        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_linked_instances
-            WHERE access_url = '$access_url'");
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id FROM ttrss_linked_instances
+             WHERE access_url = '$access_url'"
+        );
 
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-            \SmallSmallRSS\Database::query("INSERT INTO ttrss_linked_instances
-                (access_url, access_key, last_connected, last_status_in, last_status_out)
-                VALUES
-                ('$access_url', '$access_key', '1970-01-01', -1, -1)");
+            \SmallSmallRSS\Database::query(
+                "INSERT INTO ttrss_linked_instances
+                 (access_url, access_key, last_connected, last_status_in, last_status_out)
+                 VALUES
+                 ('$access_url', '$access_key', '1970-01-01', -1, -1)"
+            );
 
         }
 
@@ -203,9 +208,9 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_linked_instances WHERE id = '$id'"
         );
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\"  name=\"id\" value=\"$id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\"  name=\"op\" value=\"pref-instances\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\"  name=\"method\" value=\"editSave\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"id\" value=\"$id\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"editSave\">";
         print "<div class=\"dlgSec\">".__("Instance")."</div>";
         print "<div class=\"dlgSecCont\">";
 
@@ -215,7 +220,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Instance URL")."\"
             regExp='^(http|https)://.*'
-            style=\"font-size : 16px; width: 20em\" name=\"access_url\"
+            style=\"font-size: 16px; width: 20em\" name=\"access_url\"
             value=\"$access_url\">";
         print "<hr/>";
         $access_key = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "access_key"));
@@ -400,8 +405,8 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function addInstance()
     {
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\"  name=\"op\" value=\"pref-instances\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\"  name=\"method\" value=\"add\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"add\">";
         print "<div class=\"dlgSec\">".__("Instance")."</div>";
         print "<div class=\"dlgSecCont\">";
 
@@ -410,7 +415,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Instance URL")."\"
             regExp='^(http|https)://.*'
-            style=\"font-size : 16px; width: 20em\" name=\"access_url\">";
+            style=\"font-size: 16px; width: 20em\" name=\"access_url\">";
         print "<hr/>";
 
         $access_key = sha1(uniqid(rand(), true));

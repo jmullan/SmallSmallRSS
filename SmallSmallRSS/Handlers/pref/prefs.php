@@ -6,7 +6,7 @@ class Pref_Prefs extends ProtectedHandler
     private $pref_help = array();
     private $pref_sections = array();
 
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "updateself", "customizecss", "editprefprofiles");
 
@@ -259,8 +259,8 @@ class Pref_Prefs extends ProtectedHandler
 
         print "</table>";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-prefs\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"changeemail\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"changeemail\">";
 
         print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
             __("Save data")."</button>";
@@ -334,8 +334,8 @@ class Pref_Prefs extends ProtectedHandler
 
             print "</table>";
 
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-prefs\">";
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"changepassword\">";
+            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"changepassword\">";
 
             print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
                 __("Change password")."</button>";
@@ -382,8 +382,8 @@ class Pref_Prefs extends ProtectedHandler
 
                     print "</table>";
 
-                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-prefs\">";
-                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"otpdisable\">";
+                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"otpdisable\">";
 
                     print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
                         __("Disable OTP")."</button>";
@@ -404,8 +404,8 @@ class Pref_Prefs extends ProtectedHandler
 
                     print "<form dojoType=\"dijit.form.Form\" id=\"changeOtpForm\">";
 
-                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-prefs\">";
-                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"otpenable\">";
+                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"otpenable\">";
 
                     print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
                     evt.preventDefault();
@@ -599,7 +599,7 @@ class Pref_Prefs extends ProtectedHandler
                     $pref_name,
                     $value,
                     get_translations(),
-                    "style='width : 220px; margin : 0px' dojoType='dijit.form.Select'"
+                    "style='width: 220px; margin : 0px' dojoType='dijit.form.Select'"
                 );
 
             } elseif ($pref_name == "USER_TIMEZONE") {
@@ -711,7 +711,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $listed_boolean_prefs = htmlspecialchars(join(",", $listed_boolean_prefs));
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
@@ -721,8 +721,8 @@ class Pref_Prefs extends ProtectedHandler
         print '</div>'; # inside pane
         print '<div dojoType="dijit.layout.ContentPane" region="bottom">';
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-prefs\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"saveconfig\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"saveconfig\">";
 
         print "<div dojoType=\"dijit.form.ComboButton\" type=\"submit\">
             <span>".__('Save configuration')."</span>
@@ -789,8 +789,8 @@ class Pref_Prefs extends ProtectedHandler
         }
         </script>";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"pref-prefs\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"setplugins\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setplugins\">";
 
         print "<table width='100%' class='prefPluginsList'>";
 
@@ -1045,14 +1045,14 @@ class Pref_Prefs extends ProtectedHandler
             T_sprintf("You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target=\"_blank\" class=\"visibleLink\" href=\"%s\">This file</a> can be used as a baseline.", "css/tt-rss.css")
         );
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"rpc\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"setpref\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"key\" value=\"USER_STYLESHEET\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setpref\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"key\" value=\"USER_STYLESHEET\">";
 
         print "<table width='100%'><tr><td>";
         print "<textarea dojoType=\"dijit.form.SimpleTextarea\"
-            style='font-size : 12px; width : 100%; height: 200px;'
-            placeHolder='body#ttrssMain { font-size : 14px; };'
+            style='font-size: 12px; width: 100%; height: 200px;'
+            placeHolder='body#ttrssMain { font-size: 14px; };'
             name='value'>$value</textarea>";
         print "</td></tr></table>";
 

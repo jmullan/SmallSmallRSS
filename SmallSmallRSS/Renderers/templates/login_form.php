@@ -24,7 +24,7 @@ $return = urlencode($_SERVER["REQUEST_URI"]);
 
 <form action="public.php?return=<?php echo $return ?>"
   dojoType="dijit.form.Form" method="POST" id="loginForm" name="loginForm">
-  <input dojoType="dijit.form.TextBox" style="display : none" name="op" value="login" />
+  <input dojoType="dijit.form.TextBox" style="display: none" name="op" value="login" />
   <div class='header'>
     <img src="images/logo_wide.png" />
   </div>
@@ -42,7 +42,7 @@ if (!empty($login_error_msg)) {
         <label><?php echo __("Login:") ?></label>
         <input name="login" class="input"
           onchange="fetchProfiles()" onfocus="fetchProfiles()" onblur="fetchProfiles()"
-          style="width : 220px"
+          style="width: 220px"
           required="1"
           value="<?php echo $fake_login ?>" />
     </div>
@@ -51,7 +51,7 @@ if (!empty($login_error_msg)) {
     <div class="row">
       <label><?php echo __("Password:") ?></label>
       <input type="password" name="password" required="1"
-        style="width : 220px" class="input"
+        style="width: 220px" class="input"
         value="<?php echo $fake_password ?>"/>
 <?php
 if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_internal") !== false) { ?>
@@ -63,7 +63,7 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_internal") !== false) { 
     <div class="row">
       <label><?php echo __("Profile:") ?></label>
       <span id='profile_box'>
-        <select disabled='disabled' dojoType='dijit.form.Select' style='width : 220px; margin : 0px'>
+        <select disabled='disabled' dojoType='dijit.form.Select' style='width: 220px; margin : 0px'>
           <option><?php echo __("Default profile") ?></option>
         </select>
       </span>

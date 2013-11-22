@@ -1,8 +1,8 @@
 <!-- $BeginBlock digest -->
-<h1 style='font-size : x-large'>New headlines for last 24 hours, as of ${CUR_DATE} ${CUR_TIME}</h1>
+<h1 style='font-size: x-large'>New headlines for last 24 hours, as of ${CUR_DATE} ${CUR_TIME}</h1>
 <hr/>
 <!-- $BeginBlock feed -->
-<h2 style='font-size : large'>${FEED_TITLE}</h2>
+<h2 style='font-size: large'>${FEED_TITLE}</h2>
 
 <ul>
 <!-- $BeginBlock article -->

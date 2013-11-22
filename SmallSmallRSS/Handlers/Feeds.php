@@ -13,7 +13,7 @@ class Feeds extends ProtectedHandler
         return $value;
     }
 
-    public function CRSFIgnore($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "feedbrowser", "quickaddfeed", "search");
         return array_search($method, $csrf_ignored) !== false;
@@ -598,16 +598,16 @@ class Feeds extends ProtectedHandler
 
                     $reply['content'] .= $labels_str;
 
-                    $reply['content'] .= "<span class='collapseBtn' style='display : none'>
+                    $reply['content'] .= "<span class='collapseBtn' style='display: none'>
                         <img src=\"images/collapse.png\" onclick=\"cdmCollapseArticle(event, $id)\"
                         title=\"".__("Collapse article")."\"/></span>";
 
                     if (!$expand_cdm) {
-                        $content_hidden = "style=\"display : none\"";
+                        $content_hidden = "style=\"display: none\"";
                         $excerpt_hidden = '';
                     } else {
                         $content_hidden = '';
-                        $excerpt_hidden = "style=\"display : none\"";
+                        $excerpt_hidden = "style=\"display: none\"";
                     }
 
                     $reply['content'] .= "<span $excerpt_hidden
@@ -685,7 +685,7 @@ class Feeds extends ProtectedHandler
                     $reply['content'] .= "<span id=\"CWRAP-$id\">";
 
                     //                    if (!$expand_cdm) {
-                    $reply['content'] .= "<span id=\"CENCW-$id\" style=\"display : none\">";
+                    $reply['content'] .= "<span id=\"CENCW-$id\" style=\"display: none\">";
                     $reply['content'] .= htmlspecialchars($line["content"]);
                     $reply['content'] .= "</span.";
 
@@ -1042,17 +1042,17 @@ class Feeds extends ProtectedHandler
 
     public function quickAddFeed()
     {
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"rpc\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"addfeed\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"addfeed\">";
 
         print "<div class=\"dlgSec\">".__("Feed or site URL")."</div>";
         print "<div class=\"dlgSecCont\">";
 
         print "<div style='float : right'>
-            <img style='display : none'
+            <img style='display: none'
                 id='feed_add_spinner' src='images/indicator_white.gif'></div>";
 
-        print "<input style=\"font-size : 16px; width : 20em;\"
+        print "<input style=\"font-size: 16px; width: 20em;\"
             placeHolder=\"".__("Feed or site URL")."\"
             dojoType=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"feed\" id=\"feedDlg_feedUrl\">";
 
@@ -1065,7 +1065,7 @@ class Feeds extends ProtectedHandler
 
         print "</div>";
 
-        print '<div id="feedDlg_feedsContainer" style="display : none">
+        print '<div id="feedDlg_feedsContainer" style="display: none">
 
                 <div class="dlgSec">' . __('Available feeds') . '</div>
                 <div class="dlgSecCont">'.
@@ -1077,18 +1077,18 @@ class Feeds extends ProtectedHandler
                 </select>'.
             '</div></div>';
 
-        print "<div id='feedDlg_loginContainer' style='display : none'>
+        print "<div id='feedDlg_loginContainer' style='display: none'>
 
                 <div class=\"dlgSec\">".__("Authentication")."</div>
                 <div class=\"dlgSecCont\">".
 
             " <input dojoType=\"dijit.form.TextBox\" name='login'\"
                     placeHolder=\"".__("Login")."\"
-                    style=\"width : 10em;\"> ".
+                    style=\"width: 10em;\"> ".
             " <input
                     placeHolder=\"".__("Password")."\"
                     dojoType=\"dijit.form.TextBox\" type='password'
-                    style=\"width : 10em;\" name='pass'\">
+                    style=\"width: 10em;\" name='pass'\">
             </div></div>";
 
 
@@ -1120,12 +1120,12 @@ class Feeds extends ProtectedHandler
 
         $browser_search = $this->escape_from_request("search");
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"rpc\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"updateFeedBrowser\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"updateFeedBrowser\">";
 
         print "<div dojoType=\"dijit.Toolbar\">
             <div style='float : right'>
-            <img style='display : none'
+            <img style='display: none'
                 id='feed_browser_spinner' src='images/indicator_white.gif'>
             <input name=\"search\" dojoType=\"dijit.form.TextBox\" size=\"20\" type=\"search\"
                 onchange=\"dijit.byId('feedBrowserDlg').update()\" value=\"$browser_search\">
@@ -1163,7 +1163,7 @@ class Feeds extends ProtectedHandler
 
         print "<div align='center'>
             <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').execute()\">".__('Subscribe')."</button>
-            <button dojoType=\"dijit.form.Button\" style='display : none' id='feed_archive_remove' onclick=\"dijit.byId('feedBrowserDlg').removeFromArchive()\">".__('Remove')."</button>
+            <button dojoType=\"dijit.form.Button\" style='display: none' id='feed_archive_remove' onclick=\"dijit.byId('feedBrowserDlg').removeFromArchive()\">".__('Remove')."</button>
             <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').hide()\" >".__('Cancel')."</button></div>";
 
     }
@@ -1176,7 +1176,7 @@ class Feeds extends ProtectedHandler
         print "<div class=\"dlgSec\">".__('Look for')."</div>";
         print "<div class=\"dlgSecCont\">";
         print "<input dojoType=\"dijit.form.ValidationTextBox\"
-            style=\"font-size : 16px; width : 20em;\"
+            style=\"font-size: 16px; width: 20em;\"
             required=\"1\" name=\"query\" type=\"search\" value=''>";
         print "<hr/>".__('Limit search to:')." ";
         print "<select name=\"search_mode\" dojoType=\"dijit.form.Select\">

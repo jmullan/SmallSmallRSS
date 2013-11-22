@@ -1,7 +1,7 @@
 <?php
+
 class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_Interface
 {
-
     private $host;
     private $base;
 

@@ -1044,7 +1044,7 @@ function getVirtCounters()
         );
         array_push($ret_arr, $cv);
     }
-    $feeds = \SmallSmallRSS\PluginHost::getInstance()->get_feeds(-1);
+    $feeds = \SmallSmallRSS\PluginHost::getInstance()->getFeeds(-1);
     if (is_array($feeds)) {
         foreach ($feeds as $feed) {
             $cv = array(
@@ -1609,7 +1609,7 @@ function get_hotkeys_map() {
         \SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP
     );
     foreach ($hotkey_hooks as $plugin) {
-        $hotkeys = $plugin->hook_hotkey_map($hotkeys);
+        $hotkeys = $plugin->hookHotkeyMap($hotkeys);
     }
 
     $prefixes = array();

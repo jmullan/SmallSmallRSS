@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Handlers;
 class Article extends ProtectedHandler
 {
 
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         $csrf_ignored = array("redirect", "editarticletags");
 
@@ -215,14 +215,14 @@ class Article extends ProtectedHandler
 
         $tags_str = join(", ", $tags);
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"id\" value=\"$param\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"op\" value=\"article\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display : none\" name=\"method\" value=\"setArticleTags\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"article\">";
+        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setArticleTags\">";
 
         print "<table width='100%'><tr><td>";
 
         print "<textarea dojoType=\"dijit.form.SimpleTextarea\" rows='4'
-            style='font-size : 12px; width : 100%' id=\"tags_str\"
+            style='font-size: 12px; width: 100%' id=\"tags_str\"
             name='tags_str'>$tags_str</textarea>
         <div class=\"autocomplete\" id=\"tags_choices\"
                 style=\"display:none\"></div>";

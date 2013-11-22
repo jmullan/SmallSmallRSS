@@ -1,6 +1,7 @@
 <?php
 
-class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers\IHandler {
+class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers\IHandler
+{
     private $host;
 
     const API_VERSION = 2;
@@ -16,10 +17,10 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
     public function addCommands()
     {
-        $this->host->add_command("xml-import", "import articles from XML", $this, ":", "FILE");
+        $this->host->addCommand("xml-import", "import articles from XML", $this, ":", "FILE");
     }
 
-    public function xml_import($args)
+    public function xmlImport($args)
     {
         $filename = $args['xml_import'];
         if (!is_file($filename)) {
@@ -38,7 +39,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
         print "importing $filename for user $username...\n";
-        $this->perform_data_import($filename, $owner_uid);
+        $this->performDataImport($filename, $owner_uid);
     }
 
     public function save()
@@ -86,7 +87,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         print "</div>"; # pane
     }
 
-    public function CRSFIgnore($method)
+    public function ignoreCSRF($method)
     {
         return in_array($method, array("exportget"));
     }
@@ -189,7 +190,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         print json_encode(array("exported" => $exported));
     }
 
-    public function perform_data_import($filename, $owner_uid)
+    public function performDataImport($filename, $owner_uid)
     {
 
         $num_imported = 0;
@@ -461,7 +462,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         }
 
         if (is_file($tmp_file)) {
-            $this->perform_data_import($tmp_file, $_SESSION['uid']);
+            $this->performDataImport($tmp_file, $_SESSION['uid']);
             unlink($tmp_file);
         } else {
             \SmallSmallRSS\Renderers\Messages::renderError(__('No file uploaded.'));

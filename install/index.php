@@ -198,7 +198,7 @@ $issel_mysql = $DB_TYPE == "mysql" ? "selected" : "";
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<link rel="stylesheet" type="text/css" href="../css/utility.css">
 	<style type="text/css">
-	textarea { font-size : 12px; }
+	textarea { font-size: 12px; }
 	</style>
 </head>
 <body>

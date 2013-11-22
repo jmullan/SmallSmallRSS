@@ -15,7 +15,7 @@ class Swap_JK extends \SmallSmallRSS\Plugin
         \SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP,
     );
 
-    public function hook_hotkey_map($hotkeys)
+    public function hookHotkeyMap($hotkeys)
     {
         $hotkeys["j"] = "next_feed";
         $hotkeys["k"] = "prev_feed";

@@ -169,7 +169,7 @@ class Dlg extends ProtectedHandler
         print "<input class=\"noborder\" dojoType=\"dijit.form.RadioButton\" type=\"radio\" value=\"all\" name=\"tag_mode\" id=\"tag_mode_all\">";
         print "<label for=\"tag_mode_all\">".__("All tags.")."</input>";
 
-        print "<select id=\"all_tags\" name=\"all_tags\" title=\"" . __('Which Tags?') . "\" multiple=\"multiple\" size=\"10\" style=\"width : 100%\">";
+        print "<select id=\"all_tags\" name=\"all_tags\" title=\"" . __('Which Tags?') . "\" multiple=\"multiple\" size=\"10\" style=\"width: 100%\">";
         $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT tag_name FROM ttrss_tags WHERE owner_uid = ".$_SESSION['uid']."
             AND LENGTH(tag_name) <= 30 ORDER BY tag_name ASC"

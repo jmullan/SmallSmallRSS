@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Handlers;
 class Opml extends ProtectedHandler
 {
 
-    function CRSFIgnore($method)
+    function ignoreCSRF($method)
     {
         $csrf_ignored = array("export", "import");
 

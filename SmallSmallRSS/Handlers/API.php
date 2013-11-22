@@ -144,7 +144,7 @@ class API extends Handler
         $offset = (int) $this->escape_from_request("offset");
         $include_nested = $this->request_sql_bool("include_nested");
 
-        $feeds = $this->api_get_feeds($cat_id, $unread_only, $limit, $offset, $include_nested);
+        $feeds = $this->apiGetFeeds($cat_id, $unread_only, $limit, $offset, $include_nested);
 
         $this->wrap(self::STATUS_OK, $feeds);
     }
@@ -517,7 +517,7 @@ class API extends Handler
         }
     }
 
-    static function api_get_feeds($cat_id, $unread_only, $limit, $offset, $include_nested = false)
+    static function apiGetFeeds($cat_id, $unread_only, $limit, $offset, $include_nested = false)
     {
 
         $feeds = array();

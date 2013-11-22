@@ -1,8 +1,9 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class Pref_Users extends ProtectedHandler
 {
-    function before($method)
+    public function before($method)
     {
         if (parent::before($method)) {
             if ($_SESSION["access_level"] < 10) {
@@ -14,14 +15,14 @@ class Pref_Users extends ProtectedHandler
         return false;
     }
 
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "edit", "userdetails");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function userdetails()
+    public function userdetails()
     {
 
         $uid = sprintf("%d", $_REQUEST["id"]);
@@ -45,10 +46,12 @@ class Pref_Users extends ProtectedHandler
         $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
         print "<table width='100%'>";
         $last_login = make_local_datetime(
-            \SmallSmallRSS\Database::fetch_result($result, 0, "last_login"), true
+            \SmallSmallRSS\Database::fetch_result($result, 0, "last_login"),
+            true
         );
         $created = make_local_datetime(
-            \SmallSmallRSS\Database::fetch_result($result, 0, "created"), true
+            \SmallSmallRSS\Database::fetch_result($result, 0, "created"),
+            true
         );
         $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, "access_level");
         $stored_articles = \SmallSmallRSS\Database::fetch_result($result, 0, "stored_articles");
@@ -92,7 +95,7 @@ class Pref_Users extends ProtectedHandler
         return;
     }
 
-    function edit()
+    public function edit()
     {
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
 
@@ -133,46 +136,45 @@ class Pref_Users extends ProtectedHandler
         $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
         if (!$sel_disabled) {
             $form_elements_renderer->renderSelect(
-                "access_level", $access_level, $access_level_names,
+                "access_level",
+                $access_level,
+                $access_level_names,
                 "dojoType=\"dijit.form.Select\" $sel_disabled"
             );
         } else {
             $form_elements_renderer->renderSelect(
-                "", $access_level, $access_level_names,
+                "",
+                $access_level,
+                $access_level_names,
                 "dojoType=\"dijit.form.Select\" $sel_disabled"
             );
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"access_level\" value=\"$access_level\">";
+            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"";
+            print " name=\"access_level\" value=\"$access_level\">";
         }
 
         print "<hr/>";
-
-        print "<input dojoType=\"dijit.form.TextBox\" type=\"password\" size=\"20\" onkeypress=\"return filterCR(event, userEditSave)\" placeholder=\"Change password\"
-                name=\"password\">";
-
+        print "<input dojoType=\"dijit.form.TextBox\" type=\"password\" size=\"20\"";
+        print " onkeypress=\"return filterCR(event, userEditSave)\"";
+        print " placeholder=\"Change password\" name=\"password\">";
         print "</div>";
-
         print "<div class=\"dlgSec\">".__("Options")."</div>";
         print "<div class=\"dlgSecCont\">";
-
-        print "<input dojoType=\"dijit.form.TextBox\" size=\"30\" name=\"email\" onkeypress=\"return filterCR(event, userEditSave)\" placeholder=\"E-mail\"
-                value=\"$email\">";
-
+        print "<input dojoType=\"dijit.form.TextBox\" size=\"30\" name=\"email\"";
+        print " onkeypress=\"return filterCR(event, userEditSave)\" placeholder=\"E-mail\"";
+        print " value=\"$email\">";
         print "</div>";
-
         print "</table>";
-
         print "</form>";
-
-        print "<div class=\"dlgButtons\">
-                <button dojoType=\"dijit.form.Button\" type=\"submit\">".
-            __('Save')."</button>
-                <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('userEditDlg').hide()\">".
-            __('Cancel')."</button></div>";
-
-        return;
+        print "<div class=\"dlgButtons\">";
+        print "<button dojoType=\"dijit.form.Button\" type=\"submit\">";
+        print __('Save');
+        print "</button>";
+        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('userEditDlg').hide()\">";
+        print __('Cancel');
+        print "</button></div>";
     }
 
-    function editSave()
+    public function editSave()
     {
         $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["login"]));
         $uid = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
@@ -189,14 +191,19 @@ class Pref_Users extends ProtectedHandler
         }
 
         \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_users SET $pass_query_part login = '$login',
-                access_level = '$access_level', email = '$email', otp_enabled = false
+            "UPDATE ttrss_users
+             SET
+                $pass_query_part
+                login = '$login',
+                access_level = '$access_level',
+                email = '$email',
+                otp_enabled = false
                 WHERE id = '$uid'"
         );
 
     }
 
-    function remove()
+    public function remove()
     {
         $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
@@ -209,7 +216,7 @@ class Pref_Users extends ProtectedHandler
         }
     }
 
-    function add()
+    public function add()
     {
 
         $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["login"]));
@@ -260,7 +267,7 @@ class Pref_Users extends ProtectedHandler
         }
     }
 
-    static function resetUserPassword($uid, $show_password)
+    public static function resetUserPassword($uid, $show_password)
     {
 
         $result = \SmallSmallRSS\Database::query(
@@ -309,9 +316,11 @@ class Pref_Users extends ProtectedHandler
             $mail = new \SmallSmallRSS\Mailer();
 
             $rc = $mail->quickMail(
-                $email, $login,
+                $email,
+                $login,
                 __("[tt-rss] Password change notification"),
-                $message, false
+                $message,
+                false
             );
 
             if (!$rc) {
@@ -320,13 +329,13 @@ class Pref_Users extends ProtectedHandler
         }
     }
 
-    function resetPass()
+    public function resetPass()
     {
         $uid = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
         Pref_Users::resetUserPassword($uid, true);
     }
 
-    function index()
+    public function index()
     {
 
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
@@ -380,7 +389,8 @@ class Pref_Users extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hookPreferencesTab_section", "prefUsersToolbar"
+            "hookPreferencesTabSection",
+            "prefUsersToolbar"
         );
 
         print "</div>"; #toolbar
@@ -423,12 +433,20 @@ class Pref_Users extends ProtectedHandler
             print "<p><table width=\"100%\" cellspacing=\"0\"
                 class=\"prefUserList\" id=\"prefUserList\">";
 
-            print "<tr class=\"title\">
-                        <td align='center' width=\"5%\">&nbsp;</td>
-                        <td width='30%'><a href=\"#\" onclick=\"updateUsersList('login')\">".__('Login')."</a></td>
-                        <td width='30%'><a href=\"#\" onclick=\"updateUsersList('access_level')\">".__('Access Level')."</a></td>
-                        <td width='20%'><a href=\"#\" onclick=\"updateUsersList('created')\">".__('Registered')."</a></td>
-                        <td width='20%'><a href=\"#\" onclick=\"updateUsersList('last_login')\">".__('Last login')."</a></td></tr>";
+            print "<tr class=\"title\">";
+            print "<td align='center' width=\"5%\">&nbsp;</td>";
+            print "<td width='30%'><a href=\"#\" onclick=\"updateUsersList('login')\">";
+            print __('Login');
+            print "</a></td>";
+            print "<td width='30%'><a href=\"#\" onclick=\"updateUsersList('access_level')\">";
+            print __('Access Level');
+            print "</a></td>";
+            print "<td width='20%'><a href=\"#\" onclick=\"updateUsersList('created')\">";
+            print __('Registered');
+            print "</a></td>";
+            print "<td width='20%'><a href=\"#\" onclick=\"updateUsersList('last_login')\">";
+            print __('Last login');
+            print "</a></td></tr>";
 
             $lnum = 0;
 
@@ -451,16 +469,15 @@ class Pref_Users extends ProtectedHandler
 
                 print "<td $onclick>" . $line["login"] . "</td>";
 
-                if (!$line["email"]) {  $line["email"] = "&nbsp;";
+                if (!$line["email"]) {
+                    $line["email"] = "&nbsp;";
                 }
 
                 print "<td $onclick>" .    $access_level_names[$line["access_level"]] . "</td>";
                 print "<td $onclick>" . $line["created"] . "</td>";
                 print "<td $onclick>" . $line["last_login"] . "</td>";
-
                 print "</tr>";
-
-                ++$lnum;
+                $lnum += 1;
             }
 
             print "</table>";
@@ -479,7 +496,8 @@ class Pref_Users extends ProtectedHandler
         print "</div>"; #pane
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hookPreferencesTab", "prefUsers"
+            "hookPreferencesTab",
+            "prefUsers"
         );
         print "</div>"; #container
     }

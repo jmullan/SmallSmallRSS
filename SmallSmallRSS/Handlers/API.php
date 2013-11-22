@@ -10,7 +10,7 @@ class API extends Handler
 
     private $seq;
 
-    function request_sql_bool($key)
+    public function request_sql_bool($key)
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
@@ -19,7 +19,7 @@ class API extends Handler
         return sql_bool_to_bool($value);
     }
 
-    function escape_from_request($key)
+    public function escape_from_request($key)
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
@@ -28,7 +28,7 @@ class API extends Handler
         return $value;
     }
 
-    function before($method)
+    public function before($method)
     {
         if (parent::before($method)) {
             header("Content-Type: application/json");
@@ -49,26 +49,26 @@ class API extends Handler
         return false;
     }
 
-    function wrap($status, $reply)
+    public function wrap($status, $reply)
     {
         print json_encode(array("seq" => $this->seq,
                                 "status" => $status,
                                 "content" => $reply));
     }
 
-    function getVersion()
+    public function getVersion()
     {
         $rv = array("version" => VERSION);
         $this->wrap(self::STATUS_OK, $rv);
     }
 
-    function getApiLevel()
+    public function getApiLevel()
     {
         $rv = array("level" => self::API_LEVEL);
         $this->wrap(self::STATUS_OK, $rv);
     }
 
-    function login()
+    public function login()
     {
         $login = $this->escape_from_request("user");
         $password = $_REQUEST["password"];
@@ -107,18 +107,18 @@ class API extends Handler
         }
     }
 
-    function logout()
+    public function logout()
     {
         logout_user();
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
-    function isLoggedIn()
+    public function isLoggedIn()
     {
         $this->wrap(self::STATUS_OK, array("status" => $_SESSION["uid"] != ''));
     }
 
-    function getUnread()
+    public function getUnread()
     {
         $feed_id = $this->escape_from_request("feed_id");
         $is_cat = $this->escape_from_request("is_cat");
@@ -131,12 +131,12 @@ class API extends Handler
     }
 
     /* Method added for ttrss-reader for Android */
-    function getCounters()
+    public function getCounters()
     {
         $this->wrap(self::STATUS_OK, getAllCounters());
     }
 
-    function getFeeds()
+    public function getFeeds()
     {
         $cat_id = $this->escape_from_request("cat_id");
         $unread_only = $this->request_sql_bool("unread_only");
@@ -149,7 +149,7 @@ class API extends Handler
         $this->wrap(self::STATUS_OK, $feeds);
     }
 
-    function getCategories()
+    public function getCategories()
     {
         $unread_only = $this->request_sql_bool("unread_only");
         $enable_nested = $this->request_sql_bool("enable_nested");
@@ -159,8 +159,7 @@ class API extends Handler
 
         if ($enable_nested) {
             $nested_qpart = "parent_cat IS NULL";
-        }
-        else {
+        } else {
             $nested_qpart = "true";
         }
 
@@ -212,14 +211,14 @@ class API extends Handler
         $this->wrap(self::STATUS_OK, $cats);
     }
 
-    function getHeadlines()
+    public function getHeadlines()
     {
         $feed_id = $this->escape_from_request("feed_id");
         if ($feed_id != "") {
 
             $limit = (int) $this->escape_from_request("limit");
-
-            if (!$limit || $limit >= 200) {  $limit = 200;
+            if (!$limit || $limit >= 200) {
+                $limit = 200;
             }
 
             $offset = (int) $this->escape_from_request("skip");
@@ -263,7 +262,7 @@ class API extends Handler
         }
     }
 
-    function updateArticle()
+    public function updateArticle()
     {
         $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
         $mode = (int) $this->escape_from_request("mode");
@@ -302,7 +301,8 @@ class API extends Handler
                 break;
         }
 
-        if ($field == "note") {  $set_to = "'$data'";
+        if ($field == "note") {
+            $set_to = "'$data'";
         }
 
         if ($field && $set_to && count($article_ids) > 0) {
@@ -344,7 +344,7 @@ class API extends Handler
 
     }
 
-    function getArticle()
+    public function getArticle()
     {
 
         $article_id = join(",", array_filter(explode(",", $this->escape_from_request("article_id")), 'is_numeric'));
@@ -403,7 +403,7 @@ class API extends Handler
         }
     }
 
-    function getConfig()
+    public function getConfig()
     {
         $config = array(
             "icons_dir" => \SmallSmallRSS\Config::get('ICONS_DIR'),
@@ -419,7 +419,7 @@ class API extends Handler
         $this->wrap(self::STATUS_OK, $config);
     }
 
-    function updateFeed()
+    public function updateFeed()
     {
         require_once "include/rssfuncs.php";
         $feed_id = (int) $this->escape_from_request("feed_id");
@@ -427,7 +427,7 @@ class API extends Handler
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
-    function catchupFeed()
+    public function catchupFeed()
     {
         $feed_id = $this->escape_from_request("feed_id");
         $is_cat = $this->escape_from_request("is_cat");
@@ -437,13 +437,13 @@ class API extends Handler
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
-    function getPref()
+    public function getPref()
     {
         $pref_name = $this->escape_from_request("pref_name");
         $this->wrap(self::STATUS_OK, array("value" => \SmallSmallRSS\DBPrefs::read($pref_name)));
     }
 
-    function getLabels()
+    public function getLabels()
     {
         $owner_id = $_SESSION['uid'];
         $article_id = (int) $_REQUEST['article_id'];
@@ -453,15 +453,15 @@ class API extends Handler
         );
     }
 
-    function setArticleLabel()
+    public function setArticleLabel()
     {
 
         $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
         $label_id = (int) $this->escape_from_request('label_id');
         $assign = (bool) $this->escape_from_request('assign') == "true";
-        $label = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Labels::findCaption(
-            $label_id, $_SESSION["uid"]
-        ));
+        $label = \SmallSmallRSS\Database::escape_string(
+            \SmallSmallRSS\Labels::findCaption($label_id, $_SESSION["uid"])
+        );
         $num_updated = 0;
         if ($label) {
             foreach ($article_ids as $id) {
@@ -474,12 +474,12 @@ class API extends Handler
             }
         }
         $this->wrap(
-            self::STATUS_OK, array("status" => "OK",
-                                   "updated" => $num_updated)
+            self::STATUS_OK,
+            array("status" => "OK", "updated" => $num_updated)
         );
     }
 
-    function index($method)
+    public function index($method)
     {
         $plugin = \SmallSmallRSS\PluginHost::getInstance()->get_api_method(strtolower($method));
         if ($plugin && method_exists($plugin, $method)) {
@@ -504,7 +504,7 @@ class API extends Handler
         }
     }
 
-    function shareToPublished()
+    public function shareToPublished()
     {
         $title = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["title"]));
         $url = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["url"]));
@@ -517,7 +517,7 @@ class API extends Handler
         }
     }
 
-    static function apiGetFeeds($cat_id, $unread_only, $limit, $offset, $include_nested = false)
+    public static function apiGetFeeds($cat_id, $unread_only, $limit, $offset, $include_nested = false)
     {
 
         $feeds = array();
@@ -653,16 +653,27 @@ class API extends Handler
         return $feeds;
     }
 
-    static function api_get_headlines($feed_id, $limit, $offset,
-                                      $filter, $is_cat, $show_excerpt, $show_content, $view_mode, $order,
-                                      $include_attachments, $since_id,
-                                      $search = "", $search_mode = "",
-                                      $include_nested = false, $sanitize_content = true) {
+    static function api_get_headlines(
+        $feed_id, $limit, $offset,
+        $filter, $is_cat, $show_excerpt, $show_content, $view_mode, $order,
+        $include_attachments, $since_id,
+        $search = "", $search_mode = "",
+        $include_nested = false, $sanitize_content = true
+    ) {
 
         $qfh_ret = queryFeedHeadlines(
-            $feed_id, $limit,
-            $view_mode, $is_cat, $search, $search_mode,
-            $order, $offset, 0, false, $since_id, $include_nested
+            $feed_id,
+            $limit,
+            $view_mode,
+            $is_cat,
+            $search,
+            $search_mode,
+            $order,
+            $offset,
+            0,
+            false,
+            $since_id,
+            $include_nested
         );
 
         $result = $qfh_ret[0];
@@ -671,8 +682,10 @@ class API extends Handler
         $headlines = array();
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            $is_updated = ($line["last_read"] == "" &&
-                           ($line["unread"] != "t" && $line["unread"] != "1"));
+            $is_updated = (
+                $line["last_read"] == ""
+                && ($line["unread"] != "t" && $line["unread"] != "1")
+            );
 
             $tags = explode(",", $line["tag_cache"]);
             $labels = json_decode($line["label_cache"], true);
@@ -714,7 +727,8 @@ class API extends Handler
                     $headline_row["content"] = sanitize(
                         $line["content_preview"],
                         sql_bool_to_bool($line['hide_images']),
-                        false, $line["site_url"]
+                        false,
+                        $line["site_url"]
                     );
                 } else {
                     $headline_row["content"] = $line["content_preview"];
@@ -722,7 +736,8 @@ class API extends Handler
             }
 
             // unify label output to ease parsing
-            if ($labels["no-labels"] == 1) {  $labels = array();
+            if ($labels["no-labels"] == 1) {
+                $labels = array();
             }
 
             $headline_row["labels"] = $labels;
@@ -748,7 +763,7 @@ class API extends Handler
         return $headlines;
     }
 
-    function unsubscribeFeed()
+    public function unsubscribeFeed()
     {
         $feed_id = (int) $this->escape_from_request("feed_id");
 
@@ -765,7 +780,7 @@ class API extends Handler
         }
     }
 
-    function subscribeToFeed()
+    public function subscribeToFeed()
     {
         $feed_url = $this->escape_from_request("feed_url");
         $category_id = (int) $this->escape_from_request("category_id");
@@ -781,7 +796,7 @@ class API extends Handler
         }
     }
 
-    function getFeedTree()
+    public function getFeedTree()
     {
         $include_empty = $this->request_sql_bool('include_empty');
 

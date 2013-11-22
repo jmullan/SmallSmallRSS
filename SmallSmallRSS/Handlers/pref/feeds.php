@@ -1606,7 +1606,7 @@ class Pref_Feeds extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hookPreferencesTab_section", "prefFeedsOPML"
+            "hookPreferencesTabSection", "prefFeedsOPML"
         );
 
         print "</div>"; # pane
@@ -1666,7 +1666,7 @@ class Pref_Feeds extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hookPreferencesTab_section", "prefFeedsPublishedGenerated"
+            "hookPreferencesTabSection", "prefFeedsPublishedGenerated"
         );
 
         print "</div>"; #pane

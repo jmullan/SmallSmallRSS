@@ -72,7 +72,8 @@ class Logger
      * @param string $msg The debug message.
      * @return void
      */
-    public static function debug($msg, $show=true, $is_debug=true) {
+    public static function debug($msg, $show=true, $is_debug=true)
+    {
         if (!$is_debug) {
             return;
         }
@@ -92,7 +93,7 @@ class Logger
             print "$message\n";
         }
 
-        if (defined('LOGFILE'))  {
+        if (defined('LOGFILE')) {
             $fp = fopen(LOGFILE, 'a+');
             if ($fp) {
                 fputs($fp, "$message\n");
@@ -102,7 +103,8 @@ class Logger
 
     }
 
-    public static function clearExpired() {
+    public static function clearExpired()
+    {
         self::get()->adapter->clearExpired();
     }
 }

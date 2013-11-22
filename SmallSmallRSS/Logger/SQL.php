@@ -32,7 +32,8 @@ class Logger_SQL extends Logger_Abstract implements Logger_Interface
     }
 
 
-    public static function clearExpired() {
+    public static function clearExpired()
+    {
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_error_log

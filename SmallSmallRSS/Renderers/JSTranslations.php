@@ -1,8 +1,10 @@
 <?php
 namespace SmallSmallRSS\Renderers;
 
-class JSTranslations {
-    public function render() {
+class JSTranslations
+{
+    public function render()
+    {
         print 'var T_messages = new Object();
         function __(msg) {
             if (T_messages[msg]) {
@@ -21,7 +23,9 @@ class JSTranslations {
             self::T_js_decl($orig, $translation);
         }
     }
-    static public function T_js_decl($s1, $s2) {
+
+    public static function T_js_decl($s1, $s2)
+    {
         if ($s1 && $s2) {
             $s1 = preg_replace("/\n/", "", $s1);
             $s2 = preg_replace("/\n/", "", $s2);

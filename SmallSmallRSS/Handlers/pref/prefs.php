@@ -1,19 +1,20 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class Pref_Prefs extends ProtectedHandler
 {
 
     private $pref_help = array();
     private $pref_sections = array();
 
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "updateself", "customizecss", "editprefprofiles");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function __construct($args)
+    public function __construct($args)
     {
         parent::__construct($args);
 
@@ -27,42 +28,81 @@ class Pref_Prefs extends ProtectedHandler
         $this->pref_help = array(
             "ALLOW_DUPLICATE_POSTS" => array(__("Allow duplicate articles"), ""),
             "AUTO_ASSIGN_LABELS" => array(__("Assign articles to labels automatically"), ""),
-            "BLACKLISTED_TAGS" => array(__("Blacklisted tags"), __("When auto-detecting tags in articles these tags will not be applied (comma-separated list).")),
-            "CDM_AUTO_CATCHUP" => array(__("Automatically mark articles as read"), __("This option enables marking articles as read automatically while you scroll article list.")),
+            "BLACKLISTED_TAGS" => array(
+                __("Blacklisted tags"),
+                __("When auto-detecting tags in articles these tags will not be applied (comma-separated list).")
+            ),
+            "CDM_AUTO_CATCHUP" => array(
+                __("Automatically mark articles as read"),
+                __("This option enables marking articles as read automatically while you scroll article list.")
+            ),
             "CDM_EXPANDED" => array(__("Automatically expand articles in combined mode"), ""),
-            "COMBINED_DISPLAY_MODE" => array(__("Combined feed display"), __("Display expanded list of feed articles, instead of separate displays for headlines and article content")),
+            "COMBINED_DISPLAY_MODE" => array(
+                __("Combined feed display"),
+                __("Display expanded list of feed articles, instead of separate displays for headlines and article content")
+            ),
             "CONFIRM_FEED_CATCHUP" => array(__("Confirm marking feed as read"), ""),
             "DEFAULT_ARTICLE_LIMIT" => array(__("Amount of articles to display at once"), ""),
-            "DEFAULT_UPDATE_INTERVAL" => array(__("Default feed update interval"), __("Shortest interval at which a feed will be checked for updates regardless of update method")),
+            "DEFAULT_UPDATE_INTERVAL" => array(
+                __("Default feed update interval"),
+                __("Shortest interval at which a feed will be checked for updates regardless of update method")
+            ),
             "DIGEST_CATCHUP" => array(__("Mark articles in e-mail digest as read"), ""),
-            "DIGEST_ENABLE" => array(__("Enable e-mail digest"), __("This option enables sending daily digest of new (and unread) headlines on your configured e-mail address")),
-            "DIGEST_PREFERRED_TIME" => array(__("Try to send digests around specified time"), __("Uses UTC timezone")),
-            "ENABLE_API_ACCESS" => array(__("Enable API access"), __("Allows external clients to access this account through the API")),
+            "DIGEST_ENABLE" => array(
+                __("Enable e-mail digest"),
+                __("This option enables sending daily digest of new (and unread) headlines on your configured e-mail address")
+            ),
+            "DIGEST_PREFERRED_TIME" => array(
+                __("Try to send digests around specified time"),
+                __("Uses UTC timezone")
+            ),
+            "ENABLE_API_ACCESS" => array(
+                __("Enable API access"),
+                __("Allows external clients to access this account through the API")
+            ),
             "ENABLE_FEED_CATS" => array(__("Enable feed categories"), ""),
             "FEEDS_SORT_BY_UNREAD" => array(__("Sort feeds by unread articles count"), ""),
             "FRESH_ARTICLE_MAX_AGE" => array(__("Maximum age of fresh articles (in hours)"), ""),
             "HIDE_READ_FEEDS" => array(__("Hide feeds with no unread articles"), ""),
             "HIDE_READ_SHOWS_SPECIAL" => array(__("Show special feeds when hiding read feeds"), ""),
-            "LONG_DATE_FORMAT" => array(__("Long date format"), __("The syntax used is identical to the PHP <a href='http://php.net/manual/function.date.php'>date()</a> function.")),
-            "ON_CATCHUP_SHOW_NEXT_FEED" => array(__("On catchup show next feed"), __("Automatically open next feed with unread articles after marking one as read")),
+            "LONG_DATE_FORMAT" => array(
+                __("Long date format"),
+                __("The syntax used is identical to the PHP <a href='http://php.net/manual/function.date.php'>date()</a> function.")
+            ),
+            "ON_CATCHUP_SHOW_NEXT_FEED" => array(
+                __("On catchup show next feed"),
+                __("Automatically open next feed with unread articles after marking one as read")
+            ),
             "PURGE_OLD_DAYS" => array(__("Purge articles after this number of days (0 - disables)"), ""),
             "PURGE_UNREAD_ARTICLES" => array(__("Purge unread articles"), ""),
             "REVERSE_HEADLINES" => array(__("Reverse headline order (oldest first)"), ""),
             "SHORT_DATE_FORMAT" => array(__("Short date format"), ""),
             "SHOW_CONTENT_PREVIEW" => array(__("Show content preview in headlines list"), ""),
-            "SORT_HEADLINES_BY_FEED_DATE" => array(__("Sort headlines by feed date"), __("Use feed-specified date to sort headlines instead of local import date.")),
-            "SSL_CERT_SERIAL" => array(__("Login with an SSL certificate"), __("Click to register your SSL client certificate with tt-rss")),
+            "SORT_HEADLINES_BY_FEED_DATE" => array(
+                __("Sort headlines by feed date"),
+                __("Use feed-specified date to sort headlines instead of local import date.")
+            ),
+            "SSL_CERT_SERIAL" => array(
+                __("Login with an SSL certificate"),
+                __("Click to register your SSL client certificate with tt-rss")
+            ),
             "STRIP_IMAGES" => array(__("Do not embed images in articles"), ""),
-            "STRIP_UNSAFE_TAGS" => array(__("Strip unsafe tags from articles"), __("Strip all but most common HTML tags when reading articles.")),
+            "STRIP_UNSAFE_TAGS" => array(
+                __("Strip unsafe tags from articles"),
+                __("Strip all but most common HTML tags when reading articles.")
+            ),
             "USER_STYLESHEET" => array(__("Customize stylesheet"), __("Customize CSS stylesheet to your liking")),
             "USER_TIMEZONE" => array(__("Time zone"), ""),
-            "VFEED_GROUP_BY_FEED" => array(__("Group headlines in virtual feeds"), __("Special feeds, labels, and categories are grouped by originating feeds")),
+            "VFEED_GROUP_BY_FEED" => array(
+                __("Group headlines in virtual feeds"),
+                __("Special feeds, labels, and categories are grouped by originating feeds")
+            ),
             "USER_LANGUAGE" => array(__("Language")),
             "USER_CSS_THEME" => array(__("Theme"), __("Select one of the available CSS themes"))
         );
     }
 
-    function changepassword()
+    public function changepassword()
     {
 
         $old_pw = $_POST["old_password"];
@@ -93,42 +133,33 @@ class Pref_Prefs extends ProtectedHandler
         }
     }
 
-    function saveconfig()
+    public function saveconfig()
     {
         $boolean_prefs = explode(",", $_POST["boolean_prefs"]);
-
         foreach ($boolean_prefs as $pref) {
-            if (!isset($_POST[$pref])) {  $_POST[$pref] = 'false';
+            if (!isset($_POST[$pref])) {
+                $_POST[$pref] = 'false';
             }
         }
-
         $need_reload = false;
-
         foreach (array_keys($_POST) as $pref_name) {
-
             $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
             $value = \SmallSmallRSS\Database::escape_string($_POST[$pref_name]);
-
             if ($pref_name == 'DIGEST_PREFERRED_TIME') {
                 if (\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME') != $value) {
-
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_users SET
                         last_digest_sent = NULL WHERE id = " . $_SESSION['uid']
                     );
-
                 }
             }
-
             if ($pref_name == "USER_LANGUAGE") {
                 if ($_SESSION["language"] != $value) {
                     $need_reload = true;
                 }
             }
-
             \SmallSmallRSS\DBPrefs::write($pref_name, $value);
         }
-
         if ($need_reload) {
             print "PREFS_NEED_RELOAD";
         } else {
@@ -136,16 +167,13 @@ class Pref_Prefs extends ProtectedHandler
         }
     }
 
-    function getHelp()
+    public function getHelp()
     {
-
         $pref_name = \SmallSmallRSS\Database::escape_string($_REQUEST["pn"]);
-
         $result = \SmallSmallRSS\Database::query(
             "SELECT help_text FROM ttrss_prefs
             WHERE pref_name = '$pref_name'"
         );
-
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
             $help_text = \SmallSmallRSS\Database::fetch_result($result, 0, "help_text");
             print $help_text;
@@ -154,46 +182,35 @@ class Pref_Prefs extends ProtectedHandler
         }
     }
 
-    function changeemail()
+    public function changeemail()
     {
-
         $email = \SmallSmallRSS\Database::escape_string($_POST["email"]);
         $full_name = \SmallSmallRSS\Database::escape_string($_POST["full_name"]);
-
         $active_uid = $_SESSION["uid"];
-
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users SET email = '$email',
             full_name = '$full_name' WHERE id = '$active_uid'"
         );
-
         print __("Your personal data has been saved.");
-
-        return;
     }
 
-    function resetconfig()
+    public function resetconfig()
     {
-
         $_SESSION["prefs_op_result"] = "reset-to-defaults";
-
         if ($_SESSION["profile"]) {
             $profile_qpart = "profile = '" . $_SESSION["profile"] . "'";
         } else {
             $profile_qpart = "profile IS NULL";
         }
-
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_user_prefs
             WHERE $profile_qpart AND owner_uid = ".$_SESSION["uid"]
         );
-
         initialize_user_prefs($_SESSION["uid"], $_SESSION["profile"]);
-
         echo __("Your preferences are now set to default values.");
     }
 
-    function index()
+    public function index()
     {
         $form_element_renderer = new \SmallSmallRSS\Renderers\FormElements();
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
@@ -202,20 +219,30 @@ class Pref_Prefs extends ProtectedHandler
 
         /* "FEEDS_SORT_BY_UNREAD", "HIDE_READ_FEEDS", "REVERSE_HEADLINES" */
 
-        $profile_blacklist = array("ALLOW_DUPLICATE_POSTS", "PURGE_OLD_DAYS",
-                                   "PURGE_UNREAD_ARTICLES", "DIGEST_ENABLE", "DIGEST_CATCHUP",
-                                   "BLACKLISTED_TAGS", "ENABLE_API_ACCESS", "UPDATE_POST_ON_CHECKSUM_CHANGE",
-                                   "DEFAULT_UPDATE_INTERVAL", "USER_TIMEZONE", "SORT_HEADLINES_BY_FEED_DATE",
-                                   "SSL_CERT_SERIAL", "DIGEST_PREFERRED_TIME");
+        $profile_blacklist = array(
+            "ALLOW_DUPLICATE_POSTS",
+            "PURGE_OLD_DAYS",
+            "PURGE_UNREAD_ARTICLES",
+            "DIGEST_ENABLE",
+            "DIGEST_CATCHUP",
+            "BLACKLISTED_TAGS",
+            "ENABLE_API_ACCESS",
+            "UPDATE_POST_ON_CHECKSUM_CHANGE",
+            "DEFAULT_UPDATE_INTERVAL",
+            "USER_TIMEZONE",
+            "SORT_HEADLINES_BY_FEED_DATE",
+            "SSL_CERT_SERIAL",
+            "DIGEST_PREFERRED_TIME"
+        );
 
 
         $_SESSION["prefs_op_result"] = "";
 
         print "<div dojoType=\"dijit.layout.AccordionContainer\" region=\"center\">";
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Personal data / Authentication')."\">";
-
+        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"";
+        print __('Personal data / Authentication');
+        print "\">";
         print "<form dojoType=\"dijit.form.Form\" id=\"changeUserdataForm\">";
-
         print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
         evt.preventDefault();
         if (this.validate()) {
@@ -229,7 +256,6 @@ class Pref_Prefs extends ProtectedHandler
 
         }
         </script>";
-
         print "<table width=\"100%\" class=\"prefPrefsList\">";
 
         print "<h2>" . __("Personal data") . "</h2>";
@@ -245,11 +271,12 @@ class Pref_Prefs extends ProtectedHandler
         $otp_enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "otp_enabled"));
 
         print "<tr><td width=\"40%\">".__('Full name')."</td>";
-        print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" name=\"full_name\" required=\"1\"
-            value=\"$full_name\"></td></tr>";
+        print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\"";
+        print " name=\"full_name\" required=\"1\" value=\"$full_name\"></td></tr>";
 
         print "<tr><td width=\"40%\">".__('E-mail')."</td>";
-        print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" name=\"email\" required=\"1\" value=\"$email\"></td></tr>";
+        print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\"";
+        print " name=\"email\" required=\"1\" value=\"$email\"></td></tr>";
 
         if (!\SmallSmallRSS\Auth::is_single_user_mode() && empty($_SESSION["hide_hello"])) {
             $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, "access_level");
@@ -285,7 +312,8 @@ class Pref_Prefs extends ProtectedHandler
 
             if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                 \SmallSmallRSS\Renderers\Messages::renderWarning(
-                    __("Your password is at default value, please change it."), "default_pass_warning"
+                    __("Your password is at default value, please change it."),
+                    "default_pass_warning"
                 );
             }
 
@@ -321,21 +349,26 @@ class Pref_Prefs extends ProtectedHandler
             print "<table width=\"100%\" class=\"prefPrefsList\">";
 
             print "<tr><td width=\"40%\">".__("Old password")."</td>";
-            print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" type=\"password\" required=\"1\" name=\"old_password\"></td></tr>";
+            print "<td class=\"prefValue\">";
+            print "<input dojoType=\"dijit.form.ValidationTextBox\" type=\"password\"";
+            print " required=\"1\" name=\"old_password\"></td></tr>";
 
             print "<tr><td width=\"40%\">".__("New password")."</td>";
 
-            print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" type=\"password\" required=\"1\"
-                name=\"new_password\"></td></tr>";
+            print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\"";
+            print " type=\"password\" required=\"1\" name=\"new_password\"></td></tr>";
 
             print "<tr><td width=\"40%\">".__("Confirm password")."</td>";
 
-            print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" type=\"password\" required=\"1\" name=\"confirm_password\"></td></tr>";
+            print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\"";
+            print " type=\"password\" required=\"1\" name=\"confirm_password\"></td></tr>";
 
             print "</table>";
 
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"changepassword\">";
+            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"";
+            print " name=\"op\" value=\"pref-prefs\">";
+            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"";
+            print " name=\"method\" value=\"changepassword\">";
 
             print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
                 __("Change password")."</button>";
@@ -464,7 +497,8 @@ class Pref_Prefs extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hookPreferencesTab_section", "prefPrefsAuth"
+            "hookPreferencesTabSection",
+            "prefPrefsAuth"
         );
 
         print "</div>"; #pane
@@ -555,7 +589,8 @@ class Pref_Prefs extends ProtectedHandler
             $short_desc = $this->getShortDesc($pref_name);
             $help_text = $this->getHelpText($pref_name);
 
-            if (!$short_desc) {  continue;
+            if (!$short_desc) {
+                continue;
             }
 
             if (!empty($_SESSION["profile"]) && in_array(
@@ -587,7 +622,8 @@ class Pref_Prefs extends ProtectedHandler
             print $short_desc;
             print "</label>";
 
-            if ($help_text) {  print "<div class=\"prefHelp\">".__($help_text)."</div>";
+            if ($help_text) {
+                print "<div class=\"prefHelp\">".__($help_text)."</div>";
             }
 
             print "</td>";
@@ -715,7 +751,8 @@ class Pref_Prefs extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hookPreferencesTab_section", "prefPrefsPrefsInside"
+            "hookPreferencesTabSection",
+            "prefPrefsPrefsInside"
         );
 
         print '</div>'; # inside pane
@@ -753,7 +790,8 @@ class Pref_Prefs extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hookPreferencesTab_section", "prefPrefsPrefsOutside"
+            "hookPreferencesTabSection",
+            "prefPrefsPrefsOutside"
         );
 
         print "</form>";
@@ -878,9 +916,10 @@ class Pref_Prefs extends ProtectedHandler
 
                 print "<tr class='$rowclass'>";
 
-                print "<td align='center'><input id='FPCHK-$name' name='plugins[]' value='$name' onclick='toggleSelectRow2(this);'
-                    dojoType=\"dijit.form.CheckBox\" $checked $disabled
-                    type=\"checkbox\"></td>";
+                print "<td align='center'>";
+                print "<input id='FPCHK-$name' name='plugins[]' value='$name' onclick='toggleSelectRow2(this);'
+                       dojoType=\"dijit.form.CheckBox\" $checked $disabled
+                       type=\"checkbox\"></td>";
 
                 print "<td><label for='FPCHK-$name'>$name</label></td>";
                 print "<td><label for='FPCHK-$name'>" . htmlspecialchars($about[1]) . "</label>";
@@ -895,7 +934,8 @@ class Pref_Prefs extends ProtectedHandler
 
                 if (count($tmppluginhost->get_all($plugin)) > 0) {
                     if (in_array($name, $system_enabled) || in_array($name, $user_enabled)) {
-                        print "<td><a href='#' onclick=\"clearPluginData('$name')\" class='visibleLink'>".__("Clear data")."</a></td>";
+                        print "<td><a href='#' onclick=\"clearPluginData('$name')\" class='visibleLink'>";
+                        print __("Clear data")."</a></td>";
                     }
                 }
 
@@ -918,18 +958,19 @@ class Pref_Prefs extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hookPreferencesTab", "prefPrefs"
+            "hookPreferencesTab",
+            "prefPrefs"
         );
 
         print "</div>"; #container
     }
 
-    function toggleAdvanced()
+    public function toggleAdvanced()
     {
         $_SESSION["prefs_show_advanced"] = !$_SESSION["prefs_show_advanced"];
     }
 
-    function otpqrcode()
+    public function otpqrcode()
     {
         require_once "lib/otphp/vendor/base32.php";
         require_once "lib/otphp/lib/otp.php";
@@ -954,7 +995,7 @@ class Pref_Prefs extends ProtectedHandler
         }
     }
 
-    function otpenable()
+    public function otpenable()
     {
         require_once "lib/otphp/vendor/base32.php";
         require_once "lib/otphp/lib/otp.php";
@@ -996,7 +1037,7 @@ class Pref_Prefs extends ProtectedHandler
 
     }
 
-    function otpdisable()
+    public function otpdisable()
     {
         $password = \SmallSmallRSS\Database::escape_string($_REQUEST["password"]);
 
@@ -1016,33 +1057,35 @@ class Pref_Prefs extends ProtectedHandler
 
     }
 
-    function setplugins()
+    public function setplugins()
     {
         if (is_array($_REQUEST["plugins"])) {
             $plugins = join(",", $_REQUEST["plugins"]);
-        }
-        else {
+        } else {
             $plugins = "";
         }
 
         \SmallSmallRSS\DBPrefs::write("_ENABLED_PLUGINS", $plugins);
     }
 
-    function clearplugindata()
+    public function clearplugindata()
     {
         $name = \SmallSmallRSS\Database::escape_string($_REQUEST["name"]);
 
         \SmallSmallRSS\PluginHost::getInstance()->clear_data(\SmallSmallRSS\PluginHost::getInstance()->get_plugin($name));
     }
 
-    function customizeCSS()
+    public function customizeCSS()
     {
         $value = \SmallSmallRSS\DBPrefs::read("USER_STYLESHEET");
 
         $value = str_replace("<br/>", "\n", $value);
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            T_sprintf("You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target=\"_blank\" class=\"visibleLink\" href=\"%s\">This file</a> can be used as a baseline.", "css/tt-rss.css")
+            T_sprintf(
+                "You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target=\"_blank\" class=\"visibleLink\" href=\"%s\">This file</a> can be used as a baseline.",
+                "css/tt-rss.css"
+            )
         );
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
@@ -1065,7 +1108,7 @@ class Pref_Prefs extends ProtectedHandler
 
     }
 
-    function editPrefProfiles()
+    public function editPrefProfiles()
     {
         print "<div dojoType=\"dijit.Toolbar\">";
 

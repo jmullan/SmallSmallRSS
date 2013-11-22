@@ -272,7 +272,7 @@ class PluginHost
 
     public function load_data($force = false)
     {
-        if ($this->owner_uid)  {
+        if ($this->owner_uid) {
             $result = \SmallSmallRSS\Database::query(
                 "SELECT name, content FROM ttrss_plugin_storage
                  WHERE owner_uid = '".$this->owner_uid."'"
@@ -333,7 +333,8 @@ class PluginHost
 
         $this->storage[$idx][$name] = $value;
 
-        if ($sync) {  $this->save_data(get_class($sender));
+        if ($sync) {
+            $this->save_data(get_class($sender));
         }
     }
 

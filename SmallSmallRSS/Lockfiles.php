@@ -1,8 +1,10 @@
 <?php
 namespace SmallSmallRSS;
 
-class Lockfiles {
-    public static function unlinkExpired() {
+class Lockfiles
+{
+    public static function unlinkExpired()
+    {
         $num_deleted = 0;
         if (!is_writable(\SmallSmallRSS\Config::get('LOCK_DIRECTORY'))) {
             \SmallSmallRSS\Logger::debug(
@@ -21,7 +23,8 @@ class Lockfiles {
         }
     }
 
-    public static function get_contents($lockfile) {
+    public static function get_contents($lockfile)
+    {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (is_file($full_path) && is_readable($full_path)) {
             return file_get_contents($full_path);
@@ -30,14 +33,16 @@ class Lockfiles {
         }
     }
 
-    public static function unlock($lockfile) {
+    public static function unlock($lockfile)
+    {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (file_exists($full_path)) {
             unlink($full_path);
         }
     }
 
-    public static function make($lockfile) {
+    public static function make($lockfile)
+    {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (!touch($full_path)) {
             \SmallSmallRSS\Logger::Log("Could not touch $full_path");
@@ -67,7 +72,8 @@ class Lockfiles {
         return $fp;
     }
 
-    public static function is_locked($lockfile) {
+    public static function is_locked($lockfile)
+    {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (!file_exists($full_path)) {
             return false;
@@ -88,7 +94,8 @@ class Lockfiles {
         return true;
     }
 
-    public static function last_modified($lockfile) {
+    public static function last_modified($lockfile)
+    {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (!file_exists($full_path)) {
             return 0;
@@ -97,7 +104,8 @@ class Lockfiles {
         return $stat_f['mtime'];
     }
 
-    public static function make_stamp($lockfile) {
+    public static function make_stamp($lockfile)
+    {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         $fp = fopen($full_path, "w");
         if (!$fp) {

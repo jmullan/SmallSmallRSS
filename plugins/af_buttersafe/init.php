@@ -1,62 +1,47 @@
 <?php
 class Af_Buttersafe extends \SmallSmallRSS\Plugin {
 
-	private $host;
+    private $host;
 
-	function about() {
-		return array(1.0,
-			"Strip unnecessary stuff from Buttersafe feeds",
-			"fox");
-	}
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'Buttersafe Cleanup';
+    const DESCRIPTION = 'Strip unnecessary stuff from Buttersafe feeds';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-	function init($host) {
-		$this->host = $host;
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
+    );
 
-		$host->add_hook($host::HOOK_ARTICLE_FILTER, $this);
-	}
-
-	function hook_article_filter($article) {
-		$owner_uid = $article["owner_uid"];
-
-		if (strpos($article["guid"], "buttersafe.com") !== FALSE) {
-			if (strpos($article["plugin_data"], "buttersafe,$owner_uid:") === FALSE) {
-
-				$doc = new DOMDocument();
-				@$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
-
-				$basenode = false;
-
-				if ($doc) {
-					$xpath = new DOMXPath($doc);
-					$entries = $xpath->query('(//img[@src])');
-
-					$matches = array();
-
-					foreach ($entries as $entry) {
-
-						if (preg_match("/(http:\/\/buttersafe.com\/comics\/\d{4}.*)/i", $entry->getAttribute("src"), $matches)) {
-
-							$basenode = $entry;
-							break;
-						}
-					}
-
-					if ($basenode) {
-						$article["content"] = $doc->saveXML($basenode);
-						$article["plugin_data"] = "buttersafe,$owner_uid:" . $article["plugin_data"];
-					}
-				}
-			} elseif (isset($article["stored"]["content"])) {
-				$article["content"] = $article["stored"]["content"];
-			}
-		}
-
-		return $article;
-	}
-
-	function api_version() {
-		return 2;
-	}
-
+    function hookArticleFilter($article)
+    {
+        $owner_uid = $article["owner_uid"];
+        if (strpos($article["guid"], "buttersafe.com") !== false) {
+            if (strpos($article["plugin_data"], "buttersafe,$owner_uid:") === false) {
+                $doc = new DOMDocument();
+                @$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                $basenode = false;
+                if ($doc) {
+                    $xpath = new DOMXPath($doc);
+                    $entries = $xpath->query('(//img[@src])');
+                    $matches = array();
+                    $regex = "/(http:\/\/buttersafe.com\/comics\/\d{4}.*)/i";
+                    foreach ($entries as $entry) {
+                        if (preg_match($regex, $entry->getAttribute("src"), $matches)) {
+                            $basenode = $entry;
+                            break;
+                        }
+                    }
+                    if ($basenode) {
+                        $article["content"] = $doc->saveXML($basenode);
+                        $article["plugin_data"] = "buttersafe,$owner_uid:" . $article["plugin_data"];
+                    }
+                }
+            } elseif (isset($article["stored"]["content"])) {
+                $article["content"] = $article["stored"]["content"];
+            }
+        }
+        return $article;
+    }
 }
-?>

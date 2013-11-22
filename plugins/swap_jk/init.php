@@ -1,31 +1,24 @@
 <?php
-class Swap_JK extends \SmallSmallRSS\Plugin {
 
-	private $host;
+class Swap_JK extends \SmallSmallRSS\Plugin
+{
+    private $host;
 
-	function about() {
-		return array(1.0,
-			"Swap j and k hotkeys (for vi brethren)",
-			"fox");
-	}
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'vi-style navigation';
+    const DESCRIPTION = 'Swap j and k hotkeys (for vi brethren)';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-	function init($host) {
-		$this->host = $host;
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP,
+    );
 
-		$host->add_hook($host::HOOK_HOTKEY_MAP, $this);
-	}
-
-	function hook_hotkey_map($hotkeys) {
-
-		$hotkeys["j"] = "next_feed";
-		$hotkeys["k"] = "prev_feed";
-
-		return $hotkeys;
-	}
-
-	function api_version() {
-		return 2;
-	}
-
+    public function hook_hotkey_map($hotkeys)
+    {
+        $hotkeys["j"] = "next_feed";
+        $hotkeys["k"] = "prev_feed";
+        return $hotkeys;
+    }
 }
-?>

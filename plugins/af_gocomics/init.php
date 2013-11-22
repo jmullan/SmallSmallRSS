@@ -1,61 +1,52 @@
 <?php
-class Af_GoComics extends \SmallSmallRSS\Plugin {
-	private $host;
+class Af_GoComics extends \SmallSmallRSS\Plugin
+{
+    private $host;
 
-	function about() {
-		return array(1.0,
-			"Strip unnecessary stuff from gocomics feeds",
-			"fox");
-	}
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'GoComics Cleanup';
+    const DESCRIPTION = 'Strip unnecessary stuff from gocomics feeds';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-	function init($host) {
-		$this->host = $host;
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
+    );
 
-		$host->add_hook($host::HOOK_ARTICLE_FILTER, $this);
-	}
+    function hookArticleFilter($article)
+    {
+        $owner_uid = $article["owner_uid"];
+        if (strpos($article["guid"], "gocomics.com") !== false) {
+            if (strpos($article["plugin_data"], "gocomics,$owner_uid:") === false) {
+                $doc = new DOMDocument();
+                @$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
 
-	function hook_article_filter($article) {
-		$owner_uid = $article["owner_uid"];
+                $basenode = false;
 
-		if (strpos($article["guid"], "gocomics.com") !== FALSE) {
-			if (strpos($article["plugin_data"], "gocomics,$owner_uid:") === FALSE) {
-				$doc = new DOMDocument();
-				@$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                if ($doc) {
+                    $xpath = new DOMXPath($doc);
+                    $entries = $xpath->query('(//img[@src])'); // we might also check for img[@class='strip'] I guess...
 
-				$basenode = false;
+                    $matches = array();
+                    $regex = "/(http:\/\/assets.amuniversal.com\/.*)/i";
+                    foreach ($entries as $entry) {
+                        if (preg_match($regex, $entry->getAttribute("src"), $matches)) {
+                            $entry->setAttribute("src", $matches[0]);
+                            $basenode = $entry;
+                            break;
+                        }
+                    }
 
-				if ($doc) {
-					$xpath = new DOMXPath($doc);
-					$entries = $xpath->query('(//img[@src])'); // we might also check for img[@class='strip'] I guess...
-
-					$matches = array();
-
-					foreach ($entries as $entry) {
-
-						if (preg_match("/(http:\/\/assets.amuniversal.com\/.*)/i", $entry->getAttribute("src"), $matches)) {
-
-							$entry->setAttribute("src", $matches[0]);
-							$basenode = $entry;
-							break;
-						}
-					}
-
-					if ($basenode) {
-						$article["content"] = $doc->saveXML($basenode);
-						$article["plugin_data"] = "gocomics,$owner_uid:" . $article["plugin_data"];
-					}
-				}
-			} elseif (isset($article["stored"]["content"])) {
-				$article["content"] = $article["stored"]["content"];
-			}
-		}
-
-		return $article;
-	}
-
-	function api_version() {
-		return 2;
-	}
-
+                    if ($basenode) {
+                        $article["content"] = $doc->saveXML($basenode);
+                        $article["plugin_data"] = "gocomics,$owner_uid:" . $article["plugin_data"];
+                    }
+                }
+            } elseif (isset($article["stored"]["content"])) {
+                $article["content"] = $article["stored"]["content"];
+            }
+        }
+        return $article;
+    }
 }
-?>

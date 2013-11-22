@@ -3,20 +3,50 @@ require_once __DIR__ . "/../../lib/otphp/vendor/base32.php";
 require_once __DIR__ . "/../../lib/otphp/lib/otp.php";
 require_once __DIR__ . "/../../lib/otphp/lib/totp.php";
 
-class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_Interface {
+class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_Interface
+{
     private $host;
 
-    function about() {
-        return array(
-            1.0, "Authenticates against internal tt-rss database", "fox", true);
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'Internal Authentication';
+    const DESCRIPTION = 'Authenticates against internal tt-rss database';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
+
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_AUTH_USER
+    );
+
+    private function renderOTP($return, $login, $password)
+    {
+        $renderer = new \SmallSmallRSS\Renderers\CSS();
+        ?>
+        <html>
+          <head>
+            <title>Tiny Tiny RSS</title>
+            <?php $renderer->renderStylesheetTag("css/utility.css"); ?>
+          </head>
+          <body class="otp">
+            <div class="content">
+              <form action="public.php?return=<?php echo $return ?>" method="POST" class="otpform">
+                <input type="hidden" name="op" value="login" />
+                <input type="hidden" name="login" value="<?php echo htmlspecialchars($login) ?>" />
+                <input type="hidden" name="password" value="<?php echo htmlspecialchars($password) ?>" />
+                <label for="otp"><?php echo __("Please enter your one time password:") ?></label>
+                <input autocomplete="off" size="6" name="otp" value="" />
+                <input type="submit" value="Continue" />
+              </form>
+            </div>
+            <script type="text/javascript">
+              document.forms[0].otp.focus();
+            </script>
+        <?php
     }
 
-    function init($host) {
-        $this->host = $host;
-        $host->add_hook($host::HOOK_AUTH_USER, $this);
-    }
 
-    function authenticate($login, $password) {
+    public function authenticate($login, $password)
+    {
         $pwd_hash1 = encrypt_password($password);
         $pwd_hash2 = encrypt_password($password, $login);
         $login = \SmallSmallRSS\Database::escape_string($login);
@@ -41,30 +71,7 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
                             }
                         } else {
                             $return = urlencode($_REQUEST["return"]);
-?>
-<html>
-  <head><title>Tiny Tiny RSS</title>
-<?php
-
-     $renderer = new \SmallSmallRSS\Renderers\CSS();
-     $renderer->renderStylesheetTag("css/utility.css")
-?>
-</head>
-<body class="otp">
-  <div class="content">
-  <form action="public.php?return=<?php echo $return ?>" method="POST" class="otpform">
-    <input type="hidden" name="op" value="login" />
-    <input type="hidden" name="login" value="<?php echo htmlspecialchars($login) ?>" />
-    <input type="hidden" name="password" value="<?php echo htmlspecialchars($password) ?>" />
-    <label for="otp"><?php echo __("Please enter your one time password:") ?></label>
-    <input autocomplete="off" size="6" name="otp" value="" />
-    <input type="submit" value="Continue" />
-  </form>
-</div>
-<script type="text/javascript">
-  document.forms[0].otp.focus();
-</script>
-<?php
+                            $this->renderOTP($return, $login, $password);
                             exit;
                         }
                     }
@@ -74,8 +81,10 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
 
         if (\SmallSmallRSS\Sanity::getSchemaVersion() > 87) {
 
-            $result = \SmallSmallRSS\Database::query("SELECT salt FROM ttrss_users WHERE
-                login = '$login'");
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT salt FROM ttrss_users WHERE
+                 login = '$login'"
+            );
             if (\SmallSmallRSS\Database::num_rows($result) != 1) {
                 return false;
             }
@@ -93,8 +102,11 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
                     // upgrade password to MODE2
                     $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
                     $pwd_hash = encrypt_password($password, $salt, true);
-                    \SmallSmallRSS\Database::query("UPDATE ttrss_users SET
-                          pwd_hash = '$pwd_hash', salt = '$salt' WHERE login = '$login'");
+                    \SmallSmallRSS\Database::query(
+                        "UPDATE ttrss_users
+                         SET pwd_hash = '$pwd_hash', salt = '$salt'
+                         WHERE login = '$login'"
+                    );
                     $query = "SELECT id
                     FROM ttrss_users WHERE
                         login = '$login' AND pwd_hash = '$pwd_hash'";
@@ -111,9 +123,13 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
 
         } else {
             $query = "SELECT id
-             FROM ttrss_users WHERE
-                login = '$login' AND (pwd_hash = '$pwd_hash1' OR
-                    pwd_hash = '$pwd_hash2')";
+                      FROM ttrss_users
+                      WHERE
+                          login = '$login'
+                          AND (
+                              pwd_hash = '$pwd_hash1' OR
+                              pwd_hash = '$pwd_hash2'
+                          )";
         }
         $result = \SmallSmallRSS\Database::query($query);
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
@@ -122,11 +138,14 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
         return false;
     }
 
-    function check_password($owner_uid, $password) {
+    public function check_password($owner_uid, $password)
+    {
         $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
-
-        $result = \SmallSmallRSS\Database::query("SELECT salt,login FROM ttrss_users WHERE
-            id = '$owner_uid'");
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT salt, login
+             FROM ttrss_users
+             WHERE id = '$owner_uid'"
+        );
 
         $salt = \SmallSmallRSS\Database::fetch_result($result, 0, "salt");
         $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
@@ -151,7 +170,8 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
         return \SmallSmallRSS\Database::num_rows($result) != 0;
     }
 
-    function change_password($owner_uid, $old_password, $new_password) {
+    public function change_password($owner_uid, $old_password, $new_password)
+    {
         $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
 
         if ($this->check_password($owner_uid, $old_password)) {
@@ -175,9 +195,4 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
             return "ERROR: ".__('Old password is incorrect.');
         }
     }
-
-    function api_version() {
-        return 2;
-    }
 }
-

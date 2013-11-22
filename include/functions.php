@@ -195,7 +195,7 @@ function initialize_user_prefs($uid, $profile = false)
         array_push($active_prefs, $line["pref_name"]);
     }
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-        if (array_search($line["pref_name"], $active_prefs) === FALSE) {
+        if (array_search($line["pref_name"], $active_prefs) === false) {
             $line["def_value"] = \SmallSmallRSS\Database::escape_string($line["def_value"]);
             $line["pref_name"] = \SmallSmallRSS\Database::escape_string($line["pref_name"]);
             if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
@@ -2586,7 +2586,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
                     id=\"ATSTRTIP-$id\" connectId=\"ATSTR-$id\"
                     position=\"below\">$tags_str_full</div>";
             foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON) as $p) {
-                $rv['content'] .= $p->hook_article_button($line);
+                $rv['content'] .= $p->hookArticleButton($line);
             }
 
         } else {
@@ -2604,8 +2604,10 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
 
         if ($line["orig_feed_id"]) {
 
-            $tmp_result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_archived_feeds
-                    WHERE id = ".$line["orig_feed_id"]);
+            $tmp_result = \SmallSmallRSS\Database::query(
+                "SELECT * FROM ttrss_archived_feeds
+                 WHERE id = ".$line["orig_feed_id"]
+            );
 
             if (\SmallSmallRSS\Database::num_rows($tmp_result) != 0) {
 
@@ -3081,10 +3083,9 @@ function format_article_enclosures($id, $always_display_enclosures,
 
             $player = format_inline_player($url, $ctype);
 
-            if ($player) array_push($entries_inline, $player);
-
-            #                $entry .= " <a target=\"_blank\" href=\"" . htmlspecialchars($url) . "\">" .
-            #                    $filename . " (" . $ctype . ")" . "</a>";
+            if ($player) {
+                array_push($entries_inline, $player);
+            }
 
             $entry = "<div onclick=\"window.open('".htmlspecialchars($url)."')\"
                     dojoType=\"dijit.MenuItem\">$filename ($ctype)</div>";
@@ -3126,7 +3127,9 @@ function format_article_enclosures($id, $always_display_enclosures,
 
         if (count($entries_inline) > 0) {
             $rv .= "<hr clear='both'/>";
-            foreach ($entries_inline as $entry) { $rv .= $entry; };
+            foreach ($entries_inline as $entry) {
+                $rv .= $entry;
+            };
             $rv .= "<hr clear='both'/>";
         }
 
@@ -3144,7 +3147,8 @@ function format_article_enclosures($id, $always_display_enclosures,
     return $rv;
 }
 
-function getLastArticleId() {
+function getLastArticleId()
+{
     $result = \SmallSmallRSS\Database::query("SELECT MAX(ref_id) AS id FROM ttrss_user_entries
             WHERE owner_uid = " . $_SESSION["uid"]);
 
@@ -3155,7 +3159,8 @@ function getLastArticleId() {
     }
 }
 
-function build_url($parts) {
+function build_url($parts)
+{
     return $parts['scheme'] . "://" . $parts['host'] . $parts['path'];
 }
 
@@ -3167,7 +3172,8 @@ function build_url($parts) {
  *
  * @return string Absolute URL
  */
-function rewrite_relative_url($url, $rel_url) {
+function rewrite_relative_url($url, $rel_url)
+{
     if (strpos($rel_url, "magnet:") === 0) {
         return $rel_url;
     } elseif (strpos($rel_url, "://") !== false) {
@@ -3175,14 +3181,13 @@ function rewrite_relative_url($url, $rel_url) {
     } elseif (strpos($rel_url, "//") === 0) {
         # protocol-relative URL (rare but they exist)
         return $rel_url;
-    } elseif (strpos($rel_url, "/") === 0)
-              {
-                  $parts = parse_url($url);
-                  $parts['path'] = $rel_url;
+    } elseif (strpos($rel_url, "/") === 0) {
+        $parts = parse_url($url);
+        $parts['path'] = $rel_url;
 
-                  return build_url($parts);
+        return build_url($parts);
 
-              } else {
+    } else {
         $parts = parse_url($url);
         if (!isset($parts['path'])) {
             $parts['path'] = '/';
@@ -3198,7 +3203,8 @@ function rewrite_relative_url($url, $rel_url) {
     }
 }
 
-function sphinx_search($query, $offset = 0, $limit = 30) {
+function sphinx_search($query, $offset = 0, $limit = 30)
+{
     require_once __DIR__ . '/../lib/sphinxapi.php';
     $sphinxClient = new SphinxClient();
     $sphinxpair = explode(":", \SmallSmallRSS\Config::get('SPHINX_SERVER'), 2);
@@ -3234,7 +3240,8 @@ function sphinx_search($query, $offset = 0, $limit = 30) {
     return $ids;
 }
 
-function cleanup_tags($days = 14, $limit = 1000) {
+function cleanup_tags($days = 14, $limit = 1000)
+{
 
     if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $interval_query = "date_updated < NOW() - INTERVAL '$days days'";
@@ -3276,7 +3283,8 @@ function cleanup_tags($days = 14, $limit = 1000) {
 }
 
 
-function rewrite_urls($html) {
+function rewrite_urls($html)
+{
     libxml_use_internal_errors(true);
     $charset_hack = '<head>
                      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -3314,7 +3322,8 @@ function rewrite_urls($html) {
     }
 }
 
-function filter_to_sql($filter, $owner_uid) {
+function filter_to_sql($filter, $owner_uid)
+{
     $query = array();
     if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $reg_qpart = "~";
@@ -3322,7 +3331,7 @@ function filter_to_sql($filter, $owner_uid) {
         $reg_qpart = "REGEXP";
     }
     foreach ($filter["rules"] as $rule) {
-        $regexp_valid = preg_match('/' . $rule['reg_exp'] . '/', $rule['reg_exp']) !== FALSE;
+        $regexp_valid = preg_match('/' . $rule['reg_exp'] . '/', $rule['reg_exp']) !== false;
         if ($regexp_valid) {
             $rule['reg_exp'] = \SmallSmallRSS\Database::escape_string($rule['reg_exp']);
             switch ($rule["type"]) {

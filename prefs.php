@@ -56,7 +56,7 @@ foreach (array("lib/prototype.js",
 <?php
 $js_renderer = new \SmallSmallRSS\Renderers\JS();
 foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
-    $js_renderer->render_minified($p->get_prefs_js());
+    $js_renderer->render_minified($p->getPreferencesJavascript());
 }
 $js_renderer->render_minified_js_files(
     array("../lib/CheckBoxTree", "functions", "deprecated", "prefs", "PrefFeedTree", "PrefFilterTree", "PrefLabelTree")
@@ -107,14 +107,18 @@ $translation_renderer->render();
     <div id="labelConfigTab" dojoType="dijit.layout.ContentPane"
     href="backend.php?op=pref-labels"
     title="<?php echo __('Labels') ?>"></div>
-<?php if ($_SESSION["access_level"] >= 10) { ?>
-<div id="userConfigTab" dojoType="dijit.layout.ContentPane"
+<?php
+if ($_SESSION["access_level"] >= 10) {
+?>
+    <div id="userConfigTab" dojoType="dijit.layout.ContentPane"
      href="backend.php?op=pref-users"
      title="<?php echo __('Users') ?>"></div>
      <div id="systemConfigTab" dojoType="dijit.layout.ContentPane"
      href="backend.php?op=pref-system"
      title="<?php echo __('System') ?>"></div>
-<?php } ?>
+<?php
+}
+?>
 <?php
      \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
          \SmallSmallRSS\PluginHost::HOOK_PREFS_TABS,

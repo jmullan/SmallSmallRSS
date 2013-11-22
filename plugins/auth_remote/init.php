@@ -5,21 +5,21 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
     private $host;
     private $base;
 
-    public function about()
-    {
-        return array(
-            1.0,
-            "Authenticates against remote password (e.g. supplied by Apache)",
-            "fox",
-            true
-        );
-    }
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'Remote Authentication';
+    const DESCRIPTION = 'Authenticates against remote password (e.g. supplied by Apache)';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-    public function init($host)
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_AUTH_USER
+    );
+
+    public function __construct($pluginhost)
     {
-        $this->host = $host;
+        $this->host = $pluginhost;
         $this->base = new \SmallSmallRSS\Auth_Base();
-        $host->add_hook($host::HOOK_AUTH_USER, $this);
     }
 
     public function getLoginBySSLCertificate()
@@ -71,7 +71,9 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
                     if ($fullname) {
                         $fullname = \SmallSmallRSS\Database::escape_string($fullname);
                         \SmallSmallRSS\Database::query(
-                            "UPDATE ttrss_users SET full_name = '$fullname' WHERE id = " . $user_id
+                            "UPDATE ttrss_users
+                             SET full_name = '$fullname'
+                             WHERE id = " . $user_id
                         );
                     }
                     // update user mail
@@ -87,10 +89,5 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
             }
         }
         return false;
-    }
-
-    public function api_version()
-    {
-        return 2;
     }
 }

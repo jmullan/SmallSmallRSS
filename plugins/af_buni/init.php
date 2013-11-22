@@ -1,62 +1,48 @@
 <?php
-class Af_Buni extends \SmallSmallRSS\Plugin {
 
-	private $host;
+class Af_Buni extends \SmallSmallRSS\Plugin
+{
+    private $host;
 
-	function about() {
-		return array(1.0,
-			"Fix Buni rss feed",
-			"fox");
-	}
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'BuniComic Cleanup';
+    const DESCRIPTION = 'Fix Buni rss feed';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-	function init($host) {
-		$this->host = $host;
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
+    );
 
-		$host->add_hook($host::HOOK_ARTICLE_FILTER, $this);
-	}
-
-	function hook_article_filter($article) {
-		$owner_uid = $article["owner_uid"];
-
-		if (strpos($article["guid"], "bunicomic.com") !== FALSE) {
-			if (strpos($article["plugin_data"], "buni,$owner_uid:") === FALSE) {
-
-				$doc = new DOMDocument();
-				@$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
-
-				$basenode = false;
-
-				if ($doc) {
-					$xpath = new DOMXPath($doc);
-					$entries = $xpath->query('(//img[@src])');
-
-					$matches = array();
-
-					foreach ($entries as $entry) {
-
-						if (preg_match("/(http:\/\/www.bunicomic.com\/comics\/\d{4}.*)/i", $entry->getAttribute("src"), $matches)) {
-
-							$basenode = $entry;
-							break;
-						}
-					}
-
-					if ($basenode) {
-						$article["content"] = $doc->saveXML($basenode);
-						$article["plugin_data"] = "buni,$owner_uid:" . $article["plugin_data"];
-					}
-				}
-			} elseif (isset($article["stored"]["content"])) {
-				$article["content"] = $article["stored"]["content"];
-			}
-		}
-
-		return $article;
-	}
-
-	function api_version() {
-		return 2;
-	}
-
+    public function hookArticleFilter($article)
+    {
+        $owner_uid = $article["owner_uid"];
+        if (strpos($article["guid"], "bunicomic.com") !== false) {
+            if (strpos($article["plugin_data"], "buni,$owner_uid:") === false) {
+                $doc = new DOMDocument();
+                @$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                $basenode = false;
+                if ($doc) {
+                    $xpath = new DOMXPath($doc);
+                    $entries = $xpath->query('(//img[@src])');
+                    $matches = array();
+                    $regex = "/(http:\/\/www.bunicomic.com\/comics\/\d{4}.*)/i";
+                    foreach ($entries as $entry) {
+                        if (preg_match($regex, $entry->getAttribute("src"), $matches)) {
+                            $basenode = $entry;
+                            break;
+                        }
+                    }
+                    if ($basenode) {
+                        $article["content"] = $doc->saveXML($basenode);
+                        $article["plugin_data"] = "buni,$owner_uid:" . $article["plugin_data"];
+                    }
+                }
+            } elseif (isset($article["stored"]["content"])) {
+                $article["content"] = $article["stored"]["content"];
+            }
+        }
+        return $article;
+    }
 }
-?>

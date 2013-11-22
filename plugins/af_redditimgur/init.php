@@ -1,142 +1,147 @@
 <?php
-class Af_RedditImgur extends \SmallSmallRSS\Plugin {
-	private $host;
 
-	function about() {
-		return array(1.0,
-			"Inline image links in Reddit RSS feeds",
-			"fox");
-	}
+class Af_RedditImgur extends \SmallSmallRSS\Plugin
+{
+    private $host;
 
-	function init($host) {
-		$this->host = $host;
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'Reddit + Imgur';
+    const DESCRIPTION = 'Inline image links in Reddit RSS feeds';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-		$host->add_hook($host::HOOK_ARTICLE_FILTER, $this);
-	}
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
+    );
 
-	function hook_article_filter($article) {
-		$owner_uid = $article["owner_uid"];
+    function hookArticleFilter($article)
+    {
+        $owner_uid = $article["owner_uid"];
+        $force = false;
+        if (strpos($article["link"], "reddit.com/r/") !== false) {
+            if ($force || strpos($article["plugin_data"], "redditimgur,$owner_uid:") === false) {
+                $doc = new DOMDocument();
+                @$doc->loadHTML($article["content"]);
 
-		$force = false;
+                if ($doc) {
+                    $xpath = new DOMXPath($doc);
+                    $entries = $xpath->query('(//a[@href]|//img[@src])');
 
-		if (strpos($article["link"], "reddit.com/r/") !== FALSE) {
-			if (strpos($article["plugin_data"], "redditimgur,$owner_uid:") === FALSE || $force) {
-				$doc = new DOMDocument();
-				@$doc->loadHTML($article["content"]);
+                    $found = false;
 
-				if ($doc) {
-					$xpath = new DOMXPath($doc);
-					$entries = $xpath->query('(//a[@href]|//img[@src])');
+                    foreach ($entries as $entry) {
+                        if ($entry->hasAttribute("href")) {
+                            if (preg_match("/\.(jpg|jpeg|gif|png)$/i", $entry->getAttribute("href"))) {
+                                $img = $doc->createElement('img');
+                                $img->setAttribute("src", $entry->getAttribute("href"));
+                                $br = $doc->createElement('br');
+                                $entry->parentNode->insertBefore($img, $entry);
+                                $entry->parentNode->insertBefore($br, $entry);
+                                $found = true;
+                            }
+                            $regex = "/^http:\/\/imgur.com\/([^\.\/]+$)/";
+                            // links to imgur pages
+                            $matches = array();
+                            if (preg_match($regex, $entry->getAttribute("href"), $matches)) {
 
-					$found = false;
+                                $token = $matches[1];
 
-					foreach ($entries as $entry) {
-						if ($entry->hasAttribute("href")) {
-							if (preg_match("/\.(jpg|jpeg|gif|png)$/i", $entry->getAttribute("href"))) {
+                                $album_content = \SmallSmallRSS\Fetcher::fetch(
+                                    $entry->getAttribute("href"),
+                                    false,
+                                    false,
+                                    false,
+                                    false,
+                                    10
+                                );
 
-							 	$img = $doc->createElement('img');
-								$img->setAttribute("src", $entry->getAttribute("href"));
+                                if ($album_content && $token) {
+                                    $adoc = new DOMDocument();
+                                    @$adoc->loadHTML($album_content);
 
-								$br = $doc->createElement('br');
-								$entry->parentNode->insertBefore($img, $entry);
-								$entry->parentNode->insertBefore($br, $entry);
+                                    if ($adoc) {
+                                        $axpath = new DOMXPath($adoc);
+                                        $aentries = $axpath->query('(//img[@src])');
+                                        $regex = "/^http:\/\/i.imgur.com\/$token\./";
+                                        foreach ($aentries as $aentry) {
+                                            if (preg_match($regex, $aentry->getAttribute("src"))) {
+                                                $img = $doc->createElement('img');
+                                                $img->setAttribute("src", $aentry->getAttribute("src"));
 
-								$found = true;
-							}
+                                                $br = $doc->createElement('br');
 
-							// links to imgur pages
-							$matches = array();
-							if (preg_match("/^http:\/\/imgur.com\/([^\.\/]+$)/", $entry->getAttribute("href"), $matches)) {
+                                                $entry->parentNode->insertBefore($img, $entry);
+                                                $entry->parentNode->insertBefore($br, $entry);
 
-								$token = $matches[1];
+                                                $found = true;
 
-								$album_content = \SmallSmallRSS\Fetcher::fetch($entry->getAttribute("href"),
-									false, false, false, false, 10);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
-								if ($album_content && $token) {
-									$adoc = new DOMDocument();
-									@$adoc->loadHTML($album_content);
+                            // linked albums, ffs
+                            $regex = "/^http:\/\/imgur.com\/(a|album)\/[^\.]+$/";
+                            if (preg_match($regex, $entry->getAttribute("href"), $matches)) {
 
-									if ($adoc) {
-										$axpath = new DOMXPath($adoc);
-										$aentries = $axpath->query('(//img[@src])');
+                                $album_content = \SmallSmallRSS\Fetcher::fetch(
+                                    $entry->getAttribute("href"),
+                                    false,
+                                    false,
+                                    false,
+                                    false,
+                                    10
+                                );
 
-										foreach ($aentries as $aentry) {
-											if (preg_match("/^http:\/\/i.imgur.com\/$token\./", $aentry->getAttribute("src"))) {
-												$img = $doc->createElement('img');
-												$img->setAttribute("src", $aentry->getAttribute("src"));
+                                if ($album_content) {
+                                    $adoc = new DOMDocument();
+                                    @$adoc->loadHTML($album_content);
 
-												$br = $doc->createElement('br');
+                                    if ($adoc) {
+                                        $axpath = new DOMXPath($adoc);
+                                        $aentries = $axpath->query("//div[@class='image']//a[@href and @class='zoom']");
 
-												$entry->parentNode->insertBefore($img, $entry);
-												$entry->parentNode->insertBefore($br, $entry);
+                                        foreach ($aentries as $aentry) {
+                                            $img = $doc->createElement('img');
+                                            $img->setAttribute("src", $aentry->getAttribute("href"));
+                                            $entry->parentNode->insertBefore($doc->createElement('br'), $entry);
 
-												$found = true;
+                                            $br = $doc->createElement('br');
 
-												break;
-											}
-										}
-									}
-								}
-							}
+                                            $entry->parentNode->insertBefore($img, $entry);
+                                            $entry->parentNode->insertBefore($br, $entry);
 
-							// linked albums, ffs
-							if (preg_match("/^http:\/\/imgur.com\/(a|album)\/[^\.]+$/", $entry->getAttribute("href"), $matches)) {
+                                            $found = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
 
-								$album_content = \SmallSmallRSS\Fetcher::fetch($entry->getAttribute("href"),
-									false, false, false, false, 10);
+                        // remove tiny thumbnails
+                        if ($entry->hasAttribute("src")) {
+                            if ($entry->parentNode && $entry->parentNode->parentNode) {
+                                $entry->parentNode->parentNode->removeChild($entry->parentNode);
+                            }
+                        }
+                    }
 
-								if ($album_content) {
-									$adoc = new DOMDocument();
-									@$adoc->loadHTML($album_content);
+                    $node = $doc->getElementsByTagName('body')->item(0);
 
-									if ($adoc) {
-										$axpath = new DOMXPath($adoc);
-										$aentries = $axpath->query("//div[@class='image']//a[@href and @class='zoom']");
-
-										foreach ($aentries as $aentry) {
-											$img = $doc->createElement('img');
-											$img->setAttribute("src", $aentry->getAttribute("href"));
-											$entry->parentNode->insertBefore($doc->createElement('br'), $entry);
-
-											$br = $doc->createElement('br');
-
-											$entry->parentNode->insertBefore($img, $entry);
-											$entry->parentNode->insertBefore($br, $entry);
-
-											$found = true;
-										}
-									}
-								}
-							}
-						}
-
-						// remove tiny thumbnails
-						if ($entry->hasAttribute("src")) {
-							if ($entry->parentNode && $entry->parentNode->parentNode) {
-								$entry->parentNode->parentNode->removeChild($entry->parentNode);
-							}
-						}
-					}
-
-					$node = $doc->getElementsByTagName('body')->item(0);
-
-					if ($node && $found) {
-						$article["content"] = $doc->saveXML($node);
-						if (!$force) $article["plugin_data"] = "redditimgur,$owner_uid:" . $article["plugin_data"];
-					}
-				}
-			} elseif (isset($article["stored"]["content"])) {
-				$article["content"] = $article["stored"]["content"];
-			}
-		}
-
-		return $article;
-	}
-
-	function api_version() {
-		return 2;
-	}
-
+                    if ($node && $found) {
+                        $article["content"] = $doc->saveXML($node);
+                        if (!$force) {
+                            $article["plugin_data"] = "redditimgur,$owner_uid:" . $article["plugin_data"];
+                        }
+                    }
+                }
+            } elseif (isset($article["stored"]["content"])) {
+                $article["content"] = $article["stored"]["content"];
+            }
+        }
+        return $article;
+    }
 }
-?>

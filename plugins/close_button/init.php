@@ -1,33 +1,26 @@
 <?php
 class Close_Button extends \SmallSmallRSS\Plugin {
-	private $host;
+    private $host;
 
-	function init($host) {
-		$this->host = $host;
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'Article Panel Close Button';
+    const DESCRIPTION = 'Adds a button to close article panel';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-		$host->add_hook($host::HOOK_ARTICLE_BUTTON, $this);
-	}
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON
+    );
 
-	function about() {
-		return array(1.0,
-			"Adds a button to close article panel",
-			"fox");
-	}
-
-	function hook_article_button($line) {
-		if (!\SmallSmallRSS\DBPrefs::read("COMBINED_DISPLAY_MODE")) {
-			$rv = "<img src=\"plugins/close_button/button.png\"
-				class='tagsPic' style=\"cursor : pointer\"
-				onclick=\"closeArticlePanel()\"
-				title='".__('Close article')."'>";
-		}
-
-		return $rv;
-	}
-
-	function api_version() {
-		return 2;
-	}
-
+    function hookArticleButton($line)
+    {
+        if (!\SmallSmallRSS\DBPrefs::read("COMBINED_DISPLAY_MODE")) {
+            $rv = "<img src=\"plugins/close_button/button.png\"
+                    class='tagsPic' style=\"cursor: pointer\"
+                    onclick=\"closeArticlePanel()\"
+                    title='".__('Close article')."'>";
+        }
+        return $rv;
+    }
 }
-?>

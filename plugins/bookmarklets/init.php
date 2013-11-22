@@ -4,32 +4,27 @@ require __DIR__ . '/../../lib/jshrink/Minifier.php';
 class Bookmarklets extends \SmallSmallRSS\Plugin {
     private $host;
 
-    function about() {
-        return array(1.0,
-                     "Easy feed subscription and web page sharing using bookmarklets",
-                     "fox");
-    }
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'Bookmarklets';
+    const DESCRIPTION = 'Easy feed subscription and web page sharing using bookmarklets';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-    function init($host) {
-        $this->host = $host;
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB
+    );
 
-        $host->add_hook($host::HOOK_PREFS_TAB, $this);
-    }
-
-    function hook_prefs_tab($args) {
+    function hook_prefs_tab($args)
+    {
         if ($args == "prefFeeds") {
-
             print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Bookmarklets')."\">";
-
             \SmallSmallRSS\Renderers\Messages::renderNotice(
-                __("Drag the link below to your browser toolbar, open the feed you're interested in in your browser and click on the link to subscribe to it."));
-
+                __("Drag the link below to your browser toolbar, open the feed you're interested in in your browser and click on the link to subscribe to it.")
+            );
             $bm_subscribe_url = str_replace('%s', '', add_feed_url());
-
             $confirm_str = str_replace("'", "\'", __('Subscribe to %s in Tiny Tiny RSS?'));
-
             $bm_url = htmlspecialchars("javascript:{if(confirm('$confirm_str'.replace('%s',window.location.href)))window.location.href='$bm_subscribe_url'+window.location.href}");
-
             print "<p>";
             print "<a href=\"$bm_url\" class='bookmarklet'>" . __('Subscribe in Tiny Tiny RSS'). "</a>";
             print "</p>";
@@ -62,8 +57,5 @@ function() {
             print "</p>";
             print "</div>"; #pane
         }
-    }
-    function api_version() {
-        return 2;
     }
 }

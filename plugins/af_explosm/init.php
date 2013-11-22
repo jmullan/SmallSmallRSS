@@ -1,61 +1,56 @@
 <?php
 class Af_Explosm extends \SmallSmallRSS\Plugin {
 
-	private $host;
+    private $host;
 
-	function about() {
-		return array(1.0,
-			"Strip unnecessary stuff from Cyanide and Happiness feeds",
-			"fox");
-	}
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'Cyanide and Happiness Cleanup';
+    const DESCRIPTION = 'Strip unnecessary stuff from Cyanide and Happiness feeds';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-	function init($host) {
-		$this->host = $host;
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
+    );
 
-		$host->add_hook($host::HOOK_ARTICLE_FILTER, $this);
-	}
+    function hookArticleFilter($article)
+    {
+        $owner_uid = $article["owner_uid"];
 
-	function hook_article_filter($article) {
-		$owner_uid = $article["owner_uid"];
+        if (strpos($article["link"], "explosm.net/comics") !== false) {
+            if (strpos($article["plugin_data"], "explosm,$owner_uid:") === false) {
 
-		if (strpos($article["link"], "explosm.net/comics") !== FALSE) {
-			if (strpos($article["plugin_data"], "explosm,$owner_uid:") === FALSE) {
+                $doc = new DOMDocument();
+                @$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
 
-				$doc = new DOMDocument();
-				@$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                $basenode = false;
 
-				$basenode = false;
+                if ($doc) {
+                    $xpath = new DOMXPath($doc);
+                    $entries = $xpath->query('(//img[@src])'); // we might also check for img[@class='strip'] I guess...
 
-				if ($doc) {
-					$xpath = new DOMXPath($doc);
-					$entries = $xpath->query('(//img[@src])'); // we might also check for img[@class='strip'] I guess...
+                    $matches = array();
 
-					$matches = array();
+                    foreach ($entries as $entry) {
 
-					foreach ($entries as $entry) {
+                        if (preg_match("/(http:\/\/.*\/db\/files\/Comics\/.*)/i", $entry->getAttribute("src"), $matches)) {
 
-						if (preg_match("/(http:\/\/.*\/db\/files\/Comics\/.*)/i", $entry->getAttribute("src"), $matches)) {
+                            $basenode = $entry;
+                            break;
+                        }
+                    }
 
-							$basenode = $entry;
-							break;
-						}
-					}
+                    if ($basenode) {
+                        $article["content"] = $doc->saveXML($basenode);
+                        $article["plugin_data"] = "explosm,$owner_uid:" . $article["plugin_data"];
+                    }
+                }
+            } elseif (isset($article["stored"]["content"])) {
+                $article["content"] = $article["stored"]["content"];
+            }
+        }
 
-					if ($basenode) {
-						$article["content"] = $doc->saveXML($basenode);
-						$article["plugin_data"] = "explosm,$owner_uid:" . $article["plugin_data"];
-					}
-				}
-			} elseif (isset($article["stored"]["content"])) {
-				$article["content"] = $article["stored"]["content"];
-			}
-		}
-
-		return $article;
-	}
-
-	function api_version() {
-		return 2;
-	}
+        return $article;
+    }
 }
-?>

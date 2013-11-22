@@ -1,35 +1,57 @@
 <?php
 namespace SmallSmallRSS;
-class Plugin
+
+abstract class Plugin
 {
     private $dbh;
     private $host;
 
     const API_VERSION_COMPAT = 1;
+    const API_VERSION = 2;
 
-    function init($host)
+    const VERSION = 1.0;
+    const NAME = 'plugin';
+    const DESCRIPTION = 'No Description';
+    const AUTHOR = 'No Author';
+    const IS_SYSTEM = false;
+
+    public static $provides = array();
+
+    public function __construct($pluginhost)
     {
-        $this->host = $host;
+        $this->host = $pluginhost;
     }
 
-    function about()
+    public function register()
     {
-        // version, name, description, author, is_system
-        return array(1.0, "plugin", "No description", "No author", false);
+        foreach (static::$provides as $hook) {
+            $this->host->add_hook($hook, $this);
+        }
+        $this->addCommands();
     }
 
-    function get_js()
+    public function addCommands()
+    {
+    }
+
+    public function about()
+    {
+        return array(
+            static::VERSION,
+            static::NAME,
+            static::AUTHOR,
+            static::DESCRIPTION,
+            static::IS_SYSTEM
+        );
+    }
+
+    public function getJavascript()
     {
         return "";
     }
 
-    function get_prefs_js()
+    public function getPreferencesJavascript()
     {
         return "";
-    }
-
-    function api_version()
-    {
-        return Plugin::API_VERSION_COMPAT;
     }
 }

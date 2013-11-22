@@ -812,7 +812,6 @@ class Pref_Prefs extends ProtectedHandler
 
         foreach ($tmppluginhost->get_plugins() as $name => $plugin) {
             $about = $plugin->about();
-
             if (!empty($about[3]) && strpos($name, "example") === false) {
                 if (in_array($name, $system_enabled)) {
                     $checked = "checked='1'";

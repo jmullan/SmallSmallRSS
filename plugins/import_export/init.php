@@ -1,84 +1,82 @@
 <?php
+
 class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers\IHandler {
     private $host;
 
-    function init($host) {
-        $this->host = $host;
+    const API_VERSION = 2;
+    const VERSION = 1.0;
+    const NAME = 'XML Import/Export';
+    const DESCRIPTION = 'Imports and exports user data using neutral XML format';
+    const AUTHOR = 'fox';
+    const IS_SYSTEM = false;
 
-        $host->add_hook($host::HOOK_PREFS_TAB, $this);
-        $host->add_command("xml-import", "import articles from XML", $this, ":", "FILE");
+    public static $provides = array(
+        \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB
+    );
+
+    public function addCommands()
+    {
+        $this->host->add_command("xml-import", "import articles from XML", $this, ":", "FILE");
     }
 
-    function about() {
-        return array(1.0,
-                     "Imports and exports user data using neutral XML format",
-                     "fox");
-    }
-
-    function xml_import($args) {
-
+    public function xml_import($args)
+    {
         $filename = $args['xml_import'];
-
         if (!is_file($filename)) {
             print "error: input filename ($filename) doesn't exist.\n";
             return;
         }
-
-        _debug("please enter your username:");
-
+        print "please enter your username: ";
         $username = \SmallSmallRSS\Database::escape_string(trim(read_stdin()));
-
-        _debug("importing $filename for user $username...\n");
-
-        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE login = '$username'");
-
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id FROM ttrss_users WHERE login = '$username'"
+        );
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
             print "error: could not find user $username.\n";
             return;
         }
-
         $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
+        print "importing $filename for user $username...\n";
         $this->perform_data_import($filename, $owner_uid);
     }
 
-    function save() {
+    public function save()
+    {
         $example_value = \SmallSmallRSS\Database::escape_string($_POST["example_value"]);
 
         echo "Value set to $example_value (not really)";
     }
 
-    function get_prefs_js() {
+    public function getPreferencesJavascript()
+    {
         return file_get_contents(dirname(__FILE__) . "/import_export.js");
     }
 
-    function hook_prefs_tab($args) {
-        if ($args != "prefFeeds") return;
-
+    public function hook_prefs_tab($args)
+    {
+        if ($args != "prefFeeds") {
+            return;
+        }
         print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Import and export')."\">";
-
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            __("You can export and import your Starred and Archived articles for safekeeping or when migrating between tt-rss instances of same version."));
-
+            __("You can export and import your Starred and Archived articles for safekeeping or when migrating between tt-rss instances of same version.")
+        );
         print "<p>";
-
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return exportData()\">".
             __('Export my data')."</button> ";
-
         print "<hr>";
-
         print "<iframe id=\"data_upload_iframe\"
-			name=\"data_upload_iframe\" onload=\"dataImportComplete(this)\"
-			style=\"width: 400px; height: 100px; display: none;\"></iframe>";
-
+            name=\"data_upload_iframe\" onload=\"dataImportComplete(this)\"
+            style=\"width: 400px; height: 100px; display: none;\"></iframe>";
         print "<form name=\"import_form\" style='display : block' target=\"data_upload_iframe\"
-			enctype=\"multipart/form-data\" method=\"POST\"
-			action=\"backend.php\">
-			<input id=\"export_file\" name=\"export_file\" type=\"file\">&nbsp;
-			<input type=\"hidden\" name=\"op\" value=\"pluginhandler\">
-			<input type=\"hidden\" name=\"plugin\" value=\"import_export\">
-			<input type=\"hidden\" name=\"method\" value=\"dataimport\">
-			<button dojoType=\"dijit.form.Button\" onclick=\"return importData();\" type=\"submit\">" .
+            enctype=\"multipart/form-data\" method=\"POST\"
+            action=\"backend.php\">
+            <input id=\"export_file\" name=\"export_file\" type=\"file\">&nbsp;
+            <input type=\"hidden\" name=\"op\" value=\"pluginhandler\">
+            <input type=\"hidden\" name=\"plugin\" value=\"import_export\">
+            <input type=\"hidden\" name=\"method\" value=\"dataimport\">
+            <button dojoType=\"dijit.form.Button\" onclick=\"return importData();\" type=\"submit\">" .
             __('Import') . "</button>";
 
         print "</form>";
@@ -88,19 +86,23 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         print "</div>"; # pane
     }
 
-    function csrf_ignore($method) {
+    public function csrf_ignore($method)
+    {
         return in_array($method, array("exportget"));
     }
 
-    function before($method) {
+    public function before($method)
+    {
         return $_SESSION["uid"] != false;
     }
 
-    function after() {
+    public function after()
+    {
         return true;
     }
 
-    function exportget() {
+    public function exportget()
+    {
         $exportname = \SmallSmallRSS\Config::get('CACHE_DIR') . "/export/" .
             sha1($_SESSION['uid'] . $_SESSION['login']) . ".xml";
 
@@ -119,34 +121,37 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         }
     }
 
-    function exportrun() {
+    public function exportrun()
+    {
         $offset = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['offset']);
         $exported = 0;
         $limit = 250;
 
         if ($offset < 10000 && is_writable(\SmallSmallRSS\Config::get('CACHE_DIR') . "/export")) {
-            $result = \SmallSmallRSS\Database::query("SELECT
-					ttrss_entries.guid,
-					ttrss_entries.title,
-					content,
-					marked,
-					published,
-					score,
-					note,
-					link,
-					tag_cache,
-					label_cache,
-					ttrss_feeds.title AS feed_title,
-					ttrss_feeds.feed_url AS feed_url,
-					ttrss_entries.updated
-				FROM
-					ttrss_user_entries LEFT JOIN ttrss_feeds ON (ttrss_feeds.id = feed_id),
-					ttrss_entries
-				WHERE
-					(marked = true OR feed_id IS NULL) AND
-					ref_id = ttrss_entries.id AND
-					ttrss_user_entries.owner_uid = " . $_SESSION['uid'] . "
-				ORDER BY ttrss_entries.id LIMIT $limit OFFSET $offset");
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT
+                    ttrss_entries.guid,
+                    ttrss_entries.title,
+                    content,
+                    marked,
+                    published,
+                    score,
+                    note,
+                    link,
+                    tag_cache,
+                    label_cache,
+                    ttrss_feeds.title AS feed_title,
+                    ttrss_feeds.feed_url AS feed_url,
+                    ttrss_entries.updated
+                FROM
+                    ttrss_user_entries LEFT JOIN ttrss_feeds ON (ttrss_feeds.id = feed_id),
+                    ttrss_entries
+                WHERE
+                    (marked = true OR feed_id IS NULL) AND
+                    ref_id = ttrss_entries.id AND
+                    ttrss_user_entries.owner_uid = " . $_SESSION['uid'] . "
+                ORDER BY ttrss_entries.id LIMIT $limit OFFSET $offset"
+            );
 
             $exportname = sha1($_SESSION['uid'] . $_SESSION['login']);
 
@@ -184,7 +189,8 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         print json_encode(array("exported" => $exported));
     }
 
-    function perform_data_import($filename, $owner_uid) {
+    public function perform_data_import($filename, $owner_uid)
+    {
 
         $num_imported = 0;
         $num_processed = 0;
@@ -203,12 +209,12 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                 $data = @gzdecode($contents);
             }
 
-            if ($data)
+            if ($data) {
                 $doc = DOMDocument::loadXML($data);
+            }
         }
 
         if ($doc) {
-
             $xpath = new DOMXpath($doc);
 
             $container = $doc->firstChild;
@@ -236,49 +242,54 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                     $article = array();
 
                     foreach ($article_node->childNodes as $child) {
-                        if ($child->nodeName != 'label_cache')
+                        if ($child->nodeName != 'label_cache') {
                             $article[$child->nodeName] = \SmallSmallRSS\Database::escape_string($child->nodeValue);
-                        else
+                        } else {
                             $article[$child->nodeName] = $child->nodeValue;
+                        }
                     }
 
                     if ($article['guid']) {
-                        ++$num_processed;
-                        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_entries
-							WHERE guid = '".$article['guid']."'");
-
+                        $num_processed += 1;
+                        $result = \SmallSmallRSS\Database::query(
+                            "SELECT id
+                             FROM ttrss_entries
+                             WHERE guid = '".$article['guid']."'"
+                        );
                         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-
                             $result = \SmallSmallRSS\Database::query(
                                 "INSERT INTO ttrss_entries
-									(title,
-									guid,
-									link,
-									updated,
-									content,
-									content_hash,
-									no_orig_date,
-									date_updated,
-									date_entered,
-									comments,
-									num_comments,
-									author)
-								VALUES
-									('".$article['title']."',
-									'".$article['guid']."',
-									'".$article['link']."',
-									'".$article['updated']."',
-									'".$article['content']."',
-									'".sha1($article['content'])."',
-									false,
-									NOW(),
-									NOW(),
-									'',
-									'0',
-									'')");
+                                    (title,
+                                    guid,
+                                    link,
+                                    updated,
+                                    content,
+                                    content_hash,
+                                    no_orig_date,
+                                    date_updated,
+                                    date_entered,
+                                    comments,
+                                    num_comments,
+                                    author)
+                                VALUES
+                                    ('".$article['title']."',
+                                    '".$article['guid']."',
+                                    '".$article['link']."',
+                                    '".$article['updated']."',
+                                    '".$article['content']."',
+                                    '".sha1($article['content'])."',
+                                    false,
+                                    NOW(),
+                                    NOW(),
+                                    '',
+                                    '0',
+                                    '')"
+                            );
 
-                            $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_entries
-								WHERE guid = '".$article['guid']."'");
+                            $result = \SmallSmallRSS\Database::query(
+                                "SELECT id FROM ttrss_entries
+                                 WHERE guid = '".$article['guid']."'"
+                            );
 
                             if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                                 $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
@@ -298,20 +309,23 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                             $feed = 'NULL';
 
                             if ($feed_url && $feed_title) {
-                                $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_feeds
-									WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'");
+                                $result = \SmallSmallRSS\Database::query(
+                                    "SELECT id FROM ttrss_feeds
+                                     WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'"
+                                );
 
                                 if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                                     $feed = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
                                 } else {
                                     // try autocreating feed in Uncategorized...
-
-                                    $result = \SmallSmallRSS\Database::query("INSERT INTO ttrss_feeds (owner_uid,
-										feed_url, title) VALUES ($owner_uid, '$feed_url', '$feed_title')");
-
-                                    $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_feeds
-										WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'");
-
+                                    $result = \SmallSmallRSS\Database::query(
+                                        "INSERT INTO ttrss_feeds (owner_uid,
+                                         feed_url, title) VALUES ($owner_uid, '$feed_url', '$feed_title')"
+                                    );
+                                    $result = \SmallSmallRSS\Database::query(
+                                        "SELECT id FROM ttrss_feeds
+                                         WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'"
+                                    );
                                     if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                                         ++$num_feeds_created;
 
@@ -320,15 +334,15 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                                 }
                             }
 
-                            if ($feed != 'NULL')
+                            if ($feed != 'NULL') {
                                 $feed_qpart = "feed_id = $feed";
-                            else
+                            } else {
                                 $feed_qpart = "feed_id IS NULL";
-
-                            //print "$ref_id / $feed / " . $article['title'] . "\n";
-
-                            $result = \SmallSmallRSS\Database::query("SELECT int_id FROM ttrss_user_entries
-								WHERE ref_id = '$ref_id' AND owner_uid = '$owner_uid' AND $feed_qpart");
+                            }
+                            $result = \SmallSmallRSS\Database::query(
+                                "SELECT int_id FROM ttrss_user_entries
+                                 WHERE ref_id = '$ref_id' AND owner_uid = '$owner_uid' AND $feed_qpart"
+                            );
 
                             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
@@ -346,19 +360,24 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
                                 $result = \SmallSmallRSS\Database::query(
                                     "INSERT INTO ttrss_user_entries
-									(ref_id, owner_uid, feed_id, unread, last_read, marked,
-										published, score, tag_cache, label_cache, uuid, note)
-									VALUES ($ref_id, $owner_uid, $feed, false,
-										NULL, $marked, $published, $score, '$tag_cache',
-											'$label_cache', '', '$note')");
+                                    (ref_id, owner_uid, feed_id, unread, last_read, marked,
+                                        published, score, tag_cache, label_cache, uuid, note)
+                                    VALUES ($ref_id, $owner_uid, $feed, false,
+                                        NULL, $marked, $published, $score, '$tag_cache',
+                                            '$label_cache', '', '$note')"
+                                );
 
                                 $label_cache = json_decode($label_cache, true);
 
                                 if (is_array($label_cache) && $label_cache["no-labels"] != 1) {
                                     foreach ($label_cache as $label) {
 
-                                        \SmallSmallRSS\Labels::create($label[1],
-                                                     $label[2], $label[3], $owner_uid);
+                                        \SmallSmallRSS\Labels::create(
+                                            $label[1],
+                                            $label[2],
+                                            $label[3],
+                                            $owner_uid
+                                        );
 
                                         \SmallSmallRSS\Labels::addArticle($ref_id, $label[1], $owner_uid);
 
@@ -386,17 +405,19 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         }
     }
 
-    function exportData() {
+    public function exportData()
+    {
 
-        print "<p style='text-align : center' id='export_status_message'>You need to prepare exported data first by clicking the button below.</p>";
+        print "<p style='text-align : center' id='export_status_message'>";
+        print "You need to prepare exported data first by clicking the button below.</p>";
 
         print "<div align='center'>";
         print "<button dojoType=\"dijit.form.Button\"
-			onclick=\"dijit.byId('dataExportDlg').prepare()\">".
+            onclick=\"dijit.byId('dataExportDlg').prepare()\">".
             __('Prepare data')."</button>";
 
         print "<button dojoType=\"dijit.form.Button\"
-			onclick=\"dijit.byId('dataExportDlg').hide()\">".
+            onclick=\"dijit.byId('dataExportDlg').hide()\">".
             __('Close this window')."</button>";
 
         print "</div>";
@@ -404,15 +425,17 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
     }
 
-    function dataImport() {
+    public function dataImport()
+    {
         header("Content-Type: text/html"); # required for iframe
-
         print "<div style='text-align : center'>";
-
         if ($_FILES['export_file']['error'] != 0) {
             \SmallSmallRSS\Renderers\Messages::renderError(
-                T_sprintf("Upload failed with error code %d",
-                                  $_FILES['export_file']['error']));
+                T_sprintf(
+                    "Upload failed with error code %d",
+                    $_FILES['export_file']['error']
+                )
+            );
             return;
         }
 
@@ -421,12 +444,15 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         if (is_uploaded_file($_FILES['export_file']['tmp_name'])) {
             $tmp_file = tempnam(\SmallSmallRSS\Config::get('CACHE_DIR') . '/upload', 'export');
 
-            $result = move_uploaded_file($_FILES['export_file']['tmp_name'],
-                                         $tmp_file);
+            $result = move_uploaded_file(
+                $_FILES['export_file']['tmp_name'],
+                $tmp_file
+            );
 
             if (!$result) {
                 \SmallSmallRSS\Renderers\Messages::renderError(
-                    __("Unable to move uploaded file."));
+                    __("Unable to move uploaded file.")
+                );
                 return;
             }
         } else {
@@ -442,17 +468,11 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
             return;
         }
 
-        print "<button dojoType=\"dijit.form.Button\"
-			onclick=\"dijit.byId('dataImportDlg').hide()\">".
-            __('Close this window')."</button>";
+        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('dataImportDlg').hide()\">"
+            . __('Close this window')
+            ."</button>";
 
         print "</div>";
 
     }
-
-    function api_version() {
-        return 2;
-    }
-
 }
-

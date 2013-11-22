@@ -735,11 +735,8 @@ class Feeds extends ProtectedHandler
 
                     $reply['content'] .= "<div style=\"float : right\">";
 
-                    //                    $reply['content'] .= "$marked_pic";
-                    //                    $reply['content'] .= "$published_pic";
-
                     foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON) as $p) {
-                        $reply['content'] .= $p->hook_article_button($line);
+                        $reply['content'] .= $p->hookArticleButton($line);
                     }
 
                     $reply['content'] .= "</div>";
@@ -754,7 +751,8 @@ class Feeds extends ProtectedHandler
                 ++$lnum;
             }
 
-            if (!empty($_REQUEST["debug"])) {  $timing_info = print_checkpoint("PE", $timing_info);
+            if (!empty($_REQUEST["debug"])) {
+                $timing_info = print_checkpoint("PE", $timing_info);
             }
 
         } else {

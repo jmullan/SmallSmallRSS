@@ -63,17 +63,6 @@ class PluginHost
         return self::$instance;
     }
 
-    private function register_plugin($name, $plugin)
-    {
-        $this->plugins[$name] = $plugin;
-    }
-
-    // needed for compatibility with API 1
-    public function get_link()
-    {
-        return false;
-    }
-
     public function get_plugins()
     {
         return $this->plugins;
@@ -145,7 +134,6 @@ class PluginHost
             }
 
             $file = "$class_dir/init.php";
-
             if (!isset($this->plugins[$class])) {
                 if (file_exists($file)) {
                     require_once $file;
@@ -159,44 +147,37 @@ class PluginHost
                     Logger::log("Wrong class type $class: $subclassing");
                     continue;
                 }
-                $plugin = new $class ($this);
-                $plugin_api = $plugin->api_version();
-                if ($plugin_api < \SmallSmallRSS\PluginHost::API_VERSION) {
+                $plugin = new $class($this);
+                if ($plugin::API_VERSION < \SmallSmallRSS\PluginHost::API_VERSION) {
                     user_error(
                         "Plugin $class is not compatible with current API version (need: "
                         . \SmallSmallRSS\PluginHost::API_VERSION
-                        . ", got: $plugin_api)", E_USER_WARNING
+                        . ", got: $plugin_api)",
+                        E_USER_WARNING
                     );
                     continue;
                 }
                 $this->last_registered = $class;
                 switch ($kind) {
                     case self::KIND_SYSTEM:
-                        if ($this->is_system($plugin)) {
-                            $plugin->init($this);
-                            $this->register_plugin($class, $plugin);
+                        if ($plugin::IS_SYSTEM) {
+                            $plugin->register();
+                            $this->plugins[$class] = $plugin;
                         }
                         break;
                     case self::KIND_USER:
-                        if (!$this->is_system($plugin)) {
-                            $plugin->init($this);
-                            $this->register_plugin($class, $plugin);
+                        if (!$plugin::IS_SYSTEM) {
+                            $plugin->register();
+                            $this->plugins[$class] = $plugin;
                         }
                         break;
                     case self::KIND_ALL:
-                        $plugin->init($this);
-                        $this->register_plugin($class, $plugin);
+                        $plugin->register();
+                        $this->plugins[$class] = $plugin;
                         break;
                 }
             }
         }
-    }
-
-    public function is_system($plugin)
-    {
-        $about = $plugin->about();
-
-        return @$about[3];
     }
 
     // only system plugins are allowed to modify routing
@@ -204,7 +185,7 @@ class PluginHost
     {
         $handler = str_replace("-", "_", strtolower($handler));
         $method = strtolower($method);
-        if ($this->is_system($sender)) {
+        if ($sender::IS_SYSTEM) {
             if (!isset($this->handlers[$handler])
                 || !is_array($this->handlers[$handler])) {
                 $this->handlers[$handler] = array();
@@ -217,8 +198,7 @@ class PluginHost
     {
         $handler = str_replace("-", "_", strtolower($handler));
         $method = strtolower($method);
-
-        if ($this->is_system($sender)) {
+        if ($sender::IS_SYSTEM) {
             unset($this->handlers[$handler][$method]);
         }
     }
@@ -289,7 +269,7 @@ class PluginHost
         if ($this->owner_uid)  {
             $result = \SmallSmallRSS\Database::query(
                 "SELECT name, content FROM ttrss_plugin_storage
-                WHERE owner_uid = '".$this->owner_uid."'"
+                 WHERE owner_uid = '".$this->owner_uid."'"
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
@@ -446,7 +426,7 @@ class PluginHost
 
     public function add_api_method($name, $sender)
     {
-        if ($this->is_system($sender)) {
+        if ($sender::IS_SYSTEM) {
             $this->api_methods[strtolower($name)] = $sender;
         }
     }

@@ -231,7 +231,7 @@ $js_renderer->render_minified_js_files(
     array("tt-rss", "functions", "feedlist", "viewfeed", "FeedTree", "PluginHost")
 );
 foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
-    $js_renderer->render_minified($p->get_js());
+    $js_renderer->render_minified($p->getJavascript());
 }
 $translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();
 $translation_renderer->render();

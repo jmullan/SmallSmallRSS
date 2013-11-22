@@ -560,7 +560,7 @@ function update_rss_feed($feed, $no_cache = false)
         );
 
         foreach ($pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER) as $plugin) {
-            $article = $plugin->hook_article_filter($article);
+            $article = $plugin->hookArticleFilter($article);
         }
 
         $entry_tags = $article["tags"];

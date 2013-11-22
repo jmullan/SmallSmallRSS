@@ -396,7 +396,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin {
         return $rc;
     }
 
-    public function hook_prefs_tab($args)
+    public function hookPreferencesTab($args)
     {
         if ($args != "prefFeeds") {
             return;

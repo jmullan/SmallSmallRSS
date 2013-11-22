@@ -75,7 +75,7 @@ if (class_exists($handler) || $override) {
     if ($handler) {
         if (!$handler instanceof \SmallSmallRSS\Handlers\IHandler) {
             $error_code = 6;
-        } elseif (validate_csrf($csrf_token) || $handler->csrf_ignore($method)) {
+        } elseif (validate_csrf($csrf_token) || $handler->CRSFIgnore($method)) {
             if ($handler->before($method)) {
                 if ($method && method_exists($handler, $method)) {
                     $handler->$method();

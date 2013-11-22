@@ -2517,7 +2517,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
             $owner_uid, $line["site_url"]
         );
         foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE) as $p) {
-            $line = $p->hook_render_article($line);
+            $line = $p->hookRenderArticle($line);
         }
         $num_comments = $line["num_comments"];
         $entry_comments = "";

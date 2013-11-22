@@ -13,7 +13,7 @@ class Feeds extends ProtectedHandler
         return $value;
     }
 
-    public function csrf_ignore($method)
+    public function CRSFIgnore($method)
     {
         $csrf_ignored = array("index", "feedbrowser", "quickaddfeed", "search");
         return array_search($method, $csrf_ignored) !== false;
@@ -539,7 +539,7 @@ class Feeds extends ProtectedHandler
                     );
 
                     foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_CDM) as $p) {
-                        $line = $p->hook_render_article_cdm($line);
+                        $line = $p->hookRenderArticleCDM($line);
                     }
 
                     if (\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED') && $line["feed_title"]) {

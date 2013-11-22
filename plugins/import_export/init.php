@@ -53,7 +53,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         return file_get_contents(dirname(__FILE__) . "/import_export.js");
     }
 
-    public function hook_prefs_tab($args)
+    public function hookPreferencesTab($args)
     {
         if ($args != "prefFeeds") {
             return;
@@ -86,7 +86,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         print "</div>"; # pane
     }
 
-    public function csrf_ignore($method)
+    public function CRSFIgnore($method)
     {
         return in_array($method, array("exportget"));
     }

@@ -14,7 +14,7 @@ class Pref_System extends ProtectedHandler
         return false;
     }
 
-    function csrf_ignore($method)
+    function CRSFIgnore($method)
     {
         $csrf_ignored = array("index");
 
@@ -93,7 +93,7 @@ class Pref_System extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hook_prefs_tab", "prefSystem"
+            "hookPreferencesTab", "prefSystem"
         );
 
         print "</div>"; #container

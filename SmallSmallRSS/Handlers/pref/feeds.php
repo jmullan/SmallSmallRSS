@@ -18,7 +18,7 @@ class Pref_Feeds extends ProtectedHandler
         return $value;
     }
 
-    function csrf_ignore($method)
+    function CRSFIgnore($method)
     {
         $csrf_ignored = array("index", "getfeedtree", "add", "editcats", "editfeed",
                               "savefeedorder", "uploadicon", "feedswitherrors", "inactivefeeds",
@@ -1606,7 +1606,7 @@ class Pref_Feeds extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hook_prefs_tab_section", "prefFeedsOPML"
+            "hookPreferencesTab_section", "prefFeedsOPML"
         );
 
         print "</div>"; # pane
@@ -1666,14 +1666,14 @@ class Pref_Feeds extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hook_prefs_tab_section", "prefFeedsPublishedGenerated"
+            "hookPreferencesTab_section", "prefFeedsPublishedGenerated"
         );
 
         print "</div>"; #pane
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hook_prefs_tab", "prefFeeds"
+            "hookPreferencesTab", "prefFeeds"
         );
 
         print "</div>"; #container

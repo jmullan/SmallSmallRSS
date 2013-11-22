@@ -6,7 +6,7 @@ class Pref_Prefs extends ProtectedHandler
     private $pref_help = array();
     private $pref_sections = array();
 
-    function csrf_ignore($method)
+    function CRSFIgnore($method)
     {
         $csrf_ignored = array("index", "updateself", "customizecss", "editprefprofiles");
 
@@ -464,7 +464,7 @@ class Pref_Prefs extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hook_prefs_tab_section", "prefPrefsAuth"
+            "hookPreferencesTab_section", "prefPrefsAuth"
         );
 
         print "</div>"; #pane
@@ -715,7 +715,7 @@ class Pref_Prefs extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hook_prefs_tab_section", "prefPrefsPrefsInside"
+            "hookPreferencesTab_section", "prefPrefsPrefsInside"
         );
 
         print '</div>'; # inside pane
@@ -753,7 +753,7 @@ class Pref_Prefs extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hook_prefs_tab_section", "prefPrefsPrefsOutside"
+            "hookPreferencesTab_section", "prefPrefsPrefsOutside"
         );
 
         print "</form>";
@@ -918,7 +918,7 @@ class Pref_Prefs extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hook_prefs_tab", "prefPrefs"
+            "hookPreferencesTab", "prefPrefs"
         );
 
         print "</div>"; #container

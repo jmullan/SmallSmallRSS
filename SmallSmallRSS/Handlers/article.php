@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Handlers;
 class Article extends ProtectedHandler
 {
 
-    function csrf_ignore($method)
+    function CRSFIgnore($method)
     {
         $csrf_ignored = array("redirect", "editarticletags");
 

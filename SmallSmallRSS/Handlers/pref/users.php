@@ -14,7 +14,7 @@ class Pref_Users extends ProtectedHandler
         return false;
     }
 
-    function csrf_ignore($method)
+    function CRSFIgnore($method)
     {
         $csrf_ignored = array("index", "edit", "userdetails");
 
@@ -380,7 +380,7 @@ class Pref_Users extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hook_prefs_tab_section", "prefUsersToolbar"
+            "hookPreferencesTab_section", "prefUsersToolbar"
         );
 
         print "</div>"; #toolbar
@@ -479,7 +479,7 @@ class Pref_Users extends ProtectedHandler
         print "</div>"; #pane
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hook_prefs_tab", "prefUsers"
+            "hookPreferencesTab", "prefUsers"
         );
         print "</div>"; #container
     }

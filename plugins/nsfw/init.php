@@ -20,7 +20,7 @@ class NSFW extends \SmallSmallRSS\Plugin
         return file_get_contents(dirname(__FILE__) . "/init.js");
     }
 
-    public function hook_render_article($article)
+    public function hookRenderArticle($article)
     {
         $tags = array_map("trim", explode(",", $this->host->get($this, "tags")));
         $a_tags = array_map("trim", explode(",", $article["tag_cache"]));
@@ -37,7 +37,7 @@ class NSFW extends \SmallSmallRSS\Plugin
         return $article;
     }
 
-    public function hook_render_article_cdm($article)
+    public function hookRenderArticleCDM($article)
     {
         $tags = array_map("trim", explode(",", $this->host->get($this, "tags")));
         $a_tags = array_map("trim", explode(",", $article["tag_cache"]));
@@ -54,7 +54,7 @@ class NSFW extends \SmallSmallRSS\Plugin
         return $article;
     }
 
-    public function hook_prefs_tab($args)
+    public function hookPreferencesTab($args)
     {
         if ($args != "prefPrefs") {
             return;

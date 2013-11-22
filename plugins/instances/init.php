@@ -133,7 +133,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         return file_get_contents(dirname(__FILE__) . "/instances.js");
     }
 
-    public function hook_prefs_tabs($args)
+    public function hookPreferencesTabs($args)
     {
         if ($_SESSION["access_level"] >= 10 || \SmallSmallRSS\Auth::is_single_user_mode()) {
             echo '<div id="instanceConfigTab" dojoType="dijit.layout.ContentPane"';
@@ -144,7 +144,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         }
     }
 
-    public function csrf_ignore($method)
+    public function CRSFIgnore($method)
     {
         $csrf_ignored = array("index", "edit");
         return array_search($method, $csrf_ignored) !== false;
@@ -352,7 +352,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hook_prefs_tab",
+            "hookPreferencesTab",
             "prefInstances"
         );
 

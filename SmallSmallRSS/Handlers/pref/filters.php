@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Handlers;
 class Pref_Filters extends ProtectedHandler
 {
 
-    function csrf_ignore($method)
+    function CRSFIgnore($method)
     {
         $csrf_ignored = array("index", "getfiltertree", "edit", "newfilter", "newrule",
                               "newaction", "savefilterorder");
@@ -763,7 +763,7 @@ class Pref_Filters extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hook_prefs_tab", "prefFilters"
+            "hookPreferencesTab", "prefFilters"
         );
 
         print "</div>"; #container

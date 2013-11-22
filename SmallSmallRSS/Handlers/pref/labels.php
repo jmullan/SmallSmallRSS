@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Handlers;
 class Pref_Labels extends ProtectedHandler
 {
 
-    function csrf_ignore($method)
+    function CRSFIgnore($method)
     {
         $csrf_ignored = array("index", "getlabeltree", "edit");
 
@@ -365,7 +365,7 @@ class Pref_Labels extends ProtectedHandler
 
         \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
             \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hook_prefs_tab", "prefLabels"
+            "hookPreferencesTab", "prefLabels"
         );
 
         print "</div>"; #container

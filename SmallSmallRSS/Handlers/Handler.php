@@ -10,7 +10,7 @@ class Handler implements IHandler
         $this->args = $args;
     }
 
-    function csrf_ignore($method)
+    function CRSFIgnore($method)
     {
         return true;
     }

@@ -185,10 +185,10 @@ function initialize_user_prefs($uid, $profile = false)
     \SmallSmallRSS\Database::query("BEGIN");
     $result = \SmallSmallRSS\Database::query("SELECT pref_name,def_value FROM ttrss_prefs");
     $u_result = \SmallSmallRSS\Database::query(
-         "SELECT pref_name
-          FROM ttrss_user_prefs
-          WHERE owner_uid = '$uid'
-          $profile_qpart"
+        "SELECT pref_name
+         FROM ttrss_user_prefs
+         WHERE owner_uid = '$uid'
+         $profile_qpart"
     );
     $active_prefs = array();
     while ($line = \SmallSmallRSS\Database::fetch_assoc($u_result)) {
@@ -345,9 +345,9 @@ function load_user_plugins($owner_uid)
     if ($owner_uid) {
         $plugins = \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS", $owner_uid);
         \SmallSmallRSS\PluginHost::getInstance()->load(
-             $plugins,
-             \SmallSmallRSS\PluginHost::KIND_USER,
-             $owner_uid
+            $plugins,
+            \SmallSmallRSS\PluginHost::KIND_USER,
+            $owner_uid
         );
         if (\SmallSmallRSS\Sanity::getSchemaVersion() > 100) {
             \SmallSmallRSS\PluginHost::getInstance()->load_data();
@@ -390,28 +390,9 @@ function login_sequence()
         if ($_SESSION["uid"]) {
             startup_gettext();
             load_user_plugins($_SESSION["uid"]);
-
             /* cleanup ccache */
-            \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_counters_cache
-                WHERE
-                    owner_uid = " . $_SESSION["uid"] . "
-                    AND (
-                       SELECT COUNT(id)
-                       FROM ttrss_feeds
-                       WHERE ttrss_feeds.id = feed_id
-                    ) = 0"
-            );
-            \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_cat_counters_cache
-                 WHERE
-                     owner_uid = " . $_SESSION["uid"] . "
-                     AND (
-                         SELECT COUNT(id)
-                         FROM ttrss_feed_categories
-                         WHERE ttrss_feed_categories.id = feed_id
-                     ) = 0"
-            );
+            \SmallSmallRSS\CountersCache::cleanup($_SESSION["uid"]);
+            \SmallSmallRSS\CatCountersCache::cleanup($_SESSION['uid']);
         }
     }
 }
@@ -516,7 +497,8 @@ function bool_to_sql_bool($s)
     }
 }
 
-function sql_random_function() {
+function sql_random_function()
+{
     if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
         return "RAND()";
     } else {
@@ -620,7 +602,8 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
                              AND feed_id = $feed
                              AND $date_qpart
                      ) as tmp
-                 )");
+                 )"
+            );
 
         } elseif ($feed < 0 && $feed > \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // special, like starred
             if ($feed == -1) {
@@ -640,7 +623,8 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
                                      AND marked = true
                                      AND $date_qpart
                              ) as tmp
-                         )");
+                         )"
+                );
             }
             if ($feed == -2) {
                 \SmallSmallRSS\Database::query(
@@ -658,7 +642,8 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
                                  AND published = true
                                  AND $date_qpart
                          ) as tmp
-                     )");
+                     )"
+                );
             }
             if ($feed == -3) {
                 $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE");
@@ -681,7 +666,8 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
                                  AND $date_qpart
                                  AND $match_part
                          ) as tmp
-                     )");
+                     )"
+                );
             }
             if ($feed == -4) {
                 \SmallSmallRSS\Database::query(
@@ -698,29 +684,48 @@ function catchup_feed($feed, $cat_view, $owner_uid = false, $max_id = false, $mo
                                  AND unread = true
                                  AND $date_qpart
                          ) as tmp
-                     )");
+                     )"
+                );
             }
 
         } elseif ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // label
             $label_id = feed_to_label_id($feed);
-            \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                        SET unread = false, last_read = NOW() WHERE ref_id IN
-                            (SELECT id FROM
-                                (SELECT ttrss_entries.id FROM ttrss_entries, ttrss_user_entries, ttrss_user_labels2 WHERE ref_id = id
-                                    AND label_id = '$label_id' AND ref_id = article_id
-                                    AND owner_uid = $owner_uid AND unread = true AND $date_qpart) as tmp)");
+            \SmallSmallRSS\Database::query(
+                "UPDATE ttrss_user_entries
+                 SET unread = false, last_read = NOW()
+                 WHERE ref_id IN (
+                     SELECT id
+                     FROM (
+                         SELECT ttrss_entries.id
+                         FROM ttrss_entries, ttrss_user_entries, ttrss_user_labels2
+                         WHERE
+                             ref_id = id
+                             AND label_id = '$label_id'
+                             AND ref_id = article_id
+                             AND owner_uid = $owner_uid AND unread = true AND $date_qpart
+                     ) as tmp
+                 )"
+            );
 
         }
-
-        \SmallSmallRSS\CounterCache::update($feed, $owner_uid, $cat_view);
-
-    } else { // tag
-        \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                    SET unread = false, last_read = NOW() WHERE ref_id IN
-                        (SELECT id FROM
-                            (SELECT ttrss_entries.id FROM ttrss_entries, ttrss_user_entries, ttrss_tags WHERE ref_id = ttrss_entries.id
-                                AND post_int_id = int_id AND tag_name = '$feed'
-                                AND ttrss_user_entries.owner_uid = $owner_uid AND unread = true AND $date_qpart) as tmp)");
+        \SmallSmallRSS\CountersCache::update($feed, $owner_uid, $cat_view);
+    } else {
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET unread = false, last_read = NOW()
+             WHERE ref_id IN (
+                 SELECT id FROM (
+                     SELECT ttrss_entries.id
+                     FROM ttrss_entries, ttrss_user_entries, ttrss_tags
+                     WHERE ref_id = ttrss_entries.id
+                         AND post_int_id = int_id
+                         AND tag_name = '$feed'
+                         AND ttrss_user_entries.owner_uid = $owner_uid
+                         AND unread = true
+                         AND $date_qpart
+                 ) as tmp
+             )"
+        );
 
     }
 }
@@ -790,7 +795,7 @@ function getCategoryCounters()
     $cv = array(
         "id" => 0,
         "kind" => "cat",
-        "counter" => (int) \SmallSmallRSS\CounterCache::find(0, $_SESSION["uid"], true)
+        "counter" => (int) \SmallSmallRSS\CountersCache::find(0, $_SESSION["uid"], true)
     );
     array_push($ret_arr, $cv);
     return $ret_arr;
@@ -997,15 +1002,7 @@ function getGlobalUnread($user_id = false)
     if (!$user_id) {
         $user_id = $_SESSION["uid"];
     }
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT SUM(value) AS c_id
-         FROM ttrss_counters_cache
-         WHERE
-             owner_uid = '$user_id'
-             AND feed_id > 0"
-    );
-    $c_id = \SmallSmallRSS\Database::fetch_result($result, 0, "c_id");
-    return $c_id;
+    return \SmallSmallRSS\CountersCache::getGlobalUnread($user_id);
 }
 
 function getGlobalCounters($global_unread = -1)
@@ -2330,7 +2327,7 @@ function catchupArticlesById($ids, $cmode, $owner_uid = false) {
             WHERE ($ids_qpart) AND owner_uid = $owner_uid");
 
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-        \SmallSmallRSS\CounterCache::update($line["feed_id"], $owner_uid);
+        \SmallSmallRSS\CountersCache::update($line["feed_id"], $owner_uid);
     }
 }
 
@@ -2473,7 +2470,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
              SET unread = false,last_read = NOW()
              WHERE ref_id = '$id' AND owner_uid = $owner_uid"
         );
-        \SmallSmallRSS\CounterCache::update($feed_id, $owner_uid);
+        \SmallSmallRSS\CountersCache::update($feed_id, $owner_uid);
     }
     $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
     $result = \SmallSmallRSS\Database::query(

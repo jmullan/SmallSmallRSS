@@ -820,7 +820,7 @@ class Feeds extends ProtectedHandler
             "UPDATE ttrss_user_entries SET
                         last_read = NOW(), unread = false WHERE unread = true AND owner_uid = " . $_SESSION["uid"]
         );
-        \SmallSmallRSS\CounterCache::zero_all($_SESSION["uid"]);
+        \SmallSmallRSS\CountersCache::zero_all($_SESSION["uid"]);
     }
 
     public function view()
@@ -900,7 +900,7 @@ class Feeds extends ProtectedHandler
          * so for performance reasons we don't do that here */
 
         if ($feed >= 0) {
-            \SmallSmallRSS\CounterCache::update($feed, $_SESSION["uid"], $cat_view);
+            \SmallSmallRSS\CountersCache::update($feed, $_SESSION["uid"], $cat_view);
         }
 
         \SmallSmallRSS\DBPrefs::write("_DEFAULT_VIEW_MODE", $view_mode);

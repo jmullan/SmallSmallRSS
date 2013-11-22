@@ -1685,7 +1685,7 @@ class Pref_Feeds extends ProtectedHandler
         $cat_id = (int) $cat_id;
 
         if ($cat_id > 0) {
-            $cat_unread = \SmallSmallRSS\CounterCache::find($cat_id, $_SESSION["uid"], true);
+            $cat_unread = \SmallSmallRSS\CountersCache::find($cat_id, $_SESSION["uid"], true);
         } elseif ($cat_id == 0 || $cat_id == -2) {
             $cat_unread = getCategoryUnread($cat_id);
         } else {
@@ -1912,7 +1912,7 @@ class Pref_Feeds extends ProtectedHandler
             (SELECT COUNT(int_id) FROM ttrss_user_entries WHERE ref_id = id) = 0"
         );
 
-        \SmallSmallRSS\CounterCache::update($id, $_SESSION['uid']);
+        \SmallSmallRSS\CountersCache::update($id, $_SESSION['uid']);
     } // function clear_feed_articles
 
     private function remove_feed_category($id, $owner_uid)
@@ -1923,7 +1923,7 @@ class Pref_Feeds extends ProtectedHandler
             WHERE id = '$id' AND owner_uid = $owner_uid"
         );
 
-        \SmallSmallRSS\CounterCache::remove($id, $owner_uid, true);
+        \SmallSmallRSS\CountersCache::remove($id, $owner_uid, true);
     }
 
     static function remove_feed($id, $owner_uid)
@@ -1991,7 +1991,7 @@ class Pref_Feeds extends ProtectedHandler
                 unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico");
             }
 
-            \SmallSmallRSS\CounterCache::remove($id, $owner_uid);
+            \SmallSmallRSS\CountersCache::remove($id, $owner_uid);
 
         } else {
             \SmallSmallRSS\Labels::remove(feed_to_label_id($id), $owner_uid);

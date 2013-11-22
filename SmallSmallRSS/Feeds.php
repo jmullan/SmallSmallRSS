@@ -81,7 +81,7 @@ class Feeds {
         }
         if ($purge_interval == -1 || !$purge_interval) {
             if ($owner_uid) {
-                \SmallSmallRSS\CounterCache::update($feed_id, $owner_uid);
+                \SmallSmallRSS\CountersCache::update($feed_id, $owner_uid);
             }
             return;
         }
@@ -143,7 +143,7 @@ class Feeds {
             );
         }
         $rows = \SmallSmallRSS\Database::affected_rows($result);
-        \SmallSmallRSS\CounterCache::update($feed_id, $owner_uid);
+        \SmallSmallRSS\CountersCache::update($feed_id, $owner_uid);
         \SmallSmallRSS\Logger::debug(
             "Purged feed $feed_id ($purge_interval): deleted $rows articles",
             false

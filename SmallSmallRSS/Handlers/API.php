@@ -320,7 +320,7 @@ class API extends Handler
                 );
 
                 while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-                    \SmallSmallRSS\CounterCache::update($line["feed_id"], $_SESSION["uid"]);
+                    \SmallSmallRSS\CountersCache::update($line["feed_id"], $_SESSION["uid"]);
                 }
             }
 

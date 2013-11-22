@@ -96,7 +96,7 @@ class Article extends ProtectedHandler
         }
 
         $feed_id = getArticleFeed($id);
-        \SmallSmallRSS\CounterCache::update($feed_id, $_SESSION["uid"]);
+        \SmallSmallRSS\CountersCache::update($feed_id, $_SESSION["uid"]);
     }
 
     static function create_published_article($title, $url, $content, $labels_str,

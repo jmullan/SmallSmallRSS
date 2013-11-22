@@ -42,7 +42,7 @@ class Mail extends \SmallSmallRSS\Plugin
         }
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_email\" value=\"$user_email\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_name\" value=\"$user_name\">";
-        require_once "lib/MiniTemplator.class.php";
+        require_once __DIR__ . "/../../lib/MiniTemplator.class.php";
         $tpl = new MiniTemplator;
         $tpl_t = new MiniTemplator;
         $tpl->readTemplateFromFile("templates/email_article_template.txt");
@@ -127,7 +127,9 @@ class Mail extends \SmallSmallRSS\Plugin
         if (!$rc) {
             $reply['error'] = $mail->ErrorInfo;
         } else {
-            save_email_address(\SmallSmallRSS\Database::escape_string($destination));
+            foreach ($addresses as $address) {
+                save_email_address(\SmallSmallRSS\Database::escape_string($address));
+            }
             $reply['message'] = "UPDATE_COUNTERS";
         }
 

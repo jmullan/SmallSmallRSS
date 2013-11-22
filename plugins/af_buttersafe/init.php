@@ -1,6 +1,7 @@
 <?php
-class Af_Buttersafe extends \SmallSmallRSS\Plugin {
 
+class Af_Buttersafe extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;
@@ -14,7 +15,7 @@ class Af_Buttersafe extends \SmallSmallRSS\Plugin {
         \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
     );
 
-    function hookArticleFilter($article)
+    public function hookArticleFilter($article)
     {
         $owner_uid = $article["owner_uid"];
         if (strpos($article["guid"], "buttersafe.com") !== false) {

@@ -14,7 +14,7 @@ class Af_GoComics extends \SmallSmallRSS\Plugin
         \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
     );
 
-    function hookArticleFilter($article)
+    public function hookArticleFilter($article)
     {
         $owner_uid = $article["owner_uid"];
         if (strpos($article["guid"], "gocomics.com") !== false) {

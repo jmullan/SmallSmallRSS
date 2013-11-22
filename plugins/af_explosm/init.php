@@ -1,6 +1,7 @@
 <?php
-class Af_Explosm extends \SmallSmallRSS\Plugin {
 
+class Af_Explosm extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;
@@ -14,33 +15,25 @@ class Af_Explosm extends \SmallSmallRSS\Plugin {
         \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
     );
 
-    function hookArticleFilter($article)
+    public function hookArticleFilter($article)
     {
         $owner_uid = $article["owner_uid"];
-
         if (strpos($article["link"], "explosm.net/comics") !== false) {
             if (strpos($article["plugin_data"], "explosm,$owner_uid:") === false) {
-
                 $doc = new DOMDocument();
                 @$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
-
                 $basenode = false;
-
                 if ($doc) {
                     $xpath = new DOMXPath($doc);
                     $entries = $xpath->query('(//img[@src])'); // we might also check for img[@class='strip'] I guess...
-
                     $matches = array();
-
+                    $regex = "/(http:\/\/.*\/db\/files\/Comics\/.*)/i";
                     foreach ($entries as $entry) {
-
-                        if (preg_match("/(http:\/\/.*\/db\/files\/Comics\/.*)/i", $entry->getAttribute("src"), $matches)) {
-
+                        if (preg_match($regex, $entry->getAttribute("src"), $matches)) {
                             $basenode = $entry;
                             break;
                         }
                     }
-
                     if ($basenode) {
                         $article["content"] = $doc->saveXML($basenode);
                         $article["plugin_data"] = "explosm,$owner_uid:" . $article["plugin_data"];
@@ -50,7 +43,6 @@ class Af_Explosm extends \SmallSmallRSS\Plugin {
                 $article["content"] = $article["stored"]["content"];
             }
         }
-
         return $article;
     }
 }

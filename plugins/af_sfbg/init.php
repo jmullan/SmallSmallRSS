@@ -1,6 +1,7 @@
 <?php
 
-class Af_SFBG extends \SmallSmallRSS\Plugin {
+class Af_SFBG extends \SmallSmallRSS\Plugin
+{
 
     private $host;
 
@@ -16,7 +17,7 @@ class Af_SFBG extends \SmallSmallRSS\Plugin {
         \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
     );
 
-    private static function should_run_against($link)
+    private static function shouldRunAgainst($link)
     {
         return (
             false !== strpos($link, 'sfbg.com')
@@ -36,7 +37,7 @@ class Af_SFBG extends \SmallSmallRSS\Plugin {
     public function hookGuidFilter($item, $guid)
     {
         $link = $item->get_link();
-        if (self::should_run_against($link)) {
+        if (self::shouldRunAgainst($link)) {
             $guid = self::cleanlink($link);
         }
         return $guid;
@@ -45,7 +46,7 @@ class Af_SFBG extends \SmallSmallRSS\Plugin {
     public function hookArticleFilter($article)
     {
         $link = $article['link'];
-        if (self::should_run_against($link)) {
+        if (self::shouldRunAgainst($link)) {
             $article['link'] = self::cleanlink($link);
         }
         return $article;

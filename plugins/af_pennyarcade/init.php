@@ -15,16 +15,11 @@ class Af_PennyArcade extends \SmallSmallRSS\Plugin
         \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
     );
 
-    function hookArticleFilter($article)
+    public function hookArticleFilter($article)
     {
         $owner_uid = $article["owner_uid"];
         if (strpos($article["link"], "penny-arcade.com") !== false && strpos($article["title"], "Comic:") !== false) {
             if (strpos($article["plugin_data"], "pennyarcade,$owner_uid:") === false) {
-
-                if ($debug_enabled) {
-                    _debug("af_pennyarcade: Processing comic");
-                }
-
                 $doc = new DOMDocument();
                 $doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
 
@@ -52,9 +47,6 @@ class Af_PennyArcade extends \SmallSmallRSS\Plugin
             && strpos($article["title"], "News Post:") !== false) {
 
             if (strpos($article["plugin_data"], "pennyarcade,$owner_uid:") === false) {
-                if ($debug_enabled) {
-                    _debug("af_pennyarcade: Processing news post");
-                }
                 $doc = new DOMDocument();
                 $doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
 

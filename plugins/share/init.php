@@ -1,5 +1,7 @@
 <?php
-class Share extends \SmallSmallRSS\Plugin {
+
+class Share extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;

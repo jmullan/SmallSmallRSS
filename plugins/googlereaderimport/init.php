@@ -1,5 +1,6 @@
 <?php
-class GoogleReaderImport extends \SmallSmallRSS\Plugin {
+class GoogleReaderImport extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;

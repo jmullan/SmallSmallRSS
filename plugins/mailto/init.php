@@ -1,5 +1,7 @@
 <?php
-class MailTo extends \SmallSmallRSS\Plugin {
+
+class MailTo extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;
@@ -29,7 +31,7 @@ class MailTo extends \SmallSmallRSS\Plugin {
     public function emailArticle()
     {
         $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
-        require_once "lib/MiniTemplator.class.php";
+        require_once __DIR__ . "/../../lib/MiniTemplator.class.php";
         $tpl = new MiniTemplator;
         $tpl_t = new MiniTemplator;
         $tpl->readTemplateFromFile("templates/email_article_template.txt");

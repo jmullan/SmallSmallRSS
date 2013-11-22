@@ -1,5 +1,7 @@
 <?php
-class Af_Whomp extends \SmallSmallRSS\Plugin {
+
+class Af_Whomp extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;
@@ -25,9 +27,9 @@ class Af_Whomp extends \SmallSmallRSS\Plugin {
                     $xpath = new DOMXPath($doc);
                     $entries = $xpath->query('(//img[@src])');
                     $matches = array();
-                    $src = $entry->getAttribute("src");
                     $regex = "/(http:\/\/www\.whompcomic\.com\/comics\/.*)/i";
                     foreach ($entries as $entry) {
+                        $src = $entry->getAttribute("src");
                         if (preg_match($regex, $src, $matches)) {
                             $entry->setAttribute("src", $matches[0]);
                             $basenode = $entry;

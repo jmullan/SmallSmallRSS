@@ -1,5 +1,7 @@
 <?php
-class Af_Unburn extends \SmallSmallRSS\Plugin {
+
+class Af_Unburn extends \SmallSmallRSS\Plugin
+{
     private $host;
 
     const API_VERSION = 2;
@@ -13,7 +15,7 @@ class Af_Unburn extends \SmallSmallRSS\Plugin {
         \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
     );
 
-    function hookArticleFilter($article)
+    public function hookArticleFilter($article)
     {
         $owner_uid = $article["owner_uid"];
         if (!function_exists("curl_init")) {

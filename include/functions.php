@@ -2942,14 +2942,15 @@ function fix_url($url) {
         return '';
 }
 
-function validate_feed_url($url) {
+function validate_feed_url($url)
+{
     $parts = parse_url($url);
-
     return ($parts['scheme'] == 'http' || $parts['scheme'] == 'feed' || $parts['scheme'] == 'https');
 
 }
 
-function get_article_enclosures($id) {
+function get_article_enclosures($id)
+{
 
     $query = "SELECT * FROM ttrss_enclosures
             WHERE post_id = '$id' AND content_url != ''";
@@ -2967,20 +2968,23 @@ function get_article_enclosures($id) {
     return $rv;
 }
 
-function save_email_address($email) {
+function save_email_address($email)
+{
     // FIXME: implement persistent storage of emails
-
-    if (!$_SESSION['stored_emails'])
+    if (!$_SESSION['stored_emails']) {
         $_SESSION['stored_emails'] = array();
-
-    if (!in_array($email, $_SESSION['stored_emails']))
+    }
+    if (!in_array($email, $_SESSION['stored_emails'])) {
         array_push($_SESSION['stored_emails'], $email);
+    }
 }
 
 
-function get_feed_access_key($feed_id, $is_cat, $owner_uid = false) {
-
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
+function get_feed_access_key($feed_id, $is_cat, $owner_uid = false)
+{
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
 
     $sql_is_cat = bool_to_sql_bool($is_cat);
 

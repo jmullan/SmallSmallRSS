@@ -842,43 +842,22 @@ function update_rss_feed($feed, $no_cache = false)
         }
         \SmallSmallRSS\Database::query("COMMIT");
         assign_article_to_label_filters(
-            $entry_ref_id, $article_filters,
-            $owner_uid, $article_labels
+            $entry_ref_id,
+            $article_filters,
+            $owner_uid,
+            $article_labels
         );
         // enclosures
         $enclosures = array();
         $encs = $item->get_enclosures();
         if (is_array($encs)) {
             foreach ($encs as $e) {
-                $e_item = array(
-                    $e->link, $e->type, $e->length);
+                $e_item = array($e->link, $e->type, $e->length);
                 array_push($enclosures, $e_item);
             }
         }
-        \SmallSmallRSS\Database::query("BEGIN");
-        foreach ($enclosures as $enc) {
-            $enc_url = \SmallSmallRSS\Database::escape_string($enc[0]);
-            $enc_type = \SmallSmallRSS\Database::escape_string($enc[1]);
-            $enc_dur = \SmallSmallRSS\Database::escape_string($enc[2]);
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT id
-                 FROM ttrss_enclosures
-                 WHERE content_url = '$enc_url' AND post_id = '$entry_ref_id'"
-            );
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-                \SmallSmallRSS\Database::query(
-                    "INSERT INTO ttrss_enclosures
-                     (content_url, content_type, title, duration, post_id)
-                     VALUES
-                     ('$enc_url', '$enc_type', '', '$enc_dur', '$entry_ref_id')"
-                );
-            }
-        }
-
-        \SmallSmallRSS\Database::query("COMMIT");
-
+        \SmallSmallRSS\Enclosures::add($enclosures);
         // check for manual tags (we have to do it here since they're loaded from filters)
-
         foreach ($article_filters as $f) {
             if ($f["type"] == "tag") {
                 $manual_tags = trim_array(explode(",", $f["param"]));
@@ -891,9 +870,19 @@ function update_rss_feed($feed, $no_cache = false)
         }
 
         // Skip boring tags
-        $boring_tags = trim_array(explode(",", mb_strtolower(\SmallSmallRSS\DBPrefs::read(
-            'BLACKLISTED_TAGS', $owner_uid, ''
-        ), 'utf-8')));
+        $boring_tags = trim_array(
+            explode(
+                ",",
+                mb_strtolower(
+                    \SmallSmallRSS\DBPrefs::read(
+                        'BLACKLISTED_TAGS',
+                        $owner_uid,
+                        ''
+                    ),
+                    'utf-8'
+                )
+            )
+        );
 
         $filtered_tags = array();
         $tags_to_cache = array();

@@ -2,7 +2,7 @@
 namespace SmallSmallRSS;
 
 class Feeds {
-    static public function get_special_feeds() {
+    public static function get_special_feeds() {
         return array(
             -4 => __('All articles'),
             -3 => __('Fresh articles'),
@@ -12,10 +12,10 @@ class Feeds {
             -6 => __('Recently read')
         );
     }
-    static public function get_special_feed_ids() {
+    public static function get_special_feed_ids() {
         return array_keys(self::get_special_feeds());
     }
-    static public function getTitle($feed_id)
+    public static function getTitle($feed_id)
     {
         $special_feeds = self::get_special_feeds();
         if (isset($special_feeds[$feed_id])) {
@@ -40,7 +40,7 @@ class Feeds {
         }
     }
 
-    static public function purge_interval($feed_id) {
+    public static function purge_interval($feed_id) {
         $result = \SmallSmallRSS\Database::query(
             "SELECT purge_interval, owner_uid
              FROM ttrss_feeds
@@ -67,7 +67,7 @@ class Feeds {
      * @access public
      * @return void
      */
-    static public function purge($feed_id, $purge_interval) {
+    public static function purge($feed_id, $purge_interval) {
         if (!$purge_interval) {
             $purge_interval = self::purge_interval($feed_id);
         }
@@ -118,15 +118,15 @@ class Feeds {
                 );
 
             } else {
-
-                $result = \SmallSmallRSS\Database::query("DELETE FROM ttrss_user_entries
-                    USING ttrss_entries
-                    WHERE
-                        ttrss_entries.id = ref_id
-                        AND marked = false AND
-                        AND feed_id = '$feed_id'
-                        AND ttrss_entries.date_updated < NOW() - INTERVAL '$purge_interval days'
-                        $query_limit"
+                $result = \SmallSmallRSS\Database::query(
+                    "DELETE FROM ttrss_user_entries
+                     USING ttrss_entries
+                     WHERE
+                         ttrss_entries.id = ref_id
+                         AND marked = false AND
+                         AND feed_id = '$feed_id'
+                         AND ttrss_entries.date_updated < NOW() - INTERVAL '$purge_interval days'
+                         $query_limit"
                 );
             }
 
@@ -152,7 +152,7 @@ class Feeds {
 
     }
 
-    static public function countFeedSubscribers()
+    public static function countFeedSubscribers()
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT feed_url, site_url, title, COUNT(id) AS subscribers
@@ -180,7 +180,7 @@ class Feeds {
         return $lines;
     }
 
-    function getFeedUpdateInterval($feed_id)
+    public static function getFeedUpdateInterval($feed_id)
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT owner_uid, update_interval
@@ -196,6 +196,20 @@ class Feeds {
             }
         } else {
             return -1;
+        }
+    }
+
+    public static function getCategory($feed_id)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT cat_id
+             FROM ttrss_feeds
+             WHERE id = '$feed_id'"
+        );
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
+        } else {
+            return false;
         }
     }
 }

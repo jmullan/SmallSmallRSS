@@ -2902,23 +2902,9 @@ function validate_feed_url($url)
 
 }
 
-function get_article_enclosures($id)
+function get_article_enclosures($post_id)
 {
-
-    $query = "SELECT * FROM ttrss_enclosures
-            WHERE post_id = '$id' AND content_url != ''";
-
-    $rv = array();
-
-    $result = \SmallSmallRSS\Database::query($query);
-
-    if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            array_push($rv, $line);
-        }
-    }
-
-    return $rv;
+    return \SmallSmallRSS\Enclosures::get($post_id);
 }
 
 function save_email_address($email)
@@ -2959,27 +2945,30 @@ function get_feeds_from_html($url, $content)
             if ($title == '') {
                 $title = $entry->getAttribute('type');
             }
-            $feedUrl = rewrite_relative_url(
-                $baseUrl, $entry->getAttribute('href')
-            );
+            $feedUrl = rewrite_relative_url($baseUrl, $entry->getAttribute('href'));
             $feedUrls[$feedUrl] = $title;
         }
     }
     return $feedUrls;
 }
 
-function is_html($content) {
+function is_html($content)
+{
     return preg_match("/<html|DOCTYPE html/i", substr($content, 0, 20)) !== 0;
 }
 
-function url_is_html($url, $login = false, $pass = false) {
+function url_is_html($url, $login = false, $pass = false)
+{
     return is_html(\SmallSmallRSS\Fetcher::fetch($url, false, $login, $pass));
 }
 
-function print_label_select($name, $value, $attributes = "") {
+function print_label_select($name, $value, $attributes = "")
+{
 
-    $result = \SmallSmallRSS\Database::query("SELECT caption FROM ttrss_labels2
-            WHERE owner_uid = '".$_SESSION["uid"]."' ORDER BY caption");
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT caption FROM ttrss_labels2
+         WHERE owner_uid = '".$_SESSION["uid"]."' ORDER BY caption"
+    );
 
     print "<select default=\"$value\" name=\"" . htmlspecialchars($name) .
         "\" $attributes onchange=\"labelSelectOnChange(this)\" >";
@@ -3000,8 +2989,12 @@ function print_label_select($name, $value, $attributes = "") {
 
 }
 
-function format_article_enclosures($id, $always_display_enclosures,
-                                   $article_content, $hide_images = false) {
+function format_article_enclosures(
+    $id,
+    $always_display_enclosures,
+    $article_content,
+    $hide_images = false
+) {
 
     $result = get_article_enclosures($id);
     $rv = '';
@@ -3017,7 +3010,9 @@ function format_article_enclosures($id, $always_display_enclosures,
             $url = $line["content_url"];
             $ctype = $line["content_type"];
 
-            if (!$ctype) $ctype = __("unknown type");
+            if (!$ctype) {
+                $ctype = __("unknown type");
+            }
 
             $filename = substr($url, strrpos($url, "/")+1);
 
@@ -3321,11 +3316,15 @@ function filter_to_sql($filter, $owner_uid)
     } else {
         $fullquery = "(false)";
     }
-    if ($filter['inverse']) $fullquery = "(NOT $fullquery)";
+    if ($filter['inverse']) {
+        $fullquery = "(NOT $fullquery)";
+    }
     return $fullquery;
 }
+
 if (!function_exists('gzdecode')) {
-    function gzdecode($string) {
+    function gzdecode($string)
+    {
         // no support for 2nd argument
         return file_get_contents(
             'compress.zlib://data:who/cares;base64,'.
@@ -3334,7 +3333,8 @@ if (!function_exists('gzdecode')) {
     }
 }
 
-function get_random_bytes($length) {
+function get_random_bytes($length)
+{
     if (function_exists('openssl_random_pseudo_bytes')) {
         return openssl_random_pseudo_bytes($length);
     } else {
@@ -3346,7 +3346,8 @@ function get_random_bytes($length) {
     }
 }
 
-function read_stdin() {
+function read_stdin()
+{
     $fp = fopen("php://stdin", "r");
     if ($fp) {
         $line = trim(fgets($fp));
@@ -3356,7 +3357,8 @@ function read_stdin() {
     return null;
 }
 
-function tmpdirname($path, $prefix) {
+function tmpdirname($path, $prefix)
+{
     // Use PHP's tmpfile function to create a temporary
     // directory name. Delete the file and keep the name.
     $tempname = tempnam($path, $prefix);
@@ -3369,20 +3371,13 @@ function tmpdirname($path, $prefix) {
     return $tempname;
 }
 
-function getFeedCategory($feed) {
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT cat_id FROM ttrss_feeds
-         WHERE id = '$feed'"
-    );
-    if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-        return \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
-    } else {
-        return false;
-    }
-
+function getFeedCategory($feed_id)
+{
+    return \SmallSmallRSS\Feeds::getCategory($feed_id);
 }
 
-function calculate_dep_timestamp() {
+function calculate_dep_timestamp()
+{
     $files = array_merge(glob("js/*.js"), glob("css/*.css"));
     $max_ts = -1;
     foreach ($files as $file) {
@@ -3393,16 +3388,23 @@ function calculate_dep_timestamp() {
     return $max_ts;
 }
 
-function label_to_feed_id($label) {
+function label_to_feed_id($label)
+{
     return \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 - abs($label);
 }
 
-function feed_to_label_id($feed) {
+function feed_to_label_id($feed)
+{
     return \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 + abs($feed);
 }
 
-function format_libxml_error($error) {
-    return T_sprintf("LibXML error %s at line %d (column %d): %s",
-                     $error->code, $error->line, $error->column,
-                     $error->message);
+function format_libxml_error($error)
+{
+    return T_sprintf(
+        "LibXML error %s at line %d (column %d): %s",
+        $error->code,
+        $error->line,
+        $error->column,
+        $error->message
+    );
 }

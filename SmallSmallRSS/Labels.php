@@ -161,7 +161,7 @@ class Labels
                 VALUES ('$label_id', '$id')"
             );
         }
-       self::clearCache($id);
+        self::clearCache($id);
     }
 
     public static function remove($id, $owner_uid)
@@ -182,15 +182,8 @@ class Labels
              AND owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::affected_rows($result) != 0 && $caption) {
-            /* Remove access key for the label */
             $ext_id = \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 - $id;
-            \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_access_keys
-                 WHERE
-                     feed_id = '$ext_id'
-                     AND owner_uid = $owner_uid"
-            );
-            /* Remove cached data */
+            \SmallSmallRSS\AccessKeys::delete($ext_id, $owner_uid);
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries
                  SET label_cache = ''
@@ -229,7 +222,8 @@ class Labels
         return $result;
     }
 
-    public static function getOwnerLabels($owner_id, $article_id = null) {
+    public static function getOwnerLabels($owner_id, $article_id = null)
+    {
         if ($article_id) {
             $article_labels = \SmallSmallRSS\Labels::getForArticle($article_id);
         } else {

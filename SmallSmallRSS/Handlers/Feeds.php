@@ -4,7 +4,7 @@ namespace SmallSmallRSS\Handlers;
 class Feeds extends ProtectedHandler
 {
 
-    public function escape_from_request($key)
+    public function getSQLEscapedStringFromRequest($key)
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
@@ -223,13 +223,13 @@ class Feeds extends ProtectedHandler
             }
         }
 
-        $search = $this->escape_from_request("query");
+        $search = $this->getSQLEscapedStringFromRequest("query");
 
         if ($search) {
             $disable_cache = true;
         }
 
-        $search_mode = $this->escape_from_request("search_mode");
+        $search_mode = $this->getSQLEscapedStringFromRequest("search_mode");
 
         if (!empty($_REQUEST["debug"])) {  $timing_info = print_checkpoint("H0", $timing_info);
         }
@@ -834,16 +834,16 @@ class Feeds extends ProtectedHandler
             $timing_info = print_checkpoint("0", $timing_info);
         }
 
-        $omode = $this->escape_from_request("omode");
-        $feed = $this->escape_from_request("feed");
-        $method = $this->escape_from_request("m");
-        $view_mode = $this->escape_from_request("view_mode");
+        $omode = $this->getSQLEscapedStringFromRequest("omode");
+        $feed = $this->getSQLEscapedStringFromRequest("feed");
+        $method = $this->getSQLEscapedStringFromRequest("m");
+        $view_mode = $this->getSQLEscapedStringFromRequest("view_mode");
         $limit = 30;
         $cat_view = $_REQUEST["cat"] == "true";
-        $next_unread_feed = $this->escape_from_request("nuf");
-        $offset = $this->escape_from_request("skip");
-        $vgroup_last_feed = $this->escape_from_request("vgrlf");
-        $order_by = $this->escape_from_request("order_by");
+        $next_unread_feed = $this->getSQLEscapedStringFromRequest("nuf");
+        $offset = $this->getSQLEscapedStringFromRequest("skip");
+        $vgroup_last_feed = $this->getSQLEscapedStringFromRequest("vgrlf");
+        $order_by = $this->getSQLEscapedStringFromRequest("order_by");
 
         if (is_numeric($feed)) {
             $feed = (int) $feed;
@@ -1118,7 +1118,7 @@ class Feeds extends ProtectedHandler
         if (defined('_DISABLE_FEED_BROWSER') && _DISABLE_FEED_BROWSER) {  return;
         }
 
-        $browser_search = $this->escape_from_request("search");
+        $browser_search = $this->getSQLEscapedStringFromRequest("search");
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"updateFeedBrowser\">";
@@ -1170,7 +1170,7 @@ class Feeds extends ProtectedHandler
 
     public function search()
     {
-        $this->params = explode(":", $this->escape_from_request("param"), 2);
+        $this->params = explode(":", $this->getSQLEscapedStringFromRequest("param"), 2);
         $active_feed_id = sprintf("%d", $this->params[0]);
         $is_cat = $this->params[1] != "false";
         print "<div class=\"dlgSec\">".__('Look for')."</div>";

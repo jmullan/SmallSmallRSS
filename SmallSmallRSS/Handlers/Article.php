@@ -1,15 +1,16 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class Article extends ProtectedHandler
 {
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("redirect", "editarticletags");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function redirect()
+    public function redirect()
     {
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
         $result = \SmallSmallRSS\Database::query(
@@ -33,7 +34,7 @@ class Article extends ProtectedHandler
         }
     }
 
-    function view()
+    public function view()
     {
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
         $cids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["cids"]));
@@ -108,8 +109,13 @@ class Article extends ProtectedHandler
         \SmallSmallRSS\CountersCache::update($feed_id, $_SESSION["uid"]);
     }
 
-    static function create_published_article($title, $url, $content, $labels_str,
-                                             $owner_uid) {
+    public static function createPublishedArticle(
+        $title,
+        $url,
+        $content,
+        $labels_str,
+        $owner_uid
+    ) {
         $guid = 'SHA1:' . sha1("ttshared:" . $url . $owner_uid);
         $content_hash = sha1($content);
 
@@ -121,12 +127,15 @@ class Article extends ProtectedHandler
 
         $rc = false;
 
-        if (!$title) {  $title = $url;
+        if (!$title) {
+            $title = $url;
         }
-        if (!$title && !$url) {  return false;
+        if (!$title && !$url) {
+            return false;
         }
 
-        if (filter_var($url, FILTER_VALIDATE_URL) === false) {  return false;
+        if (filter_var($url, FILTER_VALIDATE_URL) === false) {
+            return false;
         }
 
         \SmallSmallRSS\Database::query("BEGIN");
@@ -213,7 +222,7 @@ class Article extends ProtectedHandler
         return $rc;
     }
 
-    function editArticleTags()
+    public function editArticleTags()
     {
 
         echo __("Tags for this article (separated by commas):")."<br>";
@@ -247,7 +256,7 @@ class Article extends ProtectedHandler
 
     }
 
-    function setScore()
+    public function setScore()
     {
         $ids = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
         $score = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['score']);
@@ -262,7 +271,7 @@ class Article extends ProtectedHandler
     }
 
 
-    function setArticleTags()
+    public function setArticleTags()
     {
 
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
@@ -343,7 +352,7 @@ class Article extends ProtectedHandler
     }
 
 
-    function completeTags()
+    public function completeTags()
     {
         $search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
@@ -361,12 +370,12 @@ class Article extends ProtectedHandler
         echo "</ul>";
     }
 
-    function assigntolabel()
+    public function assigntolabel()
     {
         return $this->labelops(true);
     }
 
-    function removefromlabel()
+    public function removefromlabel()
     {
         return $this->labelops(false);
     }
@@ -376,7 +385,9 @@ class Article extends ProtectedHandler
         $reply = array();
         $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
         $label_id = \SmallSmallRSS\Database::escape_string($_REQUEST["lid"]);
-        $label = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Labels::findCaption($label_id, $_SESSION["uid"]));
+        $label = \SmallSmallRSS\Database::escape_string(
+            \SmallSmallRSS\Labels::findCaption($label_id, $_SESSION["uid"])
+        );
         $reply["info-for-headlines"] = array();
         if ($label) {
             foreach ($ids as $id) {

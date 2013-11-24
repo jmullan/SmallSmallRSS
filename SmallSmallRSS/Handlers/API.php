@@ -10,7 +10,7 @@ class API extends Handler
 
     private $seq;
 
-    public function request_sql_bool($key)
+    public function getSQLBooleanFromRequest($key)
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
@@ -19,7 +19,7 @@ class API extends Handler
         return sql_bool_to_bool($value);
     }
 
-    public function escape_from_request($key)
+    public function getSQLEscapedStringFromRequest($key)
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
@@ -51,9 +51,7 @@ class API extends Handler
 
     public function wrap($status, $reply)
     {
-        print json_encode(array("seq" => $this->seq,
-                                "status" => $status,
-                                "content" => $reply));
+        print json_encode(array("seq" => $this->seq, "status" => $status, "content" => $reply));
     }
 
     public function getVersion()
@@ -70,7 +68,7 @@ class API extends Handler
 
     public function login()
     {
-        $login = $this->escape_from_request("user");
+        $login = $this->getSQLEscapedStringFromRequest("user");
         $password = $_REQUEST["password"];
         $password_base64 = base64_decode($password);
         if (\SmallSmallRSS\Auth::is_single_user_mode()) {
@@ -120,8 +118,8 @@ class API extends Handler
 
     public function getUnread()
     {
-        $feed_id = $this->escape_from_request("feed_id");
-        $is_cat = $this->escape_from_request("is_cat");
+        $feed_id = $this->getSQLEscapedStringFromRequest("feed_id");
+        $is_cat = $this->getSQLEscapedStringFromRequest("is_cat");
 
         if ($feed_id) {
             $this->wrap(self::STATUS_OK, array("unread" => getFeedUnread($feed_id, $is_cat)));
@@ -138,11 +136,11 @@ class API extends Handler
 
     public function getFeeds()
     {
-        $cat_id = $this->escape_from_request("cat_id");
-        $unread_only = $this->request_sql_bool("unread_only");
-        $limit = (int) $this->escape_from_request("limit");
-        $offset = (int) $this->escape_from_request("offset");
-        $include_nested = $this->request_sql_bool("include_nested");
+        $cat_id = $this->getSQLEscapedStringFromRequest("cat_id");
+        $unread_only = $this->getSQLBooleanFromRequest("unread_only");
+        $limit = (int) $this->getSQLEscapedStringFromRequest("limit");
+        $offset = (int) $this->getSQLEscapedStringFromRequest("offset");
+        $include_nested = $this->getSQLBooleanFromRequest("include_nested");
 
         $feeds = $this->apiGetFeeds($cat_id, $unread_only, $limit, $offset, $include_nested);
 
@@ -151,9 +149,9 @@ class API extends Handler
 
     public function getCategories()
     {
-        $unread_only = $this->request_sql_bool("unread_only");
-        $enable_nested = $this->request_sql_bool("enable_nested");
-        $include_empty = $this->request_sql_bool('include_empty');
+        $unread_only = $this->getSQLBooleanFromRequest("unread_only");
+        $enable_nested = $this->getSQLBooleanFromRequest("enable_nested");
+        $include_empty = $this->getSQLBooleanFromRequest('include_empty');
 
         // TODO do not return empty categories, return Uncategorized and standard virtual cats
 
@@ -213,26 +211,26 @@ class API extends Handler
 
     public function getHeadlines()
     {
-        $feed_id = $this->escape_from_request("feed_id");
+        $feed_id = $this->getSQLEscapedStringFromRequest("feed_id");
         if ($feed_id != "") {
 
-            $limit = (int) $this->escape_from_request("limit");
+            $limit = (int) $this->getSQLEscapedStringFromRequest("limit");
             if (!$limit || $limit >= 200) {
                 $limit = 200;
             }
 
-            $offset = (int) $this->escape_from_request("skip");
-            $filter = $this->escape_from_request("filter");
-            $is_cat = $this->request_sql_bool("is_cat");
-            $show_excerpt = $this->request_sql_bool("show_excerpt");
-            $show_content = $this->request_sql_bool("show_content");
+            $offset = (int) $this->getSQLEscapedStringFromRequest("skip");
+            $filter = $this->getSQLEscapedStringFromRequest("filter");
+            $is_cat = $this->getSQLBooleanFromRequest("is_cat");
+            $show_excerpt = $this->getSQLBooleanFromRequest("show_excerpt");
+            $show_content = $this->getSQLBooleanFromRequest("show_content");
             /* all_articles, unread, adaptive, marked, updated */
-            $view_mode = $this->escape_from_request("view_mode");
-            $include_attachments = $this->request_sql_bool("include_attachments");
-            $since_id = (int) $this->escape_from_request("since_id");
-            $include_nested = $this->request_sql_bool("include_nested");
+            $view_mode = $this->getSQLEscapedStringFromRequest("view_mode");
+            $include_attachments = $this->getSQLBooleanFromRequest("include_attachments");
+            $since_id = (int) $this->getSQLEscapedStringFromRequest("since_id");
+            $include_nested = $this->getSQLBooleanFromRequest("include_nested");
             $sanitize_content = !isset($_REQUEST["sanitize"]) ||
-                $this->request_sql_bool("sanitize");
+                $this->getSQLBooleanFromRequest("sanitize");
 
             $override_order = false;
             switch ($_REQUEST["order_by"]) {
@@ -246,14 +244,25 @@ class API extends Handler
 
             /* do not rely on params below */
 
-            $search = $this->escape_from_request("search");
-            $search_mode = $this->escape_from_request("search_mode");
+            $search = $this->getSQLEscapedStringFromRequest("search");
+            $search_mode = $this->getSQLEscapedStringFromRequest("search_mode");
 
-            $headlines = $this->api_get_headlines(
-                $feed_id, $limit, $offset,
-                $filter, $is_cat, $show_excerpt, $show_content, $view_mode, $override_order,
-                $include_attachments, $since_id, $search, $search_mode,
-                $include_nested, $sanitize_content
+            $headlines = $this->apiGetHeadlines(
+                $feed_id,
+                $limit,
+                $offset,
+                $filter,
+                $is_cat,
+                $show_excerpt,
+                $show_content,
+                $view_mode,
+                $override_order,
+                $include_attachments,
+                $since_id,
+                $search,
+                $search_mode,
+                $include_nested,
+                $sanitize_content
             );
 
             $this->wrap(self::STATUS_OK, $headlines);
@@ -264,10 +273,10 @@ class API extends Handler
 
     public function updateArticle()
     {
-        $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
-        $mode = (int) $this->escape_from_request("mode");
-        $data = $this->escape_from_request("data");
-        $field_raw = (int) $this->escape_from_request("field");
+        $article_ids = array_filter(explode(",", $this->getSQLEscapedStringFromRequest("article_ids")), 'is_numeric');
+        $mode = (int) $this->getSQLEscapedStringFromRequest("mode");
+        $data = $this->getSQLEscapedStringFromRequest("data");
+        $field_raw = (int) $this->getSQLEscapedStringFromRequest("field");
 
         $field = "";
         $set_to = "";
@@ -306,10 +315,16 @@ class API extends Handler
         }
 
         if ($field && $set_to && count($article_ids) > 0) {
-
             $article_ids = join(", ", $article_ids);
-
-            $result = \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries SET $field = $set_to $additional_fields WHERE ref_id IN ($article_ids) AND owner_uid = " . $_SESSION["uid"]);
+            $result = \SmallSmallRSS\Database::query(
+                "UPDATE ttrss_user_entries
+                 SET
+                     $field = $set_to
+                     $additional_fields
+                 WHERE
+                     ref_id IN ($article_ids)
+                     AND owner_uid = " . $_SESSION["uid"]
+            );
 
             $num_updated = \SmallSmallRSS\Database::affected_rows($result);
 
@@ -347,28 +362,38 @@ class API extends Handler
     public function getArticle()
     {
 
-        $article_id = join(",", array_filter(explode(",", $this->escape_from_request("article_id")), 'is_numeric'));
+        $article_id = join(
+            ",",
+            array_filter(
+                explode(
+                    ",",
+                    $this->getSQLEscapedStringFromRequest("article_id")
+                ),
+                'is_numeric'
+            )
+        );
 
         if ($article_id) {
             $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
-            $query = "SELECT id,title,link,content,cached_content,feed_id,comments,int_id,
-                marked,unread,published,score,
-                ".$substring_for_date."(updated,1,16) as updated,
-                author,(SELECT title FROM ttrss_feeds WHERE id = feed_id) AS feed_title
-                FROM ttrss_entries,ttrss_user_entries
-                WHERE    id IN ($article_id) AND ref_id = id AND owner_uid = " .
-                $_SESSION["uid"];
-
+            $query = "SELECT
+                          id,title,link,content,cached_content,feed_id,comments,int_id,
+                          marked,unread,published,score,
+                          ".$substring_for_date."(updated,1,16) as updated,
+                          author,
+                          (
+                               SELECT title
+                               FROM ttrss_feeds WHERE id = feed_id
+                          ) AS feed_title
+                      FROM ttrss_entries,ttrss_user_entries
+                      WHERE
+                          id IN ($article_id)
+                          AND ref_id = id
+                          AND owner_uid = " . $_SESSION["uid"];
             $result = \SmallSmallRSS\Database::query($query);
-
             $articles = array();
-
             if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-
                 while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
                     $attachments = get_article_enclosures($line['id']);
-
                     $article = array(
                         "id" => $line["id"],
                         "title" => $line["title"],
@@ -386,8 +411,10 @@ class API extends Handler
                         "score" => (int) $line["score"],
                         "feed_title" => $line["feed_title"]
                     );
-
-                    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_API) as $p) {
+                    $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+                        \SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_API
+                    );
+                    foreach ($hooks as $p) {
                         $article = $p->hookRenderArticleApi(array("article" => $article));
                     }
 
@@ -422,15 +449,15 @@ class API extends Handler
     public function updateFeed()
     {
         require_once "include/rssfuncs.php";
-        $feed_id = (int) $this->escape_from_request("feed_id");
+        $feed_id = (int) $this->getSQLEscapedStringFromRequest("feed_id");
         update_rss_feed($feed_id);
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
     public function catchupFeed()
     {
-        $feed_id = $this->escape_from_request("feed_id");
-        $is_cat = $this->escape_from_request("is_cat");
+        $feed_id = $this->getSQLEscapedStringFromRequest("feed_id");
+        $is_cat = $this->getSQLEscapedStringFromRequest("is_cat");
 
         catchup_feed($feed_id, $is_cat);
 
@@ -439,7 +466,7 @@ class API extends Handler
 
     public function getPref()
     {
-        $pref_name = $this->escape_from_request("pref_name");
+        $pref_name = $this->getSQLEscapedStringFromRequest("pref_name");
         $this->wrap(self::STATUS_OK, array("value" => \SmallSmallRSS\DBPrefs::read($pref_name)));
     }
 
@@ -456,9 +483,9 @@ class API extends Handler
     public function setArticleLabel()
     {
 
-        $article_ids = array_filter(explode(",", $this->escape_from_request("article_ids")), 'is_numeric');
-        $label_id = (int) $this->escape_from_request('label_id');
-        $assign = (bool) $this->escape_from_request('assign') == "true";
+        $article_ids = array_filter(explode(",", $this->getSQLEscapedStringFromRequest("article_ids")), 'is_numeric');
+        $label_id = (int) $this->getSQLEscapedStringFromRequest('label_id');
+        $assign = (bool) $this->getSQLEscapedStringFromRequest('assign') == "true";
         $label = \SmallSmallRSS\Database::escape_string(
             \SmallSmallRSS\Labels::findCaption($label_id, $_SESSION["uid"])
         );
@@ -510,7 +537,7 @@ class API extends Handler
         $url = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["url"]));
         $content = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["content"]));
 
-        if (\SmallSmallRSS\Handlers\Article::create_published_article($title, $url, $content, "", $_SESSION["uid"])) {
+        if (\SmallSmallRSS\Handlers\Article::createPublishedArticle($title, $url, $content, "", $_SESSION["uid"])) {
             $this->wrap(self::STATUS_OK, array("status" => 'OK'));
         } else {
             $this->wrap(self::STATUS_ERR, array("error" => 'Publishing failed'));
@@ -612,8 +639,7 @@ class API extends Handler
 
             if ($cat_id) {
                 $cat_qpart = "cat_id = '$cat_id'";
-            }
-            else {
+            } else {
                 $cat_qpart = "cat_id IS NULL";
             }
 
@@ -653,12 +679,22 @@ class API extends Handler
         return $feeds;
     }
 
-    static function api_get_headlines(
-        $feed_id, $limit, $offset,
-        $filter, $is_cat, $show_excerpt, $show_content, $view_mode, $order,
-        $include_attachments, $since_id,
-        $search = "", $search_mode = "",
-        $include_nested = false, $sanitize_content = true
+    public static function apiGetHeadlines(
+        $feed_id,
+        $limit,
+        $offset,
+        $filter,
+        $is_cat,
+        $show_excerpt,
+        $show_content,
+        $view_mode,
+        $order,
+        $include_attachments,
+        $since_id,
+        $search = "",
+        $search_mode = "",
+        $include_nested = false,
+        $sanitize_content = true
     ) {
 
         $qfh_ret = queryFeedHeadlines(
@@ -742,8 +778,11 @@ class API extends Handler
 
             $headline_row["labels"] = $labels;
 
-            $headline_row["feed_title"] = $line["feed_title"] ? $line["feed_title"] :
-                $feed_title;
+            $headline_row["feed_title"] = (
+                $line["feed_title"]
+                ? $line["feed_title"]
+                : $feed_title
+            );
 
             $headline_row["comments_count"] = (int) $line["num_comments"];
             $headline_row["comments_link"] = $line["comments"];
@@ -752,11 +791,12 @@ class API extends Handler
 
             $headline_row["author"] = $line["author"];
             $headline_row["score"] = (int) $line["score"];
-
-            foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_API) as $p) {
+            $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+                \SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_API
+            );
+            foreach ($hooks as $p) {
                 $headline_row = $p->hookRenderArticleApi(array("headline" => $headline_row));
             }
-
             array_push($headlines, $headline_row);
         }
 
@@ -765,7 +805,7 @@ class API extends Handler
 
     public function unsubscribeFeed()
     {
-        $feed_id = (int) $this->escape_from_request("feed_id");
+        $feed_id = (int) $this->getSQLEscapedStringFromRequest("feed_id");
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_feeds WHERE
@@ -782,10 +822,10 @@ class API extends Handler
 
     public function subscribeToFeed()
     {
-        $feed_url = $this->escape_from_request("feed_url");
-        $category_id = (int) $this->escape_from_request("category_id");
-        $login = $this->escape_from_request("login");
-        $password = $this->escape_from_request("password");
+        $feed_url = $this->getSQLEscapedStringFromRequest("feed_url");
+        $category_id = (int) $this->getSQLEscapedStringFromRequest("category_id");
+        $login = $this->getSQLEscapedStringFromRequest("login");
+        $password = $this->getSQLEscapedStringFromRequest("password");
 
         if ($feed_url) {
             $rc = subscribe_to_feed($feed_url, $category_id, $login, $password);
@@ -798,7 +838,7 @@ class API extends Handler
 
     public function getFeedTree()
     {
-        $include_empty = $this->request_sql_bool('include_empty');
+        $include_empty = $this->getSQLBooleanFromRequest('include_empty');
 
         $pf = new Pref_Feeds($_REQUEST);
 

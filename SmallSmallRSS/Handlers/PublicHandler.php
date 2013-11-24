@@ -441,7 +441,7 @@ class PublicHandler extends Handler
                 $content = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["content"]));
                 $labels = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["labels"]));
 
-                Article::create_published_article(
+                Article::createPublishedArticle(
                     $title, $url, $content, $labels,
                     $_SESSION["uid"]
                 );

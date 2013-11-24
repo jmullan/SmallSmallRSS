@@ -4,12 +4,12 @@ namespace SmallSmallRSS\Handlers;
 class Pref_Feeds extends ProtectedHandler
 {
 
-    function get_mode()
+    public function get_mode()
     {
         return isset($_REQUEST['mode']) ? $_REQUEST['mode'] : '';
     }
 
-    function escape_from_request($key)
+    public function getSQLEscapedStringFromRequest($key)
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
@@ -18,7 +18,7 @@ class Pref_Feeds extends ProtectedHandler
         return $value;
     }
 
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "getfeedtree", "add", "editcats", "editfeed",
                               "savefeedorder", "uploadicon", "feedswitherrors", "inactivefeeds",
@@ -27,16 +27,16 @@ class Pref_Feeds extends ProtectedHandler
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function batch_edit_cbox($elem, $label = false)
+    public function renderBatchEditCheckbox($elem, $label = false)
     {
         print "<input type=\"checkbox\" title=\"".__("Check to enable field")."\"
                onchange=\"dijit.byId('feedEditDlg').toggleField(this, '$elem', '$label')\">";
     }
 
-    function renamecat()
+    public function renamecat()
     {
-        $title = $this->escape_from_request('title');
-        $id = $this->escape_from_request('id');
+        $title = $this->getSQLEscapedStringFromRequest('title');
+        $id = $this->getSQLEscapedStringFromRequest('id');
 
         if ($title) {
             \SmallSmallRSS\Database::query(
@@ -53,8 +53,7 @@ class Pref_Feeds extends ProtectedHandler
 
         if ($this->get_mode() != 2) {
             $search = isset($_SESSION["prefs_feed_search"]) ? $_SESSION["prefs_feed_search"] : '';
-        }
-        else {
+        } else {
             $search = "";
         }
 
@@ -120,9 +119,7 @@ class Pref_Feeds extends ProtectedHandler
             $feed['unread'] = 0;
             $feed['error'] = $feed_line['last_error'];
             $feed['icon'] = getFeedIcon($feed_line['id']);
-            $feed['param'] = make_local_datetime(
-                $feed_line['last_updated'], true
-            );
+            $feed['param'] = make_local_datetime($feed_line['last_updated'], true);
 
             array_push($items, $feed);
         }
@@ -130,18 +127,17 @@ class Pref_Feeds extends ProtectedHandler
         return $items;
     }
 
-    function getfeedtree()
+    public function getfeedtree()
     {
         print json_encode($this->makefeedtree());
     }
 
-    function makefeedtree()
+    public function makefeedtree()
     {
 
         if ($this->get_mode() != 2 && isset($_SESSION["prefs_feed_search"])) {
             $search = $_SESSION["prefs_feed_search"];
-        }
-        else {
+        } else {
             $search = "";
         }
 
@@ -285,9 +281,7 @@ class Pref_Feeds extends ProtectedHandler
                 $feed['checkbox'] = false;
                 $feed['error'] = $feed_line['last_error'];
                 $feed['icon'] = getFeedIcon($feed_line['id']);
-                $feed['param'] = make_local_datetime(
-                    $feed_line['last_updated'], true
-                );
+                $feed['param'] = make_local_datetime($feed_line['last_updated'], true);
                 $feed['unread'] = 0;
                 $feed['type'] = 'feed';
 
@@ -324,9 +318,7 @@ class Pref_Feeds extends ProtectedHandler
                 $feed['checkbox'] = false;
                 $feed['error'] = $feed_line['last_error'];
                 $feed['icon'] = getFeedIcon($feed_line['id']);
-                $feed['param'] = make_local_datetime(
-                    $feed_line['last_updated'], true
-                );
+                $feed['param'] = make_local_datetime($feed_line['last_updated'], true);
                 $feed['unread'] = 0;
                 $feed['type'] = 'feed';
 
@@ -349,7 +341,7 @@ class Pref_Feeds extends ProtectedHandler
         return $fl;
     }
 
-    function catsortreset()
+    public function catsortreset()
     {
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feed_categories
@@ -358,7 +350,7 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    function feedsortreset()
+    public function feedsortreset()
     {
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds
@@ -369,16 +361,12 @@ class Pref_Feeds extends ProtectedHandler
 
     private function process_category_order(&$data_map, $item_id, $parent_id = false, $nest_level = 0)
     {
-        $debug = isset($_REQUEST["debug"]);
-
         $prefix = "";
         for ($i = 0; $i < $nest_level; $i++) {
             $prefix .= "   ";
         }
 
-        if ($debug) {  _debug("$prefix C: $item_id P: $parent_id");
-        }
-
+        _debug("$prefix C: $item_id P: $parent_id");
         $bare_item_id = substr($item_id, strpos($item_id, ':')+1);
 
         if ($item_id != 'root') {
@@ -404,9 +392,7 @@ class Pref_Feeds extends ProtectedHandler
             foreach ($cat as $item) {
                 $id = $item['_reference'];
                 $bare_id = substr($id, strpos($id, ':')+1);
-
-                if ($debug) {  _debug("$prefix [$order_id] $id/$bare_id");
-                }
+                _debug("$prefix [$order_id] $id/$bare_id");
 
                 if ($item['_reference']) {
 
@@ -450,25 +436,17 @@ class Pref_Feeds extends ProtectedHandler
         }
     }
 
-    function savefeedorder()
+    public function savefeedorder()
     {
         $data = json_decode($_POST['payload'], true);
-
-        #file_put_contents("/tmp/saveorder.json", $_POST['payload']);
-        #$data = json_decode(file_get_contents("/tmp/saveorder.json"), true);
-
         if (!is_array($data['items'])) {
             $data['items'] = json_decode($data['items'], true);
         }
         if (is_array($data) && is_array($data['items'])) {
             $cat_order_id = 0;
-
             $data_map = array();
             $root_item = false;
-
             foreach ($data['items'] as $item) {
-
-                #                if ($item['id'] != 'root') {
                 if (is_array($item['items'])) {
                     if (isset($item['items']['_reference'])) {
                         $data_map[$item['id']] = array($item['items']);
@@ -480,108 +458,67 @@ class Pref_Feeds extends ProtectedHandler
                     $root_item = $item['id'];
                 }
             }
-
             $this->process_category_order($data_map, $root_item);
-
-            /* foreach ($data['items'][0]['items'] as $item) {
-               $id = $item['_reference'];
-               $bare_id = substr($id, strpos($id, ':')+1);
-
-               ++$cat_order_id;
-
-               if ($bare_id > 0) {
-               \SmallSmallRSS\Database::query("UPDATE ttrss_feed_categories
-               SET order_id = '$cat_order_id' WHERE id = '$bare_id' AND
-               owner_uid = " . $_SESSION["uid"]);
-               }
-
-               $feed_order_id = 0;
-
-               if (is_array($data_map[$id])) {
-               foreach ($data_map[$id] as $feed) {
-               $id = $feed['_reference'];
-               $feed_id = substr($id, strpos($id, ':')+1);
-
-               if ($bare_id != 0)
-               $cat_query = "cat_id = '$bare_id'";
-               else
-               $cat_query = "cat_id = NULL";
-
-               \SmallSmallRSS\Database::query("UPDATE ttrss_feeds
-               SET order_id = '$feed_order_id',
-               $cat_query
-               WHERE id = '$feed_id' AND
-               owner_uid = " . $_SESSION["uid"]);
-
-               ++$feed_order_id;
-               }
-               }
-               } */
         }
-
-        return;
     }
 
-    function removeicon()
+    public function removeicon()
     {
-        $feed_id = $this->escape_from_request("feed_id");
-
+        $feed_id = $this->getSQLEscapedStringFromRequest("feed_id");
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id FROM ttrss_feeds
-            WHERE id = '$feed_id' AND owner_uid = ". $_SESSION["uid"]
+            "SELECT id
+            FROM ttrss_feeds
+            WHERE
+                id = '$feed_id'
+                AND owner_uid = ". $_SESSION["uid"]
         );
-
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
             @unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico");
-
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_feeds SET favicon_avg_color = NULL
-                where id = '$feed_id'"
+                "UPDATE ttrss_feeds
+                 SET favicon_avg_color = NULL
+                 WHERE id = '$feed_id'"
             );
         }
 
         return;
     }
 
-    function uploadicon()
+    public function uploadicon()
     {
         header("Content-type: text/html");
-
         $tmp_file = false;
-
         if (is_uploaded_file($_FILES['icon_file']['tmp_name'])) {
             $tmp_file = tempnam(\SmallSmallRSS\Config::get('CACHE_DIR') . '/upload', 'icon');
-
             $result = move_uploaded_file(
                 $_FILES['icon_file']['tmp_name'],
                 $tmp_file
             );
-
             if (!$result) {
                 return;
             }
         } else {
             return;
         }
-
         $icon_file = $tmp_file;
-        $feed_id = $this->escape_from_request("feed_id");
-
+        $feed_id = $this->getSQLEscapedStringFromRequest("feed_id");
         if (is_file($icon_file) && $feed_id) {
             if (filesize($icon_file) < 20000) {
-
                 $result = \SmallSmallRSS\Database::query(
-                    "SELECT id FROM ttrss_feeds
-                    WHERE id = '$feed_id' AND owner_uid = ". $_SESSION["uid"]
+                    "SELECT id
+                     FROM ttrss_feeds
+                     WHERE
+                         id = '$feed_id'
+                         AND owner_uid = ". $_SESSION["uid"]
                 );
 
                 if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                     @unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico");
                     if (rename($icon_file, \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico")) {
                         \SmallSmallRSS\Database::query(
-                            "UPDATE ttrss_feeds SET
-                            favicon_avg_color = ''
-                            WHERE id = '$feed_id'"
+                            "UPDATE ttrss_feeds
+                             SET favicon_avg_color = ''
+                             WHERE id = '$feed_id'"
                         );
 
                         $rc = 0;
@@ -604,37 +541,44 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    function editfeed()
+    public function editfeed()
     {
-        $feed_id = $this->escape_from_request("id");
+        $feed_id = $this->getSQLEscapedStringFromRequest("id");
 
         $result = \SmallSmallRSS\Database::query(
-            "SELECT * FROM ttrss_feeds WHERE id = '$feed_id' AND
-                owner_uid = " . $_SESSION["uid"]
+            "SELECT *
+             FROM ttrss_feeds
+             WHERE
+                 id = '$feed_id' AND
+                 owner_uid = " . $_SESSION["uid"]
         );
 
-        $auth_pass_encrypted = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result(
-            $result, 0,
-            "auth_pass_encrypted"
-        ));
+        $auth_pass_encrypted = sql_bool_to_bool(
+            \SmallSmallRSS\Database::fetch_result(
+                $result,
+                0,
+                "auth_pass_encrypted"
+            )
+        );
 
-        $title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result(
-            $result,
-            0, "title"
-        ));
+        $title = htmlspecialchars(
+            \SmallSmallRSS\Database::fetch_result(
+                $result,
+                0,
+                "title"
+            )
+        );
 
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
-
         print "<div class=\"dlgSec\">".__("Feed")."</div>";
         print "<div class=\"dlgSecCont\">";
 
         /* Title */
-
         print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
-            placeHolder=\"".__("Feed Title")."\"
-            style=\"font-size: 16px; width: 20em\" name=\"title\" value=\"$title\">";
+                placeHolder=\"".__("Feed Title")."\"
+                style=\"font-size: 16px; width: 20em\" name=\"title\" value=\"$title\">";
 
         /* Feed URL */
 
@@ -870,10 +814,10 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    function editfeeds()
+    public function editfeeds()
     {
 
-        $feed_ids = $this->escape_from_request("ids");
+        $feed_ids = $this->getSQLEscapedStringFromRequest("ids");
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             "Enable the options you wish to apply using checkboxes on the right:"
@@ -894,7 +838,7 @@ class Pref_Feeds extends ProtectedHandler
             disabled=\"1\" style=\"font-size: 16px; width: 20em;\" required=\"1\"
             name=\"title\" value=\"\">";
 
-        $this->batch_edit_cbox("title");
+        $this->renderBatchEditCheckbox("title");
 
         /* Feed URL */
 
@@ -905,7 +849,7 @@ class Pref_Feeds extends ProtectedHandler
             required=\"1\" regExp='^(http|https)://.*' style=\"width: 20em\"
             name=\"feed_url\" value=\"\">";
 
-        $this->batch_edit_cbox("feed_url");
+        $this->renderBatchEditCheckbox("feed_url");
 
         /* Category */
 
@@ -920,7 +864,7 @@ class Pref_Feeds extends ProtectedHandler
                 'disabled="1" dojoType="dijit.form.Select"'
             );
 
-            $this->batch_edit_cbox("cat_id");
+            $this->renderBatchEditCheckbox("cat_id");
 
         }
 
@@ -939,7 +883,7 @@ class Pref_Feeds extends ProtectedHandler
             'disabled="1" dojoType="dijit.form.Select"'
         );
 
-        $this->batch_edit_cbox("update_interval");
+        $this->renderBatchEditCheckbox("update_interval");
 
         /* Purge intl */
 
@@ -954,7 +898,7 @@ class Pref_Feeds extends ProtectedHandler
                 'disabled="1" dojoType="dijit.form.Select"'
             );
 
-            $this->batch_edit_cbox("purge_interval");
+            $this->renderBatchEditCheckbox("purge_interval");
         }
 
         print "</div>";
@@ -965,13 +909,13 @@ class Pref_Feeds extends ProtectedHandler
             placeHolder=\"".__("Login")."\" disabled=\"1\"
             name=\"auth_login\" value=\"\">";
 
-        $this->batch_edit_cbox("auth_login");
+        $this->renderBatchEditCheckbox("auth_login");
 
         print "<br/><input dojoType=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
             placeHolder=\"".__("Password")."\" disabled=\"1\"
             value=\"\">";
 
-        $this->batch_edit_cbox("auth_pass");
+        $this->renderBatchEditCheckbox("auth_pass");
 
         print "</div>";
         print "<div class=\"dlgSec\">".__("Options")."</div>";
@@ -980,19 +924,19 @@ class Pref_Feeds extends ProtectedHandler
         print "<input disabled=\"1\" type=\"checkbox\" name=\"private\" id=\"private\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"private_l\" class='insensitive' for=\"private\">".__('Hide from Popular feeds')."</label>";
 
-        print "&nbsp;"; $this->batch_edit_cbox("private", "private_l");
+        print "&nbsp;"; $this->renderBatchEditCheckbox("private", "private_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"include_in_digest\"
             name=\"include_in_digest\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"include_in_digest_l\" class='insensitive' for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
 
-        print "&nbsp;"; $this->batch_edit_cbox("include_in_digest", "include_in_digest_l");
+        print "&nbsp;"; $this->renderBatchEditCheckbox("include_in_digest", "include_in_digest_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"always_display_enclosures\"
             name=\"always_display_enclosures\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"always_display_enclosures_l\" class='insensitive' for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
 
-        print "&nbsp;"; $this->batch_edit_cbox("always_display_enclosures", "always_display_enclosures_l");
+        print "&nbsp;"; $this->renderBatchEditCheckbox("always_display_enclosures", "always_display_enclosures_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"hide_images\"
             name=\"hide_images\"
@@ -1000,7 +944,7 @@ class Pref_Feeds extends ProtectedHandler
             for=\"hide_images\">".
             __('Do not embed images')."</label>";
 
-        print "&nbsp;"; $this->batch_edit_cbox("hide_images", "hide_images_l");
+        print "&nbsp;"; $this->renderBatchEditCheckbox("hide_images", "hide_images_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"cache_images\"
             name=\"cache_images\"
@@ -1008,13 +952,13 @@ class Pref_Feeds extends ProtectedHandler
             for=\"cache_images\">".
             __('Cache images locally')."</label>";
 
-        print "&nbsp;"; $this->batch_edit_cbox("cache_images", "cache_images_l");
+        print "&nbsp;"; $this->renderBatchEditCheckbox("cache_images", "cache_images_l");
 
         print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"mark_unread_on_update\"
             name=\"mark_unread_on_update\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"mark_unread_on_update_l\" class='insensitive' for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
 
-        print "&nbsp;"; $this->batch_edit_cbox("mark_unread_on_update", "mark_unread_on_update_l");
+        print "&nbsp;"; $this->renderBatchEditCheckbox("mark_unread_on_update", "mark_unread_on_update_l");
 
         print "</div>";
 
@@ -1030,17 +974,17 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    function batchEditSave()
+    public function batchEditSave()
     {
         return $this->editsaveops(true);
     }
 
-    function editSave()
+    public function editSave()
     {
         return $this->editsaveops(false);
     }
 
-    function editsaveops($batch)
+    public function editsaveops($batch)
     {
 
         $feed_title = \SmallSmallRSS\Database::escape_string(trim($_POST["title"]));
@@ -1202,10 +1146,10 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    function resetPubSub()
+    public function resetPubSub()
     {
 
-        $ids = $this->escape_from_request("ids");
+        $ids = $this->getSQLEscapedStringFromRequest("ids");
 
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds SET pubsub_state = 0 WHERE id IN ($ids)
@@ -1215,10 +1159,10 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    function remove()
+    public function remove()
     {
 
-        $ids = explode(",", $this->escape_from_request("ids"));
+        $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
 
         foreach ($ids as $id) {
             Pref_Feeds::remove_feed($id, $_SESSION["uid"]);
@@ -1227,17 +1171,17 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    function clear()
+    public function clear()
     {
-        $id = $this->escape_from_request("id");
+        $id = $this->getSQLEscapedStringFromRequest("id");
         $this->clear_feed_articles($id);
     }
 
-    function rescore()
+    public function rescore()
     {
         require_once "rssfuncs.php";
 
-        $ids = explode(",", $this->escape_from_request("ids"));
+        $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
 
         foreach ($ids as $id) {
 
@@ -1297,7 +1241,7 @@ class Pref_Feeds extends ProtectedHandler
 
     }
 
-    function rescoreAll()
+    public function rescoreAll()
     {
 
         $result = \SmallSmallRSS\Database::query(
@@ -1360,11 +1304,11 @@ class Pref_Feeds extends ProtectedHandler
 
     }
 
-    function categorize()
+    public function categorize()
     {
-        $ids = explode(",", $this->escape_from_request("ids"));
+        $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
 
-        $cat_id = $this->escape_from_request("cat_id");
+        $cat_id = $this->getSQLEscapedStringFromRequest("cat_id");
 
         if ($cat_id == 0) {
             $cat_id_qpart = 'NULL';
@@ -1387,22 +1331,22 @@ class Pref_Feeds extends ProtectedHandler
         \SmallSmallRSS\Database::query("COMMIT");
     }
 
-    function removeCat()
+    public function removeCat()
     {
-        $ids = explode(",", $this->escape_from_request("ids"));
+        $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
         foreach ($ids as $id) {
             $this->remove_feed_category($id, $_SESSION["uid"]);
         }
     }
 
-    function addCat()
+    public function addCat()
     {
         $feed_cat = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["cat"]));
 
         add_feed_category($feed_cat);
     }
 
-    function index()
+    public function index()
     {
 
         print "<div dojoType=\"dijit.layout.AccordionContainer\" region=\"center\">";
@@ -1444,7 +1388,7 @@ class Pref_Feeds extends ProtectedHandler
                 __("Inactive feeds") . "</button>";
         }
 
-        $feed_search = $this->escape_from_request("search");
+        $feed_search = $this->getSQLEscapedStringFromRequest("search");
 
         if (array_key_exists("search", $_REQUEST)) {
             $_SESSION["prefs_feed_search"] = $feed_search;
@@ -1728,7 +1672,7 @@ class Pref_Feeds extends ProtectedHandler
         return $obj;
     }
 
-    function inactiveFeeds()
+    public function inactiveFeeds()
     {
 
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
@@ -1815,7 +1759,7 @@ class Pref_Feeds extends ProtectedHandler
 
     }
 
-    function feedsWithErrors()
+    public function feedsWithErrors()
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT id,title,feed_url,last_error,site_url
@@ -1998,7 +1942,7 @@ class Pref_Feeds extends ProtectedHandler
         }
     }
 
-    function batchSubscribe()
+    public function batchSubscribe()
     {
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchaddfeeds\">";
@@ -2047,11 +1991,11 @@ class Pref_Feeds extends ProtectedHandler
             </div>";
     }
 
-    function batchAddFeeds()
+    public function batchAddFeeds()
     {
-        $cat_id = $this->escape_from_request('cat');
+        $cat_id = $this->getSQLEscapedStringFromRequest('cat');
         $feeds = explode("\n", $_REQUEST['feeds']);
-        $login = $this->escape_from_request('login');
+        $login = $this->getSQLEscapedStringFromRequest('login');
         $pass = trim($_REQUEST['pass']);
 
         foreach ($feeds as $feed) {
@@ -2095,7 +2039,7 @@ class Pref_Feeds extends ProtectedHandler
         }
     }
 
-    function regenOPMLKey()
+    public function regenOPMLKey()
     {
         $this->update_feed_access_key(
             'OPML:Publish',
@@ -2107,10 +2051,10 @@ class Pref_Feeds extends ProtectedHandler
         print json_encode(array("link" => $new_link));
     }
 
-    function regenFeedKey()
+    public function regenFeedKey()
     {
-        $feed_id = $this->escape_from_request('id');
-        $is_cat = $this->escape_from_request('is_cat') == "true";
+        $feed_id = $this->getSQLEscapedStringFromRequest('id');
+        $is_cat = $this->getSQLEscapedStringFromRequest('is_cat') == "true";
 
         $new_key = $this->update_feed_access_key($feed_id, $is_cat);
 
@@ -2148,7 +2092,7 @@ class Pref_Feeds extends ProtectedHandler
     }
 
     // Silent
-    function clearKeys()
+    public function clearKeys()
     {
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_access_keys WHERE

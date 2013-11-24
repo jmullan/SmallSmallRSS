@@ -12,7 +12,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB
+        \SmallSmallRSS\Hooks::PREFS_TAB
     );
 
     public function addCommands()

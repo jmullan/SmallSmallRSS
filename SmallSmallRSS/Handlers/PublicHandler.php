@@ -409,7 +409,10 @@ class PublicHandler extends Handler
         update_daemon_common(0, true, false);
         housekeeping_common();
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(\SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK, "hookUpdateTask", $op);
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+            \SmallSmallRSS\Hooks::UPDATE_TASK,
+            $op
+        );
 
     }
 

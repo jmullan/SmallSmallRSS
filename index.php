@@ -52,13 +52,6 @@ if ($_SESSION["uid"]) {
         $theme_css = "themes/$theme";
     }
 }
-$toolbar_plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-    \SmallSmallRSS\PluginHost::HOOK_TOOLBAR_BUTTON
-);
-$action_items = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-    \SmallSmallRSS\PluginHost::HOOK_ACTION_ITEM
-);
-
 $js_renderer = new \SmallSmallRSS\Renderers\JS();
 
 ?>
@@ -163,9 +156,9 @@ foreach (array("lib/prototype.js",
         </form>
         <div class="actionChooser">
 <?php
-foreach ($toolbar_plugins as $p) {
-    echo $p->hook_toolbar_button();
-}
+$toolbar_plugins = \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+    \SmallSmallRSS\Hooks::RENDER_TOOLBAR_BUTTON
+);
 ?>
           <button id="net-alert" dojoType="dijit.form.Button" style="display: none" disabled="true"
             title="<?php echo __("Communication problem with server.") ?>">
@@ -188,9 +181,7 @@ foreach ($toolbar_plugins as $p) {
             <div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcTagSelect')"><?php echo __('Select by tags...') ?></div>
             <div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcHKhelp')"><?php echo __('Keyboard shortcuts help') ?></div>
 <?php
-foreach ($action_items as $p) {
-    echo $p->hook_action_item();
-}
+\SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::RENDER_ACTION_ITEM);
 ?>
 
 <?php

@@ -12,8 +12,8 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     const IS_SYSTEM = true;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_PREFS_TABS,
-        \SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK
+        \SmallSmallRSS\Hooks::PREFS_TABS,
+        \SmallSmallRSS\Hooks::UPDATE_TASK
     );
 
     private $status_codes = array(
@@ -356,9 +356,8 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         print "</div>"; #pane
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hookPreferencesTab",
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+            \SmallSmallRSS\Hooks::PREFS_TAB,
             "prefInstances"
         );
 

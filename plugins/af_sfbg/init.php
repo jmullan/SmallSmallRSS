@@ -13,8 +13,8 @@ class Af_SFBG extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_GUID_FILTER,
-        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
+        \SmallSmallRSS\Hooks::GUID_FILTER,
+        \SmallSmallRSS\Hooks::ARTICLE_FILTER
     );
 
     private static function shouldRunAgainst($link)
@@ -34,9 +34,10 @@ class Af_SFBG extends \SmallSmallRSS\Plugin
         return 'http://www.sfbg.com' . $parts['path'];
     }
 
-    public function hookGuidFilter($item, $guid)
+    public function hookGuidFilter($args)
     {
-        $link = $item->get_link();
+        $link = $args['item']->get_link();
+        $guid = $args['guid'];
         if (self::shouldRunAgainst($link)) {
             $guid = self::cleanlink($link);
         }

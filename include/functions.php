@@ -235,7 +235,7 @@ function authenticate_user($login, $password, $check_only = false)
 {
     if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
         $user_id = false;
-        $plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_AUTH_USER);
+        $plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::AUTH_USER);
         if (!$plugins) {
             \SmallSmallRSS\Logger::log('No authentication plugins!');
         }
@@ -1526,7 +1526,7 @@ function get_hotkeys_info()
             "help_dialog" => __("Show help dialog"))
     );
     $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-        \SmallSmallRSS\PluginHost::HOOK_HOTKEY_INFO
+        \SmallSmallRSS\Hooks::HOTKEY_INFO
     );
     foreach ($hotkey_hooks as $plugin) {
         $hotkeys = $plugin->hook_hotkey_info($hotkeys);
@@ -1534,7 +1534,9 @@ function get_hotkeys_info()
     return $hotkeys;
 }
 
-function get_hotkeys_map() {
+
+function get_hotkeys_map()
+{
     $hotkeys = array(
         //            "navigation" => array(
         "k" => "next_feed",
@@ -1604,7 +1606,7 @@ function get_hotkeys_map() {
     }
 
     $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-        \SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP
+        \SmallSmallRSS\Hooks::HOTKEY_MAP
     );
     foreach ($hotkey_hooks as $plugin) {
         $hotkeys = $plugin->hookHotkeyMap($hotkeys);
@@ -2245,11 +2247,13 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
                               'sup', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'time',
                               'tr', 'track', 'tt', 'u', 'ul', 'var', 'wbr', 'video');
 
-    if (!empty($_SESSION['hasSandbox'])) $allowed_elements[] = 'iframe';
+    if (!empty($_SESSION['hasSandbox'])) {
+        $allowed_elements[] = 'iframe';
+    }
 
     $disallowed_attributes = array('id', 'style', 'class');
 
-    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_SANITIZE) as $plugin) {
+    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::SANITIZE) as $plugin) {
         $retval = $plugin->hook_sanitize($doc, $site_url, $allowed_elements, $disallowed_attributes);
         if (is_array($retval)) {
             $doc = $retval[0];
@@ -2265,7 +2269,8 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     return $res;
 }
 
-function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes) {
+function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes)
+{
     $xpath = new DOMXPath($doc);
     $entries = $xpath->query('//*');
     foreach ($entries as $entry) {
@@ -2290,11 +2295,13 @@ function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes) {
     return $doc;
 }
 
-function check_for_update() {
+function check_for_update()
+{
     return false;
 }
 
-function catchupArticlesById($ids, $cmode, $owner_uid = false) {
+function catchupArticlesById($ids, $cmode, $owner_uid = false)
+{
     if (!$owner_uid) {
         $owner_uid = $_SESSION["uid"];
     }
@@ -2512,10 +2519,11 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         $line["content"] = sanitize(
             $line["content"],
             sql_bool_to_bool($line['hide_images']),
-            $owner_uid, $line["site_url"]
+            $owner_uid,
+            $line["site_url"]
         );
-        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE) as $p) {
-            $line = $p->hookRenderArticle($line);
+        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::FILTER_ARTICLE) as $p) {
+            $line = $p->hookFilterArticle($line);
         }
         $num_comments = $line["num_comments"];
         $entry_comments = "";
@@ -2548,7 +2556,8 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         $parsed_updated = make_local_datetime(
             $line["updated"],
             true,
-            $owner_uid, true
+            $owner_uid,
+            true
         );
         $rv['content'] .= "<div class=\"postDate\">$parsed_updated</div>";
         if ($line["link"]) {
@@ -2583,7 +2592,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
             $rv['content'] .= "<div dojoType=\"dijit.Tooltip\"
                     id=\"ATSTRTIP-$id\" connectId=\"ATSTR-$id\"
                     position=\"below\">$tags_str_full</div>";
-            foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON) as $p) {
+            foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::ARTICLE_BUTTON) as $p) {
                 $rv['content'] .= $p->hookArticleButton($line);
             }
 
@@ -2594,8 +2603,8 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         $rv['content'] .= "</div>";
         $rv['content'] .= "<div clear='both'>";
 
-        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_LEFT_BUTTON) as $p) {
-            $rv['content'] .= $p->hook_article_left_button($line);
+        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::ARTICLE_LEFT_BUTTON) as $p) {
+            $rv['content'] .= $p->hookArticleLeftButton($line);
         }
 
         $rv['content'] .= "$entry_comments</div>";

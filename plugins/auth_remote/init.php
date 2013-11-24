@@ -13,7 +13,7 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_AUTH_USER
+        \SmallSmallRSS\Hooks::AUTH_USER
     );
 
     public function __construct($pluginhost)

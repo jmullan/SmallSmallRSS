@@ -15,7 +15,7 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_AUTH_USER
+        \SmallSmallRSS\Hooks::AUTH_USER
     );
 
     private function renderOTP($return, $login, $password)

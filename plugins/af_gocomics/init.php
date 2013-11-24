@@ -11,7 +11,7 @@ class Af_GoComics extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER
+        \SmallSmallRSS\Hooks::ARTICLE_FILTER
     );
 
     public function hookArticleFilter($article)

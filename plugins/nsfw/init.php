@@ -11,9 +11,9 @@ class NSFW extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE,
-        \SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_CDM,
-        \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB
+        \SmallSmallRSS\Hooks::FILTER_ARTICLE,
+        \SmallSmallRSS\Hooks::RENDER_ARTICLE_CDM,
+        \SmallSmallRSS\Hooks::PREFS_TAB
     );
 
     public function getJavascript()
@@ -21,7 +21,7 @@ class NSFW extends \SmallSmallRSS\Plugin
         return file_get_contents(dirname(__FILE__) . "/init.js");
     }
 
-    public function hookRenderArticle($article)
+    public function hookFilterArticle($article)
     {
         $tags = array_map("trim", explode(",", $this->host->get($this, "tags")));
         $a_tags = array_map("trim", explode(",", $article["tag_cache"]));

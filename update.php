@@ -132,9 +132,8 @@ if (isset($options["feeds"])) {
     \SmallSmallRSS\Lockfiles::make_stamp('update_feeds.stamp');
     update_daemon_common();
     housekeeping_common();
-    \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-        \SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK,
-        "hookUpdateTask",
+    \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+        \SmallSmallRSS\Hooks::UPDATE_TASK,
         $op
     );
 }
@@ -164,9 +163,8 @@ if (isset($options["daemon-loop"])) {
     if (!isset($options["pidlock"]) || $options["task"] == 0) {
         housekeeping_common();
     }
-    \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-        \SmallSmallRSS\PluginHost::HOOK_UPDATE_TASK,
-        "hookUpdateTask",
+    \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+        \SmallSmallRSS\Hooks::UPDATE_TASK,
         $op
     );
 }

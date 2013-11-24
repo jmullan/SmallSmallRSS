@@ -411,11 +411,11 @@ class API extends Handler
                         "score" => (int) $line["score"],
                         "feed_title" => $line["feed_title"]
                     );
-                    $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-                        \SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_API
+                    $hooks = \SmallSmallRSS\PluginHost::getInstance()->getHooks(
+                        \SmallSmallRSS\Hooks::FILTER_ARTICLE_API
                     );
                     foreach ($hooks as $p) {
-                        $article = $p->hookRenderArticleApi(array("article" => $article));
+                        $article = $p->hookFilterArticleApi(array("article" => $article));
                     }
 
 
@@ -792,10 +792,10 @@ class API extends Handler
             $headline_row["author"] = $line["author"];
             $headline_row["score"] = (int) $line["score"];
             $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-                \SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_API
+                \SmallSmallRSS\Hooks::FILTER_ARTICLE_API
             );
             foreach ($hooks as $p) {
-                $headline_row = $p->hookRenderArticleApi(array("headline" => $headline_row));
+                $headline_row = $p->hookFilterArticleApi(array("headline" => $headline_row));
             }
             array_push($headlines, $headline_row);
         }

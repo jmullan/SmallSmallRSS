@@ -17,31 +17,6 @@ class PluginHost
     private static $instance;
 
     const API_VERSION = 2;
-
-    const HOOK_ARTICLE_BUTTON = 1;
-    const HOOK_ARTICLE_FILTER = 2;
-    const HOOK_PREFS_TAB = 3;
-    const HOOK_PREFS_TAB_SECTION = 4;
-    const HOOK_PREFS_TABS = 5;
-    const HOOK_FEED_PARSED = 6;
-    const HOOK_UPDATE_TASK = 7;
-    const HOOK_AUTH_USER = 8;
-    const HOOK_HOTKEY_MAP = 9;
-    const HOOK_RENDER_ARTICLE = 10;
-    const HOOK_RENDER_ARTICLE_CDM = 11;
-    const HOOK_FEED_FETCHED = 12;
-    const HOOK_SANITIZE = 13;
-    const HOOK_RENDER_ARTICLE_API = 14;
-    const HOOK_TOOLBAR_BUTTON = 15;
-    const HOOK_ACTION_ITEM = 16;
-    const HOOK_HEADLINE_TOOLBAR_BUTTON = 17;
-    const HOOK_HOTKEY_INFO = 18;
-    const HOOK_ARTICLE_LEFT_BUTTON = 19;
-    const HOOK_PREFS_EDIT_FEED = 20;
-    const HOOK_PREFS_SAVE_FEED = 21;
-    const HOOK_FETCH_FEED = 22;
-    const HOOK_GUID_FILTER = 23;
-
     const KIND_ALL = 1;
     const KIND_SYSTEM = 2;
     const KIND_USER = 3;
@@ -77,10 +52,13 @@ class PluginHost
         }
     }
 
-    public function run_hooks($type, $method, $args)
+    public function runHooks($type, $args = null)
     {
-        foreach ($this->get_hooks($type) as $hook) {
-            $hook->$method($args);
+        $method = \SmallSmallRSS\Hooks::getHookMethod($hook);
+        if ($method !== false) {
+            foreach ($this->get_hooks($type) as $hook) {
+                $hook->$method($args);
+            }
         }
     }
 

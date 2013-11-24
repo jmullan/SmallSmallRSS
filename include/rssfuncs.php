@@ -199,19 +199,17 @@ function update_rss_feed($feed, $no_cache = false)
 
     $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, "last_updated");
     $last_article_timestamp = @strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, "last_article_timestamp"));
-    if (defined('_DISABLE_HTTP_304')) {
+    if (\SmallSmallRSS\Configs::get('DISABLE_HTTP_304')) {
         $last_article_timestamp = 0;
     }
     $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
-    $mark_unread_on_update = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result(
-        $result,
-        0, "mark_unread_on_update"
-    ));
+    $mark_unread_on_update = sql_bool_to_bool(
+        \SmallSmallRSS\Database::fetch_result($result, 0, "mark_unread_on_update")
+    );
     $pubsub_state = \SmallSmallRSS\Database::fetch_result($result, 0, "pubsub_state");
-    $auth_pass_encrypted = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result(
-        $result,
-        0, "auth_pass_encrypted"
-    ));
+    $auth_pass_encrypted = sql_bool_to_bool(
+        \SmallSmallRSS\Database::fetch_result($result, 0, "auth_pass_encrypted")
+    );
 
     \SmallSmallRSS\Database::query(
         "UPDATE ttrss_feeds
@@ -253,7 +251,7 @@ function update_rss_feed($feed, $no_cache = false)
 
     }
     if (!$rss) {
-        $feed_fetching_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FETCH_FEED);
+        $feed_fetching_hooks = $pluginhost->get_hooks(\SmallSmallRSS\Hooks::FETCH_FEED);
         foreach ($feed_fetching_hooks as $plugin) {
             if (!$feed_data) {
                 $feed_data = $plugin->hook_fetch_feed($feed_data, $fetch_url, $owner_uid, $feed);
@@ -264,8 +262,11 @@ function update_rss_feed($feed, $no_cache = false)
             _debug("fetching [$fetch_url]...");
             $fetcher = new \SmallSmallRSS\Fetcher();
             $feed_data = $fetcher->getFileContents(
-                $fetch_url, false,
-                $auth_login, $auth_pass, false,
+                $fetch_url,
+                false,
+                $auth_login,
+                $auth_pass,
+                false,
                 ($no_cache
                  ? \SmallSmallRSS\Config::get('FEED_FETCH_NO_CACHE_TIMEOUT')
                  : \SmallSmallRSS\Config::get('FEED_FETCH_TIMEOUT')),
@@ -290,7 +291,7 @@ function update_rss_feed($feed, $no_cache = false)
             return;
         }
     }
-    $fetched_feed_hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_FETCHED);
+    $fetched_feed_hooks = $pluginhost->get_hooks(\SmallSmallRSS\Hooks::FEED_FETCHED);
     foreach ($fetched_feed_hooks as $plugin) {
         $feed_data = $plugin->hook_feed_fetched($feed_data, $fetch_url, $owner_uid, $feed);
     }
@@ -331,7 +332,7 @@ function update_rss_feed($feed, $no_cache = false)
     }
 
     // We use local pluginhost here because we need to load different per-user feed plugins
-    $pluginhost->run_hooks(\SmallSmallRSS\PluginHost::HOOK_FEED_PARSED, "hook_feed_parsed", $rss);
+    $pluginhost->runHooks(\SmallSmallRSS\Hooks::FEED_PARSED, $rss);
     if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
         $favicon_interval_qpart = "favicon_last_checked < NOW() - INTERVAL '12 hour'";
     } else {
@@ -351,10 +352,9 @@ function update_rss_feed($feed, $no_cache = false)
 
     $registered_title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
     $orig_site_url = \SmallSmallRSS\Database::fetch_result($result, 0, "site_url");
-    $favicon_needs_check = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result(
-        $result, 0,
-        "favicon_needs_check"
-    ));
+    $favicon_needs_check = sql_bool_to_bool(
+        \SmallSmallRSS\Database::fetch_result($result, 0, "favicon_needs_check")
+    );
     $favicon_avg_color = \SmallSmallRSS\Database::fetch_result($result, 0, "favicon_avg_color");
 
     $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
@@ -462,9 +462,10 @@ function update_rss_feed($feed, $no_cache = false)
         if (!$entry_guid) {
             $entry_guid = make_guid_from_title($item->get_title());
         }
-        $hooks = $pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_GUID_FILTER);
+        $hooks = $pluginhost->get_hooks(\SmallSmallRSS\Hooks::GUID_FILTER);
         foreach ($hooks as $plugin) {
-            $entry_guid = $plugin->hookGuidFilter($item, $entry_guid);
+            $args = array('item' => $item, 'guid' => $entry_guid);
+            $entry_guid = $plugin->hookGuidFilter($args);
         }
         if (!$entry_guid) {
             continue;
@@ -559,7 +560,7 @@ function update_rss_feed($feed, $no_cache = false)
             "stored" => $stored_article
         );
 
-        foreach ($pluginhost->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_FILTER) as $plugin) {
+        foreach ($pluginhost->get_hooks(\SmallSmallRSS\Hooks::ARTICLE_FILTER) as $plugin) {
             $article = $plugin->hookArticleFilter($article);
         }
 

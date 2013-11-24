@@ -146,12 +146,12 @@ class Feeds extends ProtectedHandler
         $reply .= "','generatedFeed', '$feed_id:$is_cat:$rss_link')\">".__('View as RSS')."</option>";
 
         $reply .= "</select>";
-        $toolbar_button_plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-            \SmallSmallRSS\PluginHost::HOOK_HEADLINE_TOOLBAR_BUTTON
+
+        $args = array('feed_id' => $feed_id, 'is_cat' => $is_cat);
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+            \SmallSmallRSS\Hooks::RENDER_HEADLINE_TOOLBAR_BUTTON,
+            $args
         );
-        foreach ($toolbar_button_plugins as $p) {
-            echo $p->hook_headline_toolbar_button($feed_id, $is_cat);
-        }
         return $reply;
     }
 
@@ -231,7 +231,8 @@ class Feeds extends ProtectedHandler
 
         $search_mode = $this->getSQLEscapedStringFromRequest("search_mode");
 
-        if (!empty($_REQUEST["debug"])) {  $timing_info = print_checkpoint("H0", $timing_info);
+        if (!empty($_REQUEST["debug"])) {
+            $timing_info = print_checkpoint("H0", $timing_info);
         }
 
         if ($search_mode == '' && $method != '') {
@@ -285,7 +286,8 @@ class Feeds extends ProtectedHandler
             );
         }
 
-        if (!empty($_REQUEST["debug"])) {  $timing_info = print_checkpoint("H1", $timing_info);
+        if (!empty($_REQUEST["debug"])) {
+            $timing_info = print_checkpoint("H1", $timing_info);
         }
 
         $result = $qfh_ret[0];
@@ -419,9 +421,10 @@ class Feeds extends ProtectedHandler
                 }
 
                 $has_feed_icon = feed_has_icon($feed_id);
-
                 if ($has_feed_icon) {
-                    $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"".\SmallSmallRSS\Config::get('ICONS_URL')."/$feed_id.ico\" alt=\"\">";
+                    $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\""
+                        . \SmallSmallRSS\Config::get('ICONS_URL')
+                        . "/$feed_id.ico\" alt=\"\">";
                 } else {
                     $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"images/pub_set.svg\" alt=\"\">";
                 }
@@ -528,19 +531,20 @@ class Feeds extends ProtectedHandler
 
                     if ($line["tag_cache"]) {
                         $tags = explode(",", $line["tag_cache"]);
-                    }
-                    else {
+                    } else {
                         $tags = false;
                     }
 
                     $line["content"] = sanitize(
                         $line["content_preview"],
-                        sql_bool_to_bool($line['hide_images']), false, $entry_site_url
+                        sql_bool_to_bool($line['hide_images']),
+                        false,
+                        $entry_site_url
                     );
-
-                    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_RENDER_ARTICLE_CDM) as $p) {
-                        $line = $p->hookRenderArticleCDM($line);
-                    }
+                    \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+                        \SmallSmallRSS\Hooks::RENDER_ARTICLE_CDM,
+                        $line
+                    );
 
                     if (\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED') && $line["feed_title"]) {
                         if ($feed_id != $vgroup_last_feed) {
@@ -551,15 +555,10 @@ class Feeds extends ProtectedHandler
                             $cur_feed_title = htmlspecialchars($cur_feed_title);
 
                             $vf_catchup_link = "(<a class='catchup' onclick='javascript:catchupFeedInGroup($feed_id);' href='#'>".__('mark as read')."</a>)";
-
                             $has_feed_icon = feed_has_icon($feed_id);
-
                             if ($has_feed_icon) {
                                 $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"".\SmallSmallRSS\Config::get('ICONS_URL')."/$feed_id.ico\" alt=\"\">";
-                            } else {
-                                //$feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"images/blank_icon.gif\" alt=\"\">";
                             }
-
                             $reply['content'] .= "<div class='cdmFeedTitle'>".
                                 "<div style=\"float : right\">$feed_icon_img</div>".
                                 "<a href=\"#\" class='title' onclick=\"viewfeed($feed_id)\">".
@@ -697,14 +696,22 @@ class Feeds extends ProtectedHandler
 
                     $always_display_enclosures = sql_bool_to_bool($line["always_display_enclosures"]);
 
-                    $reply['content'] .= format_article_enclosures($id, $always_display_enclosures, $line["content"], sql_bool_to_bool($line["hide_images"]));
+                    $reply['content'] .= format_article_enclosures(
+                        $id,
+                        $always_display_enclosures,
+                        $line["content"],
+                        sql_bool_to_bool($line["hide_images"])
+                    );
 
                     $reply['content'] .= "</div>";
 
                     $reply['content'] .= "<div class=\"cdmFooter\">";
 
-                    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_LEFT_BUTTON) as $p) {
-                        $reply['content'] .= $p->hook_article_left_button($line);
+                    $left_button_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+                        \SmallSmallRSS\Hooks::ARTICLE_LEFT_BUTTON
+                    );
+                    foreach ($left_button_hooks as $p) {
+                        $reply['content'] .= $p->hookArticleLeftButton($line);
                     }
 
                     $tags_str = format_tags_string($tags, $id);
@@ -730,12 +737,15 @@ class Feeds extends ProtectedHandler
                         }
                     }
 
-                    if ($entry_comments) {  $reply['content'] .= "&nbsp;($entry_comments)";
+                    if ($entry_comments) {
+                        $reply['content'] .= "&nbsp;($entry_comments)";
                     }
 
                     $reply['content'] .= "<div style=\"float : right\">";
-
-                    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON) as $p) {
+                    $article_button_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+                        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+                    );
+                    foreach ($article_button_hooks as $p) {
                         $reply['content'] .= $p->hookArticleButton($line);
                     }
 

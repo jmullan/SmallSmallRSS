@@ -120,9 +120,10 @@ if ($_SESSION["access_level"] >= 10) {
 }
 ?>
 <?php
-     \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-         \SmallSmallRSS\PluginHost::HOOK_PREFS_TABS,
-         "hookPreferencesTabs", false);
+     \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+         \SmallSmallRSS\Hooks::PREFS_TABS,
+         false
+     );
 ?>
 </div>
 

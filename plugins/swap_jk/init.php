@@ -12,7 +12,7 @@ class Swap_JK extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_HOTKEY_MAP,
+        \SmallSmallRSS\Hooks::HOTKEY_MAP,
     );
 
     public function hookHotkeyMap($hotkeys)

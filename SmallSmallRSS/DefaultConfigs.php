@@ -259,7 +259,7 @@ class DefaultConfigs {
     const _API_DEBUG_HTTP_ENABLED = false;
     const _ENABLE_FEED_DEBUGGING = false;
     const _DISABLE_FEED_BROWSER = false;
-    const _DISABLE_HTTP_304 = false;
+    const DISABLE_HTTP_304 = false;
     const _NGRAM_TITLE_DUPLICATE_THRESHOLD = false;
     const DAEMON_EXTENDED_DEBUG = false;
     const _INSTALLER_IGNORE_CONFIG_CHECK = false;

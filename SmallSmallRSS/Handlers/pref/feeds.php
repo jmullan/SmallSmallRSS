@@ -781,9 +781,9 @@ class Pref_Feeds extends ProtectedHandler
 
         print "</div>";
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-            \SmallSmallRSS\PluginHost::HOOK_PREFS_EDIT_FEED,
-            "hook_prefs_edit_feed", $feed_id
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+            \SmallSmallRSS\Hooks::PREFS_EDIT_FEED,
+            $feed_id
         );
 
         $title = htmlspecialchars($title, ENT_QUOTES);
@@ -1056,9 +1056,9 @@ class Pref_Feeds extends ProtectedHandler
             WHERE id = '$feed_id' AND owner_uid = " . $_SESSION["uid"]
             );
 
-            \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-                \SmallSmallRSS\PluginHost::HOOK_PREFS_SAVE_FEED,
-                "hook_prefs_save_feed", $feed_id
+            \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+                \SmallSmallRSS\Hooks::PREFS_SAVE_FEED,
+                $feed_id
             );
 
         } else {
@@ -1548,9 +1548,9 @@ class Pref_Feeds extends ProtectedHandler
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return displayDlg('".__("Public OPML URL")."','pubOPMLUrl')\">".
             __('Display published OPML URL')."</button> ";
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hookPreferencesTabSection", "prefFeedsOPML"
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+            \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
+            "prefFeedsOPML"
         );
 
         print "</div>"; # pane
@@ -1585,7 +1585,7 @@ class Pref_Feeds extends ProtectedHandler
         $rss_url = '-2::' . htmlspecialchars(
             get_self_url_prefix() .
             "/public.php?op=rss&id=-2&view-mode=all_articles"
-        );;
+        );
 
         print "<p>";
 
@@ -1608,16 +1608,16 @@ class Pref_Feeds extends ProtectedHandler
 
         print "</p>";
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB_SECTION,
-            "hookPreferencesTabSection", "prefFeedsPublishedGenerated"
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+            \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
+            "prefFeedsPublishedGenerated"
         );
 
         print "</div>"; #pane
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hookPreferencesTab", "prefFeeds"
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+            \SmallSmallRSS\Hooks::PREFS_TAB,
+            "prefFeeds"
         );
 
         print "</div>"; #container

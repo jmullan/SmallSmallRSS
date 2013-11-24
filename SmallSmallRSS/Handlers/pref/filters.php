@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Handlers;
 class Pref_Filters extends ProtectedHandler
 {
 
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "getfiltertree", "edit", "newfilter", "newrule",
                               "newaction", "savefilterorder");
@@ -11,7 +11,7 @@ class Pref_Filters extends ProtectedHandler
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function filtersortreset()
+    public function filtersortreset()
     {
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_filters2
@@ -20,7 +20,7 @@ class Pref_Filters extends ProtectedHandler
         return;
     }
 
-    function savefilterorder()
+    public function savefilterorder()
     {
         $data = json_decode($_POST['payload'], true);
 
@@ -54,7 +54,7 @@ class Pref_Filters extends ProtectedHandler
     }
 
 
-    function testFilter()
+    public function testFilter()
     {
         $filter = array();
 
@@ -165,7 +165,7 @@ class Pref_Filters extends ProtectedHandler
     }
 
 
-    function getfiltertree()
+    public function getfiltertree()
     {
         $root = array();
         $root['id'] = 'root';
@@ -269,7 +269,7 @@ class Pref_Filters extends ProtectedHandler
         return;
     }
 
-    function edit()
+    public function edit()
     {
 
         $filter_id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
@@ -471,7 +471,7 @@ class Pref_Filters extends ProtectedHandler
         );
     }
 
-    function printRuleName()
+    public function printRuleName()
     {
         print $this->getRuleName(json_decode($_REQUEST["rule"], true));
     }
@@ -493,12 +493,12 @@ class Pref_Filters extends ProtectedHandler
         return $title;
     }
 
-    function printActionName()
+    public function printActionName()
     {
         print $this->getActionName(json_decode($_REQUEST["action"], true));
     }
 
-    function editSave()
+    public function editSave()
     {
         if ($_REQUEST["savemode"] && $_REQUEST["savemode"] == "test") {
             return $this->testFilter();
@@ -525,7 +525,7 @@ class Pref_Filters extends ProtectedHandler
 
     }
 
-    function remove()
+    public function remove()
     {
 
         $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
@@ -626,7 +626,7 @@ class Pref_Filters extends ProtectedHandler
 
     }
 
-    function add()
+    public function add()
     {
         if ($_REQUEST["savemode"] && $_REQUEST["savemode"] == "test") {
             return $this->testFilter();
@@ -660,7 +660,7 @@ class Pref_Filters extends ProtectedHandler
         \SmallSmallRSS\Database::query("COMMIT");
     }
 
-    function index()
+    public function index()
     {
 
         $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);
@@ -761,16 +761,16 @@ class Pref_Filters extends ProtectedHandler
 
         print "</div>"; #pane
 
-        \SmallSmallRSS\PluginHost::getInstance()->run_hooks(
-            \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB,
-            "hookPreferencesTab", "prefFilters"
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+            \SmallSmallRSS\Hooks::PREFS_TAB,
+            "prefFilters"
         );
 
         print "</div>"; #container
 
     }
 
-    function newfilter()
+    public function newfilter()
     {
 
         print "<form name='filter_new_form' id='filter_new_form'>";
@@ -864,7 +864,7 @@ class Pref_Filters extends ProtectedHandler
 
     }
 
-    function newrule()
+    public function newrule()
     {
         $rule = json_decode($_REQUEST["rule"], true);
 
@@ -949,7 +949,7 @@ class Pref_Filters extends ProtectedHandler
         print "</form>";
     }
 
-    function newaction()
+    public function newaction()
     {
         $action = json_decode($_REQUEST["action"], true);
 
@@ -1036,7 +1036,8 @@ class Pref_Filters extends ProtectedHandler
         $num_rules = \SmallSmallRSS\Database::fetch_result($result, 0, "num_rules");
         $num_actions = \SmallSmallRSS\Database::fetch_result($result, 0, "num_actions");
 
-        if (!$title) {  $title = __("[No caption]");
+        if (!$title) {
+            $title = __("[No caption]");
         }
 
         $title = sprintf(_ngettext("%s (%d rule)", "%s (%d rules)", $num_rules), $title, $num_rules);
@@ -1061,7 +1062,7 @@ class Pref_Filters extends ProtectedHandler
         return array($title, $actions);
     }
 
-    function join()
+    public function join()
     {
         $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 

@@ -13,7 +13,7 @@ class Bookmarklets extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_PREFS_TAB
+        \SmallSmallRSS\Hooks::PREFS_TAB
     );
 
     public function hookPreferencesTab($args)

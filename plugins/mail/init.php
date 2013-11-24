@@ -10,7 +10,7 @@ class Mail extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\PluginHost::HOOK_ARTICLE_BUTTON
+        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
     );
 
     public function getJavascript()

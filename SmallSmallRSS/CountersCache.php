@@ -1,8 +1,34 @@
 <?php
 namespace SmallSmallRSS;
 
-class CounterCache
+class CountersCache
 {
+    public static function getGlobalUnread($owner_uid)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT SUM(value) AS c_id
+             FROM ttrss_counters_cache
+             WHERE
+                 owner_uid = '$owner_uid'
+                 AND feed_id > 0"
+        );
+        $c_id = \SmallSmallRSS\Database::fetch_result($result, 0, "c_id");
+        return $c_id;
+    }
+    public static function cleanup($owner_uid)
+    {
+        \SmallSmallRSS\Database::query(
+            "DELETE FROM ttrss_counters_cache
+             WHERE
+                 owner_uid = '$owner_uid'
+                 AND (
+                    SELECT COUNT(id)
+                    FROM ttrss_feeds
+                    WHERE ttrss_feeds.id = feed_id
+                 ) = 0"
+        );
+    }
+
     public static function zero_all($owner_uid)
     {
         \SmallSmallRSS\Database::query(
@@ -15,6 +41,7 @@ class CounterCache
              value = 0 WHERE owner_uid = '$owner_uid'"
         );
     }
+
     public static function remove($feed_id, $owner_uid, $is_cat = false)
     {
 
@@ -63,10 +90,15 @@ class CounterCache
         }
     }
 
-    public static function find($feed_id, $owner_uid, $is_cat = false,
-                         $no_update = false) {
+    public static function find(
+        $feed_id,
+        $owner_uid,
+        $is_cat = false,
+        $no_update = false
+    ) {
 
-        if (!is_numeric($feed_id)) {  return;
+        if (!is_numeric($feed_id)) {
+            return;
         }
 
         if (!$is_cat) {

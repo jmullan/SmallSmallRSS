@@ -2,7 +2,6 @@
 namespace SmallSmallRSS\Handlers;
 class Article extends ProtectedHandler
 {
-
     function ignoreCSRF($method)
     {
         $csrf_ignored = array("redirect", "editarticletags");
@@ -13,11 +12,13 @@ class Article extends ProtectedHandler
     function redirect()
     {
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-
         $result = \SmallSmallRSS\Database::query(
-            "SELECT link FROM ttrss_entries, ttrss_user_entries
-                        WHERE id = '$id' AND id = ref_id AND owner_uid = '".$_SESSION['uid']."'
-                        LIMIT 1"
+            "SELECT link
+             FROM ttrss_entries, ttrss_user_entries
+             WHERE id = '$id'
+                 AND id = ref_id
+                 AND owner_uid = '".$_SESSION['uid']."'
+             LIMIT 1"
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
@@ -51,11 +52,11 @@ class Article extends ProtectedHandler
         } elseif ($mode == "raw") {
             if ($_REQUEST['html']) {
                 header("Content-Type: text/html");
-                print '<link rel="stylesheet" type="text/css" href="css/tt-rss.css"/>';
+                echo '<link rel="stylesheet" type="text/css" href="css/tt-rss.css"/>';
             }
 
             $article = format_article($id, false);
-            print $article['content'];
+            echo $article['content'];
             return;
         }
 
@@ -69,7 +70,7 @@ class Article extends ProtectedHandler
             }
         }
 
-        print json_encode($articles);
+        echo json_encode($articles);
     }
 
     private function catchupArticleById($id, $cmode)
@@ -77,21 +78,29 @@ class Article extends ProtectedHandler
 
         if ($cmode == 0) {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            unread = false,last_read = NOW()
-            WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
+                "UPDATE ttrss_user_entries
+                SET unread = false,
+                    last_read = NOW()
+                WHERE
+                    ref_id = '$id'
+                    AND owner_uid = " . $_SESSION["uid"]
             );
         } elseif ($cmode == 1) {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            unread = true
-            WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
+                "UPDATE ttrss_user_entries
+                 SET unread = true
+                 WHERE
+                     ref_id = '$id'
+                     AND owner_uid = " . $_SESSION["uid"]
             );
         } else {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            unread = NOT unread,last_read = NOW()
-            WHERE ref_id = '$id' AND owner_uid = " . $_SESSION["uid"]
+                "UPDATE ttrss_user_entries
+                 SET unread = NOT unread,
+                     last_read = NOW()
+                 WHERE
+                     ref_id = '$id'
+                     AND owner_uid = " . $_SESSION["uid"]
             );
         }
 
@@ -207,7 +216,7 @@ class Article extends ProtectedHandler
     function editArticleTags()
     {
 
-        print __("Tags for this article (separated by commas):")."<br>";
+        echo __("Tags for this article (separated by commas):")."<br>";
 
         $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
 
@@ -215,27 +224,26 @@ class Article extends ProtectedHandler
 
         $tags_str = join(", ", $tags);
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"article\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setArticleTags\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"article\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setArticleTags\">";
+        echo "<table width='100%'><tr><td>";
+        echo "<textarea dojoType=\"dijit.form.SimpleTextarea\" rows='4'
+                style='font-size: 12px; width: 100%' id=\"tags_str\"
+                name='tags_str'>";
+        echo $tags_str;
+        echo "</textarea>";
+        echo "<div class=\"autocomplete\" id=\"tags_choices\" style=\"display: none\"></div>";
 
-        print "<table width='100%'><tr><td>";
+        echo "</td></tr></table>";
 
-        print "<textarea dojoType=\"dijit.form.SimpleTextarea\" rows='4'
-            style='font-size: 12px; width: 100%' id=\"tags_str\"
-            name='tags_str'>$tags_str</textarea>
-        <div class=\"autocomplete\" id=\"tags_choices\"
-                style=\"display:none\"></div>";
+        echo "<div class='dlgButtons'>";
 
-        print "</td></tr></table>";
-
-        print "<div class='dlgButtons'>";
-
-        print "<button dojoType=\"dijit.form.Button\"
+        echo "<button dojoType=\"dijit.form.Button\"
             onclick=\"dijit.byId('editTagsDlg').execute()\">".__('Save')."</button> ";
-        print "<button dojoType=\"dijit.form.Button\"
+        echo "<button dojoType=\"dijit.form.Button\"
             onclick=\"dijit.byId('editTagsDlg').hide()\">".__('Cancel')."</button>";
-        print "</div>";
+        echo "</div>";
 
     }
 
@@ -249,7 +257,7 @@ class Article extends ProtectedHandler
             score = '$score' WHERE ref_id IN ($ids) AND owner_uid = " . $_SESSION["uid"]
         );
 
-        print json_encode(array("id" => $ids,
+        echo json_encode(array("id" => $ids,
                                 "score_pic" => get_score_pic($score)));
     }
 
@@ -291,7 +299,7 @@ class Article extends ProtectedHandler
                     continue;
                 }
 
-                //                    print "<!-- $id : $int_id : $tag -->";
+                //                    echo "<!-- $id : $int_id : $tag -->";
 
                 if ($tag != '') {
                     \SmallSmallRSS\Database::query(
@@ -321,11 +329,17 @@ class Article extends ProtectedHandler
         $tags_str = format_tags_string($tags, $id);
         $tags_str_full = join(", ", $tags);
 
-        if (!$tags_str_full) {  $tags_str_full = __("no tags");
+        if (!$tags_str_full) {
+            $tags_str_full = __("no tags");
         }
 
-        print json_encode(array("id" => (int) $id,
-                    "content" => $tags_str, "content_full" => $tags_str_full));
+        echo json_encode(
+            array(
+                "id" => (int) $id,
+                "content" => $tags_str,
+                "content_full" => $tags_str_full
+            )
+        );
     }
 
 
@@ -340,11 +354,11 @@ class Article extends ProtectedHandler
                 LIMIT 10"
         );
 
-        print "<ul>";
+        echo "<ul>";
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            print "<li>" . $line["tag_name"] . "</li>";
+            echo "<li>" . $line["tag_name"] . "</li>";
         }
-        print "</ul>";
+        echo "</ul>";
     }
 
     function assigntolabel()
@@ -382,6 +396,6 @@ class Article extends ProtectedHandler
             }
         }
         $reply["message"] = "UPDATE_COUNTERS";
-        print json_encode($reply);
+        echo json_encode($reply);
     }
 }

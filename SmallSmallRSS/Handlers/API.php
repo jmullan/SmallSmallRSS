@@ -510,7 +510,7 @@ class API extends Handler
         $url = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["url"]));
         $content = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["content"]));
 
-        if (Article::create_published_article($title, $url, $content, "", $_SESSION["uid"])) {
+        if (\SmallSmallRSS\Handlers\Article::create_published_article($title, $url, $content, "", $_SESSION["uid"])) {
             $this->wrap(self::STATUS_OK, array("status" => 'OK'));
         } else {
             $this->wrap(self::STATUS_ERR, array("error" => 'Publishing failed'));

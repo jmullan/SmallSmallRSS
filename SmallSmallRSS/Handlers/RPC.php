@@ -599,7 +599,7 @@ class RPC extends ProtectedHandler
         $is_cat = \SmallSmallRSS\Database::escape_string($_REQUEST['is_cat']) == "true";
         $mode = \SmallSmallRSS\Database::escape_string($_REQUEST['mode']);
 
-        catchup_feed($feed_id, $is_cat, false, false, $mode);
+        \SmallSmallRSS\UserEntries::catchupFeed($feed_id, $is_cat, $_SESSION['owner_uid'], false, $mode);
 
         print json_encode(array("message" => "UPDATE_COUNTERS"));
     }
@@ -707,7 +707,7 @@ class RPC extends ProtectedHandler
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $feed_id = $line["id"];
             if (time() - $tstart < ini_get("max_execution_time") * 0.7) {
-                update_rss_feed($feed_id);
+                \SmallSmallRSS\RSSUpdater::updateFeed($feed_id);
                 ++$num_updated;
             } else {
                 break;

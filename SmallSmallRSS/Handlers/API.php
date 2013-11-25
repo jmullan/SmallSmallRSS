@@ -450,7 +450,7 @@ class API extends Handler
     {
         require_once "include/rssfuncs.php";
         $feed_id = (int) $this->getSQLEscapedStringFromRequest("feed_id");
-        update_rss_feed($feed_id);
+        \SmallSmallRSS\RSSUpdater::updateFeed($feed_id);
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 
@@ -458,9 +458,7 @@ class API extends Handler
     {
         $feed_id = $this->getSQLEscapedStringFromRequest("feed_id");
         $is_cat = $this->getSQLEscapedStringFromRequest("is_cat");
-
-        catchup_feed($feed_id, $is_cat);
-
+        \SmallSmallRSS\UserEntries::catchupFeed($feed_id, $is_cat, $_SESSION['uid']);
         $this->wrap(self::STATUS_OK, array("status" => "OK"));
     }
 

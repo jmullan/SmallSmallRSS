@@ -1,6 +1,56 @@
 <?php
 namespace SmallSmallRSS;
 
+/*
+  CREATE TABLE `ttrss_feeds` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `owner_uid` int(11) NOT NULL,
+  `title` varchar(200) NOT NULL,
+  `cat_id` int(11) DEFAULT NULL,
+  `feed_url` text NOT NULL,
+  `icon_url` varchar(250) NOT NULL DEFAULT '',
+  `update_interval` int(11) NOT NULL DEFAULT '0',
+  `purge_interval` int(11) NOT NULL DEFAULT '0',
+  `last_updated` datetime DEFAULT '0000-00-00 00:00:00',
+  `last_error` varchar(250) NOT NULL DEFAULT '',
+  `favicon_avg_color` varchar(11) DEFAULT NULL,
+  `site_url` varchar(250) NOT NULL DEFAULT '',
+  `auth_login` varchar(250) NOT NULL DEFAULT '',
+  `auth_pass` varchar(250) NOT NULL DEFAULT '',
+  `parent_feed` int(11) DEFAULT NULL,
+  `private` tinyint(1) NOT NULL DEFAULT '0',
+  `rtl_content` tinyint(1) NOT NULL DEFAULT '0',
+  `hidden` tinyint(1) NOT NULL DEFAULT '0',
+  `include_in_digest` tinyint(1) NOT NULL DEFAULT '1',
+  `cache_images` tinyint(1) NOT NULL DEFAULT '0',
+  `hide_images` tinyint(1) NOT NULL DEFAULT '0',
+  `cache_content` tinyint(1) NOT NULL DEFAULT '0',
+  `auth_pass_encrypted` tinyint(1) NOT NULL DEFAULT '0',
+  `last_viewed` datetime DEFAULT NULL,
+  `last_update_started` datetime DEFAULT NULL,
+  `always_display_enclosures` tinyint(1) NOT NULL DEFAULT '0',
+  `update_method` int(11) NOT NULL DEFAULT '0',
+  `order_id` int(11) NOT NULL DEFAULT '0',
+  `mark_unread_on_update` tinyint(1) NOT NULL DEFAULT '0',
+  `update_on_checksum_change` tinyint(1) NOT NULL DEFAULT '0',
+  `strip_images` tinyint(1) NOT NULL DEFAULT '0',
+  `view_settings` varchar(250) NOT NULL DEFAULT '',
+  `pubsub_state` int(11) NOT NULL DEFAULT '0',
+  `favicon_last_checked` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `owner_uid` (`owner_uid`),
+  KEY `cat_id` (`cat_id`),
+  KEY `parent_feed` (`parent_feed`),
+  KEY `ttrss_feeds_owner_uid_index` (`owner_uid`),
+  KEY `ttrss_feeds_cat_id_idx` (`cat_id`),
+  CONSTRAINT `ttrss_feeds_ibfk_1` FOREIGN KEY
+  (`owner_uid`) REFERENCES `ttrss_users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `ttrss_feeds_ibfk_2` FOREIGN KEY (`cat_id`) REFERENCES
+  `ttrss_feed_categories` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `ttrss_feeds_ibfk_3` FOREIGN KEY (`parent_feed`) REFERENCES
+  `ttrss_feeds` (`id`) ON DELETE SET NULL
+*/
+
 class Feeds
 {
     public static function getSpecialFeeds()
@@ -220,7 +270,7 @@ class Feeds
         }
     }
 
-    public static function markUpdated($feed_ids)
+    public static function markUpdateStarted($feed_ids)
     {
         if (!$feed_ids) {
             return;
@@ -229,11 +279,25 @@ class Feeds
         foreach ($feed_ids as $feed_id) {
             $quoted_feed_ids[] = "'" . \SmallSmallRSS\Database::escape_string($feed_id) . "'";
         }
-        \SmallSmallRSS\Database::query(sprintf(
+        \SmallSmallRSS\Database::query(
+            sprintf(
+                "UPDATE ttrss_feeds
+                 SET last_update_started = NOW()
+                 WHERE id IN (%s)",
+                implode(',', $quoted_feed_ids)
+            )
+        );
+    }
+    public static function markUpdated($feed_id, $last_error = '')
+    {
+        $last_error = \SmallSmallRSS\Database::escape_string($last_error);
+        $feed_id = \SmallSmallRSS\Database::escape_string($feed_id);
+        \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds
-             SET last_update_started = NOW()
-             WHERE feed_id IN (%s)",
-            implode(',', $quoted_feed_ids)
-        ));
+             SET
+                 last_updated = NOW(),
+                 last_error = '$last_error'
+             WHERE id = '$feed_id'"
+        );
     }
 }

@@ -155,7 +155,7 @@ class Feeds extends ProtectedHandler
         return $reply;
     }
 
-    private function format_headlines_list(
+    private function formatHeadlinesList(
         $feed,
         $method,
         $view_mode,
@@ -196,7 +196,7 @@ class Feeds extends ProtectedHandler
 
                 if (!$cache_images && time() - $last_updated > 120 || isset($_REQUEST['DevForceUpdate'])) {
                     include "rssfuncs.php";
-                    update_rss_feed($feed, true);
+                    \SmallSmallRSS\RSSUpdater::updateFeed($feed, true);
                 } else {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_feeds'
@@ -209,7 +209,7 @@ class Feeds extends ProtectedHandler
         }
 
         if ($method_split[0] == "MarkAllReadGR")  {
-            catchup_feed($method_split[1], false);
+            \SmallSmallRSS\UserEntries::catchupFeed($method_split[1], false, $_SESSION['uid']);
         }
 
         // FIXME: might break tag display?
@@ -955,7 +955,7 @@ class Feeds extends ProtectedHandler
             $timing_info = print_checkpoint("04", $timing_info);
         }
 
-        $ret = $this->format_headlines_list(
+        $ret = $this->formatHeadlinesList(
             $feed, $method,
             $view_mode, $limit, $cat_view, $next_unread_feed, $offset,
             $vgroup_last_feed, $override_order, true

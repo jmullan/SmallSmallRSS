@@ -5,7 +5,8 @@ class Database
     private static $adapter = null;
     private static $link = null;
 
-    private static function adapter() {
+    private static function adapter()
+    {
         if (!self::$adapter) {
             $er = error_reporting(E_ALL);
             if (\SmallSmallRSS\Config::get('ENABLE_PDO') && class_exists("\PDO")) {
@@ -93,5 +94,4 @@ class Database
     {
         return self::adapter()->close();
     }
-
 }

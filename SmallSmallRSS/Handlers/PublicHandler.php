@@ -5,9 +5,16 @@ class PublicHandler extends Handler
 {
 
     private function generate_syndicated_feed(
-        $owner_uid, $feed, $is_cat,
-        $limit, $offset, $search, $search_mode,
-        $view_mode = false, $format = 'atom', $order = false
+        $owner_uid,
+        $feed,
+        $is_cat,
+        $limit,
+        $offset,
+        $search,
+        $search_mode,
+        $view_mode = false,
+        $format = 'atom',
+        $order = false
     ) {
 
         require_once "lib/MiniTemplator.class.php";
@@ -17,7 +24,8 @@ class PublicHandler extends Handler
             . " padding: 5px; border-style: dashed; border-color: #e7d796;"
             . " margin-bottom: 1em; color: #9a8c59;";
 
-        if (!$limit) {  $limit = 60;
+        if (!$limit) {
+            $limit = 60;
         }
 
         $date_sort_field = "date_entered DESC, updated DESC";
@@ -42,9 +50,18 @@ class PublicHandler extends Handler
 
         $qfh_ret = queryFeedHeadlines(
             $feed,
-            1, $view_mode, $is_cat, $search, $search_mode,
-            $date_sort_field, $offset, $owner_uid,
-            false, 0, false, true
+            1,
+            $view_mode,
+            $is_cat,
+            $search,
+            $search_mode,
+            $date_sort_field,
+            $offset,
+            $owner_uid,
+            false,
+            0,
+            false,
+            true
         );
 
         $result = $qfh_ret[0];
@@ -64,9 +81,18 @@ class PublicHandler extends Handler
 
         $qfh_ret = queryFeedHeadlines(
             $feed,
-            $limit, $view_mode, $is_cat, $search, $search_mode,
-            $date_sort_field, $offset, $owner_uid,
-            false, 0, false, true
+            $limit,
+            $view_mode,
+            $is_cat,
+            $search,
+            $search_mode,
+            $date_sort_field,
+            $offset,
+            $owner_uid,
+            false,
+            0,
+            false,
+            true
         );
 
 
@@ -79,7 +105,8 @@ class PublicHandler extends Handler
             "/public.php?op=rss&id=-2&key=" .
             get_feed_access_key(-2, false, $owner_uid);
 
-        if (!$feed_site_url) {  $feed_site_url = get_self_url_prefix();
+        if (!$feed_site_url) {
+            $feed_site_url = get_self_url_prefix();
         }
 
         if ($format == 'atom') {
@@ -105,7 +132,8 @@ class PublicHandler extends Handler
                 $tpl->setVariable('ARTICLE_TITLE', htmlspecialchars($line['title']), true);
                 $tpl->setVariable(
                     'ARTICLE_EXCERPT',
-                    truncate_string(strip_tags($line["content_preview"]), 100, '...'), true
+                    truncate_string(strip_tags($line["content_preview"]), 100, '...'),
+                    true
                 );
 
                 $content = sanitize($line["content_preview"], false, $owner_uid);
@@ -120,11 +148,13 @@ class PublicHandler extends Handler
 
                 $tpl->setVariable(
                     'ARTICLE_UPDATED_ATOM',
-                    date('c', strtotime($line["updated"])), true
+                    date('c', strtotime($line["updated"])),
+                    true
                 );
                 $tpl->setVariable(
                     'ARTICLE_UPDATED_RFC822',
-                    date(DATE_RFC822, strtotime($line["updated"])), true
+                    date(DATE_RFC822, strtotime($line["updated"])),
+                    true
                 );
 
                 $tpl->setVariable('ARTICLE_AUTHOR', htmlspecialchars($line['author']), true);
@@ -164,7 +194,7 @@ class PublicHandler extends Handler
                 header("Content-Type: text/plain; charset=utf-8");
             }
 
-            print $tmp;
+            echo $tmp;
         } elseif ($format == 'json') {
 
             $feed = array();
@@ -191,9 +221,11 @@ class PublicHandler extends Handler
                 $article['content'] = sanitize($line["content_preview"], false, $owner_uid);
                 $article['updated'] = date('c', strtotime($line["updated"]));
 
-                if ($line['note']) {  $article['note'] = $line['note'];
+                if ($line['note']) {
+                    $article['note'] = $line['note'];
                 }
-                if ($article['author']) {  $article['author'] = $line['author'];
+                if ($article['author']) {
+                    $article['author'] = $line['author'];
                 }
 
                 $tags = get_article_tags($line["id"], $owner_uid);
@@ -224,15 +256,15 @@ class PublicHandler extends Handler
             }
 
             header("Content-Type: application/json; charset=utf-8");
-            print json_encode($feed);
+            echo json_encode($feed);
 
         } else {
             header("Content-Type: application/json; charset=utf-8");
-            print json_encode(array("error" => array("message" => "Unknown format")));
+            echo json_encode(array("error" => array("message" => "Unknown format")));
         }
     }
 
-    function getUnread()
+    public function getUnread()
     {
         $login = \SmallSmallRSS\Database::escape_string($_REQUEST["login"]);
         $fresh = $_REQUEST["fresh"] == "1";
@@ -242,20 +274,20 @@ class PublicHandler extends Handler
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             $uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
-            print getGlobalUnread($uid);
+            echo getGlobalUnread($uid);
 
             if ($fresh) {
-                print ";";
-                print getFeedArticles(-3, false, true, $uid);
+                echo ";";
+                echo getFeedArticles(-3, false, true, $uid);
             }
 
         } else {
-            print "-1;User not found";
+            echo "-1;User not found";
         }
 
     }
 
-    function getProfiles()
+    public function getProfiles()
     {
         $login = \SmallSmallRSS\Database::escape_string($_REQUEST["login"]);
 
@@ -267,17 +299,17 @@ class PublicHandler extends Handler
                  AND login = '$login'
              ORDER BY title"
         );
-        print "<select dojoType='dijit.form.Select' style='width: 220px; margin : 0px' name='profile'>";
-        print "<option value='0'>" . __("Default profile") . "</option>";
+        echo "<select dojoType='dijit.form.Select' style='width: 220px; margin : 0px' name='profile'>";
+        echo "<option value='0'>" . __("Default profile") . "</option>";
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line["id"];
             $title = $line["title"];
-            print "<option value='$id'>$title</option>";
+            echo "<option value='$id'>$title</option>";
         }
-        print "</select>";
+        echo "</select>";
     }
 
-    function pubsub()
+    public function pubsub()
     {
         $mode = \SmallSmallRSS\Database::escape_string($_REQUEST['hub_mode']);
         $feed_id = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
@@ -300,14 +332,14 @@ class PublicHandler extends Handler
                         "UPDATE ttrss_feeds SET pubsub_state = 2
                         WHERE id = '$feed_id'"
                     );
-                    print $_REQUEST['hub_challenge'];
+                    echo $_REQUEST['hub_challenge'];
                     return;
                 } elseif ($mode == "unsubscribe") {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_feeds SET pubsub_state = 0
                          WHERE id = '$feed_id'"
                     );
-                    print $_REQUEST['hub_challenge'];
+                    echo $_REQUEST['hub_challenge'];
                     return;
 
                 } elseif (!$mode) {
@@ -327,13 +359,13 @@ class PublicHandler extends Handler
         }
 
     }
-    function logout()
+    public function logout()
     {
         logout_user();
         header("Location: index.php");
     }
 
-    function share()
+    public function share()
     {
         $uuid = \SmallSmallRSS\Database::escape_string($_REQUEST["key"]);
         $result = \SmallSmallRSS\Database::query(
@@ -349,12 +381,12 @@ class PublicHandler extends Handler
             $article = format_article($id, false, true, $owner_uid);
             print_r($article['content']);
         } else {
-            print "Article not found.";
+            echo "Article not found.";
         }
 
     }
 
-    function rss()
+    public function rss()
     {
         $feed = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
         $key = \SmallSmallRSS\Database::escape_string($_REQUEST["key"]);
@@ -369,7 +401,8 @@ class PublicHandler extends Handler
 
         $format = \SmallSmallRSS\Database::escape_string($_REQUEST['format']);
 
-        if (!$format) {  $format = 'atom';
+        if (!$format) {
+            $format = 'atom';
         }
 
         if (\SmallSmallRSS\Auth::is_single_user_mode()) {
@@ -394,44 +427,45 @@ class PublicHandler extends Handler
 
         if ($owner_id) {
             $this->generate_syndicated_feed(
-                $owner_id, $feed, $is_cat, $limit,
-                $offset, $search, $search_mode, $view_mode, $format, $order
+                $owner_id,
+                $feed,
+                $is_cat,
+                $limit,
+                $offset,
+                $search,
+                $search_mode,
+                $view_mode,
+                $format,
+                $order
             );
         } else {
             header('HTTP/1.1 403 Forbidden');
         }
     }
 
-    function globalUpdateFeeds()
+    public function globalUpdateFeeds()
     {
-        include "rssfuncs.php";
-        // Update all feeds needing a update.
-        update_daemon_common(0, true, false);
-        housekeeping_common();
-
-        \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::UPDATE_TASK,
-            $op
-        );
-
+        \SmallSmallRSS\RSSUpdater::updateBatch();
+        \SmallSmallRSS\RSSUpdater::housekeeping();
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::UPDATE_TASK);
     }
 
-    function sharepopup()
+    public function sharepopup()
     {
         if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             login_sequence();
         }
 
         header('Content-Type: text/html; charset=utf-8');
-        print "<html><head><title>Tiny Tiny RSS</title>";
+        echo "<html><head><title>Tiny Tiny RSS</title>";
         $renderer = new \SmallSmallRSS\Renderers\CSS();
         $renderer->renderStylesheetTag("css/utility.css");
         $js_renderer = new \SmallSmallRSS\Renderers\JS();
         $js_renderer->render_script_tag("lib/prototype.js");
         $js_renderer->render_script_tag("lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls");
-        print "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
-        print "\n</head>";
-        print "\n<body id='sharepopup'>";
+        echo "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
+        echo "\n</head>";
+        echo "\n<body id='sharepopup'>";
 
         $action = $_REQUEST["action"];
 
@@ -445,26 +479,25 @@ class PublicHandler extends Handler
                 $labels = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["labels"]));
 
                 Article::createPublishedArticle(
-                    $title, $url, $content, $labels,
+                    $title, $url, $content,
+                    $labels,
                     $_SESSION["uid"]
                 );
 
-                print "<script type='text/javascript'>";
-                print "window.close();";
-                print "</script>";
+                echo "<script type='text/javascript'>";
+                echo "window.close();";
+                echo "</script>";
 
             } else {
                 $title = htmlspecialchars($_REQUEST["title"]);
                 $url = htmlspecialchars($_REQUEST["url"]);
-
-                ?>
-
+?>
                 <table height='100%' width='100%'>
-                  <tr>
-                    <td colspan='2'>
-                      <h1><?php echo __("Share with Tiny Tiny RSS") ?></h1>
-                    </td>
-                  </tr>
+                     <tr>
+                     <td colspan='2'>
+                     <h1><?php echo __("Share with Tiny Tiny RSS") ?></h1>
+                     </td>
+                     </tr>
 
                      <form id='share_form' name='share_form'>
 
@@ -478,9 +511,8 @@ class PublicHandler extends Handler
                      <tr><td align='right'><?php echo __("Content:") ?></td>
                      <td><input name='content' value=""></td></tr>
                      <tr><td align='right'><?php echo __("Labels:") ?></td>
-                     <td><input name='labels' id="labels_value"
-                     placeholder='Alpha, Beta, Gamma' value="">
-                     </td></tr>
+                     <td><input name='labels' id="labels_value" placeholder='Alpha, Beta, Gamma' value="" /></td>
+                     </tr>
 
                      <tr><td>
                      <div class="autocomplete" id="labels_choices"
@@ -488,29 +520,29 @@ class PublicHandler extends Handler
 
                      <script type='text/javascript'>document.forms[0].title.focus();</script>
                      <script type='text/javascript'>
-                       new Ajax.Autocompleter('labels_value', 'labels_choices',
-                                              "backend.php?op=rpc&method=completeLabels",
-                                              { tokens: ',', paramName: "search" });
+                       new Ajax.Autocompleter(
+                           'labels_value', 'labels_choices',
+                           "backend.php?op=rpc&method=completeLabels",
+                           { tokens: ',', paramName: "search" });
                      </script>
                      <tr><td colspan='2'>
                      <div style='float : right' class='insensitive-small'>
-                <?php echo __("Shared article will appear in the Published feed.") ?>
-                      </div>
-                      <button type="submit"><?php echo __('Share') ?></button>
-                      <button onclick="return window.close()"><?php echo __('Cancel') ?></button>
-                      </div>
+                       <?php echo __("Shared article will appear in the Published feed.") ?>
+                     </div>
+                     <button type="submit"><?php echo __('Share') ?></button>
+                     <button onclick="return window.close()"><?php echo __('Cancel') ?></button>
+                     </div>
 
-                      </form>
-                      </td></tr></table>
-                      </body></html>
-                <?php
+                     </form>
+                     </td></tr></table>
+                     </body></html>
+<?php
 
             }
-
         } else {
 
             $return = urlencode($_SERVER["REQUEST_URI"])
-            ?>
+?>
 
                 <form action="public.php?return=<?php echo $return ?>"
                 method="POST" id="loginForm" name="loginForm">
@@ -528,19 +560,19 @@ class PublicHandler extends Handler
                 value="<?php echo $_SESSION["fake_password"] ?>"></td></tr>
                 <tr><td colspan='2'>
                 <button type="submit">
-            <?php echo __('Log in') ?></button>
+<?php echo __('Log in') ?></button>
 
                 <button onclick="return window.close()">
-            <?php echo __('Cancel') ?></button>
+<?php echo __('Cancel') ?></button>
                 </td></tr>
                 </table>
 
                 </form>
-            <?php
-        }
+<?php
+                }
     }
 
-    function login()
+    public function login()
     {
         $login = \SmallSmallRSS\Database::escape_string($_POST["login"]);
         $password = $_POST["password"];
@@ -592,7 +624,7 @@ class PublicHandler extends Handler
         }
     }
 
-    function subscribe()
+    public function subscribe()
     {
         if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             login_sequence();
@@ -603,7 +635,7 @@ class PublicHandler extends Handler
             $feed_url = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["feed_url"]));
 
             header('Content-Type: text/html; charset=utf-8');
-            print "<html>
+            echo "<html>
                 <head>
                     <title>Tiny Tiny RSS</title>
                     <link rel=\"stylesheet\" type=\"text/css\" href=\"css/utility.css\">
@@ -650,22 +682,22 @@ class PublicHandler extends Handler
 
             if ($feed_urls) {
 
-                print "<form action=\"public.php\">";
-                print "<input type=\"hidden\" name=\"op\" value=\"subscribe\">";
+                echo "<form action=\"public.php\">";
+                echo "<input type=\"hidden\" name=\"op\" value=\"subscribe\">";
 
-                print "<select name=\"feed_url\">";
+                echo "<select name=\"feed_url\">";
 
                 foreach ($feed_urls as $url => $name) {
                     $url = htmlspecialchars($url);
                     $name = htmlspecialchars($name);
 
-                    print "<option value=\"$url\">$name</option>";
+                    echo "<option value=\"$url\">$name</option>";
                 }
 
-                print "<input type=\"submit\" value=\"".__("Subscribe to selected feed").
+                echo "<input type=\"submit\" value=\"".__("Subscribe to selected feed").
                     "\">";
 
-                print "</form>";
+                echo "</form>";
             }
 
             $tp_uri = get_self_url_prefix() . "/prefs.php";
@@ -681,10 +713,10 @@ class PublicHandler extends Handler
             } else {
                 $feed_id = 0;
             }
-            print "<p>";
+            echo "<p>";
 
             if ($feed_id) {
-                print "<form method=\"GET\" style='display: inline'
+                echo "<form method=\"GET\" style='display: inline'
                     action=\"$tp_uri\">
                     <input type=\"hidden\" name=\"tab\" value=\"feedConfig\">
                     <input type=\"hidden\" name=\"method\" value=\"editFeed\">
@@ -693,11 +725,11 @@ class PublicHandler extends Handler
                     </form>";
             }
 
-            print "<form style='display: inline' method=\"GET\" action=\"$tt_uri\">
+            echo "<form style='display: inline' method=\"GET\" action=\"$tt_uri\">
                 <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
                 </form></p>";
 
-            print "</div></body></html>";
+            echo "</div></body></html>";
 
         } else {
             $renderer = new \SmallSmallRSS\Renderers\LoginPage();
@@ -705,7 +737,7 @@ class PublicHandler extends Handler
         }
     }
 
-    function subscribe2()
+    public function subscribe2()
     {
         $feed_url = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["feed_url"]));
         $cat_id = \SmallSmallRSS\Database::escape_string($_REQUEST["cat_id"]);
@@ -755,21 +787,21 @@ class PublicHandler extends Handler
         }
 
         if ($feed_urls) {
-            print "<form action=\"backend.php\">";
-            print "<input type=\"hidden\" name=\"op\" value=\"pref-feeds\">";
-            print "<input type=\"hidden\" name=\"quiet\" value=\"1\">";
-            print "<input type=\"hidden\" name=\"method\" value=\"add\">";
+            echo "<form action=\"backend.php\">";
+            echo "<input type=\"hidden\" name=\"op\" value=\"pref-feeds\">";
+            echo "<input type=\"hidden\" name=\"quiet\" value=\"1\">";
+            echo "<input type=\"hidden\" name=\"method\" value=\"add\">";
 
-            print "<select name=\"feed_url\">";
+            echo "<select name=\"feed_url\">";
 
             foreach ($feed_urls as $url => $name) {
                 $url = htmlspecialchars($url);
                 $name = htmlspecialchars($name);
-                print "<option value=\"$url\">$name</option>";
+                echo "<option value=\"$url\">$name</option>";
             }
 
-            print "<input type=\"submit\" value=\"".__("Subscribe to selected feed")."\">";
-            print "</form>";
+            echo "<input type=\"submit\" value=\"".__("Subscribe to selected feed")."\">";
+            echo "</form>";
         }
 
         $tp_uri = get_self_url_prefix() . "/prefs.php";
@@ -786,10 +818,10 @@ class PublicHandler extends Handler
             $feed_id = 0;
         }
 
-        print "<p>";
+        echo "<p>";
 
         if ($feed_id) {
-            print "<form method=\"GET\" style='display: inline'
+            echo "<form method=\"GET\" style='display: inline'
                 action=\"$tp_uri\">
                 <input type=\"hidden\" name=\"tab\" value=\"feedConfig\">
                 <input type=\"hidden\" name=\"method\" value=\"editFeed\">
@@ -798,36 +830,36 @@ class PublicHandler extends Handler
                 </form>";
         }
 
-        print "<form style='display: inline' method=\"GET\" action=\"$tt_uri\">
+        echo "<form style='display: inline' method=\"GET\" action=\"$tt_uri\">
             <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
             </form></p>";
 
-        print "</body></html>";
+        echo "</body></html>";
     }
 
-    function index()
+    public function index()
     {
         $renderer = new \SmallSmallRSS\Renderers\JSONError(7);
         $renderer->render();
     }
 
-    function forgotpass()
+    public function forgotpass()
     {
         startup_gettext();
 
         header('Content-Type: text/html; charset=utf-8');
-        print "<html><head><title>Tiny Tiny RSS</title>";
+        echo "<html><head><title>Tiny Tiny RSS</title>";
         $renderer = new \SmallSmallRSS\Renderers\CSS();
         $renderer->renderStylesheetTag("css/utility.css");
         $js_renderer = new \SmallSmallRSS\Renderers\JS();
         $js_renderer->render_script_tag("lib/prototype.js");
 
-        print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
+        echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
             </head><body id='forgotpass'>";
 
-        print '<div class="floatingLogo"><img src="images/logo_small.png"></div>';
-        print "<h1>".__("Password recovery")."</h1>";
-        print "<div class='content'>";
+        echo '<div class="floatingLogo"><img src="images/logo_small.png"></div>';
+        echo "<h1>".__("Password recovery")."</h1>";
+        echo "<div class='content'>";
 
         @$method = $_POST['method'];
 
@@ -836,29 +868,29 @@ class PublicHandler extends Handler
                 __("You will need to provide valid account name and email. New password will be sent on your email address.")
             );
 
-            print "<form method='POST' action='public.php'>";
-            print "<input type='hidden' name='method' value='do'>";
-            print "<input type='hidden' name='op' value='forgotpass'>";
+            echo "<form method='POST' action='public.php'>";
+            echo "<input type='hidden' name='method' value='do'>";
+            echo "<input type='hidden' name='op' value='forgotpass'>";
 
-            print "<fieldset>";
-            print "<label>".__("Login:")."</label>";
-            print "<input type='text' name='login' value='' required>";
-            print "</fieldset>";
+            echo "<fieldset>";
+            echo "<label>".__("Login:")."</label>";
+            echo "<input type='text' name='login' value='' required>";
+            echo "</fieldset>";
 
-            print "<fieldset>";
-            print "<label>".__("Email:")."</label>";
-            print "<input type='email' name='email' value='' required>";
-            print "</fieldset>";
+            echo "<fieldset>";
+            echo "<label>".__("Email:")."</label>";
+            echo "<input type='email' name='email' value='' required>";
+            echo "</fieldset>";
 
-            print "<fieldset>";
-            print "<label>".__("How much is two plus two:")."</label>";
-            print "<input type='text' name='test' value='' required>";
-            print "</fieldset>";
+            echo "<fieldset>";
+            echo "<label>".__("How much is two plus two:")."</label>";
+            echo "<input type='text' name='test' value='' required>";
+            echo "</fieldset>";
 
-            print "<p/>";
-            print "<button type='submit'>".__("Reset password")."</button>";
+            echo "<p/>";
+            echo "<button type='submit'>".__("Reset password")."</button>";
 
-            print "</form>";
+            echo "</form>";
         } elseif ($method == 'do') {
 
             $login = \SmallSmallRSS\Database::escape_string($_POST["login"]);
@@ -866,11 +898,11 @@ class PublicHandler extends Handler
             $test = \SmallSmallRSS\Database::escape_string($_POST["test"]);
 
             if (($test != 4 && $test != 'four') || !$email || !$login) {
-                 \SmallSmallRSS\Renderers\Messages::renderError(
-                     __('Some of the required form parameters are missing or incorrect.')
-                 );
+                \SmallSmallRSS\Renderers\Messages::renderError(
+                    __('Some of the required form parameters are missing or incorrect.')
+                );
 
-                print "<form method=\"GET\" action=\"public.php\">
+                echo "<form method=\"GET\" action=\"public.php\">
                     <input type=\"hidden\" name=\"op\" value=\"forgotpass\">
                     <input type=\"submit\" value=\"".__("Go back")."\">
                     </form>";
@@ -887,20 +919,20 @@ class PublicHandler extends Handler
 
                     Pref_Users::resetUserPassword($id, false);
 
-                    print "<p>";
+                    echo "<p>";
 
-                    print "<p>"."Completed."."</p>";
+                    echo "<p>"."Completed."."</p>";
 
-                    print "<form method=\"GET\" action=\"index.php\">
+                    echo "<form method=\"GET\" action=\"index.php\">
                         <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
                         </form>";
 
                 } else {
-                     \SmallSmallRSS\Renderers\Messages::renderError(
-                         __("Sorry, login and email combination not found.")
-                     );
+                    \SmallSmallRSS\Renderers\Messages::renderError(
+                        __("Sorry, login and email combination not found.")
+                    );
 
-                    print "<form method=\"GET\" action=\"public.php\">
+                    echo "<form method=\"GET\" action=\"public.php\">
                         <input type=\"hidden\" name=\"op\" value=\"forgotpass\">
                         <input type=\"submit\" value=\"".__("Go back")."\">
                         </form>";
@@ -910,13 +942,13 @@ class PublicHandler extends Handler
 
         }
 
-        print "</div>";
-        print "</body>";
-        print "</html>";
+        echo "</div>";
+        echo "</body>";
+        echo "</html>";
 
     }
 
-    function dbupdate()
+    public function dbupdate()
     {
         startup_gettext();
 
@@ -926,96 +958,81 @@ class PublicHandler extends Handler
             $renderer->render();
             exit;
         }
-
-        ?><html>
-        <head>
-             <title>Database Updater</title>
-             <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-             <link rel="stylesheet" type="text/css" href="css/utility.css"/>
-             </head>
-             <style type="text/css">
-             span.ok { color : #009000; font-weight : bold; }
-                       span.err { color : #ff0000; font-weight : bold; }
-                                  </style>
-                                  <body>
-                                  <script type='text/javascript'>
-                                  function confirmOP() {
-                               return confirm("Update the database?");
-                           }
-                                  </script>
-
-                                  <div class="floatingLogo"><img src="images/logo_small.png"></div>
-
-                                  <h1><?php echo __("Database Updater") ?></h1>
-
-                                  <div class="content">
-
-        <?php
-                                  @$op = $_REQUEST["subop"];
-                                  $updater = new \SmallSmallRSS\Database\Updater();
-
+        echo '<html>';
+        echo '<head>';
+        echo '<title>Database Updater</title>';
+        echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
+        echo '<link rel="stylesheet" type="text/css" href="css/utility.css"/>';
+        echo '</head>';
+        echo '<style type="text/css">';
+        echo '<div class="floatingLogo"><img src="images/logo_small.png" /></div>';
+        echo '<h1>';
+        echo __("Database Updater");
+        echo '</h1>';
+        echo '<div class="content">';
+        @$op = $_REQUEST["subop"];
+        $updater = new \SmallSmallRSS\Database\Updater();
         if ($op == "performupdate") {
             if ($updater->isUpdateRequired()) {
-                print "<h2>Performing updates</h2>";
-                print "<h3>Updating to schema version " . \SmallSmallRSS\Constants::SCHEMA_VERSION . "</h3>";
-                print "<ul>";
+                echo "<h2>Performing updates</h2>";
+                echo "<h3>Updating to schema version " . \SmallSmallRSS\Constants::SCHEMA_VERSION . "</h3>";
+                echo "<ul>";
                 for ($i = $updater->getSchemaVersion() + 1; $i <= \SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
-                    print "<li>Performing update up to version $i...";
+                    echo "<li>Performing update up to version $i...";
                     $result = $updater->performUpdateTo($i);
                     if (!$result) {
-                        print "<span class='err'>FAILED!</span></li></ul>";
+                        echo "<span class='err'>FAILED!</span></li></ul>";
                         \SmallSmallRSS\Renderers\Messages::renderWarning(
                             "One of the updates failed. Either retry the process or perform updates manually."
                         );
-                        print "<p><form method=\"GET\" action=\"index.php\">
+                        echo "<p><form method=\"GET\" action=\"index.php\">
                                 <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
                                 </form>";
                         break;
                     } else {
-                        print "<span class='ok'>OK!</span></li>";
+                        echo "<span class='ok'>OK!</span></li>";
                     }
                 }
-                print "</ul>";
+                echo "</ul>";
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
                     "Your Tiny Tiny RSS database is now updated to the latest version."
                 );
-                print "<p><form method=\"GET\" action=\"index.php\">
+                echo "<p><form method=\"GET\" action=\"index.php\">
                         <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
                         </form>";
             } else {
-                print "<h2>Your database is up to date.</h2>";
-                print "<p><form method=\"GET\" action=\"index.php\">
+                echo "<h2>Your database is up to date.</h2>";
+                echo "<p><form method=\"GET\" action=\"index.php\">
                         <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
                         </form>";
             }
         } else {
             if ($updater->isUpdateRequired()) {
-                print "<h2>Database update required</h2>";
-                print "<h3>";
+                echo "<h2>Database update required</h2>";
+                echo "<h3>";
                 printf(
                     "Your Tiny Tiny RSS database needs update to the latest version: %d to %d.",
-                    $updater->getSchemaVersion(), \SmallSmallRSS\Constants::SCHEMA_VERSION
+                    $updater->getSchemaVersion(),
+                    \SmallSmallRSS\Constants::SCHEMA_VERSION
                 );
-                print "</h3>";
+                echo "</h3>";
                 \SmallSmallRSS\Renderers\Messages::renderWarning(
                     "Please backup your database before proceeding."
                 );
-                print "<form method='POST'>
-                            <input type='hidden' name='subop' value='performupdate'>
-                            <input type='submit' onclick='return confirmOP()' value='".__("Perform updates")."'>
-                        </form>";
+                echo "<form method='POST'>";
+                echo "<input type='hidden' name='subop' value='performupdate'>";
+                echo "<input type='submit' onclick='return confirm(\"Update the database?\")'";
+                echo " value='".__("Perform updates")."'>";
+                echo "</form>";
             } else {
                 \SmallSmallRSS\Renderers\Messages::renderNotice("Tiny Tiny RSS database is up to date.");
-                print "<p><form method=\"GET\" action=\"index.php\">
-                            <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                        </form>";
+                echo "<p><form method=\"GET\" action=\"index.php\">";
+                echo "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+                echo "</form>";
             }
         }
-        ?>
-
-                                  </div>
-                                  </body>
-                                  </html>
-        <?php
+        echo "</div>";
+        echo "</body>";
+        echo "</html>";
     }
 }

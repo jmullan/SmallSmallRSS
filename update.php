@@ -20,6 +20,7 @@ $longopts = array(
     "log:",
     "indexes",
     "pidlock:",
+    "num-updates:",
     "update-schema",
     "convert-filters",
     "force-update",
@@ -55,6 +56,7 @@ if (count($options) == 0 || isset($options["help"])) {
     print "  --force-update       - force update of all feeds\n";
     print "  --list-plugins       - list all available plugins\n";
     print "  --help               - show this help\n";
+    print "  --num-updates N      - update this many feeds\n";
     print "Plugin options:\n";
 
     foreach (\SmallSmallRSS\PluginHost::getInstance()->get_commands() as $command => $data) {
@@ -94,7 +96,14 @@ if (isset($options["task"])) {
 if (isset($options["pidlock"])) {
     $my_pid = $options["pidlock"];
     $lock_filename = "update_daemon-$my_pid.lock";
+}
 
+$num_updates = null;
+if (isset($options["num-updates"])) {
+    $num_updates = intval($options["num-updates"]);
+    if (!$num_updates) {
+        die('Error: invalid number of updates');
+    }
 }
 
 _debug("Lock: $lock_filename");
@@ -128,14 +137,10 @@ if (isset($options["force-update"])) {
 }
 
 if (isset($options["feeds"])) {
-    $op = '';
     \SmallSmallRSS\Lockfiles::make_stamp('update_feeds.stamp');
-    update_daemon_common();
-    housekeeping_common();
-    \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-        \SmallSmallRSS\Hooks::UPDATE_TASK,
-        $op
-    );
+    \SmallSmallRSS\RSSUpdater::updateBatch($num_updates);
+    \SmallSmallRSS\RSSUpdater::housekeeping();
+    \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::UPDATE_TASK);
 }
 
 if (isset($options["feedbrowser"])) {
@@ -155,18 +160,14 @@ if (isset($options["daemon"])) {
 }
 
 if (isset($options["daemon-loop"])) {
-    $op = null;
     if (!\SmallSmallRSS\Lockfiles::make_stamp('update_daemon.stamp')) {
         _debug("warning: unable to create stampfile\n");
     }
-    update_daemon_common(isset($options["pidlock"]) ? 50 : \SmallSmallRSS\Config::get('DAEMON_FEED_LIMIT'));
+    \SmallSmallRSS\RSSUpdater::updateBatch($num_updates);
     if (!isset($options["pidlock"]) || $options["task"] == 0) {
-        housekeeping_common();
+        \SmallSmallRSS\RSSUpdater::housekeeping();
     }
-    \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-        \SmallSmallRSS\Hooks::UPDATE_TASK,
-        $op
-    );
+    \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::UPDATE_TASK);
 }
 
 if (isset($options["cleanup-tags"])) {

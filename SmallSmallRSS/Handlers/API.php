@@ -813,7 +813,7 @@ class API extends Handler
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            Pref_Feeds::remove_feed($feed_id, $_SESSION["uid"]);
+            Pref_Feeds::removeFeed($feed_id, $_SESSION["uid"]);
             $this->wrap(self::STATUS_OK, array("status" => "OK"));
         } else {
             $this->wrap(self::STATUS_ERR, array("error" => "FEED_NOT_FOUND"));

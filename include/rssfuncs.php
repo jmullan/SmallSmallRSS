@@ -1,170 +1,4 @@
 <?php
-/**
- * Update a feed batch.
- * Used by daemons to update n feeds by run.
- * Only update feed needing a update, and not being processed
- * by another process.
- *
- * @param mixed $link Database link
- * @param integer $limit Maximum number of feeds in update batch. Default to \SmallSmallRSS\Config::get('DAEMON_FEED_LIMIT').
- * @param boolean $from_http Set to true if you call this function from http to disable cli specific code.
- * @param boolean $debug Set to false to disable debug output. Default to true.
- * @return void
- */
-function update_daemon_common($limit = null, $from_http = false, $debug = true)
-{
-    if (is_null($limit)) {
-        $limit = \SmallSmallRSS\Config::get('DAEMON_FEED_LIMIT');
-    }
-    // Process all other feeds using last_updated and interval parameters
-    \SmallSmallRSS\Sanity::schemaOrDie();
-    // Test if the user has loggued in recently. If not, it does not update its feeds.
-    if (!\SmallSmallRSS\Auth::is_single_user_mode() && \SmallSmallRSS\Config::get('DAEMON_UPDATE_LOGIN_LIMIT') > 0) {
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-            $login_thresh_qpart = (
-                "AND ttrss_users.last_login >= NOW() - INTERVAL"
-                . " '" . \SmallSmallRSS\Config::get('DAEMON_UPDATE_LOGIN_LIMIT') . " days'"
-            );
-        } else {
-            $login_thresh_qpart = (
-                "AND ttrss_users.last_login >= DATE_SUB("
-                . " NOW(), INTERVAL " . \SmallSmallRSS\Config::get('DAEMON_UPDATE_LOGIN_LIMIT') . " DAY"
-                . ")"
-            );
-        }
-    } else {
-        $login_thresh_qpart = "";
-    }
-
-    // Test if the feed need a update (update interval exceded).
-    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-        $update_limit_qpart = "
-            AND
-            (
-                (
-                    ttrss_feeds.update_interval = 0
-                    AND ttrss_user_prefs.value != '-1'
-                    AND ttrss_feeds.last_updated < NOW() - CAST((ttrss_user_prefs.value || ' minutes') AS INTERVAL)
-                )
-                OR
-                (
-                    ttrss_feeds.update_interval > 0
-                    AND ttrss_feeds.last_updated < NOW() - CAST((ttrss_feeds.update_interval || ' minutes') AS INTERVAL)
-                )
-                OR ttrss_feeds.last_updated IS NULL
-                OR last_updated = '1970-01-01 00:00:00'
-            )";
-    } else {
-        $update_limit_qpart = "
-            AND
-            (
-                (
-                    ttrss_feeds.update_interval = 0
-                    AND ttrss_user_prefs.value != '-1'
-                    AND ttrss_feeds.last_updated < DATE_SUB(
-                        NOW(),
-                        INTERVAL CONVERT(ttrss_user_prefs.value, SIGNED INTEGER) MINUTE
-                    )
-                ) OR (
-                    ttrss_feeds.update_interval > 0
-                    AND ttrss_feeds.last_updated < DATE_SUB(
-                        NOW(),
-                        INTERVAL ttrss_feeds.update_interval MINUTE
-                    )
-                ) OR ttrss_feeds.last_updated IS NULL
-                OR last_updated = '1970-01-01 00:00:00')";
-    }
-
-    // Test if feed is currently being updated by another process.
-    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-        $updstart_thresh_qpart = "
-             AND (
-                 ttrss_feeds.last_update_started IS NULL
-                 OR ttrss_feeds.last_update_started < NOW() - INTERVAL '10 minutes'
-             )";
-    } else {
-        $updstart_thresh_qpart = "
-             AND (
-                 ttrss_feeds.last_update_started IS NULL
-                 OR ttrss_feeds.last_update_started < DATE_SUB(NOW(), INTERVAL 10 MINUTE)
-             )";
-    }
-
-    // Test if there is a limit to number of updated feeds
-    $query_limit = "";
-    if ($limit > 0) {
-        $query_limit = sprintf("LIMIT %d", $limit);
-    }
-
-    $query = "SELECT DISTINCT ttrss_feeds.feed_url, ttrss_feeds.last_updated
-              FROM ttrss_feeds, ttrss_users, ttrss_user_prefs
-              WHERE
-                  ttrss_feeds.owner_uid = ttrss_users.id
-                  AND ttrss_users.id = ttrss_user_prefs.owner_uid
-                  AND ttrss_user_prefs.pref_name = 'DEFAULT_UPDATE_INTERVAL'
-                  $login_thresh_qpart $update_limit_qpart
-                  $updstart_thresh_qpart
-              ORDER BY last_updated
-              $query_limit";
-    // We search for feed needing update.
-    $result = \SmallSmallRSS\Database::query($query);
-
-    _debug(sprintf("Scheduled %d feeds to update...", \SmallSmallRSS\Database::num_rows($result)), $debug);
-
-    // Here is a little cache magic in order to minimize risk of double feed updates.
-    $feeds_to_update = array();
-    while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-        array_push($feeds_to_update, \SmallSmallRSS\Database::escape_string($line['feed_url']));
-    }
-
-    // We update the feed last update started date before anything else.
-    // There is no lag due to feed contents downloads
-    // It prevents another process to update the same feed.
-
-    if (count($feeds_to_update) > 0) {
-        $feeds_quoted = array();
-        foreach ($feeds_to_update as $feed) {
-            array_push($feeds_quoted, "'" . \SmallSmallRSS\Database::escape_string($feed) . "'");
-        }
-        \SmallSmallRSS\Database::query(sprintf(
-            "UPDATE ttrss_feeds SET last_update_started = NOW()
-             WHERE feed_url IN (%s)", implode(',', $feeds_quoted)
-        ));
-    }
-
-    $nf = 0;
-
-    // For each feed, we call the feed update function.
-    foreach ($feeds_to_update as $feed) {
-        $query = "SELECT DISTINCT
-                      ttrss_feeds.id,
-                      last_updated,
-                      ttrss_feeds.owner_uid
-                  FROM ttrss_feeds, ttrss_users, ttrss_user_prefs
-                  WHERE
-                      ttrss_user_prefs.owner_uid = ttrss_feeds.owner_uid
-                      AND ttrss_users.id = ttrss_user_prefs.owner_uid
-                      AND ttrss_user_prefs.pref_name = 'DEFAULT_UPDATE_INTERVAL'
-                      AND feed_url = '" . \SmallSmallRSS\Database::escape_string($feed) . "'
-                      AND (
-                          ttrss_feeds.update_interval > 0
-                          OR ttrss_user_prefs.value != '-1'
-                      )
-                  $login_thresh_qpart
-                  ORDER BY ttrss_feeds.id
-                  $query_limit";
-        $tmp_result = \SmallSmallRSS\Database::query($query);
-        if (\SmallSmallRSS\Database::num_rows($tmp_result) > 0) {
-            while ($tline = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
-                update_rss_feed($tline["id"], true);
-                ++$nf;
-            }
-        }
-    }
-    \SmallSmallRSS\Digest::send_headlines($debug);
-    return $nf;
-}
-
 function update_rss_feed($feed, $no_cache = false)
 {
     $result = \SmallSmallRSS\Database::query(
@@ -665,10 +499,9 @@ function update_rss_feed($feed, $no_cache = false)
             $orig_content_hash = \SmallSmallRSS\Database::fetch_result($result, 0, "content_hash");
             $orig_title = \SmallSmallRSS\Database::fetch_result($result, 0, "title");
             $orig_num_comments = \SmallSmallRSS\Database::fetch_result($result, 0, "num_comments");
-            $orig_date_updated = strtotime(\SmallSmallRSS\Database::fetch_result(
-                $result,
-                0, "date_updated"
-            ));
+            $orig_date_updated = strtotime(
+                \SmallSmallRSS\Database::fetch_result($result, 0, "date_updated")
+            );
             $orig_plugin_data = \SmallSmallRSS\Database::fetch_result($result, 0, "plugin_data");
 
             $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
@@ -686,8 +519,12 @@ function update_rss_feed($feed, $no_cache = false)
             /* Collect article tags here so we could filter by them: */
 
             $article_filters = get_article_filters(
-                $filters, $entry_title,
-                $entry_content, $entry_link, $entry_timestamp, $entry_author,
+                $filters,
+                $entry_title,
+                $entry_content,
+                $entry_link,
+                $entry_timestamp,
+                $entry_author,
                 $entry_tags
             );
 
@@ -1001,8 +838,8 @@ function cache_images($html, $site_url, $debug)
             }
             if (file_exists($local_filename)) {
                 $entry->setAttribute(
-                    'src', \SmallSmallRSS\Config::get('SELF_URL_PATH') . '/image.php?url=' .
-                    base64_encode($src)
+                    'src',
+                    \SmallSmallRSS\Config::get('SELF_URL_PATH') . '/image.php?url=' . base64_encode($src)
                 );
             }
         }
@@ -1156,19 +993,4 @@ function make_guid_from_title($title)
         "-",
         mb_strtolower(strip_tags($title), 'utf-8')
     );
-}
-
-function housekeeping_common()
-{
-    \SmallSmallRSS\FileCache::clearExpired();
-    \SmallSmallRSS\Lockfiles::unlinkExpired();
-    \SmallSmallRSS\Logger::clearExpired();
-    $lines = \SmallSmallRSS\Feeds::countFeedSubscribers();
-    $count = \SmallSmallRSS\FeedbrowserCache::update($lines);
-    _debug("Feedbrowser updated, $count feeds processed.");
-
-    purge_orphans(true);
-    $rc = cleanup_tags(14, 50000);
-
-    _debug("Cleaned $rc cached tags.");
 }

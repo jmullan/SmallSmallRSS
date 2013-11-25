@@ -1,8 +1,10 @@
 <?php
 namespace SmallSmallRSS;
 
-class Feeds {
-    public static function get_special_feeds() {
+class Feeds
+{
+    public static function getSpecialFeeds()
+    {
         return array(
             -4 => __('All articles'),
             -3 => __('Fresh articles'),
@@ -12,12 +14,15 @@ class Feeds {
             -6 => __('Recently read')
         );
     }
-    public static function get_special_feed_ids() {
-        return array_keys(self::get_special_feeds());
+
+    public static function getSpecialFeedIds()
+    {
+        return array_keys(self::getSpecialFeeds());
     }
+
     public static function getTitle($feed_id)
     {
-        $special_feeds = self::get_special_feeds();
+        $special_feeds = self::getSpecialFeeds();
         if (isset($special_feeds[$feed_id])) {
             return $special_feeds[$feed_id];
         } elseif ($id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
@@ -40,7 +45,8 @@ class Feeds {
         }
     }
 
-    public static function purge_interval($feed_id) {
+    public static function purgeInterval($feed_id)
+    {
         $result = \SmallSmallRSS\Database::query(
             "SELECT purge_interval, owner_uid
              FROM ttrss_feeds
@@ -67,9 +73,10 @@ class Feeds {
      * @access public
      * @return void
      */
-    public static function purge($feed_id, $purge_interval) {
+    public static function purge($feed_id, $purge_interval)
+    {
         if (!$purge_interval) {
-            $purge_interval = self::purge_interval($feed_id);
+            $purge_interval = self::purgeInterval($feed_id);
         }
         $rows = -1;
         $result = \SmallSmallRSS\Database::query(
@@ -211,5 +218,22 @@ class Feeds {
         } else {
             return false;
         }
+    }
+
+    public static function markUpdated($feed_ids)
+    {
+        if (!$feed_ids) {
+            return;
+        }
+        $quoted_feed_ids = array();
+        foreach ($feed_ids as $feed_id) {
+            $quoted_feed_ids[] = "'" . \SmallSmallRSS\Database::escape_string($feed_id) . "'";
+        }
+        \SmallSmallRSS\Database::query(sprintf(
+            "UPDATE ttrss_feeds
+             SET last_update_started = NOW()
+             WHERE feed_id IN (%s)",
+            implode(',', $quoted_feed_ids)
+        ));
     }
 }

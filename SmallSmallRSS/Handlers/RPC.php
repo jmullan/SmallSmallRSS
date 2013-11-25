@@ -263,13 +263,13 @@ class RPC extends ProtectedHandler
         $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
 
         foreach ($ids as $id) {
-            $this->archive_article($id, $_SESSION["uid"]);
+            $this->archiveArticle($id, $_SESSION["uid"]);
         }
 
         print json_encode(array("message" => "UPDATE_COUNTERS"));
     }
 
-    private function archive_article($id, $owner_uid)
+    private function archiveArticle($id, $owner_uid)
     {
         \SmallSmallRSS\Database::query("BEGIN");
 
@@ -390,7 +390,7 @@ class RPC extends ProtectedHandler
         print json_encode(array("message" => "UPDATE_COUNTERS"));
     }
 
-    public static function get_bool_from_request($key)
+    public static function getBooleanFromRequest($key)
     {
         $value = isset($_REQUEST[$key]) ? $_REQUEST[$key] : '';
         return ($value === 'true') || ($value === true);
@@ -466,9 +466,9 @@ class RPC extends ProtectedHandler
 
     public function sanityCheck()
     {
-        $_SESSION['hasAudio'] = self::get_bool_from_request('hasAudio');
-        $_SESSION['hasSandbox'] = self::get_bool_from_request('hasSandbox');
-        $_SESSION['hasMp3'] = self::get_bool_from_request('hasMp3');
+        $_SESSION['hasAudio'] = self::getBooleanFromRequest('hasAudio');
+        $_SESSION['hasSandbox'] = self::getBooleanFromRequest('hasSandbox');
+        $_SESSION['hasMp3'] = self::getBooleanFromRequest('hasMp3');
         $_SESSION["clientTzOffset"] = (
             isset($_REQUEST["clientTzOffset"])
             ? $_REQUEST["clientTzOffset"] : null
@@ -715,7 +715,7 @@ class RPC extends ProtectedHandler
         }
         // Purge orphans and cleanup tags
         purge_orphans();
-        cleanup_tags(14, 50000);
+        \SmallSmallRSS\Tags::clearExpired(14);
         if ($num_updated > 0) {
             print json_encode(
                 array(

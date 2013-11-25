@@ -4,7 +4,7 @@ namespace SmallSmallRSS\Handlers;
 class Pref_Feeds extends ProtectedHandler
 {
 
-    public function get_mode()
+    public function getMode()
     {
         return isset($_REQUEST['mode']) ? $_REQUEST['mode'] : '';
     }
@@ -29,7 +29,7 @@ class Pref_Feeds extends ProtectedHandler
 
     public function renderBatchEditCheckbox($elem, $label = false)
     {
-        print "<input type=\"checkbox\" title=\"".__("Check to enable field")."\"
+        echo "<input type=\"checkbox\" title=\"".__("Check to enable field")."\"
                onchange=\"dijit.byId('feedEditDlg').toggleField(this, '$elem', '$label')\">";
     }
 
@@ -48,10 +48,10 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    private function get_category_items($cat_id)
+    private function getCategoryItems($cat_id)
     {
 
-        if ($this->get_mode() != 2) {
+        if ($this->getMode() != 2) {
             $search = isset($_SESSION["prefs_feed_search"]) ? $_SESSION["prefs_feed_search"] : '';
         } else {
             $search = "";
@@ -65,7 +65,7 @@ class Pref_Feeds extends ProtectedHandler
 
         // first one is set by API
         $show_empty_cats = (!empty($_REQUEST['force_show_empty'])
-                            || ($this->get_mode() != 2 && !$search));
+                            || ($this->getMode() != 2 && !$search));
 
         $items = array();
 
@@ -87,9 +87,9 @@ class Pref_Feeds extends ProtectedHandler
             $cat['child_unread'] = 0;
             $cat['auxcounter'] = 0;
 
-            $cat['items'] = $this->get_category_items($line['id']);
+            $cat['items'] = $this->getCategoryItems($line['id']);
 
-            $num_children = $this->calculate_children_count($cat);
+            $num_children = $this->countChildren($cat);
             $cat['param'] = vsprintf(_ngettext('(%d feed)', '(%d feeds)', $num_children), $num_children);
 
             if ($num_children > 0 || $show_empty_cats) {
@@ -129,13 +129,13 @@ class Pref_Feeds extends ProtectedHandler
 
     public function getfeedtree()
     {
-        print json_encode($this->makefeedtree());
+        echo json_encode($this->makefeedtree());
     }
 
     public function makefeedtree()
     {
 
-        if ($this->get_mode() != 2 && isset($_SESSION["prefs_feed_search"])) {
+        if ($this->getMode() != 2 && isset($_SESSION["prefs_feed_search"])) {
             $search = $_SESSION["prefs_feed_search"];
         } else {
             $search = "";
@@ -156,16 +156,16 @@ class Pref_Feeds extends ProtectedHandler
 
         $enable_cats = \SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS');
 
-        if ($this->get_mode() == 2) {
+        if ($this->getMode() == 2) {
 
             if ($enable_cats) {
-                $cat = $this->feedlist_init_cat(-1);
+                $cat = $this->initFeedlistCat(-1);
             } else {
                 $cat['items'] = array();
             }
 
-            foreach (\SmallSmallRSS\Feeds::get_special_feed_ids() as $i) {
-                array_push($cat['items'], $this->feedlist_init_feed($i));
+            foreach (\SmallSmallRSS\Feeds::getSpecialFeedIds() as $i) {
+                array_push($cat['items'], $this->initFeedlistFeed($i));
             }
 
             /* Plugin feeds for -1 */
@@ -196,13 +196,13 @@ class Pref_Feeds extends ProtectedHandler
             $labels = \SmallSmallRSS\Labels::getAll($_SESSION['uid']);
             if ($labels) {
                 if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
-                    $cat = $this->feedlist_init_cat(-2);
+                    $cat = $this->initFeedlistCat(-2);
                 } else {
                     $cat['items'] = array();
                 }
                 foreach ($labels as $line) {
                     $label_id = label_to_feed_id($line['id']);
-                    $feed = $this->feedlist_init_feed($label_id, false, 0);
+                    $feed = $this->initFeedlistFeed($label_id, false, 0);
                     $feed['fg_color'] = $line['fg_color'];
                     $feed['bg_color'] = $line['bg_color'];
                     array_push($cat['items'], $feed);
@@ -218,7 +218,7 @@ class Pref_Feeds extends ProtectedHandler
         if ($enable_cats) {
             $show_empty_cats = (
                 !empty($_REQUEST['force_show_empty'])
-                || ($this->get_mode() != 2 && !$search)
+                || ($this->getMode() != 2 && !$search)
             );
             $result = \SmallSmallRSS\Database::query(
                 "SELECT id, title
@@ -239,8 +239,8 @@ class Pref_Feeds extends ProtectedHandler
                 $cat['type'] = 'category';
                 $cat['unread'] = 0;
                 $cat['child_unread'] = 0;
-                $cat['items'] = $this->get_category_items($line['id']);
-                $num_children = $this->calculate_children_count($cat);
+                $cat['items'] = $this->getCategoryItems($line['id']);
+                $num_children = $this->countChildren($cat);
                 $cat['param'] = vsprintf(_ngettext('(%d feed)', '(%d feeds)', $num_children), $num_children);
                 if ($num_children > 0 || $show_empty_cats) {
                     array_push($root['items'], $cat);
@@ -294,7 +294,7 @@ class Pref_Feeds extends ProtectedHandler
                 array_push($root['items'], $cat);
             }
 
-            $num_children = $this->calculate_children_count($root);
+            $num_children = $this->countChildren($root);
             $root['param'] = vsprintf(_ngettext('(%d feed)', '(%d feeds)', $num_children), $num_children);
 
         } else {
@@ -332,7 +332,7 @@ class Pref_Feeds extends ProtectedHandler
         $fl['identifier'] = 'id';
         $fl['label'] = 'name';
 
-        if ($this->get_mode() != 2) {
+        if ($this->getMode() != 2) {
             $fl['items'] = array($root);
         } else {
             $fl['items'] =& $root['items'];
@@ -359,7 +359,7 @@ class Pref_Feeds extends ProtectedHandler
         return;
     }
 
-    private function process_category_order(&$data_map, $item_id, $parent_id = false, $nest_level = 0)
+    private function processCategoryOrder(&$data_map, $item_id, $parent_id = false, $nest_level = 0)
     {
         $prefix = "";
         for ($i = 0; $i < $nest_level; $i++) {
@@ -412,7 +412,7 @@ class Pref_Feeds extends ProtectedHandler
                         );
 
                     } elseif (strpos($id, "CAT:") === 0) {
-                        $this->process_category_order(
+                        $this->processCategoryOrder(
                             $data_map, $item['_reference'], $item_id,
                             $nest_level+1
                         );
@@ -458,7 +458,7 @@ class Pref_Feeds extends ProtectedHandler
                     $root_item = $item['id'];
                 }
             }
-            $this->process_category_order($data_map, $root_item);
+            $this->processCategoryOrder($data_map, $root_item);
         }
     }
 
@@ -535,9 +535,9 @@ class Pref_Feeds extends ProtectedHandler
 
         @unlink($icon_file);
 
-        print "<script type=\"text/javascript\">";
-        print "parent.uploadIconHandler($rc);";
-        print "</script>";
+        echo "<script type=\"text/javascript\">";
+        echo "parent.uploadIconHandler($rc);";
+        echo "</script>";
         return;
     }
 
@@ -569,14 +569,14 @@ class Pref_Feeds extends ProtectedHandler
             )
         );
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
-        print "<div class=\"dlgSec\">".__("Feed")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
+        echo "<div class=\"dlgSec\">".__("Feed")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
         /* Title */
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
+        echo "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
                 placeHolder=\"".__("Feed Title")."\"
                 style=\"font-size: 16px; width: 20em\" name=\"title\" value=\"$title\">";
 
@@ -588,10 +588,10 @@ class Pref_Feeds extends ProtectedHandler
             0, "feed_url"
         ));
 
-        print "<hr/>";
+        echo "<hr/>";
 
-        print __('URL:') . " ";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
+        echo __('URL:') . " ";
+        echo "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Feed URL")."\"
             regExp='^(http|https)://.*' style=\"width: 20em\"
             name=\"feed_url\" value=\"$feed_url\">";
@@ -599,7 +599,7 @@ class Pref_Feeds extends ProtectedHandler
         $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, "last_error");
 
         if ($last_error) {
-            print "&nbsp;<span title=\"".htmlspecialchars($last_error)."\"
+            echo "&nbsp;<span title=\"".htmlspecialchars($last_error)."\"
                 class=\"feed_error\">(error)</span>";
 
         }
@@ -610,9 +610,9 @@ class Pref_Feeds extends ProtectedHandler
 
             $cat_id = \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
 
-            print "<hr/>";
+            echo "<hr/>";
 
-            print __('Place in category:') . " ";
+            echo __('Place in category:') . " ";
 
             print_feed_cat_select(
                 "cat_id", $cat_id,
@@ -620,10 +620,10 @@ class Pref_Feeds extends ProtectedHandler
             );
         }
 
-        print "</div>";
+        echo "</div>";
 
-        print "<div class=\"dlgSec\">".__("Update")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "<div class=\"dlgSec\">".__("Update")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
         /* Update Interval */
 
@@ -641,8 +641,8 @@ class Pref_Feeds extends ProtectedHandler
 
         $purge_interval = \SmallSmallRSS\Database::fetch_result($result, 0, "purge_interval");
 
-        print "<hr/>";
-        print __('Article purging:') . " ";
+        echo "<hr/>";
+        echo __('Article purging:') . " ";
 
         $form_elements_renderer->renderSelect(
             "purge_interval",
@@ -652,13 +652,13 @@ class Pref_Feeds extends ProtectedHandler
             . ((\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) ? "" : 'disabled="1"')
         );
 
-        print "</div>";
-        print "<div class=\"dlgSec\">".__("Authentication")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "</div>";
+        echo "<div class=\"dlgSec\">".__("Authentication")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
         $auth_login = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "auth_login"));
 
-        print "<input dojoType=\"dijit.form.TextBox\" id=\"feedEditDlg_login\"
+        echo "<input dojoType=\"dijit.form.TextBox\" id=\"feedEditDlg_login\"
             placeHolder=\"".__("Login")."\"
             name=\"auth_login\" value=\"$auth_login\"><hr/>";
 
@@ -670,17 +670,17 @@ class Pref_Feeds extends ProtectedHandler
 
         $auth_pass = htmlspecialchars($auth_pass);
 
-        print "<input dojoType=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
+        echo "<input dojoType=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
             placeHolder=\"".__("Password")."\"
             value=\"$auth_pass\">";
 
-        print "<div dojoType=\"dijit.Tooltip\" connectId=\"feedEditDlg_login\" position=\"below\">
+        echo "<div dojoType=\"dijit.Tooltip\" connectId=\"feedEditDlg_login\" position=\"below\">
             ".__('<b>Hint:</b> you need to fill in your login information if your feed requires authentication, except for Twitter feeds.')."
             </div>";
 
-        print "</div>";
-        print "<div class=\"dlgSec\">".__("Options")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "</div>";
+        echo "<div class=\"dlgSec\">".__("Options")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
         $private = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "private"));
 
@@ -690,7 +690,7 @@ class Pref_Feeds extends ProtectedHandler
             $checked = "";
         }
 
-        print "<input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"private\" id=\"private\"
+        echo "<input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"private\" id=\"private\"
             $checked>&nbsp;<label for=\"private\">".__('Hide from Popular feeds')."</label>";
 
         $include_in_digest = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "include_in_digest"));
@@ -701,7 +701,7 @@ class Pref_Feeds extends ProtectedHandler
             $checked = "";
         }
 
-        print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"include_in_digest\"
+        echo "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"include_in_digest\"
             name=\"include_in_digest\"
             $checked>&nbsp;<label for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
 
@@ -714,7 +714,7 @@ class Pref_Feeds extends ProtectedHandler
             $checked = "";
         }
 
-        print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"always_display_enclosures\"
+        echo "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"always_display_enclosures\"
             name=\"always_display_enclosures\"
             $checked>&nbsp;<label for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
 
@@ -726,7 +726,7 @@ class Pref_Feeds extends ProtectedHandler
             $checked = "";
         }
 
-        print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"hide_images\"
+        echo "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"hide_images\"
         name=\"hide_images\"
             $checked>&nbsp;<label for=\"hide_images\">".
             __('Do not embed images')."</label>";
@@ -739,7 +739,7 @@ class Pref_Feeds extends ProtectedHandler
             $checked = "";
         }
 
-        print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"cache_images\"
+        echo "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"cache_images\"
         name=\"cache_images\"
             $checked>&nbsp;<label for=\"cache_images\">".
             __('Cache images locally')."</label>";
@@ -752,21 +752,21 @@ class Pref_Feeds extends ProtectedHandler
             $checked = "";
         }
 
-        print "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"mark_unread_on_update\"
+        echo "<hr/><input dojoType=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"mark_unread_on_update\"
             name=\"mark_unread_on_update\"
             $checked>&nbsp;<label for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
 
-        print "</div>";
+        echo "</div>";
 
         /* Icon */
 
-        print "<div class=\"dlgSec\">".__("Icon")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "<div class=\"dlgSec\">".__("Icon")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
-        print "<iframe name=\"icon_upload_iframe\"
+        echo "<iframe name=\"icon_upload_iframe\"
             style=\"width: 400px; height: 100px; display: none;\"></iframe>";
 
-        print "<form style='display : block' target=\"icon_upload_iframe\"
+        echo "<form style='display : block' target=\"icon_upload_iframe\"
             enctype=\"multipart/form-data\" method=\"POST\"
             action=\"backend.php\">
             <input id=\"icon_file\" size=\"10\" name=\"icon_file\" type=\"file\">
@@ -779,7 +779,7 @@ class Pref_Feeds extends ProtectedHandler
                 type=\"submit\">".__('Remove')."</button>
             </form>";
 
-        print "</div>";
+        echo "</div>";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::PREFS_EDIT_FEED,
@@ -788,7 +788,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $title = htmlspecialchars($title, ENT_QUOTES);
 
-        print "<div class='dlgButtons'>
+        echo "<div class='dlgButtons'>
             <div style=\"float : left\">
             <button dojoType=\"dijit.form.Button\" onclick='return unsubscribeFeed($feed_id, \"$title\")'>".
             __('Unsubscribe')."</button>";
@@ -797,17 +797,17 @@ class Pref_Feeds extends ProtectedHandler
             $pubsub_state = \SmallSmallRSS\Database::fetch_result($result, 0, "pubsub_state");
             $pubsub_btn_disabled = ($pubsub_state == 2) ? "" : "disabled=\"1\"";
 
-            print "<button dojoType=\"dijit.form.Button\" id=\"pubsubReset_Btn\" $pubsub_btn_disabled
+            echo "<button dojoType=\"dijit.form.Button\" id=\"pubsubReset_Btn\" $pubsub_btn_disabled
                     onclick='return resetPubSub($feed_id, \"$title\")'>".__('Resubscribe to push updates').
                 "</button>";
         }
 
-        print "</div>";
+        echo "</div>";
 
-        print "<div dojoType=\"dijit.Tooltip\" connectId=\"pubsubReset_Btn\" position=\"below\">".
+        echo "<div dojoType=\"dijit.Tooltip\" connectId=\"pubsubReset_Btn\" position=\"below\">".
             __('Resets PubSubHubbub subscription status for push-enabled feeds.')."</div>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').execute()\">".__('Save')."</button>
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').execute()\">".__('Save')."</button>
             <button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').hide()\">".__('Cancel')."</button>
         </div>";
 
@@ -823,18 +823,18 @@ class Pref_Feeds extends ProtectedHandler
             "Enable the options you wish to apply using checkboxes on the right:"
         );
 
-        print "<p>";
+        echo "<p>";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"ids\" value=\"$feed_ids\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchEditSave\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"ids\" value=\"$feed_ids\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchEditSave\">";
 
-        print "<div class=\"dlgSec\">".__("Feed")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "<div class=\"dlgSec\">".__("Feed")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
         /* Title */
 
-        print "<input dojoType=\"dijit.form.ValidationTextBox\"
+        echo "<input dojoType=\"dijit.form.ValidationTextBox\"
             disabled=\"1\" style=\"font-size: 16px; width: 20em;\" required=\"1\"
             name=\"title\" value=\"\">";
 
@@ -842,10 +842,10 @@ class Pref_Feeds extends ProtectedHandler
 
         /* Feed URL */
 
-        print "<br/>";
+        echo "<br/>";
 
-        print __('URL:') . " ";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" disabled=\"1\"
+        echo __('URL:') . " ";
+        echo "<input dojoType=\"dijit.form.ValidationTextBox\" disabled=\"1\"
             required=\"1\" regExp='^(http|https)://.*' style=\"width: 20em\"
             name=\"feed_url\" value=\"\">";
 
@@ -855,9 +855,9 @@ class Pref_Feeds extends ProtectedHandler
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
 
-            print "<br/>";
+            echo "<br/>";
 
-            print __('Place in category:') . " ";
+            echo __('Place in category:') . " ";
 
             print_feed_cat_select(
                 "cat_id", false,
@@ -868,10 +868,10 @@ class Pref_Feeds extends ProtectedHandler
 
         }
 
-        print "</div>";
+        echo "</div>";
 
-        print "<div class=\"dlgSec\">".__("Update")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "<div class=\"dlgSec\">".__("Update")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
         /* Update Interval */
 
@@ -888,8 +888,8 @@ class Pref_Feeds extends ProtectedHandler
         /* Purge intl */
 
         if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
-            print "<br/>";
-            print __('Article purging:') . " ";
+            echo "<br/>";
+            echo __('Article purging:') . " ";
             $renderer = new \SmallSmallRSS\Renderers\FormElements();
             $renderer->renderSelect(
                 "purge_interval",
@@ -901,68 +901,74 @@ class Pref_Feeds extends ProtectedHandler
             $this->renderBatchEditCheckbox("purge_interval");
         }
 
-        print "</div>";
-        print "<div class=\"dlgSec\">".__("Authentication")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "</div>";
+        echo "<div class=\"dlgSec\">".__("Authentication")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
-        print "<input dojoType=\"dijit.form.TextBox\"
+        echo "<input dojoType=\"dijit.form.TextBox\"
             placeHolder=\"".__("Login")."\" disabled=\"1\"
             name=\"auth_login\" value=\"\">";
 
         $this->renderBatchEditCheckbox("auth_login");
 
-        print "<br/><input dojoType=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
+        echo "<br/><input dojoType=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
             placeHolder=\"".__("Password")."\" disabled=\"1\"
             value=\"\">";
 
         $this->renderBatchEditCheckbox("auth_pass");
 
-        print "</div>";
-        print "<div class=\"dlgSec\">".__("Options")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "</div>";
+        echo "<div class=\"dlgSec\">".__("Options")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
-        print "<input disabled=\"1\" type=\"checkbox\" name=\"private\" id=\"private\"
+        echo "<input disabled=\"1\" type=\"checkbox\" name=\"private\" id=\"private\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"private_l\" class='insensitive' for=\"private\">".__('Hide from Popular feeds')."</label>";
 
-        print "&nbsp;"; $this->renderBatchEditCheckbox("private", "private_l");
+        echo "&nbsp;";
+        $this->renderBatchEditCheckbox("private", "private_l");
 
-        print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"include_in_digest\"
+        echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"include_in_digest\"
             name=\"include_in_digest\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"include_in_digest_l\" class='insensitive' for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
 
-        print "&nbsp;"; $this->renderBatchEditCheckbox("include_in_digest", "include_in_digest_l");
+        echo "&nbsp;";
+        $this->renderBatchEditCheckbox("include_in_digest", "include_in_digest_l");
 
-        print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"always_display_enclosures\"
+        echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"always_display_enclosures\"
             name=\"always_display_enclosures\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"always_display_enclosures_l\" class='insensitive' for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
 
-        print "&nbsp;"; $this->renderBatchEditCheckbox("always_display_enclosures", "always_display_enclosures_l");
+        echo "&nbsp;";
+        $this->renderBatchEditCheckbox("always_display_enclosures", "always_display_enclosures_l");
 
-        print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"hide_images\"
+        echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"hide_images\"
             name=\"hide_images\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label class='insensitive' id=\"hide_images_l\"
             for=\"hide_images\">".
             __('Do not embed images')."</label>";
 
-        print "&nbsp;"; $this->renderBatchEditCheckbox("hide_images", "hide_images_l");
+        echo "&nbsp;";
+        $this->renderBatchEditCheckbox("hide_images", "hide_images_l");
 
-        print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"cache_images\"
+        echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"cache_images\"
             name=\"cache_images\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label class='insensitive' id=\"cache_images_l\"
             for=\"cache_images\">".
             __('Cache images locally')."</label>";
 
-        print "&nbsp;"; $this->renderBatchEditCheckbox("cache_images", "cache_images_l");
+        echo "&nbsp;";
+        $this->renderBatchEditCheckbox("cache_images", "cache_images_l");
 
-        print "<br/><input disabled=\"1\" type=\"checkbox\" id=\"mark_unread_on_update\"
+        echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"mark_unread_on_update\"
             name=\"mark_unread_on_update\"
             dojoType=\"dijit.form.CheckBox\">&nbsp;<label id=\"mark_unread_on_update_l\" class='insensitive' for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
 
-        print "&nbsp;"; $this->renderBatchEditCheckbox("mark_unread_on_update", "mark_unread_on_update_l");
+        echo "&nbsp;";
+        $this->renderBatchEditCheckbox("mark_unread_on_update", "mark_unread_on_update_l");
 
-        print "</div>";
+        echo "</div>";
 
-        print "<div class='dlgButtons'>
+        echo "<div class='dlgButtons'>
             <button dojoType=\"dijit.form.Button\"
                 onclick=\"return dijit.byId('feedEditDlg').execute()\">".
             __('Save')."</button>
@@ -1137,7 +1143,7 @@ class Pref_Feeds extends ProtectedHandler
                         "UPDATE ttrss_feeds SET $qpart WHERE id IN ($feed_ids)
                         AND owner_uid = " . $_SESSION["uid"]
                     );
-                    print "<br/>";
+                    echo "<br/>";
                 }
             }
 
@@ -1165,7 +1171,7 @@ class Pref_Feeds extends ProtectedHandler
         $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
 
         foreach ($ids as $id) {
-            Pref_Feeds::remove_feed($id, $_SESSION["uid"]);
+            Pref_Feeds::removeFeed($id, $_SESSION["uid"]);
         }
 
         return;
@@ -1174,7 +1180,7 @@ class Pref_Feeds extends ProtectedHandler
     public function clear()
     {
         $id = $this->getSQLEscapedStringFromRequest("id");
-        $this->clear_feed_articles($id);
+        $this->clearFeedArticles($id);
     }
 
     public function rescore()
@@ -1202,14 +1208,19 @@ class Pref_Feeds extends ProtectedHandler
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $tags = get_article_tags($line["ref_id"]);
                 $article_filters = get_article_filters(
-                    $filters, $line['title'],
-                    $line['content'], $line['link'], strtotime($line['updated']),
-                    $line['author'], $tags
+                    $filters,
+                    $line['title'],
+                    $line['content'],
+                    $line['link'],
+                    strtotime($line['updated']),
+                    $line['author'],
+                    $tags
                 );
 
                 $new_score = calculate_article_score($article_filters);
 
-                if (!$scores[$new_score]) {  $scores[$new_score] = array();
+                if (!$scores[$new_score]) {
+                    $scores[$new_score] = array();
                 }
 
                 array_push($scores[$new_score], $line['ref_id']);
@@ -1237,7 +1248,7 @@ class Pref_Feeds extends ProtectedHandler
             }
         }
 
-        print __("All done.");
+        echo __("All done.");
 
     }
 
@@ -1263,24 +1274,22 @@ class Pref_Feeds extends ProtectedHandler
                      AND feed_id = '$id'
                      AND owner_uid = " . $_SESSION['uid']
             );
-
             $scores = array();
-
             while ($line = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
-
                 $tags = get_article_tags($line["ref_id"]);
-
                 $article_filters = get_article_filters(
-                    $filters, $line['title'],
-                    $line['content'], $line['link'], strtotime($line['updated']),
-                    $line['author'], $tags
+                    $filters,
+                    $line['title'],
+                    $line['content'],
+                    $line['link'],
+                    strtotime($line['updated']),
+                    $line['author'],
+                    $tags
                 );
-
                 $new_score = calculate_article_score($article_filters);
-
-                if (!$scores[$new_score]) {  $scores[$new_score] = array();
+                if (!$scores[$new_score]) {
+                    $scores[$new_score] = array();
                 }
-
                 array_push($scores[$new_score], $line['ref_id']);
             }
 
@@ -1300,7 +1309,7 @@ class Pref_Feeds extends ProtectedHandler
             }
         }
 
-        print __("All done.");
+        echo __("All done.");
 
     }
 
@@ -1335,7 +1344,7 @@ class Pref_Feeds extends ProtectedHandler
     {
         $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
         foreach ($ids as $id) {
-            $this->remove_feed_category($id, $_SESSION["uid"]);
+            $this->removeFeedCategory($id, $_SESSION["uid"]);
         }
     }
 
@@ -1349,8 +1358,8 @@ class Pref_Feeds extends ProtectedHandler
     public function index()
     {
 
-        print "<div dojoType=\"dijit.layout.AccordionContainer\" region=\"center\">";
-        print "<div id=\"pref-feeds-feeds\" dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Feeds')."\">";
+        echo "<div dojoType=\"dijit.layout.AccordionContainer\" region=\"center\">";
+        echo "<div id=\"pref-feeds-feeds\" dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Feeds')."\">";
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(id) AS num_errors
@@ -1396,85 +1405,85 @@ class Pref_Feeds extends ProtectedHandler
             $feed_search = $_SESSION["prefs_feed_search"];
         }
 
-        print '<div dojoType="dijit.layout.BorderContainer" gutters="false">';
+        echo '<div dojoType="dijit.layout.BorderContainer" gutters="false">';
 
-        print "<div region='top' dojoType=\"dijit.Toolbar\">"; #toolbar
+        echo "<div region='top' dojoType=\"dijit.Toolbar\">"; #toolbar
 
-        print "<div style='float : right; padding-right : 4px;'>
+        echo "<div style='float : right; padding-right : 4px;'>
             <input dojoType=\"dijit.form.TextBox\" id=\"feed_search\" size=\"20\" type=\"search\"
                 value=\"$feed_search\">
             <button dojoType=\"dijit.form.Button\" onclick=\"updateFeedList()\">".
             __('Search')."</button>
             </div>";
 
-        print "<div dojoType=\"dijit.form.DropDownButton\">".
+        echo "<div dojoType=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
-        print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
-        print "<div onclick=\"dijit.byId('feedTree').model.setAllChecked(true)\"
+        echo "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+        echo "<div onclick=\"dijit.byId('feedTree').model.setAllChecked(true)\"
             dojoType=\"dijit.MenuItem\">".__('All')."</div>";
-        print "<div onclick=\"dijit.byId('feedTree').model.setAllChecked(false)\"
+        echo "<div onclick=\"dijit.byId('feedTree').model.setAllChecked(false)\"
             dojoType=\"dijit.MenuItem\">".__('None')."</div>";
-        print "</div></div>";
+        echo "</div></div>";
 
-        print "<div dojoType=\"dijit.form.DropDownButton\">".
+        echo "<div dojoType=\"dijit.form.DropDownButton\">".
             "<span>" . __('Feeds')."</span>";
-        print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
-        print "<div onclick=\"quickAddFeed()\"
+        echo "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+        echo "<div onclick=\"quickAddFeed()\"
             dojoType=\"dijit.MenuItem\">".__('Subscribe to feed')."</div>";
-        print "<div onclick=\"editSelectedFeed()\"
+        echo "<div onclick=\"editSelectedFeed()\"
             dojoType=\"dijit.MenuItem\">".__('Edit selected feeds')."</div>";
-        print "<div onclick=\"resetFeedOrder()\"
+        echo "<div onclick=\"resetFeedOrder()\"
             dojoType=\"dijit.MenuItem\">".__('Reset sort order')."</div>";
-        print "<div onclick=\"batchSubscribe()\"
+        echo "<div onclick=\"batchSubscribe()\"
             dojoType=\"dijit.MenuItem\">".__('Batch subscribe')."</div>";
-        print "<div dojoType=\"dijit.MenuItem\" onclick=\"removeSelectedFeeds()\">"
+        echo "<div dojoType=\"dijit.MenuItem\" onclick=\"removeSelectedFeeds()\">"
             .__('Unsubscribe')."</div> ";
-        print "</div></div>";
+        echo "</div></div>";
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
-            print "<div dojoType=\"dijit.form.DropDownButton\">".
+            echo "<div dojoType=\"dijit.form.DropDownButton\">".
                 "<span>" . __('Categories')."</span>";
-            print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
-            print "<div onclick=\"createCategory()\"
+            echo "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+            echo "<div onclick=\"createCategory()\"
                 dojoType=\"dijit.MenuItem\">".__('Add category')."</div>";
-            print "<div onclick=\"resetCatOrder()\"
+            echo "<div onclick=\"resetCatOrder()\"
                 dojoType=\"dijit.MenuItem\">".__('Reset sort order')."</div>";
-            print "<div onclick=\"removeSelectedCategories()\"
+            echo "<div onclick=\"removeSelectedCategories()\"
                 dojoType=\"dijit.MenuItem\">".__('Remove selected')."</div>";
-            print "</div></div>";
+            echo "</div></div>";
 
         }
 
-        print $error_button;
-        print $inactive_button;
+        echo $error_button;
+        echo $inactive_button;
 
         if (defined('_ENABLE_FEED_DEBUGGING')) {
 
-            print "<select id=\"feedActionChooser\" onchange=\"feedActionChange()\">
+            echo "<select id=\"feedActionChooser\" onchange=\"feedActionChange()\">
                 <option value=\"facDefault\" selected>".__('More actions...')."</option>";
 
             if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
-                print "<option value=\"facPurge\">".__('Manual purge')."</option>";
+                echo "<option value=\"facPurge\">".__('Manual purge')."</option>";
             }
 
-            print "
+            echo "
                 <option value=\"facClear\">".__('Clear feed data')."</option>
                 <option value=\"facRescore\">".__('Rescore articles')."</option>";
 
-            print "</select>";
+            echo "</select>";
 
         }
 
-        print "</div>"; # toolbar
+        echo "</div>"; # toolbar
 
         //print '</div>';
-        print '<div dojoType="dijit.layout.ContentPane" region="center">';
+        echo '<div dojoType="dijit.layout.ContentPane" region="center">';
 
-        print "<div id=\"feedlistLoading\">
+        echo "<div id=\"feedlistLoading\">
         <img src='images/indicator_tiny.gif'>".
             __("Loading, please wait...")."</div>";
 
-        print "<div dojoType=\"fox.PrefFeedStore\" jsId=\"feedStore\"
+        echo "<div dojoType=\"fox.PrefFeedStore\" jsId=\"feedStore\"
             url=\"backend.php?op=pref-feeds&method=getfeedtree\">
         </div>
         <div dojoType=\"lib.CheckBoxStoreModel\" jsId=\"feedModel\" store=\"feedStore\"
@@ -1500,27 +1509,23 @@ class Pref_Feeds extends ProtectedHandler
         </script>
         </div>";
 
-        #        print "<div dojoType=\"dijit.Tooltip\" connectId=\"feedTree\" position=\"below\">
-        #            ".__('<b>Hint:</b> you can drag feeds and categories around.')."
-        #            </div>";
+        echo '</div>';
+        echo '</div>';
 
-        print '</div>';
-        print '</div>';
+        echo "</div>"; # feeds pane
 
-        print "</div>"; # feeds pane
-
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('OPML')."\">";
+        echo "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('OPML')."\">";
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             __("Using OPML you can export and import your feeds, filters, labels and Tiny Tiny RSS settings.")
             . __("Only main settings profile can be migrated using OPML.")
         );
 
-        print "<iframe id=\"upload_iframe\"
+        echo "<iframe id=\"upload_iframe\"
             name=\"upload_iframe\" onload=\"opmlImportComplete(this)\"
             style=\"width: 400px; height: 100px; display: none;\"></iframe>";
 
-        print "<form  name=\"opml_form\" style='display : block' target=\"upload_iframe\"
+        echo "<form  name=\"opml_form\" style='display : block' target=\"upload_iframe\"
             enctype=\"multipart/form-data\" method=\"POST\"
             action=\"backend.php\">
             <input id=\"opml_file\" name=\"opml_file\" type=\"file\">&nbsp;
@@ -1529,54 +1534,57 @@ class Pref_Feeds extends ProtectedHandler
             <button dojoType=\"dijit.form.Button\" onclick=\"return opmlImport();\" type=\"submit\">" .
             __('Import my OPML') . "</button>";
 
-        print "<hr>";
+        echo "<hr>";
 
-        print "<p>" . __('Filename:') .
+        echo "<p>" . __('Filename:') .
             " <input type=\"text\" id=\"filename\" value=\"TinyTinyRSS.opml\" />&nbsp;" .
             __('Include settings') . "<input type=\"checkbox\" id=\"settings\" checked=\"1\"/>";
 
-        print "</p><button dojoType=\"dijit.form.Button\"
+        echo "</p><button dojoType=\"dijit.form.Button\"
             onclick=\"gotoExportOpml(document.opml_form.filename.value, document.opml_form.settings.checked)\" >" .
             __('Export OPML') . "</button></p></form>";
 
-        print "<hr>";
+        echo "<hr>";
 
-        print "<p>".__('Your OPML can be published publicly and can be subscribed by anyone who knows the URL below.') . " ";
+        echo "<p>";
+        echo __('Your OPML can be published publicly and can be subscribed by anyone who knows the URL below.') . " ";
 
-        print __("Published OPML does not include your Tiny Tiny RSS settings, feeds that require authentication or feeds hidden from Popular feeds.") . "</p>";
+        echo __("Published OPML does not include your Tiny Tiny RSS settings, feeds that require authentication or feeds hidden from Popular feeds.");
+        echo "</p>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return displayDlg('".__("Public OPML URL")."','pubOPMLUrl')\">".
-            __('Display published OPML URL')."</button> ";
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"return displayDlg('";
+        echo __("Public OPML URL")."','pubOPMLUrl')\">";
+        echo __('Display published OPML URL')."</button> ";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
             "prefFeedsOPML"
         );
 
-        print "</div>"; # pane
+        echo "</div>"; # pane
 
         if (strpos($_SERVER['HTTP_USER_AGENT'], "Firefox") !== false) {
 
-            print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Firefox integration')."\">";
+            echo "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Firefox integration')."\">";
 
             \SmallSmallRSS\Renderers\Messages::renderNotice(
                 __('This Tiny Tiny RSS site can be used as a Firefox Feed Reader by clicking the link below.')
             );
 
-            print "<p>";
+            echo "<p>";
 
-            print "<button onclick='window.navigator.registerContentHandler(" .
+            echo "<button onclick='window.navigator.registerContentHandler(" .
                 "\"application/vnd.mozilla.maybe.feed\", " .
                 "\"" . add_feed_url() . "\", " . " \"Tiny Tiny RSS\")'>" .
                 __('Click here to register this site as a feed reader.') .
                 "</button>";
 
-            print "</p>";
+            echo "</p>";
 
-            print "</div>"; # pane
+            echo "</div>"; # pane
         }
 
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Published & shared articles / Generated feeds')."\">";
+        echo "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Published & shared articles / Generated feeds')."\">";
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             __('Published articles are exported as a public RSS feed and can be subscribed by anyone who knows the URL specified below.')
@@ -1587,43 +1595,43 @@ class Pref_Feeds extends ProtectedHandler
             "/public.php?op=rss&id=-2&view-mode=all_articles"
         );
 
-        print "<p>";
+        echo "<p>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return displayDlg('".__("View as RSS")."','generatedFeed', '$rss_url')\">".
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"return displayDlg('".__("View as RSS")."','generatedFeed', '$rss_url')\">".
             __('Display URL')."</button> ";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return clearFeedAccessKeys()\">".
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"return clearFeedAccessKeys()\">".
             __('Clear all generated URLs')."</button> ";
 
-        print "</p>";
+        echo "</p>";
 
         \SmallSmallRSS\Renderers\Messages::renderWarning(
             __("You can disable all articles shared by unique URLs here.")
         );
 
-        print "<p>";
+        echo "<p>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return clearArticleAccessKeys()\">".
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"return clearArticleAccessKeys()\">".
             __('Unshare all articles')."</button> ";
 
-        print "</p>";
+        echo "</p>";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
             "prefFeedsPublishedGenerated"
         );
 
-        print "</div>"; #pane
+        echo "</div>"; #pane
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::PREFS_TAB,
             "prefFeeds"
         );
 
-        print "</div>"; #container
+        echo "</div>"; #container
     }
 
-    private function feedlist_init_cat($cat_id)
+    private function initFeedlistCat($cat_id)
     {
         $obj = array();
         $cat_id = (int) $cat_id;
@@ -1646,7 +1654,7 @@ class Pref_Feeds extends ProtectedHandler
         return $obj;
     }
 
-    private function feedlist_init_feed($feed_id, $title = false, $unread = false, $error = '', $updated = '')
+    private function initFeedlistFeed($feed_id, $title = false, $unread = false, $error = '', $updated = '')
     {
         $obj = array();
         $feed_id = (int) $feed_id;
@@ -1695,22 +1703,22 @@ class Pref_Feeds extends ProtectedHandler
             ORDER BY last_article"
         );
 
-        print "<p" .__("These feeds have not been updated with new content for 3 months (oldest first):") . "</p>";
+        echo "<p" .__("These feeds have not been updated with new content for 3 months (oldest first):") . "</p>";
 
-        print "<div dojoType=\"dijit.Toolbar\">";
-        print "<div dojoType=\"dijit.form.DropDownButton\">".
+        echo "<div dojoType=\"dijit.Toolbar\">";
+        echo "<div dojoType=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
-        print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
-        print "<div onclick=\"selectTableRows('prefInactiveFeedList', 'all')\"
+        echo "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+        echo "<div onclick=\"selectTableRows('prefInactiveFeedList', 'all')\"
             dojoType=\"dijit.MenuItem\">".__('All')."</div>";
-        print "<div onclick=\"selectTableRows('prefInactiveFeedList', 'none')\"
+        echo "<div onclick=\"selectTableRows('prefInactiveFeedList', 'none')\"
             dojoType=\"dijit.MenuItem\">".__('None')."</div>";
-        print "</div></div>";
-        print "</div>"; #toolbar
+        echo "</div></div>";
+        echo "</div>"; #toolbar
 
-        print "<div class=\"inactiveFeedHolder\">";
+        echo "<div class=\"inactiveFeedHolder\">";
 
-        print "<table width=\"100%\" cellspacing=\"0\" id=\"prefInactiveFeedList\">";
+        echo "<table width=\"100%\" cellspacing=\"0\" id=\"prefInactiveFeedList\">";
 
         $lnum = 1;
 
@@ -1720,42 +1728,42 @@ class Pref_Feeds extends ProtectedHandler
             $this_row_id = "id=\"FUPDD-$feed_id\"";
 
             # class needed for selectTableRows()
-            print "<tr class=\"placeholder\" $this_row_id>";
+            echo "<tr class=\"placeholder\" $this_row_id>";
 
             $edit_title = htmlspecialchars($line["title"]);
 
             # id needed for selectTableRows()
-            print "<td width='5%' align='center'><input
+            echo "<td width='5%' align='center'><input
                 onclick='toggleSelectRow2(this);' dojoType=\"dijit.form.CheckBox\"
                 type=\"checkbox\" id=\"FUPDC-$feed_id\"></td>";
-            print "<td>";
+            echo "<td>";
 
-            print "<a class=\"visibleLink\" href=\"#\" ".
+            echo "<a class=\"visibleLink\" href=\"#\" ".
                 "title=\"".__("Click to edit feed")."\" ".
                 "onclick=\"editFeed(".$line["id"].")\">".
                 htmlspecialchars($line["title"])."</a>";
 
-            print "</td><td class=\"insensitive\" align='right'>";
-            print make_local_datetime($line['last_article'], false);
-            print "</td>";
-            print "</tr>";
+            echo "</td><td class=\"insensitive\" align='right'>";
+            echo make_local_datetime($line['last_article'], false);
+            echo "</td>";
+            echo "</tr>";
 
             ++$lnum;
         }
 
-        print "</table>";
-        print "</div>";
+        echo "</table>";
+        echo "</div>";
 
-        print "<div class='dlgButtons'>";
-        print "<div style='float : left'>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').removeSelected()\">"
+        echo "<div class='dlgButtons'>";
+        echo "<div style='float : left'>";
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').removeSelected()\">"
             .__('Unsubscribe from selected feeds')."</button> ";
-        print "</div>";
+        echo "</div>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').hide()\">".
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').hide()\">".
             __('Close this window')."</button>";
 
-        print "</div>";
+        echo "</div>";
 
     }
 
@@ -1766,20 +1774,20 @@ class Pref_Feeds extends ProtectedHandler
         FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
         );
 
-        print "<div dojoType=\"dijit.Toolbar\">";
-        print "<div dojoType=\"dijit.form.DropDownButton\">".
+        echo "<div dojoType=\"dijit.Toolbar\">";
+        echo "<div dojoType=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
-        print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
-        print "<div onclick=\"selectTableRows('prefErrorFeedList', 'all')\"
+        echo "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+        echo "<div onclick=\"selectTableRows('prefErrorFeedList', 'all')\"
             dojoType=\"dijit.MenuItem\">".__('All')."</div>";
-        print "<div onclick=\"selectTableRows('prefErrorFeedList', 'none')\"
+        echo "<div onclick=\"selectTableRows('prefErrorFeedList', 'none')\"
             dojoType=\"dijit.MenuItem\">".__('None')."</div>";
-        print "</div></div>";
-        print "</div>"; #toolbar
+        echo "</div></div>";
+        echo "</div>"; #toolbar
 
-        print "<div class=\"inactiveFeedHolder\">";
+        echo "<div class=\"inactiveFeedHolder\">";
 
-        print "<table width=\"100%\" cellspacing=\"0\" id=\"prefErrorFeedList\">";
+        echo "<table width=\"100%\" cellspacing=\"0\" id=\"prefErrorFeedList\">";
 
         $lnum = 1;
 
@@ -1789,44 +1797,44 @@ class Pref_Feeds extends ProtectedHandler
             $this_row_id = "id=\"FERDD-$feed_id\"";
 
             # class needed for selectTableRows()
-            print "<tr class=\"placeholder\" $this_row_id>";
+            echo "<tr class=\"placeholder\" $this_row_id>";
 
             $edit_title = htmlspecialchars($line["title"]);
 
             # id needed for selectTableRows()
-            print "<td width='5%' align='center'><input
+            echo "<td width='5%' align='center'><input
                 onclick='toggleSelectRow2(this);' dojoType=\"dijit.form.CheckBox\"
                 type=\"checkbox\" id=\"FERDC-$feed_id\"></td>";
-            print "<td>";
+            echo "<td>";
 
-            print "<a class=\"visibleLink\" href=\"#\" ".
+            echo "<a class=\"visibleLink\" href=\"#\" ".
                 "title=\"".__("Click to edit feed")."\" ".
                 "onclick=\"editFeed(".$line["id"].")\">".
                 htmlspecialchars($line["title"])."</a>: ";
 
-            print "<span class=\"insensitive\">";
-            print htmlspecialchars($line["last_error"]);
-            print "</span>";
+            echo "<span class=\"insensitive\">";
+            echo htmlspecialchars($line["last_error"]);
+            echo "</span>";
 
-            print "</td>";
-            print "</tr>";
+            echo "</td>";
+            echo "</tr>";
 
             ++$lnum;
         }
 
-        print "</table>";
-        print "</div>";
+        echo "</table>";
+        echo "</div>";
 
-        print "<div class='dlgButtons'>";
-        print "<div style='float : left'>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').removeSelected()\">"
+        echo "<div class='dlgButtons'>";
+        echo "<div style='float : left'>";
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').removeSelected()\">"
             .__('Unsubscribe from selected feeds')."</button> ";
-        print "</div>";
+        echo "</div>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').hide()\">".
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').hide()\">".
             __('Close this window')."</button>";
 
-        print "</div>";
+        echo "</div>";
     }
 
     /**
@@ -1836,7 +1844,7 @@ class Pref_Feeds extends ProtectedHandler
      * @param integer $id The id of the feed to purge.
      * @return void
      */
-    private function clear_feed_articles($id)
+    private function clearFeedArticles($id)
     {
 
         if ($id != 0) {
@@ -1857,9 +1865,9 @@ class Pref_Feeds extends ProtectedHandler
         );
 
         \SmallSmallRSS\CountersCache::update($id, $_SESSION['uid']);
-    } // function clear_feed_articles
+    } // function clearFeedArticles
 
-    private function remove_feed_category($id, $owner_uid)
+    private function removeFeedCategory($id, $owner_uid)
     {
 
         \SmallSmallRSS\Database::query(
@@ -1870,73 +1878,65 @@ class Pref_Feeds extends ProtectedHandler
         \SmallSmallRSS\CountersCache::remove($id, $owner_uid, true);
     }
 
-    static function remove_feed($id, $owner_uid)
+    public static function removeFeed($id, $owner_uid)
     {
-
         if ($id > 0) {
-
             /* save starred articles in Archived feed */
-
             \SmallSmallRSS\Database::query("BEGIN");
-
             /* prepare feed if necessary */
-
             $result = \SmallSmallRSS\Database::query(
-                "SELECT feed_url FROM ttrss_feeds WHERE id = $id
-                AND owner_uid = $owner_uid"
+                "SELECT feed_url
+                 FROM ttrss_feeds
+                 WHERE
+                     id = $id
+                     AND owner_uid = $owner_uid"
             );
-
-            $feed_url = \SmallSmallRSS\Database::escape_string(\SmallSmallRSS\Database::fetch_result($result, 0, "feed_url"));
-
+            $feed_url = \SmallSmallRSS\Database::escape_string(
+                \SmallSmallRSS\Database::fetch_result($result, 0, "feed_url")
+            );
             $result = \SmallSmallRSS\Database::query(
-                "SELECT id FROM ttrss_archived_feeds
-                WHERE feed_url = '$feed_url' AND owner_uid = $owner_uid"
+                "SELECT id
+                 FROM ttrss_archived_feeds
+                 WHERE
+                     feed_url = '$feed_url'
+                     AND owner_uid = $owner_uid"
             );
-
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
                 $result = \SmallSmallRSS\Database::query("SELECT MAX(id) AS id FROM ttrss_archived_feeds");
                 $new_feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "id") + 1;
-
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_archived_feeds
-                    (id, owner_uid, title, feed_url, site_url)
-                SELECT $new_feed_id, owner_uid, title, feed_url, site_url from ttrss_feeds
-                WHERE id = '$id'"
+                     (id, owner_uid, title, feed_url, site_url)
+                     SELECT $new_feed_id, owner_uid, title, feed_url, site_url
+                     FROM ttrss_feeds
+                     WHERE id = '$id'"
                 );
-
                 $archive_id = $new_feed_id;
             } else {
                 $archive_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
             }
-
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET feed_id = NULL,
-                orig_feed_id = '$archive_id' WHERE feed_id = '$id' AND
-                    marked = true AND owner_uid = $owner_uid"
+                "UPDATE ttrss_user_entries
+                 SET feed_id = NULL,
+                     orig_feed_id = '$archive_id'
+                 WHERE
+                     feed_id = '$id'
+                     AND marked = true
+                     AND owner_uid = $owner_uid"
             );
 
             /* Remove access key for the feed */
-
-            \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_access_keys WHERE
-                feed_id = '$id' AND owner_uid = $owner_uid"
-            );
-
+            \SmallSmallRSS\AccessKeys::delete($id, $owner_uid);
             /* remove the feed */
-
             \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_feeds
-                    WHERE id = '$id' AND owner_uid = $owner_uid"
+                 WHERE id = '$id' AND owner_uid = $owner_uid"
             );
-
             \SmallSmallRSS\Database::query("COMMIT");
-
             if (file_exists(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico")) {
                 unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico");
             }
-
             \SmallSmallRSS\CountersCache::remove($id, $owner_uid);
-
         } else {
             \SmallSmallRSS\Labels::remove(feed_to_label_id($id), $owner_uid);
         }
@@ -1944,25 +1944,25 @@ class Pref_Feeds extends ProtectedHandler
 
     public function batchSubscribe()
     {
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchaddfeeds\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
+        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchaddfeeds\">";
 
-        print "<table width='100%'><tr><td>
+        echo "<table width='100%'><tr><td>
             ".__("Add one valid RSS feed per line (no feed detection is done)")."
         </td><td align='right'>";
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
-            print __('Place in category:') . " ";
+            echo __('Place in category:') . " ";
             print_feed_cat_select("cat", false, 'dojoType="dijit.form.Select"');
         }
-        print "</td></tr><tr><td colspan='2'>";
-        print "<textarea
+        echo "</td></tr><tr><td colspan='2'>";
+        echo "<textarea
             style='font-size: 12px; width: 100%; height: 200px;'
             placeHolder=\"".__("Feeds to subscribe, One per line")."\"
             dojoType=\"dijit.form.SimpleTextarea\" required=\"1\" name=\"feeds\"></textarea>";
 
-        print "</td></tr><tr><td colspan='2'>";
+        echo "</td></tr><tr><td colspan='2'>";
 
-        print "<div id='feedDlg_loginContainer' style='display: none'>
+        echo "<div id='feedDlg_loginContainer' style='display: none'>
                 " .
             " <input dojoType=\"dijit.form.TextBox\" name='login'\"
                     placeHolder=\"".__("Login")."\"
@@ -1973,22 +1973,26 @@ class Pref_Feeds extends ProtectedHandler
                     style=\"width: 10em;\" name='pass'\">".
             "</div>";
 
-        print "</td></tr><tr><td colspan='2'>";
+        echo "</td></tr><tr><td colspan='2'>";
 
-        print "<div style=\"clear : both\">
+        echo "<div style=\"clear : both\">
             <input type=\"checkbox\" name=\"need_auth\" dojoType=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"
                     onclick='checkboxToggleElement(this, \"feedDlg_loginContainer\")'>
                 <label for=\"feedDlg_loginCheck\">".
             __('Feeds require authentication.')."</div>";
 
-        print "</form>";
+        echo "</form>";
 
-        print "</td></tr></table>";
+        echo "</td></tr></table>";
 
-        print "<div class=\"dlgButtons\">
-            <button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').execute()\">".__('Subscribe')."</button>
-            <button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').hide()\">".__('Cancel')."</button>
-            </div>";
+        echo "<div class=\"dlgButtons\">";
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').execute()\">";
+        echo "__('Subscribe')";
+        echo "</button>";
+        echo "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').hide()\">";
+        echo __('Cancel');
+        echo "</button>";
+        echo "</div>";
     }
 
     public function batchAddFeeds()
@@ -2033,7 +2037,6 @@ class Pref_Feeds extends ProtectedHandler
                             '[Unknown]', $cat_qpart, '$login', '$pass', 0, $auth_pass_encrypted)"
                     );
                 }
-
                 \SmallSmallRSS\Database::query("COMMIT");
             }
         }
@@ -2041,77 +2044,63 @@ class Pref_Feeds extends ProtectedHandler
 
     public function regenOPMLKey()
     {
-        $this->update_feed_access_key(
+        $this->updateFeedAccessKey(
             'OPML:Publish',
-            false, $_SESSION["uid"]
+            false,
+            $_SESSION["uid"]
         );
-
         $new_link = Opml::opml_publish_url();
-
-        print json_encode(array("link" => $new_link));
+        echo json_encode(array("link" => $new_link));
     }
 
     public function regenFeedKey()
     {
         $feed_id = $this->getSQLEscapedStringFromRequest('id');
         $is_cat = $this->getSQLEscapedStringFromRequest('is_cat') == "true";
-
-        $new_key = $this->update_feed_access_key($feed_id, $is_cat);
-
-        print json_encode(array("link" => $new_key));
+        $new_key = $this->updateFeedAccessKey($feed_id, $is_cat);
+        echo json_encode(array("link" => $new_key));
     }
 
 
-    private function update_feed_access_key($feed_id, $is_cat, $owner_uid = false)
+    private function updateFeedAccessKey($feed_id, $is_cat, $owner_uid = false)
     {
-        if (!$owner_uid) {  $owner_uid = $_SESSION["uid"];
+        if (!$owner_uid) {
+            $owner_uid = $_SESSION["uid"];
         }
-
         $sql_is_cat = bool_to_sql_bool($is_cat);
-
         $result = \SmallSmallRSS\Database::query(
             "SELECT access_key FROM ttrss_access_keys
             WHERE feed_id = '$feed_id'    AND is_cat = $sql_is_cat
             AND owner_uid = " . $owner_uid
         );
-
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             $key = \SmallSmallRSS\Database::escape_string(sha1(uniqid(rand(), true)));
-
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_access_keys SET access_key = '$key'
                 WHERE feed_id = '$feed_id' AND is_cat = $sql_is_cat
                 AND owner_uid = " . $owner_uid
             );
-
             return $key;
-
         } else {
             return get_feed_access_key($feed_id, $is_cat, $owner_uid);
         }
     }
 
-    // Silent
     public function clearKeys()
     {
-        \SmallSmallRSS\Database::query(
-            "DELETE FROM ttrss_access_keys WHERE
-            owner_uid = " . $_SESSION["uid"]
-        );
+        \SmallSmallRSS\AccessKeys::clearForOwner($_SESSION["uid"]);
     }
 
-    private function calculate_children_count($cat)
+    private function countChildren($cat)
     {
         $c = 0;
-
         foreach ($cat['items'] as $child) {
             if (isset($child['type']) && $child['type'] == 'category') {
-                $c += $this->calculate_children_count($child);
+                $c += $this->countChildren($child);
             } else {
                 $c += 1;
             }
         }
-
         return $c;
     }
 }

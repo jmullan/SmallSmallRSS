@@ -64,7 +64,7 @@ function startup_gettext()
     }
 }
 
-function _debug($msg, $show=true, $is_debug=true)
+function _debug($msg, $show = true, $is_debug = true)
 {
     \SmallSmallRSS\Logger::debug($msg, $show, $is_debug);
 }
@@ -888,7 +888,9 @@ function getFeedUnread($feed, $is_cat = false)
 
 function getLabelUnread($label_id, $owner_uid = false)
 {
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
 
     $result = \SmallSmallRSS\Database::query(
         "SELECT COUNT(ref_id) AS unread
@@ -985,7 +987,7 @@ function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_ui
     } else {
         $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(post_int_id) AS unread
-             FROM ttrss_tags,ttrss_user_entries,ttrss_entries
+             FROM ttrss_tags, ttrss_user_entries, ttrss_entries
              WHERE
                  tag_name = '$feed'
                  AND post_int_id = int_id
@@ -1224,9 +1226,12 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
 }
 
 function print_feed_select(
-    $id, $default_id = "",
-    $attributes = "", $include_all_feeds = true,
-    $root_id = false, $nest_level = 0
+    $id,
+    $default_id = "",
+    $attributes = "",
+    $include_all_feeds = true,
+    $root_id = false,
+    $nest_level = 0
 ) {
 
     if (!$root_id) {
@@ -1263,11 +1268,18 @@ function print_feed_select(
             $is_selected = ("CAT:".$line["id"] == $default_id) ? "selected=\"1\"" : "";
             printf(
                 "<option $is_selected value='CAT:%d'>%s</option>",
-                $line["id"], htmlspecialchars($line["title"])
+                $line["id"],
+                htmlspecialchars($line["title"])
             );
             if ($line["num_children"] > 0) {
-                print_feed_select($id, $default_id, $attributes,
-                                  $include_all_feeds, $line["id"], $nest_level+1);
+                print_feed_select(
+                    $id,
+                    $default_id,
+                    $attributes,
+                    $include_all_feeds,
+                    $line["id"],
+                    $nest_level + 1
+                );
             }
             $feed_result = \SmallSmallRSS\Database::query(
                 "SELECT id, title
@@ -1285,7 +1297,8 @@ function print_feed_select(
                 }
                 printf(
                     "<option $is_selected value='%d'>%s</option>",
-                    $fline["id"], htmlspecialchars($fline["title"])
+                    $fline["id"],
+                    htmlspecialchars($fline["title"])
                 );
             }
         }
@@ -1309,7 +1322,8 @@ function print_feed_select(
                 }
                 printf(
                     "<option $is_selected value='%d'>%s</option>",
-                    $fline["id"], htmlspecialchars($fline["title"])
+                    $fline["id"],
+                    htmlspecialchars($fline["title"])
                 );
             }
         }
@@ -1324,7 +1338,8 @@ function print_feed_select(
             $is_selected = ($line["id"] == $default_id) ? "selected=\"1\"" : "";
             printf(
                 "<option $is_selected value='%d'>%s</option>",
-                $line["id"], htmlspecialchars($line["title"])
+                $line["id"],
+                htmlspecialchars($line["title"])
             );
         }
     }
@@ -1334,11 +1349,16 @@ function print_feed_select(
 }
 
 function print_feed_cat_select(
-    $id, $default_id,
-    $attributes, $include_all_cats = true, $root_id = false, $nest_level = 0
+    $id,
+    $default_id,
+    $attributes,
+    $include_all_cats = true,
+    $root_id = false,
+    $nest_level = 0
 ) {
     if (!$root_id) {
-        print "<select id=\"$id\" name=\"$id\" default=\"$default_id\" onchange=\"catSelectOnChange(this)\" $attributes>";
+        print "<select id=\"$id\" name=\"$id\" default=\"$default_id\"";
+        print " onchange=\"catSelectOnChange(this)\" $attributes>";
     }
     if ($root_id) {
         $parent_qpart = "parent_cat = '$root_id'";
@@ -1371,8 +1391,11 @@ function print_feed_cat_select(
             $line["title"] = " - " . $line["title"];
         }
         if ($line["title"]) {
-            printf("<option $is_selected value='%d'>%s</option>",
-                   $line["id"], htmlspecialchars($line["title"]));
+            printf(
+                "<option $is_selected value='%d'>%s</option>",
+                $line["id"],
+                htmlspecialchars($line["title"])
+            );
         }
         if ($line["num_children"] > 0) {
             print_feed_cat_select($id, $default_id, $attributes,
@@ -1686,55 +1709,78 @@ function search_to_sql($search)
         switch ($commandpair[0]) {
             case "title":
                 if ($commandpair[1]) {
-                    array_push($query_keywords, "($not (LOWER(ttrss_entries.title) LIKE '%".
-                               \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))");
+                    array_push(
+                        $query_keywords,
+                        "($not (LOWER(ttrss_entries.title) LIKE '%".
+                        \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))"
+                    );
                 } else {
-                    array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
-                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
+                    array_push(
+                        $query_keywords,
+                        "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))"
+                    );
                 }
                 break;
             case "author":
                 if ($commandpair[1]) {
-                    array_push($query_keywords, "($not (LOWER(author) LIKE '%".
-                               \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))");
+                    array_push(
+                        $query_keywords,
+                        "($not (LOWER(author) LIKE '%"
+                        . \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))"
+                    );
                 } else {
-                    array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
-                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
+                    array_push(
+                        $query_keywords,
+                        "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))"
+                    );
                 }
                 break;
             case "note":
                 if ($commandpair[1]) {
-                    if ($commandpair[1] == "true")
+                    if ($commandpair[1] == "true") {
                         array_push($query_keywords, "($not (note IS NOT NULL AND note != ''))");
-                    elseif ($commandpair[1] == "false")
+                    } elseif ($commandpair[1] == "false") {
                         array_push($query_keywords, "($not (note IS NULL OR note = ''))");
-                    else
-                        array_push($query_keywords, "($not (LOWER(note) LIKE '%".
-                                   \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))");
+                    } else {
+                        array_push(
+                            $query_keywords,
+                            "($not (LOWER(note) LIKE '%"
+                            . \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))"
+                        );
+                    }
                 } else {
-                    array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
-                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
+                    array_push(
+                        $query_keywords,
+                        "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))"
+                    );
                 }
                 break;
             case "star":
 
                 if ($commandpair[1]) {
-                    if ($commandpair[1] == "true")
+                    if ($commandpair[1] == "true") {
                         array_push($query_keywords, "($not (marked = true))");
-                    else
+                    } else {
                         array_push($query_keywords, "($not (marked = false))");
+                    }
                 } else {
-                    array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
-                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
+                    array_push(
+                        $query_keywords,
+                        "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))"
+                    );
                 }
                 break;
             case "pub":
                 if ($commandpair[1]) {
-                    if ($commandpair[1] == "true")
+                    if ($commandpair[1] == "true") {
                         array_push($query_keywords, "($not (published = true))");
-                    else
+                    } else {
                         array_push($query_keywords, "($not (published = false))");
-
+                    }
                 } else {
                     array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
                             OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
@@ -1751,8 +1797,11 @@ function search_to_sql($search)
                     $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
                     array_push($query_keywords, "(".$substring_for_date."(updated,1,LENGTH('$k')) $not = '$k')");
                 } else {
-                    array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
-                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
+                    array_push(
+                        $query_keywords,
+                        "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+                         OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))"
+                    );
                 }
         }
     }
@@ -1760,7 +1809,8 @@ function search_to_sql($search)
     return $search_query_part;
 }
 
-function getParentCategories($cat, $owner_uid) {
+function getParentCategories($cat, $owner_uid)
+{
     $rv = array();
     $result = \SmallSmallRSS\Database::query(
         "SELECT parent_cat
@@ -1777,7 +1827,8 @@ function getParentCategories($cat, $owner_uid) {
     return $rv;
 }
 
-function getChildCategories($cat, $owner_uid) {
+function getChildCategories($cat, $owner_uid)
+{
     $rv = array();
     $result = \SmallSmallRSS\Database::query(
         "SELECT id
@@ -1793,7 +1844,21 @@ function getChildCategories($cat, $owner_uid) {
     return $rv;
 }
 
-function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $search_mode, $override_order = false, $offset = 0, $owner_uid = 0, $filter = false, $since_id = 0, $include_children = false, $ignore_vfeed_group = false) {
+function queryFeedHeadlines(
+    $feed,
+    $limit,
+    $view_mode,
+    $cat_view,
+    $search,
+    $search_mode,
+    $override_order = false,
+    $offset = 0,
+    $owner_uid = 0,
+    $filter = false,
+    $since_id = 0,
+    $include_children = false,
+    $ignore_vfeed_group = false
+) {
     $last_updated = 0;
     $last_error = 0;
     $feed_site_url = '';
@@ -1832,7 +1897,8 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
             "SELECT true AS true_val
              FROM ttrss_entries, ttrss_user_entries, ttrss_feeds
              WHERE $filter_query_part
-             LIMIT 1", false
+             LIMIT 1",
+            false
         );
         if ($result) {
             $test = \SmallSmallRSS\Database::fetch_result($result, 0, "true_val");
@@ -2083,7 +2149,9 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
                     $query_strategy_part ORDER BY $order_by
                     $limit_query_part $offset_query_part";
 
-        if (!empty($_REQUEST["debug"])) print $query;
+        if (!empty($_REQUEST["debug"])) {
+            print $query;
+        }
 
         $result = \SmallSmallRSS\Database::query($query);
 
@@ -2160,7 +2228,8 @@ function queryFeedHeadlines($feed, $limit, $view_mode, $cat_view, $search, $sear
     return array($result, $feed_title, $feed_site_url, $last_error, $last_updated);
 }
 
-function sanitize($str, $force_remove_images = false, $owner = false, $site_url = false) {
+function sanitize($str, $force_remove_images = false, $owner = false, $site_url = false)
+{
     if (!$owner) {
         $owner = $_SESSION["uid"];
     }
@@ -2318,55 +2387,71 @@ function catchupArticlesById($ids, $cmode, $owner_uid = false)
             "UPDATE ttrss_user_entries
              SET unread = false, last_read = NOW()
              WHERE ($ids_qpart) AND owner_uid = $owner_uid"
-    );
+        );
     } elseif ($cmode == 1) {
-        \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries SET
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries SET
             unread = true
-            WHERE ($ids_qpart) AND owner_uid = $owner_uid");
+            WHERE ($ids_qpart) AND owner_uid = $owner_uid"
+        );
     } else {
-        \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries SET
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries SET
             unread = NOT unread,last_read = NOW()
-            WHERE ($ids_qpart) AND owner_uid = $owner_uid");
+            WHERE ($ids_qpart) AND owner_uid = $owner_uid"
+        );
     }
 
     /* update ccache */
-
-    $result = \SmallSmallRSS\Database::query("SELECT DISTINCT feed_id FROM ttrss_user_entries
-            WHERE ($ids_qpart) AND owner_uid = $owner_uid");
-
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT DISTINCT feed_id
+         FROM ttrss_user_entries
+         WHERE ($ids_qpart) AND owner_uid = $owner_uid"
+    );
     while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
         \SmallSmallRSS\CountersCache::update($line["feed_id"], $owner_uid);
     }
 }
 
-function get_article_tags($id, $owner_uid = 0, $tag_cache = false) {
+function get_article_tags($id, $owner_uid = 0, $tag_cache = false)
+{
 
     $a_id = \SmallSmallRSS\Database::escape_string($id);
 
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
 
-    $query = "SELECT DISTINCT tag_name,
-            owner_uid as owner FROM
-            ttrss_tags WHERE post_int_id = (SELECT int_id FROM ttrss_user_entries WHERE
-            ref_id = '$a_id' AND owner_uid = '$owner_uid' LIMIT 1) ORDER BY tag_name";
+
 
     $tags = array();
 
     /* check cache first */
 
     if ($tag_cache === false) {
-        $result = \SmallSmallRSS\Database::query("SELECT tag_cache FROM ttrss_user_entries
-                WHERE ref_id = '$id' AND owner_uid = $owner_uid");
-
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT tag_cache FROM ttrss_user_entries
+             WHERE ref_id = '$id' AND owner_uid = $owner_uid"
+        );
         $tag_cache = \SmallSmallRSS\Database::fetch_result($result, 0, "tag_cache");
     }
-
     if ($tag_cache) {
         $tags = explode(",", $tag_cache);
     } else {
 
         /* do it the hard way */
-
+        $query = "SELECT DISTINCT tag_name,
+                  owner_uid as owner
+              FROM
+                  ttrss_tags
+              WHERE post_int_id = (
+                  SELECT int_id
+                  FROM ttrss_user_entries
+                  WHERE
+                      ref_id = '$a_id'
+                      AND owner_uid = '$owner_uid'
+                  LIMIT 1
+              ) ORDER BY tag_name";
         $tmp_result = \SmallSmallRSS\Database::query($query);
 
         while ($tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
@@ -2377,82 +2462,82 @@ function get_article_tags($id, $owner_uid = 0, $tag_cache = false) {
 
         $tags_str = \SmallSmallRSS\Database::escape_string(join(",", $tags));
 
-        \SmallSmallRSS\Database::query("UPDATE ttrss_user_entries
-                SET tag_cache = '$tags_str' WHERE ref_id = '$id'
-                AND owner_uid = $owner_uid");
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET tag_cache = '$tags_str'
+             WHERE ref_id = '$id'
+             AND owner_uid = $owner_uid"
+        );
     }
 
     return $tags;
 }
 
-function trim_array($array) {
+function trim_array($array)
+{
     $tmp = $array;
     array_walk($tmp, 'trim');
     return $tmp;
 }
 
-function tag_is_valid($tag) {
-    if ($tag == '') return false;
-    if (preg_match("/^[0-9]*$/", $tag)) return false;
-    if (mb_strlen($tag) > 250) return false;
+function tag_is_valid($tag)
+{
+    if ($tag == '') {
+        return false;
+    }
+    if (preg_match("/^[0-9]*$/", $tag)) {
+        return false;
+    }
+    if (mb_strlen($tag) > 250) {
+        return false;
+    }
 
     if (function_exists('iconv')) {
         $tag = iconv("utf-8", "utf-8", $tag);
     }
 
-    if (!$tag) return false;
-
+    if (!$tag) {
+        return false;
+    }
     return true;
 }
 
-function T_sprintf() {
+function T_sprintf()
+{
     $args = func_get_args();
     return vsprintf(__(array_shift($args)), $args);
 }
 
-function format_inline_player($url, $ctype) {
-
+function format_inline_player($url, $ctype)
+{
     $entry = "";
-
     $url = htmlspecialchars($url);
-
     if (strpos($ctype, "audio/") === 0) {
-
-        if ($_SESSION["hasAudio"] && (strpos($ctype, "ogg") !== false ||
-                                      $_SESSION["hasMp3"])) {
-
+        if ($_SESSION["hasAudio"]
+            && (strpos($ctype, "ogg") !== false || $_SESSION["hasMp3"])
+        ) {
             $entry .= "<audio preload=\"none\" controls>
-                    <source type=\"$ctype\" src=\"$url\"></source>
-                    </audio>";
-
+                         <source type=\"$ctype\" src=\"$url\"></source>
+                       </audio>";
         } else {
-
             $entry .= "<object type=\"application/x-shockwave-flash\"
-                    data=\"lib/button/musicplayer.swf?song_url=$url\"
-                    width=\"17\" height=\"17\" style='float : left; margin-right : 5px;'>
-                    <param name=\"movie\"
-                        value=\"lib/button/musicplayer.swf?song_url=$url\" />
-                    </object>";
+                        data=\"lib/button/musicplayer.swf?song_url=$url\"
+                        width=\"17\" height=\"17\" style='float : left; margin-right : 5px;'>
+                         <param name=\"movie\" value=\"lib/button/musicplayer.swf?song_url=$url\" />
+                       </object>";
         }
-
-        if ($entry) $entry .= "&nbsp; <a target=\"_blank\"
-                href=\"$url\">" . basename($url) . "</a>";
-
-        return $entry;
-
+        if ($entry) {
+            $entry .= "&nbsp; <a target=\"_blank\" href=\"$url\">" . basename($url) . "</a>";
+        }
     }
-
-    return "";
-
-    /*        $filename = substr($url, strrpos($url, "/")+1);
-
-        $entry .= " <a target=\"_blank\" href=\"" . htmlspecialchars($url) . "\">" .
-                $filename . " (" . $ctype . ")" . "</a>"; */
-
+    return $entry;
 }
 
-function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_uid = false) {
-    if (!$owner_uid) $owner_uid = $_SESSION["uid"];
+function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_uid = false)
+{
+    if (!$owner_uid) {
+        $owner_uid = $_SESSION["uid"];
+    }
 
     $rv = array();
 
@@ -2463,14 +2548,12 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
 
     $result = \SmallSmallRSS\Database::query(
         "SELECT feed_id FROM ttrss_user_entries
-        WHERE ref_id = '$id'"
+         WHERE ref_id = '$id'"
     );
 
     $feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "feed_id");
 
     $rv['feed_id'] = $feed_id;
-
-    //if (!$zoom_mode) { print "<article id='$id'><![CDATA["; };
 
     if ($mark_as_read) {
         $result = \SmallSmallRSS\Database::query(
@@ -2665,13 +2748,15 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
     return $rv;
 }
 
-function print_checkpoint($n, $s) {
+function print_checkpoint($n, $s)
+{
     $ts = microtime(true);
     echo sprintf("<!-- CP[$n] %.4f seconds -->\n", $ts - $s);
     return $ts;
 }
 
-function sanitize_tag($tag) {
+function sanitize_tag($tag)
+{
     $tag = trim($tag);
     $tag = mb_strtolower($tag, 'utf-8');
     $tag = preg_replace('/[\'\"\+\>\<]/', "", $tag);
@@ -2681,7 +2766,8 @@ function sanitize_tag($tag) {
     return $tag;
 }
 
-function get_self_url_prefix() {
+function get_self_url_prefix()
+{
     $self_url_path = \SmallSmallRSS\Config::get('SELF_URL_PATH');
     if (strrpos($self_url_path, "/") === strlen($self_url_path) - 1) {
         return substr($self_url_path, 0, strlen($self_url_path) - 1);
@@ -2712,7 +2798,8 @@ function encrypt_password($pass, $salt = '', $mode2 = false)
     }
 }
 
-function load_filters($feed_id, $owner_uid, $action_id = false) {
+function load_filters($feed_id, $owner_uid, $action_id = false)
+{
     $filters = array();
     $cat_id = (int) getFeedCategory($feed_id);
     $result = \SmallSmallRSS\Database::query(
@@ -2758,11 +2845,14 @@ function load_filters($feed_id, $owner_uid, $action_id = false) {
             array_push($rules, $rule);
         }
 
-        $result2 = \SmallSmallRSS\Database::query("SELECT a.action_param,t.name AS type_name
-                FROM ttrss_filters2_actions AS a,
-                ttrss_filter_actions AS t
-                WHERE
-                    action_id = t.id AND filter_id = '$filter_id'");
+        $result2 = \SmallSmallRSS\Database::query(
+            "SELECT a.action_param,t.name AS type_name
+             FROM
+                 ttrss_filters2_actions AS a,
+                 ttrss_filter_actions AS t
+             WHERE
+                 action_id = t.id AND filter_id = '$filter_id'"
+        );
 
         while ($action_line = \SmallSmallRSS\Database::fetch_assoc($result2)) {
             #                print_r($action_line);
@@ -3177,49 +3267,6 @@ function sphinx_search($query, $offset = 0, $limit = 30)
     return $ids;
 }
 
-function cleanup_tags($days = 14, $limit = 1000)
-{
-
-    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-        $interval_query = "date_updated < NOW() - INTERVAL '$days days'";
-    } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
-        $interval_query = "date_updated < DATE_SUB(NOW(), INTERVAL $days DAY)";
-    }
-
-    $tags_deleted = 0;
-
-    while ($limit > 0) {
-        $limit_part = 500;
-
-        $query = "SELECT ttrss_tags.id AS id
-                  FROM ttrss_tags, ttrss_user_entries, ttrss_entries
-                  WHERE
-                      post_int_id = int_id
-                      AND $interval_query
-                      AND ref_id = ttrss_entries.id AND tag_cache != ''
-                  LIMIT $limit_part";
-
-        $result = \SmallSmallRSS\Database::query($query);
-
-        $ids = array();
-
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            array_push($ids, $line['id']);
-        }
-
-        if (count($ids) > 0) {
-            $ids = join(",", $ids);
-            $tmp_result = \SmallSmallRSS\Database::query("DELETE FROM ttrss_tags WHERE id IN ($ids)");
-            $tags_deleted += \SmallSmallRSS\Database::affected_rows($tmp_result);
-        } else {
-            break;
-        }
-
-        $limit -= $limit_part;
-    }
-
-    return $tags_deleted;
-}
 
 
 function rewrite_urls($html)

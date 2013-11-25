@@ -97,10 +97,15 @@ if (!$lock_handle) {
 }
 \SmallSmallRSS\Sanity::schemaOrDie();
 
+
 // Protip: children close shared database handle when terminating, it's a bad idea to
 // do database stuff on main process from now on.
 
 while (true) {
+    // Divide out the configured number of updates evenly into jobs.
+    $daemon_feed_limit = \SmallSmallRSS\Config::get('DAEMON_FEED_LIMIT');
+    $fractional_updates = $daemon_feed_limit % $max_jobs;
+    $base_num_updates = (($daemon_feed_limit - $fractional_updates) / $max_jobs);
 
     // Since sleep is interupted by SIGCHLD, we need another way to
     // respect the spawn interval
@@ -114,8 +119,18 @@ while (true) {
     if ($last_checkpoint + $spawn_interval < time()) {
         \SmallSmallRSS\Daemon::kill_stuck_children();
         \SmallSmallRSS\Daemon::reap_children();
-
         for ($j = \SmallSmallRSS\Daemon::running_jobs(); $j < $max_jobs; $j++) {
+            $num_updates = $base_num_updates;
+            if ($j < $fractional_updates) {
+                // Add in the remainder of the update jobs. It's probably wiser
+                // to just make daemon_feed_limit evenly divisible by max_jobs
+                $num_updates += 1;
+            }
+            if (!$num_updates) {
+                // Only spawn jobs if there are updates for them to do
+                continue;
+            }
+
             $pid = pcntl_fork();
             if ($pid == -1) {
                 die("fork failed!\n");
@@ -127,25 +142,19 @@ while (true) {
                     register_shutdown_function('shutdown', posix_getpid());
                     $master_handlers_installed = true;
                 }
-
                 _debug("[MASTER] spawned client $j [PID:$pid]...");
                 \SmallSmallRSS\Daemon::track_pid($pid);
             } else {
                 pcntl_signal(SIGCHLD, SIG_IGN);
                 pcntl_signal(SIGINT, 'task_sigint_handler');
-
                 register_shutdown_function('task_shutdown');
-
                 $quiet = (isset($options["quiet"])) ? "--quiet" : "";
-
                 $my_pid = posix_getpid();
-
                 passthru(
                     \SmallSmallRSS\Config::get('PHP_EXECUTABLE')
-                    . " update.php --daemon-loop $quiet --task $j --pidlock $my_pid"
+                    . " update.php --daemon-loop $quiet --task $j --pidlock $my_pid --numupdates $num_updates"
                 );
                 sleep(1);
-
                 // We exit in order to avoid fork bombing.
                 exit(0);
             }

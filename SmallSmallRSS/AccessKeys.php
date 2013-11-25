@@ -33,4 +33,11 @@ class AccessKeys
             return $key;
         }
     }
+    public static function clearForOwner($owner_uid)
+    {
+        \SmallSmallRSS\Database::query(
+            "DELETE FROM ttrss_access_keys
+             WHERE owner_uid = $owner_uid"
+        );
+    }
 }

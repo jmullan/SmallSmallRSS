@@ -448,7 +448,6 @@ class API extends Handler
 
     public function updateFeed()
     {
-        require_once "include/rssfuncs.php";
         $feed_id = (int) $this->getSQLEscapedStringFromRequest("feed_id");
         \SmallSmallRSS\RSSUpdater::updateFeed($feed_id);
         $this->wrap(self::STATUS_OK, array("status" => "OK"));

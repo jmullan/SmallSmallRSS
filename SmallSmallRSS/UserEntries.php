@@ -248,4 +248,14 @@ class UserEntries
             );
         }
     }
+
+    public static function markUnread($ref_id)
+    {
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET last_read = null,
+                 unread = true
+             WHERE ref_id = '$ref_id'"
+        );
+    }
 }

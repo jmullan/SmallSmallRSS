@@ -937,7 +937,6 @@ function get_pgsql_version()
  */
 function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
 {
-    require_once __DIR__ . "/rssfuncs.php";
     $url = fix_url($url);
     if (!$url || !validate_feed_url($url)) {
         return array("code" => 2);
@@ -2031,44 +2030,28 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     $xpath = new DOMXPath($doc);
 
     $entries = $xpath->query('(//a[@href]|//img[@src])');
-
     foreach ($entries as $entry) {
         if ($site_url) {
             if ($entry->hasAttribute('href')) {
-                $entry->setAttribute(
-                    'href',
-                    rewrite_relative_url($site_url, $entry->getAttribute('href'))
-                );
+                $entry->setAttribute('href', rewrite_relative_url($site_url, $entry->getAttribute('href')));
                 $entry->setAttribute('rel', 'noreferrer');
             }
-            if ($entry->hasAttribute('src')) {
-                $src = rewrite_relative_url($site_url, $entry->getAttribute('src'));
-                $cached_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . '/images/' . sha1($src) . '.png';
-                if (file_exists($cached_filename)) {
-                    $src = \SmallSmallRSS\Config::get('SELF_URL_PATH') . '/image.php?hash=' . sha1($src);
-                }
-                $entry->setAttribute('src', $src);
-            }
-
             if ($entry->nodeName == 'img') {
+                if ($entry->hasAttribute('src')) {
+                    \SmallSmallRSS\ImageCache::processEntry($entry, false);
+                }
                 if (($owner && \SmallSmallRSS\DBPrefs::read("STRIP_IMAGES", $owner)) ||
                     $force_remove_images || !empty($_SESSION["bw_limit"])) {
-
                     $p = $doc->createElement('p');
-
                     $a = $doc->createElement('a');
                     $a->setAttribute('href', $entry->getAttribute('src'));
-
                     $a->appendChild(new DOMText($entry->getAttribute('src')));
                     $a->setAttribute('target', '_blank');
-
                     $p->appendChild($a);
-
                     $entry->parentNode->replaceChild($p, $entry);
                 }
             }
         }
-
         if (strtolower($entry->nodeName) == "a") {
             $entry->setAttribute("target", "_blank");
         }

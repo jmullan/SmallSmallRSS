@@ -46,18 +46,18 @@ class Labels
         }
         $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT
-                label_id,
-                caption,
-                fg_color,
-                bg_color
-            FROM
-                ttrss_labels2,
-                ttrss_user_labels2
-            WHERE
-                id = label_id
-                AND article_id = '$id'
-                AND owner_uid = $owner_uid
-            ORDER BY caption"
+                 label_id,
+                 caption,
+                 fg_color,
+                 bg_color
+             FROM
+                 ttrss_labels2,
+                 ttrss_user_labels2
+             WHERE
+                 id = label_id
+                 AND article_id = '$id'
+                 AND owner_uid = $owner_uid
+             ORDER BY caption"
         );
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $rk = array(
@@ -115,12 +115,13 @@ class Labels
     public static function clearCache($id)
     {
         \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_user_entries SET
-            label_cache = '' WHERE ref_id = '$id'"
+            "UPDATE ttrss_user_entries
+             SET label_cache = ''
+             WHERE ref_id = '$id'"
         );
     }
 
-    public static function removeArticle($id, $label, $owner_uid)
+    public static function removeArticle($article_id, $label, $owner_uid)
     {
         $label_id = self::findID($label, $owner_uid);
         if (!$label_id) {
@@ -128,14 +129,14 @@ class Labels
         }
         $result = \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_user_labels2
-            WHERE
-                label_id = '$label_id'
-                AND article_id = '$id'"
+             WHERE
+                 label_id = '$label_id'
+                 AND article_id = '$article_id'"
         );
-        self::clearCache($id);
+        self::clearCache($article_id);
     }
 
-    public static function addArticle($id, $label, $owner_uid)
+    public static function addArticle($article_id, $label, $owner_uid)
     {
         $label_id = self::findID($label, $owner_uid);
         if (!$label_id) {
@@ -143,25 +144,25 @@ class Labels
         }
         $result = \SmallSmallRSS\Database::query(
             "SELECT
-                article_id
-            FROM
-                ttrss_labels2,
-                ttrss_user_labels2
-            WHERE
-                label_id = id
-                AND label_id = '$label_id'
-                AND article_id = '$id'
-                AND owner_uid = '$owner_uid'
-            LIMIT 1"
+                 article_id
+             FROM
+                 ttrss_labels2,
+                 ttrss_user_labels2
+             WHERE
+                 label_id = id
+                 AND label_id = '$label_id'
+                 AND article_id = '$article_id'
+                 AND owner_uid = '$owner_uid'
+             LIMIT 1"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
             \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_user_labels2
-                (label_id, article_id)
-                VALUES ('$label_id', '$id')"
+                 (label_id, article_id)
+                 VALUES ('$label_id', '$article_id')"
             );
         }
-        self::clearCache($id);
+        self::clearCache($article_id);
     }
 
     public static function remove($id, $owner_uid)
@@ -258,7 +259,8 @@ class Labels
         }
 
     }
-    public static function getAll($owner_uid, $order_by='caption')
+
+    public static function getAll($owner_uid, $order_by = 'caption')
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT *
@@ -273,5 +275,13 @@ class Labels
         return $rv;
     }
 
-
+    public static function containsCaption($labels, $caption)
+    {
+        foreach ($labels as $label) {
+            if ($label[1] == $caption) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

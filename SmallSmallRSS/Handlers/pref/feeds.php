@@ -1185,8 +1185,6 @@ class Pref_Feeds extends ProtectedHandler
 
     public function rescore()
     {
-        require_once "rssfuncs.php";
-
         $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
 
         foreach ($ids as $id) {
@@ -1207,7 +1205,7 @@ class Pref_Feeds extends ProtectedHandler
             $scores = array();
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $tags = get_article_tags($line["ref_id"]);
-                $article_filters = get_article_filters(
+                $article_filters = \SmallSmallRSS\ArticleFilters::get(
                     $filters,
                     $line['title'],
                     $line['content'],
@@ -1217,7 +1215,7 @@ class Pref_Feeds extends ProtectedHandler
                     $tags
                 );
 
-                $new_score = calculate_article_score($article_filters);
+                $new_score = \SmallSmallRSS\ArticleFilters::calculateScore($article_filters);
 
                 if (!$scores[$new_score]) {
                     $scores[$new_score] = array();
@@ -1277,7 +1275,7 @@ class Pref_Feeds extends ProtectedHandler
             $scores = array();
             while ($line = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
                 $tags = get_article_tags($line["ref_id"]);
-                $article_filters = get_article_filters(
+                $article_filters = \SmallSmallRSS\ArticleFilters::get(
                     $filters,
                     $line['title'],
                     $line['content'],
@@ -1286,7 +1284,7 @@ class Pref_Feeds extends ProtectedHandler
                     $line['author'],
                     $tags
                 );
-                $new_score = calculate_article_score($article_filters);
+                $new_score = \SmallSmallRSS\ArticleFilters::calculateScore($article_filters);
                 if (!$scores[$new_score]) {
                     $scores[$new_score] = array();
                 }

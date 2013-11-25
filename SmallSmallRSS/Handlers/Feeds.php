@@ -195,7 +195,6 @@ class Feeds extends ProtectedHandler
                 $cache_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "cache_images"));
 
                 if (!$cache_images && time() - $last_updated > 120 || isset($_REQUEST['DevForceUpdate'])) {
-                    include "rssfuncs.php";
                     \SmallSmallRSS\RSSUpdater::updateFeed($feed, true);
                 } else {
                     \SmallSmallRSS\Database::query(
@@ -208,7 +207,7 @@ class Feeds extends ProtectedHandler
             }
         }
 
-        if ($method_split[0] == "MarkAllReadGR")  {
+        if ($method_split[0] == "MarkAllReadGR") {
             \SmallSmallRSS\UserEntries::catchupFeed($method_split[1], false, $_SESSION['uid']);
         }
 

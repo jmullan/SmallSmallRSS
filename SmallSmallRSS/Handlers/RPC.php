@@ -701,7 +701,6 @@ class RPC extends ProtectedHandler
         );
 
         $feed_id = -1;
-        require_once "rssfuncs.php";
         $num_updated = 0;
         $tstart = time();
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {

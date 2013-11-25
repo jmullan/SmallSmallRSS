@@ -4,7 +4,6 @@ require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
 
 chdir(dirname(__FILE__));
 
-require_once __DIR__ . "/include/rssfuncs.php";
 \SmallSmallRSS\Sanity::initialCheck();
 
 \SmallSmallRSS\PluginHost::init_all();

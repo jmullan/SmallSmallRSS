@@ -6,16 +6,10 @@ function _debug($msg, $show = true, $is_debug = true)
 
 function initialize_user_prefs($uid, $profile = false)
 {
-    $uid = \SmallSmallRSS\Database::escape_string($uid);
     \SmallSmallRSS\Database::query("BEGIN");
     $active_prefs = \SmallSmallRSS\UserPrefs::getActive($uid, $profile);
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT pref_name, def_value
-         FROM ttrss_prefs"
-    );
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        $pref_name = $line["pref_name"];
-        $value = $line["def_value"];
+    $default_prefs = \SmallSmallRSS\Prefs::getAll();
+    foreach ($default_prefs as $pref_name => $value) {
         if (!isset($active_prefs[$pref_name])) {
             \SmallSmallRSS\UserPrefs::insert($pref_name, $value, $uid, $profile);
         }

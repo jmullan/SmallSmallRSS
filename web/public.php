@@ -2,7 +2,7 @@
 require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Session::init();
 
-startup_gettext();
+\SmallSmallRSS\Locale::startupGettext();
 
 $script_started = microtime(true);
 

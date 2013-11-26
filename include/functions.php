@@ -1,79 +1,9 @@
 <?php
 
-/**
- * Return available translations names.
- *
- * @access public
- * @return array A array of available translations.
- */
-function get_translations()
-{
-    $tr = array(
-        "auto" => "Detect automatically",
-        "ca_CA" => "Català",
-        "cs_CZ" => "Česky",
-        "en_US" => "English",
-        "es_ES" => "Español",
-        "de_DE" => "Deutsch",
-        "fr_FR" => "Français",
-        "hu_HU" => "Magyar (Hungarian)",
-        "it_IT" => "Italiano",
-        "ja_JP" => "日本語 (Japanese)",
-        "ko_KR" => "한국어 (Korean)",
-        "lv_LV" => "Latviešu",
-        "nb_NO" => "Norwegian bokmål",
-        "nl_NL" => "Dutch",
-        "pl_PL" => "Polski",
-        "ru_RU" => "Русский",
-        "pt_BR" => "Portuguese/Brazil",
-        "zh_CN" => "Simplified Chinese",
-        "sv_SE" => "Svenska",
-        "fi_FI" => "Suomi"
-    );
-    return $tr;
-}
-
-require_once __DIR__ . "/../lib/gettext/gettext.inc";
-
-function startup_gettext()
-{
-
-    # Get locale from Accept-Language header
-    $locale = \AcceptToGettext\Scorer::al2gt(
-        array_keys(get_translations()),
-        "text/html"
-    );
-    $forced_locale = \SmallSmallRSS\Config::get('FORCE_LOCALE');
-    if ($forced_locale and $forced_locale != 'auto') {
-        $locale = $forced_locale;
-    }
-    if (!empty($_SESSION["uid"])
-        && \SmallSmallRSS\Sanity::getSchemaVersion() >= 120) {
-        $pref_locale = \SmallSmallRSS\DBPrefs::read("USER_LANGUAGE", $_SESSION["uid"]);
-        if ($pref_locale && $pref_locale != 'auto') {
-            $locale = $pref_locale;
-        }
-    }
-    if ($locale) {
-        if (defined('LC_MESSAGES')) {
-            _setlocale(LC_MESSAGES, $locale);
-        } elseif (defined('LC_ALL')) {
-            _setlocale(LC_ALL, $locale);
-        }
-        _bindtextdomain("messages", "locale");
-        _textdomain("messages");
-        _bind_textdomain_codeset("messages", "UTF-8");
-    }
-}
 
 function _debug($msg, $show = true, $is_debug = true)
 {
     \SmallSmallRSS\Logger::debug($msg, $show, $is_debug);
-}
-
-function purge_orphans($do_output = false)
-{
-    \SmallSmallRSS\Entries::purgeOrphans();
 }
 
 function get_feed_update_interval($feed_id)
@@ -390,7 +320,7 @@ function login_sequence()
         }
 
         if ($_SESSION["uid"]) {
-            startup_gettext();
+            \SmallSmallRSS\Locale::startupGettext();
             load_user_plugins($_SESSION["uid"]);
             /* cleanup ccache */
             \SmallSmallRSS\CountersCache::cleanup($_SESSION["uid"]);

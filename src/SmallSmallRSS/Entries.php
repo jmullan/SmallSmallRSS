@@ -1,8 +1,10 @@
 <?php
 namespace SmallSmallRSS;
 
-class Entries {
-    public static function purgeOrphans() {
+class Entries
+{
+    public static function purgeOrphans()
+    {
         // purge orphaned posts in main content table
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_entries

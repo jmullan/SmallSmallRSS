@@ -179,7 +179,7 @@ class RPC extends ProtectedHandler
         WHERE ref_id IN ($ids) AND owner_uid = " . $_SESSION["uid"]
         );
 
-        purge_orphans();
+        \SmallSmallRSS\Entries::purgeOrphans();
 
         print json_encode(array("message" => "UPDATE_COUNTERS"));
     }
@@ -711,7 +711,7 @@ class RPC extends ProtectedHandler
             }
         }
         // Purge orphans and cleanup tags
-        purge_orphans();
+        \SmallSmallRSS\Entries::purgeOrphans();
         \SmallSmallRSS\Tags::clearExpired(14);
         if ($num_updated > 0) {
             print json_encode(

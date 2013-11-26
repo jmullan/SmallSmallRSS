@@ -633,7 +633,7 @@ class Pref_Prefs extends ProtectedHandler
                 $form_element_renderer->renderSelect(
                     $pref_name,
                     $value,
-                    get_translations(),
+                    \SmallSmallRSS\Locale::$translations,
                     "style='width: 220px; margin : 0px' dojoType='dijit.form.Select'"
                 );
 

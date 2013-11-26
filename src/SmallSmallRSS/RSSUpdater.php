@@ -139,7 +139,7 @@ class RSSUpdater
         \SmallSmallRSS\Lockfiles::unlinkExpired();
         \SmallSmallRSS\Logger::clearExpired();
         \SmallSmallRSS\FeedbrowserCache::update(\SmallSmallRSS\Feeds::countFeedSubscribers());
-        purge_orphans(true);
+        \SmallSmallRSS\Entries::purgeOrphans();
         \SmallSmallRSS\Tags::clearExpired(14);
     }
 

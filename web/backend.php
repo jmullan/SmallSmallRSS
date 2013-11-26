@@ -31,7 +31,7 @@ $csrf_token = (isset($_REQUEST['csrf_token']) ? $_REQUEST['csrf_token'] : '');
 
 \SmallSmallRSS\Session::init();
 
-startup_gettext();
+\SmallSmallRSS\Locale::startupGettext();
 
 $script_started = microtime(true);
 

@@ -64,7 +64,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
     public function import($file = false, $owner_uid = 0)
     {
         $imported = 0;
-        purge_orphans();
+        \SmallSmallRSS\Entries::purgeOrphans();
         if (!$file) {
             header("Content-Type: text/html");
             $owner_uid = $_SESSION["uid"];

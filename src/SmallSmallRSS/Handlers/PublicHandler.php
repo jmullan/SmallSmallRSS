@@ -845,7 +845,7 @@ class PublicHandler extends Handler
 
     public function forgotpass()
     {
-        startup_gettext();
+        \SmallSmallRSS\Locale::startupGettext();
 
         header('Content-Type: text/html; charset=utf-8');
         echo "<html><head><title>Tiny Tiny RSS</title>";
@@ -950,7 +950,7 @@ class PublicHandler extends Handler
 
     public function dbupdate()
     {
-        startup_gettext();
+        \SmallSmallRSS\Locale::startupGettext();
 
         if (!\SmallSmallRSS\Auth::is_single_user_mode() && $_SESSION["access_level"] < 10) {
             $_SESSION["login_error_msg"] = __("Your access level is insufficient to run this script.");

@@ -13,10 +13,11 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     print "<b>Fatal Error</b>: PHP version 5.3.0 or newer required.\n";
     exit;
 }
-require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
+require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
 
 \SmallSmallRSS\Session::init();
 \SmallSmallRSS\Sanity::initialCheck();
+
 require_once "lib/Mobile_Detect.php";
 
 $mobile = new Mobile_Detect();
@@ -53,7 +54,12 @@ if ($_SESSION["uid"]) {
     }
 }
 $js_renderer = new \SmallSmallRSS\Renderers\JS();
-
+$js_files = array(
+    "lib/prototype.js",
+    "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
+    "lib/dojo/dojo.js",
+    "lib/dojo/tt-rss-layer.js",
+    "errors.php?mode=js");
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -79,11 +85,7 @@ foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $p) {
   <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
   <link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
 <?php
-foreach (array("lib/prototype.js",
-               "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
-               "lib/dojo/dojo.js",
-               "lib/dojo/tt-rss-layer.js",
-               "errors.php?mode=js") as $jsfile) {
+foreach ($jsfiles as $jsfile) {
     $js_renderer->render_script_tag($jsfile);
 }
 ?>
@@ -94,7 +96,7 @@ foreach (array("lib/prototype.js",
 
 <div id="overlay" style="display: block">
   <div id="overlay_inner">
-    <div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
+    <div class="insensitive"><?php echo __('Loading, please wait...'); ?></div>
     <div dojoType="dijit.ProgressBar" places="0" style="width: 300px" id="loading_bar" progress="0" maximum="100"></div>
     <noscript><br/><?php \SmallSmallRSS\Renderers\Messages::renderError('Javascript is disabled. Please enable it.') ?></noscript>
   </div>
@@ -187,7 +189,7 @@ $toolbar_plugins = \SmallSmallRSS\PluginHost::getInstance()->runHooks(
 <?php
 if (empty($_SESSION["hide_logout"])) {
 ?>
-            <div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcLogout')"><?php echo __('Logout') ?></div>
+    <div dojoType="dijit.MenuItem" onclick="quickMenuGo('qmcLogout')"><?php echo __('Logout'); ?></div>
 <?php
 }
 ?>
@@ -202,7 +204,7 @@ if (empty($_SESSION["hide_logout"])) {
         <div id="headlines-frame" dojoType="dijit.layout.ContentPane"
           onscroll="headlines_scroll_handler(this)" region="center">
           <div id="headlinesInnerContainer">
-            <div class="whiteBox"><?php echo __('Loading, please wait...') ?></div>
+                <div class="whiteBox"><?php echo __('Loading, please wait...'); ?></div>
           </div>
         </div>
         <div id="content-insert" dojoType="dijit.layout.ContentPane" region="bottom" style="height : 50%" splitter="true">

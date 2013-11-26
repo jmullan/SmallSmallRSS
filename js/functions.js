@@ -1904,4 +1904,3 @@ function label_to_feed_id(label) {
 function feed_to_label_id(feed) {
         return _label_base_index - 1 + Math.abs(feed);
 }
-

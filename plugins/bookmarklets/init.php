@@ -1,5 +1,4 @@
 <?php
-require __DIR__ . '/../../lib/jshrink/Minifier.php';
 
 class Bookmarklets extends \SmallSmallRSS\Plugin
 {

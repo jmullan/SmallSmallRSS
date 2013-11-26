@@ -33,14 +33,16 @@ function get_translations()
     return $tr;
 }
 
-require_once __DIR__ . "/../lib/accept-to-gettext.php";
 require_once __DIR__ . "/../lib/gettext/gettext.inc";
 
 function startup_gettext()
 {
 
     # Get locale from Accept-Language header
-    $locale = al2gt(array_keys(get_translations()), "text/html");
+    $locale = \AcceptToGettext\Scorer::al2gt(
+        array_keys(get_translations()),
+        "text/html"
+    );
     $forced_locale = \SmallSmallRSS\Config::get('FORCE_LOCALE');
     if ($forced_locale and $forced_locale != 'auto') {
         $locale = $forced_locale;
@@ -106,14 +108,14 @@ function get_favicon_url($url)
         $entries = $xpath->query('/html/head/link[@rel="shortcut icon" or @rel="icon"]');
         if (count($entries) > 0) {
             foreach ($entries as $entry) {
-                $favicon_url = rewrite_relative_url($url, $entry->getAttribute("href"));
+                $favicon_url = rewriteRelativeUrl($url, $entry->getAttribute("href"));
                 break;
             }
         }
     }
 
     if (!$favicon_url) {
-        $favicon_url = rewrite_relative_url($url, "/favicon.ico");
+        $favicon_url = rewriteRelativeUrl($url, "/favicon.ico");
     }
     return $favicon_url;
 }
@@ -2033,7 +2035,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     foreach ($entries as $entry) {
         if ($site_url) {
             if ($entry->hasAttribute('href')) {
-                $entry->setAttribute('href', rewrite_relative_url($site_url, $entry->getAttribute('href')));
+                $entry->setAttribute('href', rewriteRelativeUrl($site_url, $entry->getAttribute('href')));
                 $entry->setAttribute('rel', 'noreferrer');
             }
             if ($entry->nodeName == 'img') {
@@ -2803,7 +2805,7 @@ function get_feeds_from_html($url, $content)
             if ($title == '') {
                 $title = $entry->getAttribute('type');
             }
-            $feedUrl = rewrite_relative_url($baseUrl, $entry->getAttribute('href'));
+            $feedUrl = rewriteRelativeUrl($baseUrl, $entry->getAttribute('href'));
             $feedUrls[$feedUrl] = $title;
         }
     }
@@ -2943,50 +2945,6 @@ function format_article_enclosures(
 function getLastArticleId()
 {
     return \SmallSmallRSS\UserEntries::getLastId($_SESSION["uid"]);
-}
-
-function build_url($parts)
-{
-    return $parts['scheme'] . "://" . $parts['host'] . $parts['path'];
-}
-
-/**
- * Converts a (possibly) relative URL to a absolute one.
- *
- * @param string $url     Base URL (i.e. from where the document is)
- * @param string $rel_url Possibly relative URL in the document
- *
- * @return string Absolute URL
- */
-function rewrite_relative_url($url, $rel_url)
-{
-    if (strpos($rel_url, "magnet:") === 0) {
-        return $rel_url;
-    } elseif (strpos($rel_url, "://") !== false) {
-        return $rel_url;
-    } elseif (strpos($rel_url, "//") === 0) {
-        # protocol-relative URL (rare but they exist)
-        return $rel_url;
-    } elseif (strpos($rel_url, "/") === 0) {
-        $parts = parse_url($url);
-        $parts['path'] = $rel_url;
-
-        return build_url($parts);
-
-    } else {
-        $parts = parse_url($url);
-        if (!isset($parts['path'])) {
-            $parts['path'] = '/';
-        }
-        $dir = $parts['path'];
-        if (substr($dir, -1) !== '/') {
-            $dir = dirname($parts['path']);
-            $dir !== '/' && $dir .= '/';
-        }
-        $parts['path'] = $dir . $rel_url;
-
-        return build_url($parts);
-    }
 }
 
 function sphinx_search($query, $offset = 0, $limit = 30)

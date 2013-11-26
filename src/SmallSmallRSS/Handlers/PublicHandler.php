@@ -273,7 +273,7 @@ class PublicHandler extends Handler
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             $uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
-            echo getGlobalUnread($uid);
+            echo \SmallSmallRSS\CountersCache::getGlobalUnread($uid);
 
             if ($fresh) {
                 echo ";";

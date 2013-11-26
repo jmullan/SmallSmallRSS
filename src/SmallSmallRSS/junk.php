@@ -285,7 +285,7 @@ function getCategoryCounters()
     $ret_arr = array();
     /* Labels category */
     $cv = array("id" => -2, "kind" => "cat", "counter" => getCategoryUnread(-2));
-    array_push($ret_arr, $cv);
+    $ret_arr[] = $cv;
     $result = \SmallSmallRSS\Database::query(
         "SELECT
             id AS cat_id,
@@ -311,7 +311,7 @@ function getCategoryCounters()
             $child_counter = 0;
         }
         $cv = array("id" => $line["cat_id"], "kind" => "cat", "counter" => $line["unread"] + $child_counter);
-        array_push($ret_arr, $cv);
+        $ret_arr[] = $cv;
     }
 
     /* Special case: NULL category doesn't actually exist in the DB */
@@ -321,7 +321,7 @@ function getCategoryCounters()
         "kind" => "cat",
         "counter" => (int) \SmallSmallRSS\CountersCache::find(0, $_SESSION["uid"], true)
     );
-    array_push($ret_arr, $cv);
+    $ret_arr[] = $cv;
     return $ret_arr;
 }
 
@@ -366,7 +366,7 @@ function getCategoryUnread($cat, $owner_uid = false)
         );
         $cat_feeds = array();
         while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-            array_push($cat_feeds, "feed_id = " . $line["id"]);
+            $cat_feeds[] = "feed_id = " . $line["id"];
         }
 
         if (count($cat_feeds) == 0) {
@@ -524,31 +524,21 @@ function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_ui
     return $unread;
 }
 
-function getGlobalUnread($user_id = false)
-{
-    if (!$user_id) {
-        $user_id = $_SESSION["uid"];
-    }
-    return \SmallSmallRSS\CountersCache::getGlobalUnread($user_id);
-}
-
 function getGlobalCounters($global_unread = -1)
 {
-    $ret_arr = array();
     if ($global_unread == -1) {
-        $global_unread = getGlobalUnread();
+        $global_unread = \SmallSmallRSS\CountersCache::getGlobalUnread($_SESSION["uid"]);
     }
-    $cv = array("id" => "global-unread", "counter" => (int) $global_unread);
-    array_push($ret_arr, $cv);
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT COUNT(id) AS fn
-         FROM ttrss_feeds
-         WHERE owner_uid = " . $_SESSION["uid"]
+    return array(
+        array(
+            "id" => "global-unread",
+            "counter" => $global_unread
+        ),
+        array(
+            "id" => "subscribed-feeds",
+            "counter" => \SmallSmallRSS\Feeds::count($_SESSION["uid"])
+        )
     );
-    $subscribed_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, "fn");
-    $cv = array("id" => "subscribed-feeds", "counter" => (int) $subscribed_feeds);
-    array_push($ret_arr, $cv);
-    return $ret_arr;
 }
 
 function getVirtCounters()

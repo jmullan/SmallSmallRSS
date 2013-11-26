@@ -122,9 +122,15 @@ class API extends Handler
         $is_cat = $this->getSQLEscapedStringFromRequest("is_cat");
 
         if ($feed_id) {
-            $this->wrap(self::STATUS_OK, array("unread" => getFeedUnread($feed_id, $is_cat)));
+            $this->wrap(
+                self::STATUS_OK,
+                array("unread" => getFeedUnread($feed_id, $is_cat))
+            );
         } else {
-            $this->wrap(self::STATUS_OK, array("unread" => getGlobalUnread()));
+            $this->wrap(
+                self::STATUS_OK,
+                array("unread" => \SmallSmallRSS\CountersCache::getGlobalUnread($_SESSION['uid']))
+            );
         }
     }
 

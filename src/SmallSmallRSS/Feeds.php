@@ -336,4 +336,14 @@ class Feeds
              )"
         );
     }
+    public static function count($owner_uid)
+    {
+        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT COUNT(id) AS fn
+             FROM ttrss_feeds
+             WHERE owner_uid = " . $owner_uid
+        );
+        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, "fn");
+    }
 }

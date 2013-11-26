@@ -346,11 +346,13 @@ class RSSUpdater
             }
 
             $favicon_colorstring = '';
-            if (file_exists($favicon_file) && function_exists("imagecreatefromstring") && $favicon_avg_color == '') {
+            if (file_exists($favicon_file)
+                && function_exists("imagecreatefromstring")
+                && $favicon_avg_color == '') {
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_feeds
-                 SET favicon_avg_color = 'fail'
-                 WHERE id = '$feed'"
+                     SET favicon_avg_color = 'fail'
+                     WHERE id = '$feed'"
                 );
                 $favicon_color = \SmallSmallRSS\Database::escape_string(
                     \SmallSmallRSS\Colors::calculateAverage($favicon_file)
@@ -362,9 +364,9 @@ class RSSUpdater
 
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds
-             SET favicon_last_checked = NOW()
-                 $favicon_colorstring
-             WHERE id = '$feed'"
+                 SET favicon_last_checked = NOW()
+                     $favicon_colorstring
+                 WHERE id = '$feed'"
             );
         }
 
@@ -373,8 +375,8 @@ class RSSUpdater
             if ($feed_title) {
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_feeds
-                 SET title = '$feed_title'
-                 WHERE id = '$feed'"
+                     SET title = '$feed_title'
+                     WHERE id = '$feed'"
                 );
             }
         }
@@ -382,8 +384,8 @@ class RSSUpdater
         if ($site_url && $orig_site_url != $site_url) {
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds
-             SET site_url = '$site_url'
-             WHERE id = '$feed'"
+                 SET site_url = '$site_url'
+                 WHERE id = '$feed'"
             );
         }
 
@@ -391,11 +393,7 @@ class RSSUpdater
         $labels = \SmallSmallRSS\Labels::getAll($owner_uid);
         $items = $rss->get_items();
         if (!is_array($items)) {
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_feeds
-             SET last_updated = NOW(), last_error = ''
-             WHERE id = '$feed'"
-            );
+            \SmallSmallRSS\Feeds::markUpdated($feed);
             return;
         }
 

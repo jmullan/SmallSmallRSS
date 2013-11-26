@@ -310,4 +310,30 @@ class Feeds
                  last_updated = '1970-01-01'"
         );
     }
+
+    // this is called after user is created to initialize
+    // default feeds, labels or whatever else user preferences
+    // are checked on every login, not here
+    public static function newUser($uid)
+    {
+        \SmallSmallRSS\Database::query(
+            "INSERT INTO ttrss_feeds
+             (owner_uid,title,feed_url)
+             VALUES (
+                 '$uid',
+                 'Tiny Tiny RSS: New Releases',
+                 'http://tt-rss.org/releases.rss'
+             )"
+        );
+
+        \SmallSmallRSS\Database::query(
+            "INSERT INTO ttrss_feeds
+             (owner_uid,title,feed_url)
+             VALUES (
+                 '$uid',
+                 'Tiny Tiny RSS: Forum',
+                 'http://tt-rss.org/forum/rss.php'
+             )"
+        );
+    }
 }

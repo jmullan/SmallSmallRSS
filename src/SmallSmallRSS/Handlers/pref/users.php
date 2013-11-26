@@ -251,7 +251,7 @@ class Pref_Users extends ProtectedHandler
                     T_sprintf("Added user <b>%s</b> with password <b>%s</b>", $login, $tmp_user_pwd)
                 );
 
-                initialize_user($new_uid);
+                \SmallSmallRSS\Feeds\newUser($new_uid);
 
             } else {
 

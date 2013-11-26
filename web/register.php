@@ -272,7 +272,7 @@ if (!\SmallSmallRSS\Config::get('REG_MAX_USERS')
 
                     $new_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
 
-                    initialize_user($new_uid);
+                    \SmallSmallRSS\Feeds\newUser($new_uid);
 
                     $reg_text = "Hi!\n".
                         "\n".

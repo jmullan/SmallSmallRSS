@@ -81,4 +81,12 @@ class Utils
             return self::buildUrl($source_parts);
         }
     }
+
+    public static function isHtml($string)
+    {
+        return (
+            (stripos($content, '<html') !== false)
+            || (stripos($content, 'DOCTYPE html') !== false)
+        );
+    }
 }

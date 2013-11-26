@@ -233,32 +233,6 @@ function make_password($length = 8)
     return $password;
 }
 
-// this is called after user is created to initialize default feeds, labels
-// or whatever else
-// user preferences are checked on every login, not here
-
-function initialize_user($uid)
-{
-    \SmallSmallRSS\Database::query(
-        "INSERT INTO ttrss_feeds
-         (owner_uid,title,feed_url)
-         VALUES (
-             '$uid',
-             'Tiny Tiny RSS: New Releases',
-             'http://tt-rss.org/releases.rss'
-         )"
-    );
-
-    \SmallSmallRSS\Database::query(
-        "INSERT INTO ttrss_feeds
-         (owner_uid,title,feed_url)
-         VALUES (
-             '$uid',
-             'Tiny Tiny RSS: Forum',
-             'http://tt-rss.org/forum/rss.php')"
-    );
-}
-
 function logout_user()
 {
     session_destroy();
@@ -879,7 +853,7 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
     if (!$contents) {
         return array("code" => 5, "message" => $fetch_last_error);
     }
-    if (is_html($contents)) {
+    if (\SmallSmallRSS\Utils::isHtml($contents)) {
         $feedUrls = get_feeds_from_html($url, $contents);
         if (count($feedUrls) == 0) {
             return array("code" => 3);
@@ -2742,15 +2716,6 @@ function get_feeds_from_html($url, $content)
     return $feedUrls;
 }
 
-function is_html($content)
-{
-    return preg_match("/<html|DOCTYPE html/i", substr($content, 0, 20)) !== 0;
-}
-
-function url_is_html($url, $login = false, $pass = false)
-{
-    return is_html(\SmallSmallRSS\Fetcher::fetch($url, false, $login, $pass));
-}
 
 function print_label_select($name, $value, $attributes = "")
 {

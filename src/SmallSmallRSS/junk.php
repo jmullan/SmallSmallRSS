@@ -658,7 +658,7 @@ function getFeedCounters($active_feed = false)
         $count = $line["count"];
         $last_error = htmlspecialchars($line["last_error"]);
         $last_updated = make_local_datetime($line['last_updated'], false);
-        $has_img = feed_has_icon($id);
+        $has_img = \SmallSmallRSS\Feeds::hasIcon($id);
         if (date('Y') - date('Y', strtotime($line['last_updated'])) > 2) {
             $last_updated = '';
         }
@@ -1887,11 +1887,6 @@ function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes)
     return $doc;
 }
 
-function check_for_update()
-{
-    return false;
-}
-
 function catchupArticlesById($ids, $cmode, $owner_uid = false)
 {
     if (!$owner_uid) {
@@ -2415,14 +2410,6 @@ function get_score_pic($score)
     } else {
         return "score_neutral.png";
     }
-}
-
-function feed_has_icon($id)
-{
-    return (
-        is_file(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico")
-        && filesize(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico") > 0
-    );
 }
 
 function format_tags_string($tags, $id)

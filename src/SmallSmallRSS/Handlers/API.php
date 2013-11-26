@@ -655,7 +655,7 @@ class API extends Handler
 
             $unread = getFeedUnread($line["id"]);
 
-            $has_icon = feed_has_icon($line['id']);
+            $has_icon = \SmallSmallRSS\Feeds::hasIcon($line['id']);
 
             if ($unread || !$unread_only) {
 

@@ -418,7 +418,7 @@ class Feeds extends ProtectedHandler
                     $entry_author = " &mdash; $entry_author";
                 }
 
-                $has_feed_icon = feed_has_icon($feed_id);
+                $has_feed_icon = self::hasIcon($feed_id);
                 if ($has_feed_icon) {
                     $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\""
                         . \SmallSmallRSS\Config::get('ICONS_URL')
@@ -553,7 +553,7 @@ class Feeds extends ProtectedHandler
                             $cur_feed_title = htmlspecialchars($cur_feed_title);
 
                             $vf_catchup_link = "(<a class='catchup' onclick='javascript:catchupFeedInGroup($feed_id);' href='#'>".__('mark as read')."</a>)";
-                            $has_feed_icon = feed_has_icon($feed_id);
+                            $has_feed_icon = self::hasIcon($feed_id);
                             if ($has_feed_icon) {
                                 $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"".\SmallSmallRSS\Config::get('ICONS_URL')."/$feed_id.ico\" alt=\"\">";
                             }
@@ -1188,7 +1188,7 @@ class Feeds extends ProtectedHandler
         print "<hr/>".__('Limit search to:')." ";
         print "<select name=\"search_mode\" dojoType=\"dijit.form.Select\">
             <option value=\"all_feeds\">".__('All feeds')."</option>";
-        $feed_title = \SmallSmallRSS\Feeds::getTitle($active_feed_id);
+        $feed_title = self::getTitle($active_feed_id);
         if (!$is_cat) {
             $feed_cat_title = getFeedCatTitle($active_feed_id);
         } else {
@@ -1217,5 +1217,11 @@ class Feeds extends ProtectedHandler
         print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').execute()\">".__('Search')."</button>
         <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').hide()\">".__('Cancel')."</button>
         </div>";
+    }
+
+    static public function hasIcon($feed_id)
+    {
+        $file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico";
+        return (is_file($file) && filesize($file));
     }
 }

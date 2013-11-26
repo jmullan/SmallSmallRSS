@@ -28,4 +28,4 @@ if (defined('E_DEPRECATED')) {
 ini_set('user_agent', \SmallSmallRSS\Config::get('SELF_USER_AGENT'));
 
 
-require __DIR__ . '/../../include/functions.php';
+require __DIR__ . '/junk.php';

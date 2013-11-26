@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
+require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
 
 $op = (isset($_REQUEST['op']) ? $_REQUEST["op"] : '');
 $method = (!empty($_REQUEST['subop']) ? $_REQUEST['subop'] : $_REQUEST["method"]);

@@ -20,7 +20,7 @@ if (!empty($_REQUEST["sid"])) {
     session_id($_REQUEST["sid"]);
 }
 
-require_once __DIR__ . '/../SmallSmallRSS/bootstrap.php';
+require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Config::set('AUTH_DISABLE_OTP', true);
 \SmallSmallRSS\Session::init('ttrss_api_sid');
 \SmallSmallRSS\Sanity::initialCheck();

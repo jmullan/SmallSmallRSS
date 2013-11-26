@@ -1,6 +1,6 @@
 #!/usr/bin/env php
 <?php
-require_once __DIR__ . '/SmallSmallRSS/bootstrap.php';
+require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
 
 chdir(__DIR__);
 

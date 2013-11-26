@@ -105,7 +105,7 @@ class Article extends ProtectedHandler
             );
         }
 
-        $feed_id = getArticleFeed($id);
+        $feed_id = \SmallSmallRSS\UserEntries::getArticleFeed($id, $_SESSION["uid"]);
         \SmallSmallRSS\CountersCache::update($feed_id, $_SESSION["uid"]);
     }
 

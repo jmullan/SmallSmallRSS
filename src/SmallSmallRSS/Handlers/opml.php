@@ -38,7 +38,7 @@ class opml extends ProtectedHandler
             <div class=\"floatingLogo\"><img src=\"images/logo_small.png\"></div>
             <h1>".__('OPML Utility')."</h1><div class='content'>";
 
-        add_feed_category("Imported feeds");
+        \SmallSmallRSS\FeedCategories::add("Imported feeds");
 
         $this->opml_notice(__("Importing OPML..."));
         $this->opml_import($owner_uid);
@@ -454,7 +454,7 @@ class opml extends ProtectedHandler
                 $cat_id = \SmallSmallRSS\FeedCategories::get($cat_title, $parent_id);
                 \SmallSmallRSS\Database::query("BEGIN");
                 if ($cat_id === false) {
-                    add_feed_category($cat_title, $parent_id);
+                    \SmallSmallRSS\FeedCategories::add($cat_title, $parent_id);
                     $cat_id = \SmallSmallRSS\FeedCategories::get($cat_title, $parent_id);
                 }
                 \SmallSmallRSS\Database::query("COMMIT");

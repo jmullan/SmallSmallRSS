@@ -607,7 +607,7 @@ class RPC extends ProtectedHandler
     {
         $cat = \SmallSmallRSS\Database::escape_string($_REQUEST["cat"]);
 
-        add_feed_category($cat);
+        \SmallSmallRSS\FeedCategories::add($cat);
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_feed_categories WHERE

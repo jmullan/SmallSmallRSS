@@ -2458,17 +2458,6 @@ function format_article_note($id, $note, $allow_edit = true)
     return $str;
 }
 
-
-function add_feed_category($feed_cat, $parent_cat_id = false)
-{
-    return \SmallSmallRSS\FeedCategories::add($feed_cat, $parent_cat_id);
-}
-
-function getArticleFeed($id)
-{
-    return \SmallSmallRSS\UserEntries::getArticleFeed($id, $_SESSION["uid"]);
-}
-
 /**
  * Fixes incomplete URLs by prepending "http://".
  * Also replaces feed:// with http://, and

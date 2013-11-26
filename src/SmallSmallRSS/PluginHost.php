@@ -12,7 +12,6 @@ class PluginHost
     private $feeds = array();
     private $api_methods = array();
     private $owner_uid;
-    private $debug;
     private $last_registered;
     private static $instance;
 
@@ -350,18 +349,7 @@ class PluginHost
         }
     }
 
-    public function set_debug($debug)
-    {
-        $this->debug = $debug;
-    }
-
-    public function get_debug()
-    {
-        return $this->debug;
-    }
-
     // Plugin feed functions are *EXPERIMENTAL*!
-
     // cat_id: only -1 is supported (Special)
     public function add_feed($cat_id, $title, $icon, $sender)
     {

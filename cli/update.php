@@ -73,7 +73,6 @@ if (!isset($options['update-schema'])) {
 \SmallSmallRSS\Config::set('VERBOSITY', isset($options['quiet']) ? 0 : 1);
 
 if (isset($options["log"])) {
-    _debug("Logging to " . $options["log"]);
     define('LOGFILE', $options["log"]);
 }
 
@@ -84,7 +83,6 @@ if (!isset($options["daemon"])) {
 }
 
 if (isset($options["task"])) {
-    _debug("Using task id " . $options["task"]);
     $lock_filename = $lock_filename . "-task_" . $options["task"];
 }
 
@@ -101,8 +99,6 @@ if (isset($options["num-updates"])) {
     }
 }
 
-_debug("Lock: $lock_filename");
-
 $lock_handle = \SmallSmallRSS\Lockfiles::make($lock_filename);
 // Try to lock a file in order to avoid concurrent update.
 if (!$lock_handle) {
@@ -115,13 +111,11 @@ $must_exit = false;
 
 if (isset($options["task"]) && isset($options["pidlock"])) {
     $waits = $options["task"] * 5;
-    _debug("Waiting before update ($waits)");
     sleep($waits);
 }
 
 
 if (isset($options["force-update"])) {
-    _debug("marking all feeds as needing update...");
     \SmallSmallRSS\Feeds::resetAll();
 }
 
@@ -143,14 +137,13 @@ if (isset($options["daemon"])) {
         $quiet = (isset($options["quiet"])) ? "--quiet" : "";
         passthru(\SmallSmallRSS\Config::get('PHP_EXECUTABLE') . " " . $argv[0] ." --daemon-loop $quiet");
         $sleep = \SmallSmallRSS\Config::get('DAEMON_SLEEP_INTERVAL');
-        _debug("Sleeping for $sleep seconds...");
         sleep($sleep);
     }
 }
 
 if (isset($options["daemon-loop"])) {
     if (!\SmallSmallRSS\Lockfiles::stamp('update_daemon')) {
-        _debug("warning: unable to create stampfile\n");
+        \SmallSmallRSS\Logger::debug("warning: unable to create stampfile\n");
     }
     \SmallSmallRSS\RSSUpdater::updateBatch($num_updates);
     if (!isset($options["pidlock"]) || $options["task"] == 0) {
@@ -161,7 +154,6 @@ if (isset($options["daemon-loop"])) {
 
 if (isset($options["cleanup-tags"])) {
     $rc = cleanup_tags(14, 50000);
-    _debug("$rc tags deleted.\n");
 }
 
 if (isset($options["indexes"])) {
@@ -170,11 +162,8 @@ if (isset($options["indexes"])) {
     if (read_stdin() != 'yes') {
         exit;
     }
-    _debug("clearing existing indexes...");
     \SmallSmallRSS\Database\Updater::dropIndexes();
-    _debug('creating new indexes...');
     \SmallSmallRSS\Database\Updater::createIndexes();
-    _debug("all done.");
 }
 
 if (isset($options["convert-filters"])) {
@@ -183,8 +172,6 @@ if (isset($options["convert-filters"])) {
     if (read_stdin() != 'yes') {
         exit;
     }
-    _debug("converting filters...");
-
     \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2");
 
     $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_filters ORDER BY id");
@@ -232,31 +219,21 @@ if (isset($options["convert-filters"])) {
 }
 
 if (isset($options["update-schema"])) {
-    _debug("checking for updates (" . \SmallSmallRSS\Config::get('DB_TYPE') . ")...");
-
     $updater = new \SmallSmallRSS\Database\Updater();
     if ($updater->isUpdateRequired()) {
-        _debug(
-            "schema update required, version " . $updater->getSchemaVersion()
-            . " to " . \SmallSmallRSS\Constants::SCHEMA_VERSION
-        );
-        _debug("WARNING: please backup your database before continuing.");
-        _debug("Type 'yes' to continue.");
+        print "WARNING: please backup your database before continuing.";
+        print "Type 'yes' to continue.";
 
         if (read_stdin() != 'yes') {
             exit;
         }
         for ($i = $updater->getSchemaVersion() + 1; $i <= \SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {
-            _debug("performing update up to version $i...");
             $result = $updater->performUpdateTo($i);
-            _debug($result ? "OK!" : "FAILED!");
             if (!$result) {
-                return;
+                print 'DATABASE UPDATE FAILED';
+                exit(1);
             }
-
         }
-    } else {
-        _debug("update not required.");
     }
 }
 

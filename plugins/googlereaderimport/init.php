@@ -30,29 +30,20 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
     {
         $file = $args['greaderImport'];
         if (!file_exists($file)) {
-            _debug("file not found: $file");
+            \SmallSmallRSS\Logger::debug("file not found: $file");
             return;
         }
-
-        _debug("please enter your username:");
-
+        print "please enter your username:";
         $username = \SmallSmallRSS\Database::escape_string(trim(read_stdin()));
-
-        _debug("looking up user: $username...");
-
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_users
              WHERE login = '$username'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-            _debug("user not found.");
+            \SmallSmallRSS\Logger::debug("user not found.");
             return;
         }
-
         $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
-
-        _debug("processing: $file (owner_uid: $owner_uid)");
-
         $this->import($file, $owner_uid);
     }
 
@@ -101,7 +92,6 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
         }
         if ($file) {
             $sql_set_marked = strtolower(basename($file)) == 'starred.json' ? 'true' : 'false';
-            _debug("will set articles as starred: $sql_set_marked");
         } else {
             $sql_set_marked = strtolower($_FILES['starred_file']['name']) == 'starred.json' ? 'true' : 'false';
         }
@@ -164,9 +154,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                             );
                         }
                     }
-
                     $processed++;
-
                     $imported += (int) $this->createArticle(
                         $owner_uid,
                         $guid,
@@ -179,28 +167,13 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                         $tags,
                         $orig_feed_data
                     );
-
-                    if ($file && $processed % 25 == 0) {
-                        _debug("processed $processed articles...");
-                    }
                 }
-
-                if ($file) {
-                    _debug(sprintf("All done. %d of %d articles imported.", $imported, $processed));
-                } else {
-                    print "<p style='text-align: center'>"
-                        . T_sprintf("All done. %d out of %d articles imported.", $imported, $processed)
-                        . "</p>";
-                }
-
             } else {
                 \SmallSmallRSS\Renderers\Messages::renderError(__('The document has incorrect format.'));
             }
-
         } else {
             \SmallSmallRSS\Renderers\Messages::renderError(__('Error while parsing document.'));
         }
-
         if (!$file) {
             print "<div align='center'>";
             print "<button dojoType=\"dijit.form.Button\"

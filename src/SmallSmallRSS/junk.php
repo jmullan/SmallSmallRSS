@@ -1,9 +1,4 @@
 <?php
-function _debug($msg, $show = true, $is_debug = true)
-{
-    \SmallSmallRSS\Logger::debug($msg, $show, $is_debug);
-}
-
 function initialize_user_prefs($uid, $profile = false)
 {
     \SmallSmallRSS\Database::query("BEGIN");
@@ -136,12 +131,7 @@ function login_sequence()
                 exit;
             }
         } else {
-            /* bump login timestamp */
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_users
-                 SET last_login = NOW()
-                 WHERE id = " . $_SESSION["uid"]
-            );
+            \SmallSmallRSS\Users::markLogin($_SESSION['uid']);
             $_SESSION["last_login_update"] = time();
         }
 

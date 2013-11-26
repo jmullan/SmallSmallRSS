@@ -16,8 +16,6 @@ class Digest
         $user_limit = 15; // amount of users to process (e.g. emails to send out)
         $limit = 1000; // maximum amount of headlines to include
 
-        _debug("Sending digests, batch of max $user_limit users, headline limit = $limit", true, $debug);
-
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
             $interval_query = "last_digest_sent < NOW() - INTERVAL '1 days'";
         } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
@@ -35,7 +33,6 @@ class Digest
                 $since = time() - $preferred_ts;
                 // try to send digests within 2 hours of preferred time
                 if ($preferred_ts && $since >= 0 && $since < 7200) {
-                    _debug("Sending digest for UID:" . $line['id'] . " - " . $line["email"], true, $debug);
                     $do_catchup = \SmallSmallRSS\DBPrefs::read('DIGEST_CATCHUP', $line['id'], false);
                     $tuple = prepare_headlines_digest($line["id"], 1, $limit);
                     $digest = $tuple[0];
@@ -55,15 +52,11 @@ class Digest
                             $digest_text
                         );
                         if (!$rc) {
-                            _debug("ERROR: " . $mail->ErrorInfo, true, $debug);
+                            \SmallSmallRSS\Logger::debug("ERROR: " . $mail->ErrorInfo, true, $debug);
                         }
-                        _debug("RC=$rc", true, $debug);
                         if ($rc && $do_catchup) {
-                            _debug("Marking affected articles as read...", true, $debug);
                             catchupArticlesById($affected_ids, 0, $line["id"]);
                         }
-                    } else {
-                        _debug("No headlines", true, $debug);
                     }
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_users SET last_digest_sent = NOW()
@@ -73,8 +66,6 @@ class Digest
                 }
             }
         }
-        _debug("All done.", true, $debug);
-
     }
 
     public function prepare_headlines($user_id, $days = 1, $limit = 1000)

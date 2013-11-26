@@ -13,11 +13,10 @@ class Daemon
                 if (\SmallSmallRSS\Lockfiles::is_locked("update_daemon-$pid.lock")) {
                     array_push($tmp, $pid);
                 } else {
-                    _debug("[reap_children] child $pid seems active but lockfile is unlocked.");
+                    \SmallSmallRSS\Logger::debug("[reap_children] child $pid seems active but lockfile is unlocked.");
                     unset(self::$ctimes[$pid]);
                 }
             } else {
-                _debug("[reap_children] child $pid reaped.");
                 unset(self::$ctimes[$pid]);
             }
         }
@@ -30,7 +29,7 @@ class Daemon
         foreach (array_keys(self::$ctimes) as $pid) {
             $started = self::$ctimes[$pid];
             if (time() - $started > \SmallSmallRSS\Config::get('MAX_CHILD_RUNTIME')) {
-                _debug("[MASTER] child process $pid seems to be stuck, aborting...");
+                \SmallSmallRSS\Logger::debug("[MASTER] child process $pid seems to be stuck, aborting...");
                 posix_kill($pid, SIGKILL);
             }
         }

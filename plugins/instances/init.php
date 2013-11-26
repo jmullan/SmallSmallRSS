@@ -31,7 +31,6 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function hookUpdateTask($args)
     {
-        _debug("Get linked feeds...");
         $this->get_linked_feeds();
     }
 
@@ -64,7 +63,6 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line['id'];
-            _debug("Updating: " . $line['access_url'] . " ($id)");
             $fetch_url = $line['access_url'] . '/public.php?op=fbexport';
             $post_query = 'key=' . $line['access_key'];
             $feeds = \SmallSmallRSS\Fetcher::fetch($fetch_url, false, false, false, $post_query);
@@ -111,7 +109,6 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
                             // we will try again later
                             // TODO: maybe perform expiration based on updated here?
                         }
-                        _debug("Processed " . count($feeds['feeds']) . " feeds.");
                     }
                 } else {
                     $status = 2;

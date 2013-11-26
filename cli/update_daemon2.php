@@ -14,7 +14,6 @@ $last_checkpoint = -1;
 function sigchld_handler($signal)
 {
     $running_jobs = \SmallSmallRSS\Daemon::reap_children();
-    _debug("[SIGCHLD] jobs left: $running_jobs");
     $status = null;
     pcntl_waitpid(-1, $status, WNOHANG);
 }
@@ -22,7 +21,6 @@ function sigchld_handler($signal)
 function shutdown($caller_pid)
 {
     if ($caller_pid == posix_getpid()) {
-        _debug("removing lockfile (master)...");
         \SmallSmallRSS\Lockfiles::unlock("update_daemon.lock");
     }
 }
@@ -30,22 +28,19 @@ function shutdown($caller_pid)
 function task_shutdown()
 {
     $pid = posix_getpid();
-    _debug("removing lockfile ($pid)...");
     \SmallSmallRSS\Lockfiles::unlock("update_daemon-$pid.lock");
 }
 
 function sigint_handler()
 {
-    _debug("[MASTER] SIG_INT received.\n");
     shutdown(posix_getpid());
-    die;
+    exit();
 }
 
 function task_sigint_handler()
 {
-    _debug("[TASK] SIG_INT received.\n");
     task_shutdown();
-    die;
+    exit();
 }
 
 pcntl_signal(SIGCHLD, 'sigchld_handler');
@@ -69,29 +64,28 @@ if (isset($options["help"])) {
 \SmallSmallRSS\Config::set('VERBOSITY', isset($options['quiet']) ? 0 : 1);
 
 if (isset($options["tasks"])) {
-    _debug("Set to spawn " . $options["tasks"] . " children.");
     \SmallSmallRSS\Config::set('MAX_JOBS', (int) $options["tasks"]);
 }
 $max_jobs = \SmallSmallRSS\Config::get('MAX_JOBS');
 
 if (isset($options["interval"])) {
-    _debug("Spawn interval: " . $options["interval"] . " seconds.");
     \SmallSmallRSS\Config::set('SPAWN_INTERVAL', (int) $options["interval"]);
 }
 $spawn_interval = \SmallSmallRSS\Config::get('SPAWN_INTERVAL');
 if (isset($options["log"])) {
-    _debug("Logging to " . $options["log"]);
     define('LOGFILE', $options["log"]);
 }
 
 if (\SmallSmallRSS\Lockfiles::is_locked("update_daemon.lock")) {
-    die("error: Can't create lockfile. Maybe another daemon is already running.\n");
+    print "error: Can't create lockfile. Maybe another daemon is already running.\n";
+    exit(1);
 }
 
 // Try to lock a file in order to avoid concurrent update.
 $lock_handle = \SmallSmallRSS\Lockfiles::make("update_daemon.lock");
 if (!$lock_handle) {
-    die("error: Can't create lockfile. Maybe another daemon is already running.\n");
+    print "error: Can't create lockfile. Maybe another daemon is already running.\n";
+    exit(1);
 }
 \SmallSmallRSS\Sanity::schemaOrDie();
 
@@ -111,7 +105,6 @@ while (true) {
 
     if ($next_spawn % 60 == 0) {
         $running_jobs = \SmallSmallRSS\Daemon::running_jobs();
-        _debug("[MASTER] active jobs: $running_jobs, next spawn at $next_spawn sec.");
     }
 
     if ($last_checkpoint + $spawn_interval < time()) {
@@ -134,13 +127,11 @@ while (true) {
                 die("fork failed!\n");
             } elseif ($pid) {
                 if (!$master_handlers_installed) {
-                    _debug("[MASTER] installing shutdown handlers");
                     pcntl_signal(SIGINT, 'sigint_handler');
                     pcntl_signal(SIGTERM, 'sigint_handler');
                     register_shutdown_function('shutdown', posix_getpid());
                     $master_handlers_installed = true;
                 }
-                _debug("[MASTER] spawned client $j [PID:$pid]...");
                 \SmallSmallRSS\Daemon::track_pid($pid);
             } else {
                 pcntl_signal(SIGCHLD, SIG_IGN);

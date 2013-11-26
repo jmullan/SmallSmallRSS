@@ -90,13 +90,13 @@ class Updater
                     $index = $matches[1];
                     $table = $matches[2];
                     $statement = "CREATE INDEX $index ON $table";
-                    _debug($statement);
+                    \SmallSmallRSS\Logger::debug($statement);
                     \SmallSmallRSS\Database::query($statement);
                 }
             }
             fclose($fp);
         } else {
-            _debug("unable to open schema file.");
+            \SmallSmallRSS\Logger::debug("unable to open schema file.");
         }
     }
 }

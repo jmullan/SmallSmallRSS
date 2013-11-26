@@ -19,7 +19,7 @@ class FileCache
         // TODO sanitize input
         $cache_dir = \SmallSmallRSS\Config::get('CACHE_DIR') . "/$subdir";
         if (!is_writable($cache_dir)) {
-            _debug("$cache_dir is not writable");
+            \SmallSmallRSS\Logger::debug("$cache_dir is not writable");
             return 0;
         }
         $cache_lifetime = \SmallSmallRSS\Config::get('CACHE_LIFETIME');

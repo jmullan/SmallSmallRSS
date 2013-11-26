@@ -74,7 +74,7 @@ class Users
     public static function create($login, $email = '', $password = false)
     {
         $login = \SmallSmallRSS\Database::escape_string(mb_strtolower(trim($login)));
-        $email = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["email"]));
+        $email = \SmallSmallRSS\Database::escape_string(trim($email));
         if (!$password) {
             $password = self::makePassword();
         }
@@ -96,5 +96,14 @@ class Users
             return false;
         }
         return \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+    }
+    public static function markLogin($id)
+    {
+        $id = \SmallSmallRSS\Database::escape_string(trim($id));
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_users
+             SET last_login = NOW()
+             WHERE id = $id"
+        );
     }
 }

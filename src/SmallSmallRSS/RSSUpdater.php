@@ -148,7 +148,7 @@ class RSSUpdater
     public static function updateFeed($feed, $no_cache = false)
     {
         if (is_null($feed) || $feed === '') {
-            _debug('Bad feed specified ' . var_export($feed, true));
+            \SmallSmallRSS\Logger::debug('Bad feed specified ' . var_export($feed, true));
             return false;
         }
         $result = \SmallSmallRSS\Database::query(
@@ -177,7 +177,7 @@ class RSSUpdater
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-            _debug("feed $feed NOT FOUND/SKIPPED");
+            \SmallSmallRSS\Logger::debug("feed $feed NOT FOUND/SKIPPED");
             return false;
         }
 
@@ -204,7 +204,6 @@ class RSSUpdater
         $date_feed_processed = date('Y-m-d H:i');
         $cache_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . "/simplepie/" . sha1($fetch_url) . ".xml";
         $pluginhost = new \SmallSmallRSS\PluginHost();
-        $pluginhost->set_debug(true);
         $pluginhost->init_all();
         $pluginhost->init_user($owner_uid);
         $pluginhost->load_data();
@@ -233,7 +232,6 @@ class RSSUpdater
             }
             $fetch_last_error = false;
             if (!$feed_data) {
-                _debug("fetching [$fetch_url]...");
                 $fetcher = new \SmallSmallRSS\Fetcher();
                 $feed_data = $fetcher->getFileContents(
                     $fetch_url,
@@ -252,7 +250,7 @@ class RSSUpdater
                 $fetch_last_error_code = $fetcher->last_error_code;
             }
             if ($fetch_last_error) {
-                _debug("unable to fetch: $fetch_last_error [$fetch_last_error_code]");
+                \SmallSmallRSS\Logger::debug("unable to fetch: $fetch_last_error [$fetch_last_error_code]");
                 $error_escaped = '';
                 // If-Modified-Since
                 if ($fetch_last_error_code != 304) {
@@ -281,13 +279,12 @@ class RSSUpdater
         $feed = \SmallSmallRSS\Database::escape_string($feed);
         if ($rss->error()) {
             $error_msg = \SmallSmallRSS\Database::escape_string(mb_substr($rss->error(), 0, 245));
-            _debug("error fetching feed: $error_msg");
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds
-             SET
-                 last_error = '$error_msg',
-                 last_updated = NOW()
-             WHERE id = '$feed'"
+                 SET
+                     last_error = '$error_msg',
+                     last_updated = NOW()
+                 WHERE id = '$feed'"
             );
             return;
         }
@@ -297,11 +294,10 @@ class RSSUpdater
             if (is_writable(\SmallSmallRSS\Config::get('CACHE_DIR') . "/simplepie")) {
                 $new_rss_hash = md5($feed_data);
                 if ($new_rss_hash != $rss_hash && count($rss->get_items()) > 0) {
-                    _debug("saving $cache_filename");
                     @file_put_contents($cache_filename, $feed_data);
                 }
             } else {
-                _debug("$cache_filename is not writable");
+                \SmallSmallRSS\Logger::debug("$cache_filename is not writable");
             }
         }
 
@@ -365,7 +361,7 @@ class RSSUpdater
                 );
                 $favicon_colorstring = ",favicon_avg_color = '".$favicon_color."'";
             } elseif ($favicon_avg_color == 'fail') {
-                _debug("floicon failed on this file, not trying to recalculate avg color");
+                \SmallSmallRSS\Logger::debug("floicon failed on this file, not trying to recalculate avg color");
             }
 
             \SmallSmallRSS\Database::query(
@@ -559,7 +555,6 @@ class RSSUpdater
             );
 
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-                _debug("base guid [$entry_guid] not found");
                 // base post entry does not exist, create it
                 $query = "
                 INSERT INTO ttrss_entries (
@@ -791,11 +786,6 @@ class RSSUpdater
                 // if post needs update, update it and mark all user entries
                 // linking to this post as updated
                 if ($post_needs_update) {
-
-                    if (defined('DAEMON_EXTENDED_DEBUG')) {
-                        _debug("post $entry_guid_hashed needs update...");
-                    }
-
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_entries
                             SET title = '$entry_title',

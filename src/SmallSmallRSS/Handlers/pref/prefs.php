@@ -968,14 +968,10 @@ class Pref_Prefs extends ProtectedHandler
 
     public function otpqrcode()
     {
-        require_once "lib/otphp/vendor/base32.php";
-        require_once "lib/otphp/lib/otp.php";
-        require_once "lib/otphp/lib/totp.php";
-
         $result = \SmallSmallRSS\Database::query(
             "SELECT login,salt,otp_enabled
-            FROM ttrss_users
-            WHERE id = ".$_SESSION["uid"]
+             FROM ttrss_users
+             WHERE id = ".$_SESSION["uid"]
         );
 
         $base32 = new \Base32();
@@ -991,10 +987,6 @@ class Pref_Prefs extends ProtectedHandler
 
     public function otpenable()
     {
-        require_once "lib/otphp/vendor/base32.php";
-        require_once "lib/otphp/lib/otp.php";
-        require_once "lib/otphp/lib/totp.php";
-
         $password = $_REQUEST["password"];
         $otp = $_REQUEST["otp"];
 
@@ -1008,8 +1000,7 @@ class Pref_Prefs extends ProtectedHandler
                 WHERE id = ".$_SESSION["uid"]
             );
 
-            $base32 = new Base32();
-
+            $base32 = new \Base32();
             $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetch_result($result, 0, "salt")));
             $topt = new \OTPHP\TOTP($secret);
 

@@ -1,5 +1,5 @@
 <?php
-namespace \SmallSmallRSS;
+namespace SmallSmallRSS;
 
 class FileCache {
     private static $default_caches = array("simplepie", "images", "export", "upload");

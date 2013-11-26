@@ -105,7 +105,7 @@ class PluginHost
                 continue;
             }
             $class_file = strtolower(basename($class));
-            $class_dir = __DIR__ . "/../plugins/$class_file";
+            $class_dir = __DIR__ . "/../../plugins/$class_file";
             if (!is_dir($class_dir)) {
                 Logger::log("Missing class dir $class_dir");
                 continue;

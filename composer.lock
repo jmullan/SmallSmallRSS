@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "87052d77e9e58f4a7c1a50f977c819c3",
+    "hash": "089a19c631a9f7b5dd22d0bd82ba1f89",
     "packages": [
         {
             "name": "aferrandini/phpqrcode",
@@ -144,6 +144,21 @@
                 "issues": "https://github.com/jmullan/Pubsubhubbub/issues"
             },
             "time": "2013-11-26 04:01:02"
+        },
+        {
+            "name": "lelag/otphp",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:lelag/otphp.git",
+                "reference": "master"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "lib/"
+                ]
+            }
         },
         {
             "name": "php-gettext/php-gettext",

@@ -20,21 +20,23 @@ class RSSUpdater
         }
         // Process all other feeds using last_updated and interval parameters
         \SmallSmallRSS\Sanity::schemaOrDie();
-        $feeds_ids = \SmallSmallRSS\RSSUpdater::getUpdateableFeeds($limit);
+        $feed_ids = \SmallSmallRSS\RSSUpdater::getUpdateableFeeds($limit);
         // Here is a little cache magic in order to minimize risk of double feed updates.
         // We update the feed last update started date before anything else.
         // There is no lag due to feed contents downloads
         // It prevents another process from updating the same feed.
         \SmallSmallRSS\Feeds::markUpdateStarted($feeds_to_update);
         $nf = 0;
-        self::updateFeed($tline["id"], true);
+        foreach ($feed_ids as $feed_id) {
+            self::updateFeed($feed_id, true);
+        }
         \SmallSmallRSS\Digest::send_headlines();
         return $nf;
     }
     public static function getUpdateableFeeds($limit = null)
     {
-        // Test if the user has loggued in recently. If not, it does not update
-        // its feeds.
+        // Test if the user has loggued in recently. If not, do not update
+        // their feeds.
         $single_user = \SmallSmallRSS\Auth::is_single_user_mode();
         $daemon_update_login_limit = \SmallSmallRSS\Config::get('DAEMON_UPDATE_LOGIN_LIMIT');
         if (!$single_user && $daemon_update_login_limit > 0) {
@@ -145,6 +147,10 @@ class RSSUpdater
 
     public static function updateFeed($feed, $no_cache = false)
     {
+        if (is_null($feed) || $feed === '') {
+            _debug('Bad feed specified ' . var_export($feed, true));
+            return false;
+        }
         $result = \SmallSmallRSS\Database::query(
             "SELECT
              id,
@@ -179,7 +185,7 @@ class RSSUpdater
 
         $last_updated = $row["last_updated"];
         $last_article_timestamp = strtotime($row["last_article_timestamp"]);
-        if (\SmallSmallRSS\Configs::get('DISABLE_HTTP_304')) {
+        if (\SmallSmallRSS\Config::get('DISABLE_HTTP_304')) {
             $last_article_timestamp = 0;
         }
         $owner_uid = $row["owner_uid"];

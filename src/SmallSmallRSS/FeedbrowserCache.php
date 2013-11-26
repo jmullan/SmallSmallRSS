@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 
-class FeedbrowerCache {
+class FeedbrowserCache {
     function update($lines) {
         \SmallSmallRSS\Database::query("BEGIN");
         \SmallSmallRSS\Database::query("DELETE FROM ttrss_feedbrowser_cache");

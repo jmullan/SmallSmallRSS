@@ -38,4 +38,9 @@ class Logger_Syslog
         }
         error_log($string);
     }
+
+    public static function clearExpired()
+    {
+        return false;
+    }
 }

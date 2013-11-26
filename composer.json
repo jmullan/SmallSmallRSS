@@ -64,7 +64,8 @@
         "aferrandini/phpqrcode": "1.0.1",
         "phpmailer/phpmailer": "*",
         "jmullan/accepttogettext": "*@dev",
-        "jmullan/pubsubhubbub": "*@dev"
+        "jmullan/pubsubhubbub": "*@dev",
+        "lelag/otphp": "1.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"
@@ -75,7 +76,8 @@
     },
     "autoload": {
         "psr-0": {
-            "SmallSmallRSS\\": "./src/"
+            "SmallSmallRSS\\": "src/",
+            "Base32": "vendor/lelag/otphp/vendor/"
         }
     }
 }

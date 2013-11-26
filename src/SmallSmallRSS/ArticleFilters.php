@@ -1,3 +1,4 @@
+<?php
 namespace SmallSmallRSS;
 
 class ArticleFilters
@@ -88,7 +89,7 @@ class ArticleFilters
         return false;
     }
 
-    function calculateArticleScore($filters)
+    function calculateScore($filters)
     {
         $score = 0;
         foreach ($filters as $f) {

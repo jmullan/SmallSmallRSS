@@ -1,5 +1,6 @@
 <?php
-function make_password($length = 8) {
+function make_password($length = 8)
+{
     $password = "";
     $possible = "0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ*%+^";
     $i = 0;
@@ -16,7 +17,8 @@ function make_password($length = 8) {
 }
 
 
-function sanity_check($db_type) {
+function sanity_check($db_type)
+{
     $errors = array();
 
     if (version_compare(PHP_VERSION, '5.3.0', '<')) {
@@ -66,7 +68,8 @@ function sanity_check($db_type) {
     return $errors;
 }
 
-function db_connect($host, $user, $pass, $db, $type, $port = false) {
+function db_connect($host, $user, $pass, $db, $type, $port = false)
+{
     if ($type == "pgsql") {
         $string = "dbname=$db user=$user";
         if ($pass) {
@@ -91,14 +94,18 @@ function db_connect($host, $user, $pass, $db, $type, $port = false) {
             $link = mysql_connect($host, $user, $pass);
             if ($link) {
                 $result = mysql_select_db($db, $link);
-                if ($result) return $link;
+                if ($result) {
+                    return $link;
+                }
             }
         }
     }
 }
 
-function make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS,
-                     $DB_PORT, $SELF_URL_PATH) {
+function make_config(
+    $DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS,
+    $DB_PORT, $SELF_URL_PATH
+) {
 
     $rv = "";
     $finished = false;
@@ -125,7 +132,8 @@ function make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS,
     return $rv;
 }
 
-function db_query($link, $query, $type, $die_on_error = true) {
+function db_query($link, $query, $type, $die_on_error = true)
+{
     if ($type == "pgsql") {
         $result = pg_query($link, $query);
         if (!$result) {
@@ -152,7 +160,8 @@ function db_query($link, $query, $type, $die_on_error = true) {
     }
 }
 
-function makeSelfURLPath() {
+function makeSelfURLPath()
+{
     $url_path = (
         (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] != "on") ? 'http://' :  'https://')
         . $_SERVER["HTTP_HOST"] . parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
@@ -161,14 +170,11 @@ function makeSelfURLPath() {
 }
 
 
-
-
-
-
 if (file_exists("../config.ini")) {
     if (!defined('_INSTALLER_IGNORE_CONFIG_CHECK')) {
         \SmallSmallRSS\Renderers\Messages::renderError(
-            "Error: config.ini already exists in tt-rss directory; aborting.");
+            "Error: config.ini already exists in tt-rss directory; aborting."
+        );
         exit;
     }
 }
@@ -297,7 +303,8 @@ if ($op == 'testconfig') {
 
     if (count($notices) > 0) {
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            "Configuration check succeeded with minor problems:");
+            "Configuration check succeeded with minor problems:"
+        );
 
         print "<ul>";
 
@@ -314,7 +321,8 @@ if ($op == 'testconfig') {
 
     if (!$link) {
         \SmallSmallRSS\Renderers\Messages::renderError(
-            "Unable to connect to database using specified parameters.");
+            "Unable to connect to database using specified parameters."
+        );
         exit;
     }
 
@@ -325,7 +333,9 @@ if ($op == 'testconfig') {
     $result = @\SmallSmallRSS\Database::query($link, "SELECT true FROM ttrss_feeds", $DB_TYPE, false);
     if ($result) {
         \SmallSmallRSS\Renderers\Messages::renderError(
-            "Existing tt-rss tables will be removed from the database. If you would like to keep your data, skip database initialization.");
+            "Existing tt-rss tables will be removed from the database."
+            . " If you would like to keep your data, skip database initialization."
+        );
         $need_confirm = true;
     } else {
         $need_confirm = false;
@@ -377,7 +387,8 @@ if ($op == 'testconfig') {
 
     if (!$link) {
         \SmallSmallRSS\Renderers\Messages::renderError(
-            "Unable to connect to database using specified parameters.");
+            "Unable to connect to database using specified parameters."
+        );
         exit;
     }
 
@@ -394,11 +405,13 @@ if ($op == 'testconfig') {
         }
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            "Database initialization completed.");
+            "Database initialization completed."
+        );
 
     } else {
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            "Database initialization skipped.");
+            "Database initialization skipped."
+        );
     }
 
     print "<h2>Generated configuration file</h2>";
@@ -439,24 +452,33 @@ echo make_config($DB_TYPE, $DB_HOST, $DB_USER, $DB_NAME, $DB_PASS, $DB_PORT, $SE
     if (!file_exists("../config.ini")) {
         $fp = fopen("../config.ini", "w");
         if ($fp) {
-            $written = fwrite($fp, make_config($DB_TYPE, $DB_HOST,
-                                               $DB_USER, $DB_NAME, $DB_PASS,
-                                               $DB_PORT, $SELF_URL_PATH));
+            $written = fwrite(
+                $fp,
+                make_config(
+                    $DB_TYPE, $DB_HOST,
+                    $DB_USER, $DB_NAME, $DB_PASS,
+                    $DB_PORT, $SELF_URL_PATH
+                )
+            );
             if ($written > 0) {
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
-                    "Successfully saved config.ini. You can try <a href=\"..\">loading tt-rss now</a>.");
+                    "Successfully saved config.ini. You can try <a href=\"..\">loading tt-rss now</a>."
+                );
             } else {
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
-                    "Unable to write into config.ini in tt-rss directory.");
+                    "Unable to write into config.ini in tt-rss directory."
+                );
             }
             fclose($fp);
         } else {
             \SmallSmallRSS\Renderers\Messages::renderError(
-                "Unable to open config.ini in tt-rss directory for writing.");
+                "Unable to open config.ini in tt-rss directory for writing."
+            );
         }
     } else {
         \SmallSmallRSS\Renderers\Messages::renderError(
-            "config.ini already present in tt-rss directory, refusing to overwrite.");
+            "config.ini already present in tt-rss directory, refusing to overwrite."
+        );
     }
 }
 ?>

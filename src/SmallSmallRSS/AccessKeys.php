@@ -40,4 +40,19 @@ class AccessKeys
              WHERE owner_uid = $owner_uid"
         );
     }
+    public static function getOwner($key)
+    {
+        $key = \SmallSmallRSS\Database::escape_string($key);
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT owner_uid
+             FROM ttrss_access_keys
+             WHERE
+                 access_key = '$key'
+                 AND feed_id = 'OPML:Publish'"
+        );
+        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
+        }
+        return false;
+    }
 }

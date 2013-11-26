@@ -10,61 +10,50 @@ if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
 
+$registration_enabled = \SmallSmallRSS\Config::get('ENABLE_REGISTRATION');
+$num_users = \SmallSmallRSS\Users::count();
+$max_users = \SmallSmallRSS\Config::get('REG_MAX_USERS');
+if (!$max_users) {
+    $max_users = $num_users + 1;
+}
+$avail_users = max($max_users - $num_users, 0);
+if ($registration_enabled) {
+    $reg_suffix = "enabled";
+} else {
+    $avail_users = 0;
+    $reg_suffix = "disabled";
+}
+
 if ($_REQUEST["format"] == "feed") {
     header("Content-Type: text/xml");
     print '<?xml version="1.0" encoding="utf-8"?>';
-    print "<feed xmlns=\"http://www.w3.org/2005/Atom\">
-            <id>".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php")."</id>
-            <title>Tiny Tiny RSS registration slots</title>
-            <link rel=\"self\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php?format=feed")."\"/>
-            <link rel=\"alternate\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'))."\"/>";
+    print "<feed xmlns=\"http://www.w3.org/2005/Atom\">";
+    print "<id>".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php")."</id>";
+    print "<title>Tiny Tiny RSS registration slots</title>";
+    print "<link rel=\"self\" href=\"";
+    print htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php?format=feed");
+    print "\"/>";
+    print "<link rel=\"alternate\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'))."\"/>";
 
-    if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
-        $result = \SmallSmallRSS\Database::query("SELECT COUNT(*) AS cu FROM ttrss_users");
-        $num_users = \SmallSmallRSS\Database::fetch_result($result, 0, "cu");
-
-        $num_users = \SmallSmallRSS\Config::get('REG_MAX_USERS') - $num_users;
-        if ($num_users < 0) $num_users = 0;
-        $reg_suffix = "enabled";
-    } else {
-        $num_users = 0;
-        $reg_suffix = "disabled";
-    }
-
-    print "<entry>
-            <id>".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'))."/register.php?$num_users"."</id>
-            <link rel=\"alternate\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php")."\"/>";
-
+    print "<entry>";
+    print "<id>";
+    print htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'));
+    print "/register.php?$num_users";
+    print "</id>";
+    print "<link rel=\"alternate\" href=\"";
+    print htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php");
+    print "\"/>";
     print "<title>$num_users slots are currently available, registration $reg_suffix</title>";
     print "<summary>$num_users slots are currently available, registration $reg_suffix</summary>";
-
     print "</entry>";
-
     print "</feed>";
-
     return;
 }
 
 /* Remove users which didn't login after receiving their registration information */
-
-if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-    \SmallSmallRSS\Database::query(
-        "DELETE FROM ttrss_users WHERE last_login IS NULL
-         AND created < NOW() - INTERVAL '1 day' AND access_level = 0"
-    );
-} else {
-    \SmallSmallRSS\Database::query(
-        "DELETE FROM ttrss_users WHERE last_login IS NULL
-         AND created < DATE_SUB(NOW(), INTERVAL 1 DAY) AND access_level = 0"
-    );
-}
-
+\SmallSmallRSS\Users::clearExpired();
 if ($action == "check") {
-    $login = trim(\SmallSmallRSS\Database::escape_string($_REQUEST['login']));
-    $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE
-            LOWER(login) = LOWER('$login')");
-    $is_registered = \SmallSmallRSS\Database::num_rows($result) > 0;
-
+    $is_registered = \SmallSmallRSS\Users::isRegistered($_REQUEST['login']);
     header("Content-Type: application/xml");
     print "<result>";
     printf("%d", $is_registered);
@@ -75,161 +64,76 @@ if ($action == "check") {
 
 <html>
 <head>
-<title>Create new account</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <link rel="stylesheet" type="text/css" href="css/utility.css">
-    <script type="text/javascript" src="js/functions.js"></script>
-    <script type="text/javascript" src="lib/prototype.js"></script>
-    <script type="text/javascript" src="lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls"></script>
-    </head>
-
-    <script type="text/javascript">
-
-    function checkUsername() {
-
-    try {
-        var f = document.forms['register_form'];
-        var login = f.login.value;
-
-        if (login == "") {
-            new Effect.Highlight(f.login);
-            f.sub_btn.disabled = true;
-            return false;
-        }
-
-        var query = "register.php?action=check&login=" +
-        param_escape(login);
-
-        new Ajax.Request(query, {
-            onComplete: function(transport) {
-
-                    try {
-
-                        var reply = transport.responseXML;
-
-                        var result = reply.getElementsByTagName('result')[0];
-                        var result_code = result.firstChild.nodeValue;
-
-                        if (result_code == 0) {
-                            new Effect.Highlight(f.login, {startcolor : '#00ff00'});
-                            f.sub_btn.disabled = false;
-                        } else {
-                            new Effect.Highlight(f.login, {startcolor : '#ff0000'});
-                            f.sub_btn.disabled = true;
-                        }
-                    } catch (e) {
-                        exception_error("checkUsername_callback", e);
-                    }
-
-                } });
-
-    } catch (e) {
-        exception_error("checkUsername", e);
-    }
-
-    return false;
-
-}
-
-function validateRegForm() {
-    try {
-
-        var f = document.forms['register_form'];
-
-        if (f.login.value.length == 0) {
-            new Effect.Highlight(f.login);
-            return false;
-        }
-
-        if (f.email.value.length == 0) {
-            new Effect.Highlight(f.email);
-            return false;
-        }
-
-        if (f.turing_test.value.length == 0) {
-            new Effect.Highlight(f.turing_test);
-            return false;
-        }
-
-        return true;
-
-    } catch (e) {
-        exception_error("validateRegForm", e);
-        return false;
-    }
-}
-
-</script>
-
+  <title>Create new account</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="css/utility.css">
+  <script type="text/javascript" src="js/functions.js"></script>
+  <script type="text/javascript" src="lib/prototype.js"></script>
+  <script type="text/javascript" src="lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls"></script>
+  <script type="text/javascript" src="js/register.js"></script>
+</head>
 <body>
-
-<div class="floatingLogo"><img src="images/logo_small.png"></div>
-
-    <h1><?php echo __("Create new account") ?></h1>
-
-    <div class="content">
-
+  <div class="floatingLogo"><img src="images/logo_small.png" /></div>
+  <h1><?php echo __("Create new account") ?></h1>
+  <div class="content">
 <?php
-    if (!\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
+    if (!$registration_enabled) {
         \SmallSmallRSS\Renderers\Messages::renderError(
-            __("New user registrations are administratively disabled."));
-
-        print "<p><form method=\"GET\" action=\"backend.php\">
-                <input type=\"hidden\" name=\"op\" value=\"logout\">
-                <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                </form>";
+            __("New user registrations are administratively disabled.")
+        );
+        print '<form method="GET" action="backend.php">';
+        print '<input type="hidden" name="op" value="logout" />';
+        print '<p><input type="submit" value="<?php echo __("Return to Tiny Tiny RSS"); ?>" /></p>';
+        print '</form>';
         return;
     }
-?>
 
-<?php if (\SmallSmallRSS\Config::get('REG_MAX_USERS') > 0) {
-$result = \SmallSmallRSS\Database::query("SELECT COUNT(*) AS cu FROM ttrss_users");
-$num_users = \SmallSmallRSS\Database::fetch_result($result, 0, "cu");
-} ?>
-
-<?php
-if (!\SmallSmallRSS\Config::get('REG_MAX_USERS')
-    || $num_users < \SmallSmallRSS\Config::get('REG_MAX_USERS')) {
-?>
-    <?php if (!$action) { ?>
-
-    <p><?php echo __('Your temporary password will be sent to the specified email. Accounts, which were not logged in once, are erased automatically 24 hours after temporary password is sent.') ?></p>
-
-    <form action="register.php" method="POST" name="register_form">
-    <input type="hidden" name="action" value="do_register">
-    <table>
-    <tr>
-    <td><?php echo __('Desired login:') ?></td><td>
-        <input name="login" required>
-    </td><td>
-        <input type="submit" value="<?php echo __('Check availability') ?>" onclick='return checkUsername()'>
-    </td></tr>
-    <tr><td><?php echo __('Email:') ?></td><td>
-        <input name="email" type="email" required>
-    </td></tr>
-    <tr><td><?php echo __('How much is two plus two:') ?></td><td>
-        <input name="turing_test" required></td></tr>
-    <tr><td colspan="2" align="right">
-    <input type="submit" name="sub_btn" value="<?php echo __('Submit registration') ?>"
-            disabled="disabled" onclick='return validateRegForm()'>
-    </td></tr>
-    </table>
-    </form>
-
-    <?php print "<p><form method=\"GET\" action=\"index.php\">
-                <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                </form>"; ?>
-
-    <?php } elseif ($action == "do_register") { ?>
-
-    <?php
-        $login = mb_strtolower(trim(\SmallSmallRSS\Database::escape_string($_REQUEST["login"])));
-        $email = trim(\SmallSmallRSS\Database::escape_string($_REQUEST["email"]));
-        $test = trim(\SmallSmallRSS\Database::escape_string($_REQUEST["turing_test"]));
-
-        if (!$login || !$email || !$test) {
+if (!$max_users || $avail_users) {
+    if (!$action) {
+        print '<p>';
+        echo __('Your temporary password will be sent to the specified email. Accounts, which were not logged in once, are erased automatically 24 hours after temporary password is sent.');
+        print '</p>';
+        print '<form action="register.php" method="POST" name="register_form">';
+        print '<input type="hidden" name="action" value="do_register">';
+        print '<table>';
+        print '<tr>';
+        print '<td>';
+        echo __('Desired login:');
+        print '</td><td>';
+        print '<input name="login" required>';
+        print '</td>';
+        print '<td>';
+        print '<input type="submit" value="';
+        echo __('Check availability');
+        print '" onclick="return checkUsername()">';
+        print '</td>';
+        print '</tr>';
+        print '<tr><td>';
+        echo __('Email:');
+        print '</td><td>';
+        print '<input name="email" type="email" required>';
+        print '</td></tr>';
+        print '<tr><td>';
+        echo __('How much is two plus two:');
+        print '</td><td>';
+        print '<input name="turing_test" required></td></tr>';
+        print '<tr><td colspan="2" align="right">';
+        print '<input type="submit" name="sub_btn" value="';
+        echo __('Submit registration');
+        print '"';
+        print 'disabled="disabled" onclick="return validateRegForm()" />';
+        print '</td></tr>';
+        print '</table>';
+        print '</form>';
+        print "<p><form method=\"GET\" action=\"index.php\">";
+        print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+        print "</form>";
+    } elseif ($action == "do_register") {
+        $test = trim($_REQUEST["turing_test"]);
+        if (empty($_REQUEST['login']) || empty($_REQUEST['email']) || !$test) {
             \SmallSmallRSS\Renderers\Messages::renderError(
-                            __("Your registration information is incomplete."));
+                __("Your registration information is incomplete.")
+            );
             print "<p><form method=\"GET\" action=\"index.php\">
                 <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
                 </form>";
@@ -237,43 +141,23 @@ if (!\SmallSmallRSS\Config::get('REG_MAX_USERS')
         }
 
         if ($test == "four" || $test == "4") {
-
-            $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE
-                login = '$login'");
-
-            $is_registered = \SmallSmallRSS\Database::num_rows($result) > 0;
-
+            $is_registered = \SmallSmallRSS\Users::isRegistered($_REQUEST['login']);
             if ($is_registered) {
                 \SmallSmallRSS\Renderers\Messages::renderError(
-                                    __('Sorry, this username is already taken.'));
-                print "<p><form method=\"GET\" action=\"index.php\">
-                <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                </form>";
+                    __('Sorry, this username is already taken.')
+                );
+                print "<p><form method=\"GET\" action=\"index.php\">";
+                print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+                print "</form>";
             } else {
-
-                $password = make_password();
-
-                $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
-                $pwd_hash = encrypt_password($password, $salt, true);
-
-                \SmallSmallRSS\Database::query("INSERT INTO ttrss_users
-                    (login,pwd_hash,access_level,last_login, email, created, salt)
-                    VALUES ('$login', '$pwd_hash', 0, null, '$email', NOW(), '$salt')");
-
-                $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE
-                    login = '$login' AND pwd_hash = '$pwd_hash'");
-
-                if (\SmallSmallRSS\Database::num_rows($result) != 1) {
+                $new_uid = \SmallSmallRSS\Users::create($_REQUEST['login'], $_REQUEST['email']);
+                if (!$new_uid) {
                     \SmallSmallRSS\Renderers\Messages::renderError(__('Registration failed.'));
-                    print "<p><form method=\"GET\" action=\"index.php\">
-                    <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                    </form>";
+                    print "<p><form method=\"GET\" action=\"index.php\">";
+                    print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+                    print "</form>";
                 } else {
-
-                    $new_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
-
                     \SmallSmallRSS\Feeds\newUser($new_uid);
-
                     $reg_text = "Hi!\n".
                         "\n".
                         "You are receiving this message, because you (or somebody else) have opened\n".
@@ -294,9 +178,8 @@ if (!\SmallSmallRSS\Config::get('REG_MAX_USERS')
                     $rc = $mail->quickMail($email, "", "Registration information for Tiny Tiny RSS", $reg_text, false);
 
                     if (!$rc) {
-                                            \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
-                                        }
-
+                        \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
+                    }
                     unset($reg_text);
                     unset($mail);
                     unset($rc);
@@ -323,36 +206,32 @@ if (!\SmallSmallRSS\Config::get('REG_MAX_USERS')
                             \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
                         }
                     }
-
                     \SmallSmallRSS\Renderers\Messages::renderNotice(
                         __("Account created successfully.")
                     );
-
-                    print "<p><form method=\"GET\" action=\"index.php\">
-                    <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                    </form>";
+                    print "<p><form method=\"GET\" action=\"index.php\">";
+                    print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+                    print "</form>";
 
                 }
 
             }
-
-                } else {
-                    \SmallSmallRSS\Renderers\Messages::renderError(
-                        'Plese check the form again, you have failed the robot test.'
-                    );
-                    print "<p><form method=\"GET\" action=\"index.php\">
-                           <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />
-                           </form>";
-
-         }
+        } else {
+            \SmallSmallRSS\Renderers\Messages::renderError(
+                'Plese check the form again, you have failed the robot test.'
+            );
+            print "<p><form method=\"GET\" action=\"index.php\">";
+            print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />";
+            print "</form>";
+        }
     }
 } else {
     \SmallSmallRSS\Renderers\Messages::renderNotice(__('New user registrations are currently closed.'));
-    print "<p><form method=\"GET\" action=\"index.php\">
-           <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />
-           </form>";
-} ?>
-
-    </div>
+    print "<p><form method=\"GET\" action=\"index.php\">";
+    print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />";
+    print "</form>";
+}
+?>
+  </div>
 </body>
 </html>

@@ -6,12 +6,6 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 error_reporting(-1);
 \SmallSmallRSS\Sanity::initialCheck();
 \SmallSmallRSS\Utils::cleanUpStripslashes();
-$include_paths = array(
-    dirname(__DIR__) . '/include/',
-    get_include_path(),
-);
-set_include_path(join(PATH_SEPARATOR, $include_paths));
-
 if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
     \SmallSmallRSS\Config::set('SUBSTRING_FOR_DATE', 'SUBSTRING_FOR_DATE');
 } else {
@@ -34,4 +28,4 @@ if (defined('E_DEPRECATED')) {
 ini_set('user_agent', \SmallSmallRSS\Config::get('SELF_USER_AGENT'));
 
 
-require __DIR__ . '/../include/functions.php';
+require __DIR__ . '/../../include/functions.php';

@@ -38,14 +38,14 @@ function get_favicon_url($url)
         $entries = $xpath->query('/html/head/link[@rel="shortcut icon" or @rel="icon"]');
         if (count($entries) > 0) {
             foreach ($entries as $entry) {
-                $favicon_url = rewriteRelativeUrl($url, $entry->getAttribute("href"));
+                $favicon_url = \SmallSmallRSS\Utils::rewriteRelativeUrl($url, $entry->getAttribute("href"));
                 break;
             }
         }
     }
 
     if (!$favicon_url) {
-        $favicon_url = rewriteRelativeUrl($url, "/favicon.ico");
+        $favicon_url = \SmallSmallRSS\Utils::rewriteRelativeUrl($url, "/favicon.ico");
     }
     return $favicon_url;
 }
@@ -1939,7 +1939,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     foreach ($entries as $entry) {
         if ($site_url) {
             if ($entry->hasAttribute('href')) {
-                $entry->setAttribute('href', rewriteRelativeUrl($site_url, $entry->getAttribute('href')));
+                $entry->setAttribute('href', \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $entry->getAttribute('href')));
                 $entry->setAttribute('rel', 'noreferrer');
             }
             if ($entry->nodeName == 'img') {
@@ -2709,7 +2709,7 @@ function get_feeds_from_html($url, $content)
             if ($title == '') {
                 $title = $entry->getAttribute('type');
             }
-            $feedUrl = rewriteRelativeUrl($baseUrl, $entry->getAttribute('href'));
+            $feedUrl = \SmallSmallRSS\Utils::rewriteRelativeUrl($baseUrl, $entry->getAttribute('href'));
             $feedUrls[$feedUrl] = $title;
         }
     }

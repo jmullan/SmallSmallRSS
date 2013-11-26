@@ -55,15 +55,14 @@ class Sanity
     {
         $errors = array();
 
-        if (!file_exists("config.ini")) {
+        if (!file_exists(__DIR__ . "/../../config.ini")) {
             array_push(
                 $errors,
                 "Configuration file not found."
                 . " Looks like you forgot to copy config.ini-dist to config.ini and edit it."
             );
         } else {
-
-            if (file_exists("install") && !file_exists("config.ini")) {
+            if (file_exists(__DIR__ . "/../../web/install") && !file_exists(__DIR__ . "/../../config.ini")) {
                 array_push(
                     $errors,
                     "Please copy config.ini-dist to config.ini or run the installer in install/"

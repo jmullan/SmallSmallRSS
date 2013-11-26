@@ -8,7 +8,7 @@ if (!file_exists("config.ini")) {
     print "You forgot to copy <b>config.ini-dist</b> to <b>config.ini</b> and edit it.\n";
     exit;
 }
-require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
+require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Session::init();
 
 if (!\SmallSmallRSS\PluginHost::init_all()) {

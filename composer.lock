@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "e5e100f66473cb1cc650085100825a49",
+    "hash": "87052d77e9e58f4a7c1a50f977c819c3",
     "packages": [
         {
             "name": "aferrandini/phpqrcode",
@@ -50,24 +50,100 @@
             "time": "2013-07-08 09:39:08"
         },
         {
-            "name": "jmullan/AcceptToGettext",
-            "version": "2.0.0",
+            "name": "jmullan/accepttogettext",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jmullan/AcceptToGettext",
-                "reference": "master"
+                "url": "https://github.com/jmullan/AcceptToGettext.git",
+                "reference": "db58d92c47f8bfa6ebeeb513d8738aac53c3bc80"
             },
-            "type": "library"
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jmullan/AcceptToGettext/zipball/db58d92c47f8bfa6ebeeb513d8738aac53c3bc80",
+                "reference": "db58d92c47f8bfa6ebeeb513d8738aac53c3bc80",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "AcceptToGettext\\": "src/"
+                }
+            },
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Jesse Mullan",
+                    "email": "jmullan@visi.com"
+                },
+                {
+                    "name": "Wouter Verhelst",
+                    "email": "wouter@grep.be"
+                }
+            ],
+            "description": "Examine Accept-* headers and choose the correct gettext locale",
+            "keywords": [
+                "gettext"
+            ],
+            "support": {
+                "source": "https://github.com/jmullan/AcceptToGettext/tree/master",
+                "issues": "https://github.com/jmullan/AcceptToGettext/issues"
+            },
+            "time": "2013-11-26 04:07:30"
         },
         {
-            "name": "jmullan/Pubsubhubbub",
-            "version": "2.0.0",
+            "name": "jmullan/pubsubhubbub",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/jmullan/Pubsubhubbub",
-                "reference": "master"
+                "url": "https://github.com/jmullan/Pubsubhubbub.git",
+                "reference": "a1e1eb851e0a17a6ff7d02f23004871855745a7b"
             },
-            "type": "library"
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jmullan/Pubsubhubbub/zipball/a1e1eb851e0a17a6ff7d02f23004871855745a7b",
+                "reference": "a1e1eb851e0a17a6ff7d02f23004871855745a7b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Pubsubhubbub\\": "./src/"
+                }
+            },
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Jesse Mullan",
+                    "email": "jmullan@visi.com"
+                },
+                {
+                    "name": "Josh Fraser",
+                    "email": "joshfraz@gmail.com"
+                }
+            ],
+            "description": "Pubsubhubbub Publisher and Subscriber",
+            "keywords": [
+                "PuSH",
+                "pubsubhubbub"
+            ],
+            "support": {
+                "source": "https://github.com/jmullan/Pubsubhubbub/tree/master",
+                "issues": "https://github.com/jmullan/Pubsubhubbub/issues"
+            },
+            "time": "2013-11-26 04:01:02"
         },
         {
             "name": "php-gettext/php-gettext",
@@ -80,6 +156,9 @@
             },
             "type": "library",
             "autoload": {
+                "files": [
+                    "gettext.inc"
+                ],
                 "classmap": [
                     "gettext.php",
                     "streams.php"
@@ -601,9 +680,10 @@
 
     ],
     "minimum-stability": "stable",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "jmullan/accepttogettext": 20,
+        "jmullan/pubsubhubbub": 20
+    },
     "platform": {
         "php": ">=5.3.0",
         "ext-curl": "*"

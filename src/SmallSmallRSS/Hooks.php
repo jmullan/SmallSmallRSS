@@ -18,8 +18,8 @@ class Hooks
     const FEED_FETCHED = 12;
     const SANITIZE = 13;
     const FILTER_ARTICLE_API = 14;
-    const TOOLBAR_BUTTON = 15;
-    const ACTION_ITEM = 16;
+    const RENDER_TOOLBAR_BUTTON = 15;
+    const RENDER_ACTION_ITEM = 16;
     const RENDER_HEADLINE_TOOLBAR_BUTTON = 17;
     const HOTKEY_INFO = 18;
     const ARTICLE_LEFT_BUTTON = 19;

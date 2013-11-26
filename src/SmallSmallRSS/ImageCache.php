@@ -1,3 +1,4 @@
+<?php
 namespace SmallSmallRSS;
 
 class ImageCache
@@ -26,7 +27,7 @@ class ImageCache
         if (0 === strpos($src, \SmallSmallRSS\Config::get('SELF_URL_PATH'))) {
             return;
         }
-        $src = rewriteRelativeUrl($site_url, $path);
+        $src = \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $path);
         $cached = self::isCached($site_url, $path, $download_if_missing);
         if ($cached) {
             $src = \SmallSmallRSS\Config::get('SELF_URL_PATH') . '/image.php?hash=' . sha1($src);

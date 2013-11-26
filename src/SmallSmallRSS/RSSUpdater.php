@@ -328,7 +328,7 @@ class RSSUpdater
         $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
 
         $site_url = \SmallSmallRSS\Database::escape_string(
-            mb_substr(rewriteRelativeUrl($fetch_url, $rss->get_link()), 0, 245)
+            mb_substr(\SmallSmallRSS\Utils::rewriteRelativeUrl($fetch_url, $rss->get_link()), 0, 245)
         );
 
         if ($favicon_needs_check || $force_refetch) {
@@ -447,7 +447,7 @@ class RSSUpdater
             }
             $entry_timestamp_fmt = strftime("%Y/%m/%d %H:%M:%S", $entry_timestamp);
             $entry_title = $item->get_title();
-            $entry_link = rewriteRelativeUrl($site_url, $item->get_link());
+            $entry_link = \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $item->get_link());
             if (!$entry_title) {
                 $entry_title = date("Y-m-d H:i:s", $entry_timestamp);
             };

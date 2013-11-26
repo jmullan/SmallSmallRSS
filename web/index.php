@@ -1,9 +1,9 @@
 <?php
-if (file_exists("install") && !file_exists("config.ini")) {
+if (file_exists(__DIR__ . "/install") && !file_exists(__DIR__ . "/../config.ini")) {
     header("Location: install/");
 }
 
-if (!file_exists("config.ini")) {
+if (!file_exists(__DIR__ . "/../config.ini")) {
     print "<b>Fatal Error</b>: You forgot to copy
            <b>config.ini-dist</b> to <b>config.ini</b> and edit it.\n";
     exit;
@@ -13,10 +13,9 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     print "<b>Fatal Error</b>: PHP version 5.3.0 or newer required.\n";
     exit;
 }
-require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
+require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Session::init();
-require_once "lib/Mobile_Detect.php";
-
+require_once __DIR__ . "/../lib/Mobile_Detect.php";
 $mobile = new Mobile_Detect();
 
 if (!\SmallSmallRSS\PluginHost::init_all()) {
@@ -56,7 +55,8 @@ $js_files = array(
     "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
     "lib/dojo/dojo.js",
     "lib/dojo/tt-rss-layer.js",
-    "errors.php?mode=js");
+    "errors.php?mode=js"
+);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -82,7 +82,8 @@ foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $p) {
   <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
   <link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
 <?php
-foreach ($jsfiles as $jsfile) {
+foreach ($js_files as $jsfile) {
+    echo "<!-- $jsfile -->";
     $js_renderer->render_script_tag($jsfile);
 }
 ?>

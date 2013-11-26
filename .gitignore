@@ -5,7 +5,7 @@
 lib/floIcon.php
 .idea/*
 config.php
-feed-icons/*
+web/feed-icons/*
 cache/*/*
 lock/*
 tags

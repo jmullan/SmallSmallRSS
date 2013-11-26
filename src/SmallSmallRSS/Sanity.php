@@ -40,11 +40,14 @@ class Sanity
 
     public static function makeSelfURLPath()
     {
-        $url_path = (
-            ($_SERVER['HTTPS'] != "on" ? 'http://' : 'https://')
-            . $_SERVER["HTTP_HOST"]
-            . parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)
+        $https = (
+            (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on')
+            ? 'http://'
+            : 'https://'
         );
+        $host = (isset($_SERVER["HTTP_HOST"]) ? $_SERVER["HTTP_HOST"] : 'localhost');
+        $request_uri = (isset($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : '/');
+        $url_path = ($https . $host . parse_url($request_uri, PHP_URL_PATH));
         return $url_path;
     }
 
@@ -143,16 +146,16 @@ class Sanity
                     );
                 }
             }
-
             if (\SmallSmallRSS\Config::get('SELF_URL_PATH') == "http://yourserver/tt-rss/") {
-                $urlpath = preg_replace("/\w+\.php$/", "", self::makeSelfURLPath());
-
-                array_push(
-                    $errors,
-                    "Please set SELF_URL_PATH to the correct value for your server (possible value: <b>$urlpath</b>)"
-                );
+                if ('cli' != php_sapi_name()) {
+                    $urlpath = preg_replace("/\w+\.php$/", "", self::makeSelfURLPath());
+                    array_push(
+                        $errors,
+                        "Please set SELF_URL_PATH to the correct value for your server"
+                        . " (possible value: <b>$urlpath</b>)"
+                    );
+                }
             }
-
             if (!is_writable(\SmallSmallRSS\Config::get('ICONS_DIR'))) {
                 array_push(
                     $errors,
@@ -222,7 +225,7 @@ class Sanity
             }
         }
 
-        if (count($errors) > 0 && $_SERVER['REQUEST_URI']) {
+        if (count($errors) > 0 && !empty($_SERVER['REQUEST_URI'])) {
             $insane = new \SmallSmallRSS\Renderers\Insane($errors);
             $insane->render();
             exit;

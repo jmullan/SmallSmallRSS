@@ -300,4 +300,14 @@ class Feeds
              WHERE id = '$feed_id'"
         );
     }
+
+    public static function resetAll()
+    {
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_feeds
+             SET
+                 last_update_started = '1970-01-01',
+                 last_updated = '1970-01-01'"
+        );
+    }
 }

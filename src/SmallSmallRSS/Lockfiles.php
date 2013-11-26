@@ -94,7 +94,7 @@ class Lockfiles
         return true;
     }
 
-    public static function last_modified($lockfile)
+    public static function lastModified($lockfile)
     {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (!file_exists($full_path)) {
@@ -104,8 +104,9 @@ class Lockfiles
         return $stat_f['mtime'];
     }
 
-    public static function make_stamp($lockfile)
+    public static function stamp($stamp)
     {
+        $lockfile = $stamp . '.stamp';
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         $fp = fopen($full_path, "w");
         if (!$fp) {
@@ -121,5 +122,11 @@ class Lockfiles
         flock($fp, LOCK_UN);
         fclose($fp);
         return true;
+    }
+    public static function whenStamped($stamp)
+    {
+        $lockfile = $stamp . '.stamp';
+        return self::get_contents($lockfile);
+
     }
 }

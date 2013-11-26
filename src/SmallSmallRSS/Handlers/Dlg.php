@@ -78,7 +78,7 @@ class Dlg extends ProtectedHandler
                 . " running, which prevents all feeds from updating. Please start the"
                 . " daemon process or contact instance owner."
             );
-            $stamp = (int) \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
+            $stamp = (int) \SmallSmallRSS\Lockfiles::whenStamped("update_daemon");
             print "<p>" . __("Last update:") . " " . date("Y.m.d, G:i", $stamp);
 
         }
@@ -88,7 +88,7 @@ class Dlg extends ProtectedHandler
                 . " This could indicate a problem like crash or a hang. Please"
                 . " check the daemon process or contact instance owner."
             );
-            $stamp = (int) \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
+            $stamp = (int) \SmallSmallRSS\Lockfiles::whenStamped("update_daemon");
             print "<p>" . __("Last update:") . " " . date("Y.m.d, G:i", $stamp);
         }
         print "</div>";

@@ -14,10 +14,7 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     exit;
 }
 require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
-
 \SmallSmallRSS\Session::init();
-\SmallSmallRSS\Sanity::initialCheck();
-
 require_once "lib/Mobile_Detect.php";
 
 $mobile = new Mobile_Detect();

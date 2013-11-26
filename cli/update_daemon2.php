@@ -4,8 +4,6 @@ require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
 
 chdir(__DIR__);
 
-\SmallSmallRSS\Sanity::initialCheck();
-
 if (!function_exists('pcntl_fork')) {
     die("error: This script requires PHP compiled with PCNTL module.\n");
 }

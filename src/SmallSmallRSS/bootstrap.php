@@ -4,6 +4,7 @@
  */
 require_once __DIR__ . '/../../vendor/autoload.php';
 error_reporting(-1);
+\SmallSmallRSS\Sanity::initialCheck();
 \SmallSmallRSS\Utils::cleanUpStripslashes();
 $include_paths = array(
     dirname(__DIR__) . '/include/',

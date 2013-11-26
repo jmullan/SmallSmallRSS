@@ -1441,8 +1441,8 @@ function make_runtime_info()
     $data['cdm_expanded'] = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
     $data['dependency_timestamp'] = calculate_dep_timestamp();
     $data['reload_on_ts_change'] = \SmallSmallRSS\Config::get('RELOAD_ON_TS_CHANGE');
-    $feeds_stamp = \SmallSmallRSS\Lockfiles::get_contents("update_feeds.stamp");
-    $daemon_stamp = \SmallSmallRSS\Lockfiles::get_contents("update_daemon.stamp");
+    $feeds_stamp = \SmallSmallRSS\Lockfiles::whenStamped("update_feeds");
+    $daemon_stamp = \SmallSmallRSS\Lockfiles::whenStamped("update_daemon");
     $data['daemon_is_running'] = (
         \SmallSmallRSS\Lockfiles::is_locked("update_daemon.lock")
         || (bool) $feeds_stamp

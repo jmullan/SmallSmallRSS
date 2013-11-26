@@ -1,11 +1,7 @@
 #!/usr/bin/env php
 <?php
 require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
-
-chdir(dirname(__FILE__));
-
-\SmallSmallRSS\Sanity::initialCheck();
-
+chdir(__DIR__);
 \SmallSmallRSS\PluginHost::init_all();
 
 $longopts = array(
@@ -126,17 +122,11 @@ if (isset($options["task"]) && isset($options["pidlock"])) {
 
 if (isset($options["force-update"])) {
     _debug("marking all feeds as needing update...");
-
-    \SmallSmallRSS\Database::query(
-        "UPDATE ttrss_feeds
-         SET
-             last_update_started = '1970-01-01',
-             last_updated = '1970-01-01'"
-    );
+    \SmallSmallRSS\Feeds::resetAll();
 }
 
 if (isset($options["feeds"])) {
-    \SmallSmallRSS\Lockfiles::make_stamp('update_feeds.stamp');
+    \SmallSmallRSS\Lockfiles::stamp('update_feeds');
     \SmallSmallRSS\RSSUpdater::updateBatch($num_updates);
     \SmallSmallRSS\RSSUpdater::housekeeping();
     \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::UPDATE_TASK);
@@ -159,7 +149,7 @@ if (isset($options["daemon"])) {
 }
 
 if (isset($options["daemon-loop"])) {
-    if (!\SmallSmallRSS\Lockfiles::make_stamp('update_daemon.stamp')) {
+    if (!\SmallSmallRSS\Lockfiles::stamp('update_daemon')) {
         _debug("warning: unable to create stampfile\n");
     }
     \SmallSmallRSS\RSSUpdater::updateBatch($num_updates);
@@ -175,70 +165,21 @@ if (isset($options["cleanup-tags"])) {
 }
 
 if (isset($options["indexes"])) {
-    _debug("PLEASE BACKUP YOUR DATABASE BEFORE PROCEEDING!");
-    _debug("Type 'yes' to continue.");
-
+    print "PLEASE BACKUP YOUR DATABASE BEFORE PROCEEDING!";
+    print "Type 'yes' to continue.";
     if (read_stdin() != 'yes') {
         exit;
     }
     _debug("clearing existing indexes...");
-
-    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT relname
-             FROM pg_catalog.pg_class
-             WHERE
-                 relname LIKE 'ttrss_%'
-                 AND relname NOT LIKE '%_pkey'
-                 AND relkind = 'i'"
-        );
-    } else {
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT index_name,table_name
-             FROM information_schema.statistics
-             WHERE index_name LIKE 'ttrss_%'"
-        );
-    }
-
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-            $statement = "DROP INDEX " . $line["relname"];
-            _debug($statement);
-        } else {
-            $statement = "ALTER TABLE " . $line['table_name'] . " DROP INDEX ".$line['index_name'];
-            _debug($statement);
-        }
-        \SmallSmallRSS\Database::query($statement, false);
-    }
-
-    _debug("reading indexes from schema for: " . \SmallSmallRSS\Config::get('DB_TYPE'));
-
-    $fp = fopen("schema/ttrss_schema_" . \SmallSmallRSS\Config::get('DB_TYPE') . ".sql", "r");
-    if ($fp) {
-        while (($line = fgets($fp))) {
-            $matches = array();
-
-            if (preg_match("/^create index ([^ ]+) on ([^ ]+)$/i", $line, $matches)) {
-                $index = $matches[1];
-                $table = $matches[2];
-
-                $statement = "CREATE INDEX $index ON $table";
-
-                _debug($statement);
-                \SmallSmallRSS\Database::query($statement);
-            }
-        }
-        fclose($fp);
-    } else {
-        _debug("unable to open schema file.");
-    }
+    \SmallSmallRSS\Database\Updater::dropIndexes();
+    _debug('creating new indexes...');
+    \SmallSmallRSS\Database\Updater::createIndexes();
     _debug("all done.");
 }
 
 if (isset($options["convert-filters"])) {
-    _debug("WARNING: this will remove all existing type2 filters.");
-    _debug("Type 'yes' to continue.");
-
+    print "WARNING: this will remove all existing type2 filters.";
+    print "Type 'yes' to continue.";
     if (read_stdin() != 'yes') {
         exit;
     }

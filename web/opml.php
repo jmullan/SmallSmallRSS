@@ -1,9 +1,6 @@
 <?php
 require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
-
 \SmallSmallRSS\Session::init();
-\SmallSmallRSS\Sanity::initialCheck();
-
 if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }

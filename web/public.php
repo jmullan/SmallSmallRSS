@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/src/SmallSmallRSS/bootstrap.php';
-\SmallSmallRSS\Sanity::initialCheck();
 \SmallSmallRSS\Session::init();
 
 startup_gettext();

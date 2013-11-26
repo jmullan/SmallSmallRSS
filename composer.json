@@ -65,7 +65,8 @@
         "phpmailer/phpmailer": "*",
         "jmullan/accepttogettext": "*@dev",
         "jmullan/pubsubhubbub": "*@dev",
-        "lelag/otphp": "1.0.0"
+        "lelag/otphp": "1.0.0",
+        "mobiledetect/mobiledetectlib": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"

@@ -16,3 +16,4 @@ web.config
 *flymake.php
 *.ini
 vendor
+composer.lock

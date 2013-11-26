@@ -340,9 +340,8 @@ class RSSUpdater
 
             $favicon_file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed.ico";
             $favicon_modified = @filemtime($favicon_file);
-            check_feed_favicon($site_url, $feed);
+            self::checkFeedFavicon($site_url, $feed);
             $favicon_modified_new = @filemtime($favicon_file);
-
             if ($favicon_modified_new > $favicon_modified) {
                 $favicon_avg_color = '';
             }

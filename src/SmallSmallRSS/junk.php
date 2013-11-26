@@ -4,145 +4,20 @@ function _debug($msg, $show = true, $is_debug = true)
     \SmallSmallRSS\Logger::debug($msg, $show, $is_debug);
 }
 
-function get_feed_update_interval($feed_id)
-{
-    \SmallSmallRSS\Feeds::getFeedUpdateInterval($feed_id);
-}
-
-/**
- * Try to determine the favicon URL for a feed.
- * adapted from wordpress favicon plugin by Jeff Minard (http://thecodepro.com/)
- * http://dev.wp-plugins.org/file/favatars/trunk/favatars.php
- *
- * @param string $url A feed or page URL
- * @access public
- * @return mixed The favicon URL, or false if none was found.
- */
-function get_favicon_url($url)
-{
-    $favicon_url = false;
-    if ($html = @\SmallSmallRSS\Fetcher::fetch($url)) {
-        libxml_use_internal_errors(true);
-
-        $doc = new DOMDocument();
-        $doc->loadHTML($html);
-        $xpath = new DOMXPath($doc);
-
-        $base = $xpath->query('/html/head/base');
-        foreach ($base as $b) {
-            $url = $b->getAttribute("href");
-            break;
-        }
-        $entries = $xpath->query('/html/head/link[@rel="shortcut icon" or @rel="icon"]');
-        if (count($entries) > 0) {
-            foreach ($entries as $entry) {
-                $favicon_url = \SmallSmallRSS\Utils::rewriteRelativeUrl($url, $entry->getAttribute("href"));
-                break;
-            }
-        }
-    }
-
-    if (!$favicon_url) {
-        $favicon_url = \SmallSmallRSS\Utils::rewriteRelativeUrl($url, "/favicon.ico");
-    }
-    return $favicon_url;
-}
-
-function check_feed_favicon($site_url, $feed)
-{
-    $icon_file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed.ico";
-
-    if (!file_exists($icon_file)) {
-        $favicon_url = get_favicon_url($site_url);
-
-        if ($favicon_url) {
-            // Limiting to "image" type misses those served with text/plain
-            $contents = \SmallSmallRSS\Fetcher::fetch($favicon_url); // , "image");
-
-            if ($contents) {
-                // Crude image type matching.
-                // Patterns gleaned from the file(1) source code.
-                if (preg_match('/^\x00\x00\x01\x00/', $contents)) {
-                    // 0       string  \000\000\001\000        MS Windows icon resource
-                    //error_log("check_feed_favicon: favicon_url=$favicon_url isa MS Windows icon resource");
-                } elseif (preg_match('/^GIF8/', $contents)) {
-                    // 0       string          GIF8            GIF image data
-                    //error_log("check_feed_favicon: favicon_url=$favicon_url isa GIF image");
-                } elseif (preg_match('/^\x89PNG\x0d\x0a\x1a\x0a/', $contents)) {
-                    // 0       string          \x89PNG\x0d\x0a\x1a\x0a         PNG image data
-                    //error_log("check_feed_favicon: favicon_url=$favicon_url isa PNG image");
-                } elseif (preg_match('/^\xff\xd8/', $contents)) {
-                    // 0       beshort         0xffd8          JPEG image data
-                    //error_log("check_feed_favicon: favicon_url=$favicon_url isa JPG image");
-                } else {
-                    //error_log("check_feed_favicon: favicon_url=$favicon_url isa UNKNOWN type");
-                    $contents = "";
-                }
-            }
-
-            if ($contents) {
-                $fp = @fopen($icon_file, "w");
-
-                if ($fp) {
-                    fwrite($fp, $contents);
-                    fclose($fp);
-                    chmod($icon_file, 0644);
-                }
-            }
-        }
-        return $icon_file;
-    }
-}
-
-function print_radio($id, $default, $true_is, $values, $attributes = "")
-{
-    $renderer = new \SmallSmallRSS\Renderers\FormElements();
-    $renderer->renderRadio($id, $default, $true_is, $values, $attributes);
-}
-
 function initialize_user_prefs($uid, $profile = false)
 {
     $uid = \SmallSmallRSS\Database::escape_string($uid);
-    if (!$profile) {
-        $profile = "NULL";
-        $profile_qpart = "AND profile IS NULL";
-    } else {
-        $profile_qpart = "AND profile = '$profile'";
-    }
-    if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
-        $profile_qpart = "";
-    }
     \SmallSmallRSS\Database::query("BEGIN");
-    $result = \SmallSmallRSS\Database::query("SELECT pref_name,def_value FROM ttrss_prefs");
-    $u_result = \SmallSmallRSS\Database::query(
-        "SELECT pref_name
-         FROM ttrss_user_prefs
-         WHERE owner_uid = '$uid'
-         $profile_qpart"
+    $active_prefs = \SmallSmallRSS\UserPrefs::getActive($uid, $profile);
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT pref_name, def_value
+         FROM ttrss_prefs"
     );
-    $active_prefs = array();
-    while ($line = \SmallSmallRSS\Database::fetch_assoc($u_result)) {
-        array_push($active_prefs, $line["pref_name"]);
-    }
     while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        if (array_search($line["pref_name"], $active_prefs) === false) {
-            $line["def_value"] = \SmallSmallRSS\Database::escape_string($line["def_value"]);
-            $line["pref_name"] = \SmallSmallRSS\Database::escape_string($line["pref_name"]);
-            if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
-                \SmallSmallRSS\Database::query(
-                    "INSERT INTO ttrss_user_prefs
-                     (owner_uid,pref_name,value)
-                     VALUES
-                     ('$uid', '" . $line["pref_name"] . "','" . $line["def_value"] . "')"
-                );
-            } else {
-                \SmallSmallRSS\Database::query(
-                    "INSERT INTO ttrss_user_prefs
-                     (owner_uid,pref_name,value, profile)
-                     VALUES
-                     ('$uid', '".$line["pref_name"]."','".$line["def_value"]."', $profile)"
-                );
-            }
+        $pref_name = $line["pref_name"];
+        $value = $line["def_value"];
+        if (!isset($active_prefs[$pref_name])) {
+            \SmallSmallRSS\UserPrefs::insert($pref_name, $value, $uid, $profile);
         }
     }
     \SmallSmallRSS\Database::query("COMMIT");

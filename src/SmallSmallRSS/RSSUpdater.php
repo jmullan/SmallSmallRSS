@@ -946,4 +946,81 @@ class RSSUpdater
             mb_strtolower(strip_tags($title), 'utf-8')
         );
     }
+
+    public static function checkFeedFavicon($site_url, $feed)
+    {
+        $icon_file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed.ico";
+        if (!file_exists($icon_file)) {
+            $favicon_url = self::getFaviconUrl($site_url);
+            if ($favicon_url) {
+                // Limiting to "image" type misses those served with text/plain
+                $contents = \SmallSmallRSS\Fetcher::fetch($favicon_url);
+                if ($contents) {
+                    // Crude image type matching.
+                    // Patterns gleaned from the file(1) source code.
+                    $regexes = array(
+                        'MS Windows icon resource' => '/^\x00\x00\x01\x00/',
+                        'GIF image data' => '/^GIF8/',
+                        'PNG image data' => '/^\x89PNG\x0d\x0a\x1a\x0a/',
+                        'JPEG image data' => '/^\xff\xd8/'
+                    );
+                    $found = false;
+                    foreach ($regexes as $regex) {
+                        if (preg_match($regex, $contents)) {
+                            $found = true;
+                        }
+                    }
+                    if (!$found) {
+                        \SmallSmallRSS\Logger::log("$favicon_url is an unknown type");
+                        $contents = '';
+                    }
+                }
+                if ($contents) {
+                    $fp = @fopen($icon_file, "w");
+                    if ($fp) {
+                        fwrite($fp, $contents);
+                        fclose($fp);
+                        chmod($icon_file, 0644);
+                    }
+                }
+            }
+            return $icon_file;
+        }
+    }
+    /**
+     * Try to determine the favicon URL for a feed.
+     * adapted from wordpress favicon plugin by Jeff Minard (http://thecodepro.com/)
+     * http://dev.wp-plugins.org/file/favatars/trunk/favatars.php
+     *
+     * @param string $url A feed or page URL
+     * @access public
+     * @return mixed The favicon URL, or false if none was found.
+     */
+    function getFaviconUrl($url)
+    {
+        $favicon_url = false;
+        if ($html = \SmallSmallRSS\Fetcher::fetch($url)) {
+            libxml_use_internal_errors(true);
+            $doc = new DOMDocument();
+            $doc->loadHTML($html);
+            $xpath = new DOMXPath($doc);
+            $base = $xpath->query('/html/head/base');
+            foreach ($base as $b) {
+                $url = $b->getAttribute("href");
+                break;
+            }
+            $entries = $xpath->query('/html/head/link[@rel="shortcut icon" or @rel="icon"]');
+            if (count($entries) > 0) {
+                foreach ($entries as $entry) {
+                    $favicon_url = \SmallSmallRSS\Utils::rewriteRelativeUrl($url, $entry->getAttribute("href"));
+                    break;
+                }
+            }
+        }
+        if (!$favicon_url) {
+            $favicon_url = \SmallSmallRSS\Utils::rewriteRelativeUrl($url, "/favicon.ico");
+        }
+        return $favicon_url;
+    }
+
 }

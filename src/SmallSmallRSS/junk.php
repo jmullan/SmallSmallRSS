@@ -2459,11 +2459,6 @@ function format_article_note($id, $note, $allow_edit = true)
 }
 
 
-function get_feed_category($feed_cat, $parent_cat_id = false)
-{
-    return \SmallSmallRSS\FeedCategories::get($feed_cat, $parent_cat_id);
-}
-
 function add_feed_category($feed_cat, $parent_cat_id = false)
 {
     return \SmallSmallRSS\FeedCategories::add($feed_cat, $parent_cat_id);

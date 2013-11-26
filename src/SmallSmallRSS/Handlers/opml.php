@@ -441,7 +441,7 @@ class opml extends ProtectedHandler
     {
         $body = $doc->getElementsByTagName('body');
 
-        $default_cat_id = (int) get_feed_category('Imported feeds', false);
+        $default_cat_id = (int) \SmallSmallRSS\FeedCategories::get('Imported feeds', false);
 
         if ($root_node) {
             $cat_title = \SmallSmallRSS\Database::escape_string(mb_substr($root_node->attributes->getNamedItem('text')->nodeValue, 0, 250));
@@ -451,11 +451,11 @@ class opml extends ProtectedHandler
             }
 
             if (!in_array($cat_title, array("tt-rss-filters", "tt-rss-labels", "tt-rss-prefs"))) {
-                $cat_id = get_feed_category($cat_title, $parent_id);
+                $cat_id = \SmallSmallRSS\FeedCategories::get($cat_title, $parent_id);
                 \SmallSmallRSS\Database::query("BEGIN");
                 if ($cat_id === false) {
                     add_feed_category($cat_title, $parent_id);
-                    $cat_id = get_feed_category($cat_title, $parent_id);
+                    $cat_id = \SmallSmallRSS\FeedCategories::get($cat_title, $parent_id);
                 }
                 \SmallSmallRSS\Database::query("COMMIT");
             } else {

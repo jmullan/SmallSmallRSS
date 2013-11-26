@@ -820,17 +820,9 @@ class RPC extends ProtectedHandler
     public function log()
     {
         $logmsg = \SmallSmallRSS\Database::escape_string($_REQUEST['logmsg']);
-
         if ($logmsg) {
-            \SmallSmallRSS\Logger::logError(
-                E_USER_WARNING,
-                $logmsg,
-                '[client-js]',
-                0,
-                false
-            );
+            \SmallSmallRSS\Logger::logError(E_USER_WARNING, $logmsg, '[client-js]', 0, false);
         }
-
         echo json_encode(array("message" => "HOST_ERROR_LOGGED"));
 
     }

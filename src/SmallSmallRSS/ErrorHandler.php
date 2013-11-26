@@ -20,11 +20,10 @@ class ErrorHandler
             $line = $error["line"];
             $errstr = $error["message"];
 
-            if (!$errno) {  return false;
+            if (!$errno) {
+                return false;
             }
-
             $context = debug_backtrace();
-
             $file = substr(str_replace(dirname(dirname(__FILE__)), "", $file), 1);
             return \SmallSmallRSS\Logger::logError($errno, $errstr, $file, $line, $context);
         }

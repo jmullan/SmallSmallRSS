@@ -138,7 +138,7 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
         return false;
     }
 
-    public function check_password($owner_uid, $password)
+    public function checkPassword($owner_uid, $password)
     {
         $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
         $result = \SmallSmallRSS\Database::query(
@@ -174,7 +174,7 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
     {
         $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
 
-        if ($this->check_password($owner_uid, $old_password)) {
+        if ($this->checkPassword($owner_uid, $old_password)) {
 
             $new_salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
             $new_password_hash = encrypt_password($new_password, $new_salt, true);

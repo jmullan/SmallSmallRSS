@@ -28,6 +28,23 @@ class Users
             );
         }
     }
+
+    public static function findUserByLogin($login)
+    {
+        $login = \SmallSmallRSS\Database::escape_string($login);
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id
+             FROM ttrss_users
+             WHERE login = '$login'"
+        );
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+        } else {
+            return false;
+        }
+
+    }
+
     public static function isRegistered($login)
     {
         $login = \SmallSmallRSS\Database::escape_string(mb_strtolower(trim($login)));
@@ -39,11 +56,28 @@ class Users
         return \SmallSmallRSS\Database::num_rows($result) > 0;
     }
 
-    public static function create($login, $email)
+    public static function makePassword($length = 8)
+    {
+        $password = "";
+        $possible = '0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ+-_=!$#';
+        $i = 0;
+        while ($i < $length) {
+            $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
+            if (!strstr($password, $char)) {
+                $password .= $char;
+                $i++;
+            }
+        }
+        return $password;
+    }
+
+    public static function create($login, $email = '', $password = false)
     {
         $login = \SmallSmallRSS\Database::escape_string(mb_strtolower(trim($login)));
         $email = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["email"]));
-        $password = make_password();
+        if (!$password) {
+            $password = self::makePassword();
+        }
         $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
         $pwd_hash = encrypt_password($password, $salt, true);
         \SmallSmallRSS\Database::query(

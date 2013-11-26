@@ -1000,7 +1000,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
 
-        if ($authenticator->check_password($_SESSION["uid"], $password)) {
+        if ($authenticator->checkPassword($_SESSION["uid"], $password)) {
 
             $result = \SmallSmallRSS\Database::query(
                 "SELECT salt
@@ -1037,7 +1037,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION["auth_module"]);
 
-        if ($authenticator->check_password($_SESSION["uid"], $password)) {
+        if ($authenticator->checkPassword($_SESSION["uid"], $password)) {
 
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_users SET otp_enabled = false WHERE

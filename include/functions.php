@@ -1,6 +1,4 @@
 <?php
-
-
 function _debug($msg, $show = true, $is_debug = true)
 {
     \SmallSmallRSS\Logger::debug($msg, $show, $is_debug);
@@ -216,21 +214,6 @@ function authenticate_user($login, $password, $check_only = false)
         initialize_user_prefs($_SESSION["uid"]);
         return true;
     }
-}
-
-function make_password($length = 8)
-{
-    $password = "";
-    $possible = "0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ";
-    $i = 0;
-    while ($i < $length) {
-        $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
-        if (!strstr($password, $char)) {
-            $password .= $char;
-            $i++;
-        }
-    }
-    return $password;
 }
 
 function logout_user()

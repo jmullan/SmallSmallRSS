@@ -54,7 +54,7 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
             $try_login = $this->getLoginBySSLCertificate();
         }
         if ($try_login) {
-            $user_id = $this->base->auto_create_user($try_login, $password);
+            $user_id = $this->base->autoCreateUser($try_login, $password);
             if ($user_id) {
                 $_SESSION["fake_login"] = $try_login;
                 $_SESSION["fake_password"] = "******";

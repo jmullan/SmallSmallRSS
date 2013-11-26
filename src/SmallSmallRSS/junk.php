@@ -2293,23 +2293,14 @@ function encrypt_password($pass, $salt = '', $mode2 = false)
 function load_filters($feed_id, $owner_uid, $action_id = false)
 {
     $filters = array();
-    $cat_id = (int) getFeedCategory($feed_id);
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT * FROM ttrss_filters2
-         WHERE
-             owner_uid = $owner_uid
-             AND enabled = true
-         ORDER BY order_id, title"
-    );
-
+    $cat_id = \SmallSmallRSS\Feeds::getCategory($feed_id);
     $check_cats = join(
         ',',
         array_merge(getParentCategories($cat_id, $owner_uid), array($cat_id))
     );
-
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        $filter_id = $line["id"];
-
+    $filter_lines = \SmallSmallRSS\Filters::getEnabled($owner_uid);
+    foreach ($filter_lines as $filter_line) {
+        $filter_id = $filter_line['id'];
         $result2 = \SmallSmallRSS\Database::query(
             "SELECT
                  r.reg_exp, r.inverse, r.feed_id, r.cat_id, r.cat_filter, t.name AS type_name
@@ -2327,8 +2318,6 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
         $actions = array();
 
         while ($rule_line = \SmallSmallRSS\Database::fetch_assoc($result2)) {
-            #                print_r($rule_line);
-
             $rule = array();
             $rule["reg_exp"] = $rule_line["reg_exp"];
             $rule["type"] = $rule_line["type_name"];
@@ -2355,19 +2344,15 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
 
             array_push($actions, $action);
         }
-
-
         $filter = array();
-        $filter["match_any_rule"] = sql_bool_to_bool($line["match_any_rule"]);
-        $filter["inverse"] = sql_bool_to_bool($line["inverse"]);
+        $filter["match_any_rule"] = sql_bool_to_bool($filter_line["match_any_rule"]);
+        $filter["inverse"] = sql_bool_to_bool($filter_line["inverse"]);
         $filter["rules"] = $rules;
         $filter["actions"] = $actions;
-
         if (count($rules) > 0 && count($actions) > 0) {
-            array_push($filters, $filter);
+            $filters[] = $filter;
         }
     }
-
     return $filters;
 }
 
@@ -2425,11 +2410,11 @@ function format_article_labels($labels, $id)
 
 function format_article_note($id, $note, $allow_edit = true)
 {
-    $str = "<div class='articleNote'    onclick=\"editArticleNote($id)\">
-            <div class='noteEdit' onclick=\"editArticleNote($id)\">".
-        ($allow_edit ? __('(edit note)') : "")."</div>$note</div>";
-
-    return $str;
+    return (
+        "<div class='articleNote'    onclick=\"editArticleNote($id)\">"
+        . "<div class='noteEdit' onclick=\"editArticleNote($id)\">"
+        . ($allow_edit ? __('(edit note)') : "")."</div>$note</div>"
+    );
 }
 
 /**
@@ -2469,11 +2454,6 @@ function validate_feed_url($url)
 
 }
 
-function get_article_enclosures($post_id)
-{
-    return \SmallSmallRSS\Enclosures::get($post_id);
-}
-
 function save_email_address($email)
 {
     // FIXME: implement persistent storage of emails
@@ -2484,7 +2464,6 @@ function save_email_address($email)
         array_push($_SESSION['stored_emails'], $email);
     }
 }
-
 
 function get_feed_access_key($feed_id, $is_cat, $owner_uid = false)
 {
@@ -2554,7 +2533,7 @@ function format_article_enclosures(
     $hide_images = false
 ) {
 
-    $result = get_article_enclosures($id);
+    $result = \SmallSmallRSS\Enclosures::get($id);
     $rv = '';
 
     if (count($result) > 0) {
@@ -2840,11 +2819,6 @@ function tmpdirname($path, $prefix)
         return false;
     }
     return $tempname;
-}
-
-function getFeedCategory($feed_id)
-{
-    return \SmallSmallRSS\Feeds::getCategory($feed_id);
 }
 
 function calculate_dep_timestamp()

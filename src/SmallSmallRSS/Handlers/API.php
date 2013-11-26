@@ -400,7 +400,7 @@ class API extends Handler
             $articles = array();
             if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                 while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-                    $attachments = get_article_enclosures($line['id']);
+                    $attachments = \SmallSmallRSS\Enclosures::get($line['id']);
                     $article = array(
                         "id" => $line["id"],
                         "title" => $line["title"],
@@ -744,7 +744,7 @@ class API extends Handler
             );
 
             if ($include_attachments) {
-                $headline_row['attachments'] = get_article_enclosures(
+                $headline_row['attachments'] = \SmallSmallRSS\Enclosures::get(
                     $line['id']
                 );
             }

@@ -165,7 +165,7 @@ class PublicHandler extends Handler
                     $tpl->addBlock('category');
                 }
 
-                $enclosures = get_article_enclosures($line["id"]);
+                $enclosures = \SmallSmallRSS\Enclosures::get($line["id"]);
 
                 foreach ($enclosures as $e) {
                     $type = htmlspecialchars($e['content_type']);
@@ -237,7 +237,7 @@ class PublicHandler extends Handler
                     }
                 }
 
-                $enclosures = get_article_enclosures($line["id"]);
+                $enclosures = \SmallSmallRSS\Enclosures::get($line["id"]);
 
                 if (count($enclosures) > 0) {
                     $article['enclosures'] = array();

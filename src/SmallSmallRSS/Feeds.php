@@ -264,7 +264,7 @@ class Feeds
              WHERE id = '$feed_id'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
+            return (int) \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
         } else {
             return false;
         }

@@ -639,7 +639,7 @@ class Pref_Prefs extends ProtectedHandler
 
             } elseif ($pref_name == "USER_TIMEZONE") {
 
-                $timezones = explode("\n", file_get_contents("lib/timezones.txt"));
+                $timezones = explode("\n", file_get_contents(__DIR__ . "/timezones.txt"));
                 $timezone_array = array_combine($timezones, $timezones);
                 $form_element_renderer->renderSelect(
                     $pref_name,

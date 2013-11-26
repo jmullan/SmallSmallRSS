@@ -32,7 +32,6 @@ class DBPrefs
                  ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
         );
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
             if ($user_id == $_SESSION["uid"]) {
                 $pref_name = $line["pref_name"];
                 self::$cache[$pref_name]["type"] = $line["type_name"];

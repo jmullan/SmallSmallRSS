@@ -343,7 +343,8 @@ class Feeds extends ProtectedHandler
                     }
                 }
 
-                if (!is_array($labels)) {  $labels = \SmallSmallRSS\Labels::getForArticle($id);
+                if (!is_array($labels)) {
+                    $labels = \SmallSmallRSS\Labels::getForArticle($id, $_SESSION['uid']);
                 }
 
                 $labels_str = "<span id=\"HLLCTR-$id\">";

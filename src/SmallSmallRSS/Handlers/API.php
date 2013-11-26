@@ -405,7 +405,7 @@ class API extends Handler
                         "id" => $line["id"],
                         "title" => $line["title"],
                         "link" => $line["link"],
-                        "labels" => \SmallSmallRSS\Labels::getForArticle($line['id']),
+                        "labels" => \SmallSmallRSS\Labels::getForArticle($line['id'], $_SESSION["uid"]),
                         "unread" => sql_bool_to_bool($line["unread"]),
                         "marked" => sql_bool_to_bool($line["marked"]),
                         "published" => sql_bool_to_bool($line["published"]),
@@ -729,9 +729,6 @@ class API extends Handler
 
             $tags = explode(",", $line["tag_cache"]);
             $labels = json_decode($line["label_cache"], true);
-
-            //if (!$tags) $tags = get_article_tags($line["id"]);
-            //if (!$labels) $labels = \SmallSmallRSS\Labels::getForArticle($line["id"]);
 
             $headline_row = array(
                 "id" => (int) $line["id"],

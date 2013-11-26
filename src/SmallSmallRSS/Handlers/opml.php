@@ -324,14 +324,12 @@ class opml extends ProtectedHandler
     {
         $attrs = $node->attributes;
         $label_name = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-name')->nodeValue);
-
         if ($label_name) {
             $fg_color = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-fg-color')->nodeValue);
             $bg_color = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-bg-color')->nodeValue);
-
-            if (!\SmallSmallRSS\Labels::findID($label_name, $_SESSION['uid'])) {
+            if (!\SmallSmallRSS\Labels::findID($label_name, $owner_uid)) {
                 $this->opml_notice(T_sprintf("Adding label %s", htmlspecialchars($label_name)));
-                \SmallSmallRSS\Labels::create($label_name, $fg_color, $bg_color, $owner_uid);
+                \SmallSmallRSS\Labels::create($label_name, $owner_uid, $fg_color, $bg_color);
             } else {
                 $this->opml_notice(T_sprintf("Duplicate label: %s", htmlspecialchars($label_name)));
             }

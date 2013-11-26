@@ -269,7 +269,7 @@ class Pref_Labels extends ProtectedHandler
 
         if ($caption) {
 
-            if (\SmallSmallRSS\Labels::create($caption)) {
+            if (\SmallSmallRSS\Labels::create($caption, $_SESSION['uid'])) {
                 if (!$output) {
                     print T_sprintf("Created label <b>%s</b>", htmlspecialchars($caption));
                 }

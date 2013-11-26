@@ -20,12 +20,9 @@ class Labels
         }
     }
 
-    public static function getForArticle($id, $owner_uid = false)
+    public static function getForArticle($id, $owner_uid)
     {
         $rv = array();
-        if (!$owner_uid) {
-            $owner_uid = $_SESSION["uid"];
-        }
         $result = \SmallSmallRSS\Database::query(
             "SELECT label_cache
              FROM ttrss_user_entries
@@ -100,7 +97,7 @@ class Labels
             self::clearCache($id);
         }
         if (!$labels) {
-            $labels = self::getForArticle($id);
+            $labels = self::getForArticle($id, $owner_uid);
         }
         $labels = \SmallSmallRSS\Database::escape_string(json_encode($labels));
         \SmallSmallRSS\Database::query(
@@ -167,9 +164,6 @@ class Labels
 
     public static function remove($id, $owner_uid)
     {
-        if (!$owner_uid) {
-            $owner_uid = $_SESSION["uid"];
-        }
         \SmallSmallRSS\Database::query("BEGIN");
         $result = \SmallSmallRSS\Database::query(
             "SELECT caption
@@ -196,19 +190,14 @@ class Labels
         \SmallSmallRSS\Database::query("COMMIT");
     }
 
-    public static function create($caption, $fg_color = '', $bg_color = '', $owner_uid = false)
+    public static function create($caption, $owner_uid, $fg_color = '', $bg_color = '')
     {
-        if (!$owner_uid) {
-            $owner_uid = $_SESSION['uid'];
-        }
         \SmallSmallRSS\Database::query("BEGIN");
-        $result = false;
         $result = \SmallSmallRSS\Database::query(
             "SELECT id
              FROM ttrss_labels2
              WHERE
-                 caption = '$caption'
-                 AND owner_uid = $owner_uid"
+                 caption = '$caption' AND owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
             $result = \SmallSmallRSS\Database::query(
@@ -223,10 +212,10 @@ class Labels
         return $result;
     }
 
-    public static function getOwnerLabels($owner_id, $article_id = null)
+    public static function getOwnerLabels($owner_uid, $article_id = null)
     {
         if ($article_id) {
-            $article_labels = \SmallSmallRSS\Labels::getForArticle($article_id);
+            $article_labels = \SmallSmallRSS\Labels::getForArticle($article_id, $owner_uid);
         } else {
             $article_labels = array();
         }
@@ -234,7 +223,7 @@ class Labels
         $result = \SmallSmallRSS\Database::query(
             "SELECT id, caption, fg_color, bg_color
              FROM ttrss_labels2
-             WHERE owner_uid = '$owner_id'
+             WHERE owner_uid = '$owner_uid'
              ORDER BY caption"
         );
         $rv = array();

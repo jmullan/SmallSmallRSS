@@ -360,24 +360,25 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                                 ++$num_imported;
 
                                 $result = \SmallSmallRSS\Database::query(
-                                    "INSERT INTO ttrss_user_entries
-                                    (ref_id, owner_uid, feed_id, unread, last_read, marked,
-                                        published, score, tag_cache, label_cache, uuid, note)
-                                    VALUES ($ref_id, $owner_uid, $feed, false,
-                                        NULL, $marked, $published, $score, '$tag_cache',
-                                            '$label_cache', '', '$note')"
+                                    "INSERT INTO ttrss_user_entries (
+                                         ref_id, owner_uid, feed_id, unread, last_read, marked,
+                                         published, score, tag_cache, label_cache, uuid, note)
+                                     VALUES (
+                                         $ref_id, $owner_uid, $feed, false,
+                                         NULL, $marked, $published, $score, '$tag_cache',
+                                         '$label_cache', '', '$note'
+                                     )"
                                 );
 
                                 $label_cache = json_decode($label_cache, true);
 
                                 if (is_array($label_cache) && $label_cache["no-labels"] != 1) {
                                     foreach ($label_cache as $label) {
-
                                         \SmallSmallRSS\Labels::create(
                                             $label[1],
+                                            $owner_uid,
                                             $label[2],
-                                            $label[3],
-                                            $owner_uid
+                                            $label[3]
                                         );
 
                                         \SmallSmallRSS\Labels::addArticle($ref_id, $label[1], $owner_uid);

@@ -15,7 +15,7 @@ class Mailer extends \PHPMailer
     public $PluginDir = "lib/phpmailer/";
     public $ContentType = "text/html"; //default email type is HTML
 
-    function __construct()
+    public function __construct()
     {
         $this->From = \SmallSmallRSS\Config::get('SMTP_FROM_ADDRESS');
         $this->FromName = \SmallSmallRSS\Config::get('SMTP_FROM_NAME');

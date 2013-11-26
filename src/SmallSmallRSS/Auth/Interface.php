@@ -3,5 +3,5 @@ namespace SmallSmallRSS;
 
 interface Auth_Interface
 {
-    function authenticate($login, $password);
+    public function authenticate($login, $password);
 }

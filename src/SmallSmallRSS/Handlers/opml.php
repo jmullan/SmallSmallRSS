@@ -1,16 +1,16 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Opml extends ProtectedHandler
+class opml extends ProtectedHandler
 {
 
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("export", "import");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function export()
+    public function export()
     {
         $output_name = $_REQUEST["filename"];
         if (!$output_name) {  $output_name = "TinyTinyRSS.opml";
@@ -22,7 +22,7 @@ class Opml extends ProtectedHandler
         return $this->opml_export($output_name, $owner_uid, false, ($show_settings == 1));
     }
 
-    function import()
+    public function import()
     {
         $owner_uid = $_SESSION["uid"];
 
@@ -67,8 +67,7 @@ class Opml extends ProtectedHandler
 
         if ($hide_private_feeds) {
             $hide_qpart = "(private IS false AND auth_login = '' AND auth_pass = '')";
-        }
-        else {
+        } else {
             $hide_qpart = "true";
         }
 
@@ -122,7 +121,7 @@ class Opml extends ProtectedHandler
         return $out;
     }
 
-    function opml_export($name, $owner_uid, $hide_private_feeds = false, $include_settings = true)
+    public function opml_export($name, $owner_uid, $hide_private_feeds = false, $include_settings = true)
     {
         if (!$owner_uid) {  return;
         }
@@ -514,7 +513,7 @@ class Opml extends ProtectedHandler
         }
     }
 
-    function opml_import($owner_uid)
+    public function opml_import($owner_uid)
     {
         if (!$owner_uid) {  return;
         }
@@ -572,7 +571,7 @@ class Opml extends ProtectedHandler
         print "$msg<br/>";
     }
 
-    static function opml_publish_url()
+    public static function opml_publish_url()
     {
 
         $url_path = get_self_url_prefix();

@@ -1,10 +1,12 @@
 <?php
 namespace SmallSmallRSS;
 
-class FileCache {
+class FileCache
+{
     private static $default_caches = array("simplepie", "images", "export", "upload");
 
-    public static function clearExpired() {
+    public static function clearExpired()
+    {
         $num_deleted = 0;
         foreach (self::$default_caches as $subdir) {
           $num_deleted += self::clearExpiredDirContents($subdir);
@@ -12,7 +14,8 @@ class FileCache {
         return $num_deleted;
     }
 
-    public static function clearExpiredDirContents($subdir) {
+    public static function clearExpiredDirContents($subdir)
+    {
         // TODO sanitize input
         $cache_dir = \SmallSmallRSS\Config::get('CACHE_DIR') . "/$subdir";
         if (!is_writable($cache_dir)) {

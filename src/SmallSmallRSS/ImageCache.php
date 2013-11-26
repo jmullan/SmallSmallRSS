@@ -19,7 +19,8 @@ class ImageCache
         return $doc->saveXML($node);
     }
 
-    public static function processEntry($entry, $download_if_missing = true) {
+    public static function processEntry($entry, $download_if_missing = true)
+    {
         if (!$entry->hasAttribute('src')) {
             return;
         }
@@ -41,7 +42,8 @@ class ImageCache
         return file_exists($filename);
     }
 
-    public static function isCached($src, $download_if_missing = true) {
+    public static function isCached($src, $download_if_missing = true)
+    {
         $local_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . "/images/" . sha1($src) . ".png";
         if (!file_exists($local_filename)) {
             $file_content = \SmallSmallRSS\Fetcher::fetch($src);

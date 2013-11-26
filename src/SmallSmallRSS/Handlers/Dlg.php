@@ -4,7 +4,7 @@ class Dlg extends ProtectedHandler
 {
     private $param;
 
-    function before($method)
+    public function before($method)
     {
         if (parent::before($method)) {
             header("Content-Type: text/html"); # required for iframe
@@ -15,7 +15,7 @@ class Dlg extends ProtectedHandler
         return false;
     }
 
-    function importOpml()
+    public function importOpml()
     {
         print __("If you have imported labels and/or filters, you might need to reload preferences to see your new data.") . "</p>";
 
@@ -46,7 +46,7 @@ class Dlg extends ProtectedHandler
 
     }
 
-    function pubOPMLUrl()
+    public function pubOPMLUrl()
     {
         $url_path = Opml::opml_publish_url();
 
@@ -69,7 +69,7 @@ class Dlg extends ProtectedHandler
 
     }
 
-    function explainError()
+    public function explainError()
     {
         print "<div class=\"errorExplained\">";
         if ($this->param == 1) {
@@ -99,7 +99,7 @@ class Dlg extends ProtectedHandler
 
     }
 
-    function printTagCloud()
+    public function printTagCloud()
     {
         print "<div class=\"tagCloudContainer\">";
 
@@ -160,7 +160,7 @@ class Dlg extends ProtectedHandler
         print "</div>";
     }
 
-    function printTagSelect()
+    public function printTagSelect()
     {
         print __("Match:"). "&nbsp;" .
             "<input class=\"noborder\" dojoType=\"dijit.form.RadioButton\" type=\"radio\" checked value=\"any\" name=\"tag_mode\" id=\"tag_mode_any\">";
@@ -189,7 +189,7 @@ class Dlg extends ProtectedHandler
         print "</div>";
     }
 
-    function generatedFeed()
+    public function generatedFeed()
     {
         $this->params = explode(":", $this->param, 3);
         $feed_id = \SmallSmallRSS\Database::escape_string($this->params[0]);

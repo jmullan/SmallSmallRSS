@@ -6,13 +6,13 @@ class PDOStatement implements DatabaseInterface
     private $stmt;
     private $cache;
 
-    function __construct($stmt)
+    public function __construct($stmt)
     {
         $this->stmt = $stmt;
         $this->cache = false;
     }
 
-    function fetch_result($row, $param)
+    public function fetch_result($row, $param)
     {
         if (!$this->cache) {
             $this->cache = $this->stmt->fetchAll();
@@ -25,12 +25,12 @@ class PDOStatement implements DatabaseInterface
         }
     }
 
-    function rowCount()
+    public function rowCount()
     {
         return $this->stmt->rowCount();
     }
 
-    function fetch()
+    public function fetch()
     {
         return $this->stmt->fetch();
     }

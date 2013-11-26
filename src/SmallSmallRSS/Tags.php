@@ -3,7 +3,7 @@ namespace SmallSmallRSS;
 
 class Tags
 {
-    function clearExpired($days = 14)
+    public function clearExpired($days = 14)
     {
         $limit = 50000;
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {

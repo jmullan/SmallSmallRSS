@@ -1,11 +1,13 @@
 <?php
 namespace SmallSmallRSS;
 
-class Config {
+class Config
+{
     private static $initialized = false;
     private static $values = array();
 
-    private static function initialize() {
+    private static function initialize()
+    {
         if (self::$initialized) {
             return;
         }
@@ -13,7 +15,8 @@ class Config {
         self::read_from_ini();
     }
 
-    private static function read_from_ini() {
+    private static function read_from_ini()
+    {
         $ini_file = __DIR__ . '/../../config.ini';
         if (!file_exists($ini_file)) {
             return;
@@ -29,7 +32,8 @@ class Config {
         }
     }
 
-    public static function get($key) {
+    public static function get($key)
+    {
         self::initialize();
         if (!isset(self::$values[$key])) {
             if (\SmallSmallRSS\DefaultConfigs::has($key)) {
@@ -42,7 +46,8 @@ class Config {
         return self::$values[$key];
     }
 
-    public static function set($key, $value) {
+    public static function set($key, $value)
+    {
         self::initialize();
         self::$values[$key] = $value;
     }

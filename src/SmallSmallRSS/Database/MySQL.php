@@ -5,7 +5,7 @@ class MySQL implements DatabaseInterface
 {
     private $link;
 
-    function connect($host, $user, $pass, $db, $port)
+    public function connect($host, $user, $pass, $db, $port)
     {
         $this->link = mysql_connect($host, $user, $pass);
         if ($this->link) {
@@ -20,14 +20,14 @@ class MySQL implements DatabaseInterface
         }
     }
 
-    function escape_string($s, $strip_tags = true)
+    public function escape_string($s, $strip_tags = true)
     {
         if ($strip_tags) {  $s = strip_tags($s);
         }
         return mysql_real_escape_string($s, $this->link);
     }
 
-    function query($query, $die_on_error = true)
+    public function query($query, $die_on_error = true)
     {
         $result = mysql_query($query, $this->link);
         if (!$result) {
@@ -39,38 +39,38 @@ class MySQL implements DatabaseInterface
         return $result;
     }
 
-    function fetch_assoc($result)
+    public function fetch_assoc($result)
     {
         return mysql_fetch_assoc($result);
     }
 
 
-    function num_rows($result)
+    public function num_rows($result)
     {
         return mysql_num_rows($result);
     }
 
-    function fetch_result($result, $row, $param)
+    public function fetch_result($result, $row, $param)
     {
         return mysql_result($result, $row, $param);
     }
 
-    function close()
+    public function close()
     {
         return mysql_close($this->link);
     }
 
-    function affected_rows($result)
+    public function affected_rows($result)
     {
         return mysql_affected_rows($this->link);
     }
 
-    function last_error()
+    public function last_error()
     {
         return mysql_error();
     }
 
-    function init()
+    public function init()
     {
         $this->query("SET time_zone = '+0:0'");
         $this->query("SET NAMES " . \SmallSmallRSS\Config::get('MYSQL_CHARSET'));

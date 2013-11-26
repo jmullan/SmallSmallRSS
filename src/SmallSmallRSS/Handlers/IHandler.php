@@ -2,7 +2,7 @@
 namespace SmallSmallRSS\Handlers;
 interface IHandler
 {
-    function ignoreCSRF($method);
-    function before($method);
-    function after();
+    public function ignoreCSRF($method);
+    public function before($method);
+    public function after();
 }

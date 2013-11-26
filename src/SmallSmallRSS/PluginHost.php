@@ -399,12 +399,12 @@ class PluginHost
         }
     }
 
-    static function pfeed_to_feed_id($label)
+    public static function pfeed_to_feed_id($label)
     {
         return \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX - 1 - abs($label);
     }
 
-    static function feed_to_pfeed_id($feed)
+    public static function feed_to_pfeed_id($feed)
     {
         return \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX - 1 + abs($feed);
     }
@@ -425,11 +425,13 @@ class PluginHost
         return null;
     }
 
-    public static function init_all() {
+    public static function init_all()
+    {
         self::getInstance()->load(\SmallSmallRSS\Config::get('PLUGINS'), self::KIND_ALL);
         return true;
     }
-    public function init_user($owner_uid) {
+    public function init_user($owner_uid)
+    {
         $user_plugins = \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS", $owner_uid);
         $this->load($user_plugins, self::KIND_USER, $owner_uid);
         return true;

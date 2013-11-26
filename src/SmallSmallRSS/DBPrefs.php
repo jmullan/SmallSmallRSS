@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 
-class DbPrefs
+class DBPrefs
 {
     private static $cache = array();
     public static function cache()

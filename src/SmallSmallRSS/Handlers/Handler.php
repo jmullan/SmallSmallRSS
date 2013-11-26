@@ -5,22 +5,22 @@ class Handler implements IHandler
     protected $dbh;
     protected $args;
 
-    function __construct($args)
+    public function __construct($args)
     {
         $this->args = $args;
     }
 
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         return true;
     }
 
-    function before($method)
+    public function before($method)
     {
         return true;
     }
 
-    function after()
+    public function after()
     {
         return true;
     }

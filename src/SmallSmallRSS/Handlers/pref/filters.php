@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class Pref_Filters extends ProtectedHandler
 {
 

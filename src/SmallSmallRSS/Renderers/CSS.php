@@ -1,8 +1,10 @@
 <?php
 namespace SmallSmallRSS\Renderers;
 
-class CSS {
-    public function renderUserStylesheet() {
+class CSS
+{
+    public function renderUserStylesheet()
+    {
         $value = \SmallSmallRSS\DBPrefs::read('USER_STYLESHEET');
         if ($value) {
             echo "<style type=\"text/css\">";
@@ -10,7 +12,8 @@ class CSS {
             echo "</style>";
         }
     }
-    public function renderStylesheetTag($filename) {
+    public function renderStylesheetTag($filename)
+    {
         $timestamp = filemtime(__DIR__ . "../../$filename");
         echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$filename?$timestamp\"/>\n";
     }

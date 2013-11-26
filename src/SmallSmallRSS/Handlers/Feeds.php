@@ -337,8 +337,7 @@ class Feeds extends ProtectedHandler
                     if ($label_cache) {
                         if ($label_cache["no-labels"] == 1) {
                             $labels = array();
-                        }
-                        else {
+                        } else {
                             $labels = $label_cache;
                         }
                     }
@@ -933,8 +932,7 @@ class Feeds extends ProtectedHandler
         }
         if (!$next_unread_feed) {
             $reply['headlines']['id'] = $feed;
-        }
-        else {
+        } else {
             $reply['headlines']['id'] = $next_unread_feed;
         }
         $reply['headlines']['is_cat'] = (bool) $cat_view;

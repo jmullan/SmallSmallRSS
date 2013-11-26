@@ -3,7 +3,7 @@ namespace SmallSmallRSS;
 
 class FeedItem_Atom extends FeedItem_Abstract
 {
-    function get_id()
+    public function get_id()
     {
         $id = $this->elem->getElementsByTagName("id")->item(0);
 
@@ -14,7 +14,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    function get_date()
+    public function get_date()
     {
         $updated = $this->elem->getElementsByTagName("updated")->item(0);
 
@@ -35,7 +35,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    function get_link()
+    public function get_link()
     {
         $links = $this->elem->getElementsByTagName("link");
 
@@ -50,7 +50,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    function get_title()
+    public function get_title()
     {
         $title = $this->elem->getElementsByTagName("title")->item(0);
 
@@ -59,7 +59,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    function get_content()
+    public function get_content()
     {
         $content = $this->elem->getElementsByTagName("content")->item(0);
 
@@ -74,7 +74,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    function get_description()
+    public function get_description()
     {
         $content = $this->elem->getElementsByTagName("summary")->item(0);
 
@@ -90,7 +90,7 @@ class FeedItem_Atom extends FeedItem_Abstract
 
     }
 
-    function get_categories()
+    public function get_categories()
     {
         $categories = $this->elem->getElementsByTagName("category");
         $cats = array();
@@ -110,7 +110,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         return $cats;
     }
 
-    function get_enclosures()
+    public function get_enclosures()
     {
         $links = $this->elem->getElementsByTagName("link");
 

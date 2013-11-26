@@ -416,7 +416,8 @@ class RPC extends ProtectedHandler
         );
     }
 
-    private function makeInitParams() {
+    private function makeInitParams()
+    {
         $prefs = array(
             "ON_CATCHUP_SHOW_NEXT_FEED",
             "HIDE_READ_FEEDS",

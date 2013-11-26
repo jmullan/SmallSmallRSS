@@ -1,16 +1,17 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class Pref_Labels extends ProtectedHandler
 {
 
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         $csrf_ignored = array("index", "getlabeltree", "edit");
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    function edit()
+    public function edit()
     {
         $label_id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
 
@@ -90,7 +91,7 @@ class Pref_Labels extends ProtectedHandler
         return;
     }
 
-    function getlabeltree()
+    public function getlabeltree()
     {
         $root = array();
         $root['id'] = 'root';
@@ -122,7 +123,7 @@ class Pref_Labels extends ProtectedHandler
         return;
     }
 
-    function colorset()
+    public function colorset()
     {
         $kind = \SmallSmallRSS\Database::escape_string($_REQUEST["kind"]);
         $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
@@ -167,7 +168,7 @@ class Pref_Labels extends ProtectedHandler
         return;
     }
 
-    function colorreset()
+    public function colorreset()
     {
         $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
         foreach ($ids as $id) {
@@ -196,7 +197,7 @@ class Pref_Labels extends ProtectedHandler
 
     }
 
-    function save()
+    public function save()
     {
 
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
@@ -250,7 +251,7 @@ class Pref_Labels extends ProtectedHandler
         return;
     }
 
-    function remove()
+    public function remove()
     {
 
         $ids = explode(",", \SmallSmallRSS\Database::escape_string($_REQUEST["ids"]));
@@ -261,7 +262,7 @@ class Pref_Labels extends ProtectedHandler
 
     }
 
-    function add()
+    public function add()
     {
         $caption = \SmallSmallRSS\Database::escape_string($_REQUEST["caption"]);
         $output = \SmallSmallRSS\Database::escape_string($_REQUEST["output"]);
@@ -291,7 +292,7 @@ class Pref_Labels extends ProtectedHandler
         return;
     }
 
-    function index()
+    public function index()
     {
 
         $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);

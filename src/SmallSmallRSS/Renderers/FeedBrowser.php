@@ -1,7 +1,8 @@
 <?php
 namespace SmallSmallRSS\Renderers;
 
-class FeedBrowser extends \SmallSmallRSS\Renderers\Base {
+class FeedBrowser extends \SmallSmallRSS\Renderers\Base
+{
     const MODE_1 = 1;
     const MODE_2 = 2;
 

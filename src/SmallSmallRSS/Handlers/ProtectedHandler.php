@@ -2,7 +2,7 @@
 namespace SmallSmallRSS\Handlers;
 class ProtectedHandler extends Handler
 {
-    function before($method)
+    public function before($method)
     {
         return parent::before($method) && $_SESSION['uid'];
     }

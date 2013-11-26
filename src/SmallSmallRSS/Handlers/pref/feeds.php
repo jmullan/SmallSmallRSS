@@ -1498,7 +1498,7 @@ class Pref_Feeds extends ProtectedHandler
 
             if (id.match('FEED:')) {
                 editFeed(bare_id);
-            } else if (id.match('CAT:')) {
+            } elseif (id.match('CAT:')) {
                 editCat(bare_id, item);
             }
         </script>

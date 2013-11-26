@@ -1,15 +1,15 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class Backend extends Handler
+class backend extends Handler
 {
-    function loading()
+    public function loading()
     {
         header("Content-type: text/html");
         print __("Loading, please wait...") . " " .
             "<img src='images/indicator_tiny.gif'>";
     }
 
-    function digestTest()
+    public function digestTest()
     {
         header("Content-type: text/html");
         $rv = \SmallSmallRSS\Digest::prepare_headlines($_SESSION['uid'], 1, 1000);
@@ -92,7 +92,7 @@ class Backend extends Handler
         print "</ul>";
     }
 
-    function help()
+    public function help()
     {
         $topic = basename($_REQUEST["topic"]);
 

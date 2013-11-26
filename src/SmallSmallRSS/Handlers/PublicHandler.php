@@ -32,8 +32,7 @@ class PublicHandler extends Handler
 
         if ($feed == -2) {
             $date_sort_field = "last_published DESC";
-        }
-        elseif ($feed == -1)
+        } elseif ($feed == -1)
             $date_sort_field = "last_marked DESC";
 
         switch ($order) {

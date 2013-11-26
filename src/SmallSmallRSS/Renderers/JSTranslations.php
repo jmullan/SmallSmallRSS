@@ -6,14 +6,16 @@ class JSTranslations
     public function render()
     {
         print 'var T_messages = new Object();
-        function __(msg) {
+        function __(msg)
+        {
             if (T_messages[msg]) {
                 return T_messages[msg];
             } else {
                 return msg;
             }
         }
-        function ngettext(msg1, msg2, n) {
+        function ngettext(msg1, msg2, n)
+        {
             return (parseInt(n) > 1) ? msg2 : msg1;
         }';
         $l10n = _get_reader();

@@ -1,13 +1,13 @@
 <?php
 namespace SmallSmallRSS\Handlers;
-class PluginHandler extends ProtectedHandler
+class pluginhandler extends ProtectedHandler
 {
-    function ignoreCSRF($method)
+    public function ignoreCSRF($method)
     {
         return true;
     }
 
-    function catchall($method)
+    public function catchall($method)
     {
         $plugin = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_REQUEST["plugin"]);
 

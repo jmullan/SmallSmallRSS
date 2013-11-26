@@ -5,7 +5,7 @@ class PDOWrapper implements DatabaseInterface
 {
     private $pdo;
 
-    function connect($host, $user, $pass, $db, $port)
+    public function connect($host, $user, $pass, $db, $port)
     {
         $connstr = \SmallSmallRSS\Config::get('DB_TYPE') . ":host=$host;dbname=$db";
         if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
@@ -21,7 +21,7 @@ class PDOWrapper implements DatabaseInterface
         return $this->pdo;
     }
 
-    function escape_string($s, $strip_tags = true)
+    public function escape_string($s, $strip_tags = true)
     {
         if ($strip_tags) {  $s = strip_tags($s);
         }
@@ -29,7 +29,7 @@ class PDOWrapper implements DatabaseInterface
         return mb_substr($qs, 1, mb_strlen($qs)-2);
     }
 
-    function query($query, $die_on_error = true)
+    public function query($query, $die_on_error = true)
     {
         try {
             return new \SmallSmallRSS\Database\PDOStatement($this->pdo->query($query));
@@ -38,7 +38,7 @@ class PDOWrapper implements DatabaseInterface
         }
     }
 
-    function fetch_assoc($result)
+    public function fetch_assoc($result)
     {
         try {
             if ($result) {
@@ -51,7 +51,7 @@ class PDOWrapper implements DatabaseInterface
         }
     }
 
-    function num_rows($result)
+    public function num_rows($result)
     {
         try {
             if ($result) {
@@ -64,17 +64,17 @@ class PDOWrapper implements DatabaseInterface
         }
     }
 
-    function fetch_result($result, $row, $param)
+    public function fetch_result($result, $row, $param)
     {
         return $result->fetch_result($row, $param);
     }
 
-    function close()
+    public function close()
     {
         $this->pdo = null;
     }
 
-    function affected_rows($result)
+    public function affected_rows($result)
     {
         try {
             if ($result) {
@@ -87,12 +87,12 @@ class PDOWrapper implements DatabaseInterface
         }
     }
 
-    function last_error()
+    public function last_error()
     {
         return join(" ", $this->pdo->errorInfo());
     }
 
-    function init()
+    public function init()
     {
         switch (\SmallSmallRSS\Config::get('DB_TYPE')) {
             case "pgsql":

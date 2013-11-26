@@ -250,7 +250,7 @@ class Pref_Prefs extends ProtectedHandler
 
             new Ajax.Request('backend.php', {
                 parameters: dojo.objectToQuery(this.getValues()),
-                onComplete: function(transport) {
+                onComplete: function (transport) {
                     notify_callback2(transport);
             } });
 
@@ -326,7 +326,7 @@ class Pref_Prefs extends ProtectedHandler
 
                 new Ajax.Request('backend.php', {
                     parameters: dojo.objectToQuery(this.getValues()),
-                    onComplete: function(transport) {
+                    onComplete: function (transport) {
                         notify('');
                         if (transport.responseText.indexOf('ERROR: ') == 0) {
                             notify_error(transport.responseText.replace('ERROR: ', ''));
@@ -394,7 +394,7 @@ class Pref_Prefs extends ProtectedHandler
 
                     new Ajax.Request('backend.php', {
                         parameters: dojo.objectToQuery(this.getValues()),
-                        onComplete: function(transport) {
+                        onComplete: function (transport) {
                             notify('');
                             if (transport.responseText.indexOf('ERROR: ') == 0) {
                                 notify_error(transport.responseText.replace('ERROR: ', ''));
@@ -447,7 +447,7 @@ class Pref_Prefs extends ProtectedHandler
 
                         new Ajax.Request('backend.php', {
                             parameters: dojo.objectToQuery(this.getValues()),
-                            onComplete: function(transport) {
+                            onComplete: function (transport) {
                                 notify('');
                                 if (transport.responseText.indexOf('ERROR:') == 0) {
                                     notify_error(transport.responseText.replace('ERROR:', ''));
@@ -513,7 +513,7 @@ class Pref_Prefs extends ProtectedHandler
 
             new Ajax.Request('backend.php', {
                 parameters: dojo.objectToQuery(this.getValues()),
-                onComplete: function(transport) {
+                onComplete: function (transport) {
                     var msg = transport.responseText;
                     if (quit) {
                         gotoMain();
@@ -814,7 +814,7 @@ class Pref_Prefs extends ProtectedHandler
 
             new Ajax.Request('backend.php', {
                 parameters: dojo.objectToQuery(this.getValues()),
-                onComplete: function(transport) {
+                onComplete: function (transport) {
                     notify('');
                     if (confirm(__('Selected plugins have been enabled. Reload?'))) {
                         window.location.reload();
@@ -1180,7 +1180,7 @@ class Pref_Prefs extends ProtectedHandler
                         content: {op: 'rpc', method: 'saveprofile',
                             value: this.value,
                             id: this.srcNodeRef.getAttribute('profile-id')},
-                            load: function(response) {
+                            load: function (response) {
                                 elem.attr('value', response);
                         }
                     });

@@ -1,7 +1,8 @@
 <?php
 namespace SmallSmallRSS;
 
-class DefaultConfigs {
+class DefaultConfigs
+{
     // *******************************************
     // *** Database configuration (important!) ***
     // *******************************************
@@ -269,13 +270,16 @@ class DefaultConfigs {
      */
     const CACHE_LIFETIME = 604800;
 
-    public static function has($key) {
+    public static function has($key)
+    {
         return defined("self::$key");
     }
-    public static function get($key) {
+    public static function get($key)
+    {
         return constant("self::$key");
     }
-    public static function type($key) {
+    public static function type($key)
+    {
         $type = 'string';
         if (self::has($key)) {
             $type = gettype(self::get($key));

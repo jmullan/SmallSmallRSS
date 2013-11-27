@@ -55,7 +55,7 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
                      WHERE login = '$login'"
                 );
                 if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-                    $base32 = new \Base32();
+                    $base32 = new \OTPHP\Base32();
                     $otp_enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "otp_enabled"));
                     $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetch_result($result, 0, "salt")));
                     $topt = new \OTPHP\TOTP($secret);

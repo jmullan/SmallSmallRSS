@@ -974,7 +974,7 @@ class Pref_Prefs extends ProtectedHandler
              WHERE id = ".$_SESSION["uid"]
         );
 
-        $base32 = new \Base32();
+        $base32 = new \OTPHP\Base32();
         $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
         $otp_enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "otp_enabled"));
 
@@ -1000,7 +1000,7 @@ class Pref_Prefs extends ProtectedHandler
                 WHERE id = ".$_SESSION["uid"]
             );
 
-            $base32 = new \Base32();
+            $base32 = new \OTPHP\Base32();
             $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetch_result($result, 0, "salt")));
             $topt = new \OTPHP\TOTP($secret);
 

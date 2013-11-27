@@ -23,6 +23,10 @@
             "url": "https://github.com/jmullan/Pubsubhubbub"
         },
         {
+            "type": "vcs",
+            "url": "https://github.com/jmullan/otphp"
+        },
+        {
             "type": "package",
             "package": {
                 "name": "php-gettext/php-gettext",
@@ -39,21 +43,6 @@
                     ]
                 }
             }
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "lelag/otphp",
-                "version": "1.0.0",
-                "source": {
-                    "type": "git",
-                    "url": "git@github.com:lelag/otphp.git",
-                    "reference": "master"
-                },
-                "autoload": {
-                    "classmap": ["lib/"]
-                }
-            }
         }
     ],
     "require": {
@@ -65,7 +54,7 @@
         "phpmailer/phpmailer": "*",
         "jmullan/accepttogettext": "*@dev",
         "jmullan/pubsubhubbub": "*@dev",
-        "lelag/otphp": "1.0.0",
+        "jmullan/otphp": "*@dev",
         "mobiledetect/mobiledetectlib": "*"
     },
     "require-dev": {

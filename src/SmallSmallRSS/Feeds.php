@@ -346,4 +346,11 @@ class Feeds
         );
         return (int) \SmallSmallRSS\Database::fetch_result($result, 0, "fn");
     }
+
+    static public function hasIcon($feed_id)
+    {
+        $file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico";
+        return (is_file($file) && filesize($file));
+    }
+
 }

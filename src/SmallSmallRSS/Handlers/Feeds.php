@@ -419,7 +419,7 @@ class Feeds extends ProtectedHandler
                     $entry_author = " &mdash; $entry_author";
                 }
 
-                $has_feed_icon = self::hasIcon($feed_id);
+                $has_feed_icon = \SmallSmallRSS\Feeds::hasIcon($feed_id);
                 if ($has_feed_icon) {
                     $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\""
                         . \SmallSmallRSS\Config::get('ICONS_URL')
@@ -553,10 +553,15 @@ class Feeds extends ProtectedHandler
 
                             $cur_feed_title = htmlspecialchars($cur_feed_title);
 
-                            $vf_catchup_link = "(<a class='catchup' onclick='javascript:catchupFeedInGroup($feed_id);' href='#'>".__('mark as read')."</a>)";
-                            $has_feed_icon = self::hasIcon($feed_id);
+                            $vf_catchup_link = "(<a class='catchup'"
+                                . " onclick='javascript:catchupFeedInGroup($feed_id);' href='#'>"
+                                . __('mark as read')
+                                ."</a>)";
+                            $has_feed_icon = \SmallSmallRSS\Feeds::hasIcon($feed_id);
                             if ($has_feed_icon) {
-                                $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\"".\SmallSmallRSS\Config::get('ICONS_URL')."/$feed_id.ico\" alt=\"\">";
+                                $feed_icon_img = "<img class=\"tinyFeedIcon\" src=\""
+                                    . \SmallSmallRSS\Config::get('ICONS_URL')
+                                    ."/$feed_id.ico\" alt=\"\">";
                             }
                             $reply['content'] .= "<div class='cdmFeedTitle'>".
                                 "<div style=\"float : right\">$feed_icon_img</div>".
@@ -1220,9 +1225,4 @@ class Feeds extends ProtectedHandler
         </div>";
     }
 
-    static public function hasIcon($feed_id)
-    {
-        $file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico";
-        return (is_file($file) && filesize($file));
-    }
 }

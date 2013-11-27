@@ -1405,7 +1405,6 @@ function queryFeedHeadlines(
         $filter_query_part = filter_to_sql($filter, $owner_uid);
 
         // Try to check if SQL regexp implementation chokes on a valid regexp
-
         $result = \SmallSmallRSS\Database::query(
             "SELECT true AS true_val
              FROM ttrss_entries, ttrss_user_entries, ttrss_feeds
@@ -1753,9 +1752,11 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     if (strpos($res, "href=") === false) {
         $res = rewrite_urls($res);
     }
-    $charset_hack = '<head>
-            <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        </head>';
+    $charset_hack = (
+        '<head>'
+        . '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>'
+        . '</head>'
+    );
 
     $res = trim($res);
     if (!$res) {
@@ -1771,15 +1772,20 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     foreach ($entries as $entry) {
         if ($site_url) {
             if ($entry->hasAttribute('href')) {
-                $entry->setAttribute('href', \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $entry->getAttribute('href')));
+                $entry->setAttribute(
+                    'href',
+                    \SmallSmallRSS\Utils::rewriteRelativeUrl(
+                        $site_url, $entry->getAttribute('href')
+                    )
+                );
                 $entry->setAttribute('rel', 'noreferrer');
             }
             if ($entry->nodeName == 'img') {
                 if ($entry->hasAttribute('src')) {
-                    \SmallSmallRSS\ImageCache::processEntry($entry, false);
+                    \SmallSmallRSS\ImageCache::processEntry($entry, $site_url, false);
                 }
-                if (($owner && \SmallSmallRSS\DBPrefs::read("STRIP_IMAGES", $owner)) ||
-                    $force_remove_images || !empty($_SESSION["bw_limit"])) {
+                if (($owner && \SmallSmallRSS\DBPrefs::read("STRIP_IMAGES", $owner))
+                    || $force_remove_images || !empty($_SESSION["bw_limit"])) {
                     $p = $doc->createElement('p');
                     $a = $doc->createElement('a');
                     $a->setAttribute('href', $entry->getAttribute('src'));

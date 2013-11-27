@@ -13,13 +13,13 @@ class ImageCache
         $xpath = new DOMXPath($doc);
         $entries = $xpath->query('(//img[@src])');
         foreach ($entries as $entry) {
-            self::processEntry($entry);
+            self::processEntry($entry, $site_url);
         }
         $node = $doc->getElementsByTagName('body')->item(0);
         return $doc->saveXML($node);
     }
 
-    public static function processEntry($entry, $download_if_missing = true)
+    public static function processEntry($entry, $site_url, $download_if_missing = true)
     {
         if (!$entry->hasAttribute('src')) {
             return;
@@ -28,8 +28,8 @@ class ImageCache
         if (0 === strpos($src, \SmallSmallRSS\Config::get('SELF_URL_PATH'))) {
             return;
         }
-        $src = \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $path);
-        $cached = self::isCached($site_url, $path, $download_if_missing);
+        $src = \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $src);
+        $cached = self::isCached($src, $download_if_missing);
         if ($cached) {
             $src = \SmallSmallRSS\Config::get('SELF_URL_PATH') . '/image.php?hash=' . sha1($src);
         }

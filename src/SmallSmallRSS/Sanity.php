@@ -214,12 +214,13 @@ class Sanity
                 array_push($errors, "PHP safe mode setting is not supported.");
             }
 
-            if ((\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB') || \SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED'))
+            if ((\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB')
+                 || \SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED'))
                 && !function_exists("curl_init")) {
                 array_push($errors, "PHP support for CURL is required for PubSubHubbub.");
             }
 
-            if (!class_exists("DOMDocument")) {
+            if (!class_exists('\DOMDocument')) {
                 array_push($errors, "PHP support for DOMDocument is required, but was not found.");
             }
         }

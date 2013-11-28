@@ -300,7 +300,7 @@ class Pref_Users extends ProtectedHandler
         if ($email) {
             require_once "lib/MiniTemplator.class.php";
 
-            $tpl = new MiniTemplator;
+            $tpl = new \MiniTemplator;
 
             $tpl->readTemplateFromFile("templates/resetpass_template.txt");
 

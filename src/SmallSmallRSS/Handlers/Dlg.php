@@ -18,55 +18,36 @@ class Dlg extends ProtectedHandler
     public function importOpml()
     {
         print __("If you have imported labels and/or filters, you might need to reload preferences to see your new data.") . "</p>";
-
         print "<div class=\"prefFeedOPMLHolder\">";
         $owner_uid = $_SESSION["uid"];
-
         \SmallSmallRSS\Database::query("BEGIN");
-
         print "<ul class='nomarks'>";
-
         $opml = new Opml($_REQUEST);
-
         $opml->opml_import($_SESSION["uid"]);
-
         \SmallSmallRSS\Database::query("COMMIT");
-
         print "</ul>";
         print "</div>";
-
         print "<div align='center'>";
         print "<button dojoType=\"dijit.form.Button\"
             onclick=\"dijit.byId('opmlImportDlg').execute()\">".
             __('Close this window')."</button>";
         print "</div>";
-
         print "</div>";
-
-
     }
 
     public function pubOPMLUrl()
     {
         $url_path = Opml::opml_publish_url();
-
         print __("Your Public OPML URL is:");
-
         print "<div class=\"tagCloudContainer\">";
         print "<a id='pub_opml_url' href='$url_path' target='_blank'>$url_path</a>";
         print "</div>";
-
         print "<div align='center'>";
-
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return opmlRegenKey()\">".
-            __('Generate new URL')."</button> ";
-
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return closeInfoBox()\">".
-            __('Close this window')."</button>";
-
+        print "<button dojoType=\"dijit.form.Button\" onclick=\"return opmlRegenKey()\">"
+            . __('Generate new URL')."</button> ";
+        print "<button dojoType=\"dijit.form.Button\" onclick=\"return closeInfoBox()\">"
+            . __('Close this window')."</button>";
         print "</div>";
-
-
     }
 
     public function explainError()

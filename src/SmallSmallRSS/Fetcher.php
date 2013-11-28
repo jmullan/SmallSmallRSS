@@ -3,9 +3,15 @@ namespace SmallSmallRSS;
 
 class Fetcher
 {
+    public $site_url;
+    public $fetch_curl_used;
+    public $fetch_last_error;
+    public $fetch_last_error_code;
+    public $fetch_last_content_code;
 
-    public function __construct()
+    public function __construct($site_url)
     {
+        $this->site_url = $site_url;
         $this->fetch_curl_used = false;
         $this->fetch_last_error = false;
         $this->fetch_last_error_code = false;
@@ -72,7 +78,11 @@ class Fetcher
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
             curl_setopt($ch, CURLOPT_USERAGENT, SELF_USER_AGENT);
             curl_setopt($ch, CURLOPT_ENCODING, "");
-            curl_setopt($ch, CURLOPT_REFERER, $url);
+            if (false !== $this->site_url) {
+                curl_setopt($ch, CURLOPT_REFERER, $this->site_url);
+            } else {
+                curl_setopt($ch, CURLOPT_REFERER, $url);
+            }
 
             if ($post_query) {
                 curl_setopt($ch, CURLOPT_POST, true);
@@ -204,7 +214,11 @@ class Fetcher
         );
         curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
         curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_REFERER, $url);
+        if (false !== $this->site_url) {
+            curl_setopt($ch, CURLOPT_REFERER, $this->site_url);
+        } else {
+            curl_setopt($ch, CURLOPT_REFERER, $url);
+        }
         curl_setopt($curl, CURLOPT_ENCODING, 'gzip,deflate');
         curl_setopt($curl, CURLOPT_AUTOREFERER, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

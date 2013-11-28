@@ -252,12 +252,12 @@ class opml extends ProtectedHandler
         $out .= "</body></opml>";
 
         // Format output.
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         $doc->formatOutput = true;
         $doc->preserveWhiteSpace = false;
         $doc->loadXML($out);
 
-        $xpath = new DOMXpath($doc);
+        $xpath = new \DOMXpath($doc);
         $outlines = $xpath->query("//outline[@title]");
 
         // cleanup empty categories
@@ -463,7 +463,7 @@ class opml extends ProtectedHandler
             $outlines = $root_node->childNodes;
 
         } else {
-            $xpath = new DOMXpath($doc);
+            $xpath = new \DOMXpath($doc);
             $outlines = $xpath->query("//opml/body/outline");
 
             $cat_id = 0;
@@ -519,8 +519,6 @@ class opml extends ProtectedHandler
         $debug = isset($_REQUEST["debug"]);
         $doc = false;
 
-        #        if ($debug) $doc = DOMDocument::load("/tmp/test.opml");
-
         if ($_FILES['opml_file']['error'] != 0) {
             \SmallSmallRSS\Renderers\Messages::renderError(T_sprintf(
                 "Upload failed with error code %d",
@@ -549,7 +547,7 @@ class opml extends ProtectedHandler
         }
 
         if (is_file($tmp_file)) {
-            $doc = new DOMDocument();
+            $doc = new \DOMDocument();
             $doc->load($tmp_file);
             unlink($tmp_file);
         } elseif (!$doc) {

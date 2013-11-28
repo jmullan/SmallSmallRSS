@@ -1764,9 +1764,9 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
     }
     libxml_use_internal_errors(true);
 
-    $doc = new DOMDocument();
+    $doc = new \DOMDocument();
     $doc->loadHTML($charset_hack . $res);
-    $xpath = new DOMXPath($doc);
+    $xpath = new \DOMXPath($doc);
 
     $entries = $xpath->query('(//a[@href]|//img[@src])');
     foreach ($entries as $entry) {
@@ -1789,7 +1789,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
                     $p = $doc->createElement('p');
                     $a = $doc->createElement('a');
                     $a->setAttribute('href', $entry->getAttribute('src'));
-                    $a->appendChild(new DOMText($entry->getAttribute('src')));
+                    $a->appendChild(new \DOMText($entry->getAttribute('src')));
                     $a->setAttribute('target', '_blank');
                     $p->appendChild($a);
                     $entry->parentNode->replaceChild($p, $entry);
@@ -1843,7 +1843,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
 
 function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes)
 {
-    $xpath = new DOMXPath($doc);
+    $xpath = new \DOMXPath($doc);
     $entries = $xpath->query('//*');
     foreach ($entries as $entry) {
         if (!in_array($entry->nodeName, $allowed_elements)) {
@@ -2486,9 +2486,9 @@ function get_feeds_from_html($url, $content)
 
     libxml_use_internal_errors(true);
 
-    $doc = new DOMDocument();
+    $doc = new \DOMDocument();
     $doc->loadHTML($content);
-    $xpath = new DOMXPath($doc);
+    $xpath = new \DOMXPath($doc);
     $entries = $xpath->query('/html/head/link[@rel="alternate"]');
     $feedUrls = array();
     foreach ($entries as $entry) {
@@ -2675,9 +2675,9 @@ function rewrite_urls($html)
     $charset_hack = '<head>
                      <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
                      </head>';
-    $doc = new DOMDocument();
+    $doc = new \DOMDocument();
     $doc->loadHTML($charset_hack . $html);
-    $xpath = new DOMXPath($doc);
+    $xpath = new \DOMXPath($doc);
     $entries = $xpath->query('//*/text()');
     foreach ($entries as $entry) {
         if (strstr($entry->wholeText, "://") !== false) {
@@ -2687,7 +2687,7 @@ function rewrite_urls($html)
                 $entry->wholeText
             );
             if ($text != $entry->wholeText) {
-                $cdoc = new DOMDocument();
+                $cdoc = new \DOMDocument();
                 $cdoc->loadHTML($charset_hack . $text);
                 foreach ($cdoc->childNodes as $cnode) {
                     $cnode = $doc->importNode($cnode, true);

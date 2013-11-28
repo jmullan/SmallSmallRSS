@@ -990,9 +990,9 @@ class RSSUpdater
         $favicon_url = false;
         if ($html = \SmallSmallRSS\Fetcher::fetch($url)) {
             libxml_use_internal_errors(true);
-            $doc = new DOMDocument();
+            $doc = new \DOMDocument();
             $doc->loadHTML($html);
-            $xpath = new DOMXPath($doc);
+            $xpath = new \DOMXPath($doc);
             $base = $xpath->query('/html/head/base');
             foreach ($base as $b) {
                 $url = $b->getAttribute("href");

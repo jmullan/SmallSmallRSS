@@ -22,9 +22,22 @@ class Auth_Remote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_I
         $this->base = new \SmallSmallRSS\Auth_Base();
     }
 
+    public static function getSSLCertificateId()
+    {
+        if (!empty($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"])) {
+            return sha1(
+                $_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"]
+                . $_SERVER["REDIRECT_SSL_CLIENT_V_START"]
+                . $_SERVER["REDIRECT_SSL_CLIENT_V_END"]
+                . $_SERVER["REDIRECT_SSL_CLIENT_S_DN"]
+            );
+        }
+        return "";
+    }
+
     public function getLoginBySSLCertificate()
     {
-        $cert_serial = \SmallSmallRSS\Database::escape_string(get_ssl_certificate_id());
+        $cert_serial = \SmallSmallRSS\Database::escape_string(self::getSSLCertificateId());
         if ($cert_serial) {
             $result = \SmallSmallRSS\Database::query(
                 "SELECT login

@@ -710,8 +710,8 @@ class Pref_Prefs extends ProtectedHandler
                 print "<input dojoType=\"dijit.form.ValidationTextBox\"
                     id=\"SSL_CERT_SERIAL\" readonly=\"1\"
                     name=\"$pref_name\" value=\"$value\">";
-
-                $cert_serial = htmlspecialchars(get_ssl_certificate_id());
+                $cert_id = \Auth_Remote::getSSLCertificateId();
+                $cert_serial = htmlspecialchars($cert_id);
                 $has_serial = ($cert_serial) ? "false" : "true";
 
                 print " <button dojoType=\"dijit.form.Button\" disabled=\"$has_serial\"

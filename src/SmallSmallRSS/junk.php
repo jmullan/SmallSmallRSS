@@ -12,19 +12,6 @@ function initialize_user_prefs($uid, $profile = false)
     \SmallSmallRSS\Database::query("COMMIT");
 }
 
-function get_ssl_certificate_id()
-{
-    if (!empty($_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"])) {
-        return sha1(
-            $_SERVER["REDIRECT_SSL_CLIENT_M_SERIAL"]
-            . $_SERVER["REDIRECT_SSL_CLIENT_V_START"]
-            . $_SERVER["REDIRECT_SSL_CLIENT_V_END"]
-            . $_SERVER["REDIRECT_SSL_CLIENT_S_DN"]
-        );
-    }
-    return "";
-}
-
 function authenticate_user($login, $password, $check_only = false)
 {
     if (!\SmallSmallRSS\Auth::is_single_user_mode()) {

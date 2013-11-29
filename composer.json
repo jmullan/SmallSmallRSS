@@ -55,7 +55,8 @@
         "jmullan/accepttogettext": "*@dev",
         "jmullan/pubsubhubbub": "*@dev",
         "jmullan/otphp": "*@dev",
-        "mobiledetect/mobiledetectlib": "*"
+        "mobiledetect/mobiledetectlib": "*",
+        "gigablah/sphinxphp": "2.0.*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"

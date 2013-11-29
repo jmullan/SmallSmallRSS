@@ -1369,7 +1369,7 @@ function queryFeedHeadlines(
     $ext_tables_part = "";
     if ($search) {
         if (\SmallSmallRSS\Config::get('SPHINX_ENABLED')) {
-            $ids = join(",", @sphinx_search($search, 0, 500));
+            $ids = join(",", sphinx_search($search, 0, 500));
             if ($ids) {
                 $search_query_part = "ref_id IN ($ids) AND ";
             } else {
@@ -2619,38 +2619,31 @@ function getLastArticleId()
 
 function sphinx_search($query, $offset = 0, $limit = 30)
 {
-    require_once __DIR__ . '/../lib/sphinxapi.php';
-    $sphinxClient = new SphinxClient();
+    $sphinxClient = new \Sphinx\SphinxClient();
     $sphinxpair = explode(":", \SmallSmallRSS\Config::get('SPHINX_SERVER'), 2);
-    $sphinxClient->SetServer($sphinxpair[0], (int) $sphinxpair[1]);
-    $sphinxClient->SetConnectTimeout(1);
-    $sphinxClient->SetFieldWeights(
+    $sphinxClient->setServer($sphinxpair[0], (int) $sphinxpair[1]);
+    $sphinxClient->setConnectTimeout(1);
+    $sphinxClient->setFieldWeights(
         array(
             'title' => 70,
             'content' => 30,
             'feed_title' => 20
         )
     );
-    $sphinxClient->SetMatchMode(SPH_MATCH_EXTENDED2);
-    $sphinxClient->SetRankingMode(SPH_RANK_PROXIMITY_BM25);
-    $sphinxClient->SetLimits($offset, $limit, 1000);
-    $sphinxClient->SetArrayResult(false);
-    $sphinxClient->SetFilter('owner_uid', array($_SESSION['uid']));
+    $sphinxClient->setMatchMode(SPH_MATCH_EXTENDED2);
+    $sphinxClient->setRankingMode(SPH_RANK_PROXIMITY_BM25);
+    $sphinxClient->setLimits($offset, $limit, 1000);
+    $sphinxClient->setArrayResult(false);
+    $sphinxClient->setFilter('owner_uid', array($_SESSION['uid']));
 
-    $result = $sphinxClient->Query(
-        $query,
-        \SmallSmallRSS\Config::get('SPHINX_INDEX')
-    );
-
+    $result = $sphinxClient->query($query, \SmallSmallRSS\Config::get('SPHINX_INDEX'));
     $ids = array();
-
     if (is_array($result['matches'])) {
         foreach (array_keys($result['matches']) as $int_id) {
             $ref_id = $result['matches'][$int_id]['attrs']['ref_id'];
-            array_push($ids, $ref_id);
+            $ids[] = $ref_id;
         }
     }
-
     return $ids;
 }
 

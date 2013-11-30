@@ -27,6 +27,10 @@
             "url": "https://github.com/jmullan/otphp"
         },
         {
+            "type": "vcs",
+            "url": "https://github.com/jmullan/MiniTemplatorForPhp"
+        },
+        {
             "type": "package",
             "package": {
                 "name": "php-gettext/php-gettext",
@@ -55,6 +59,7 @@
         "jmullan/accepttogettext": "*@dev",
         "jmullan/pubsubhubbub": "*@dev",
         "jmullan/otphp": "*@dev",
+        "jmullan/minitemplator": "*@dev",
         "mobiledetect/mobiledetectlib": "*",
         "gigablah/sphinxphp": "2.0.*"
     },

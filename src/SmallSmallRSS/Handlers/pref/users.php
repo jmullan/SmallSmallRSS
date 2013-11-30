@@ -298,23 +298,14 @@ class Pref_Users extends ProtectedHandler
         }
 
         if ($email) {
-            require_once "lib/MiniTemplator.class.php";
-
-            $tpl = new \MiniTemplator;
-
+            $tpl = new \MiniTemplator\Engine();
             $tpl->readTemplateFromFile("templates/resetpass_template.txt");
-
             $tpl->setVariable('LOGIN', $login);
             $tpl->setVariable('NEWPASS', $tmp_user_pwd);
-
             $tpl->addBlock('message');
-
             $message = "";
-
             $tpl->generateOutputToString($message);
-
             $mail = new \SmallSmallRSS\Mailer();
-
             $rc = $mail->quickMail(
                 $email,
                 $login,
@@ -322,7 +313,6 @@ class Pref_Users extends ProtectedHandler
                 $message,
                 false
             );
-
             if (!$rc) {
                 \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
             }

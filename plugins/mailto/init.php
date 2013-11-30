@@ -31,9 +31,8 @@ class MailTo extends \SmallSmallRSS\Plugin
     public function emailArticle()
     {
         $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
-        require_once __DIR__ . "/../../lib/MiniTemplator.class.php";
-        $tpl = new MiniTemplator;
-        $tpl_t = new MiniTemplator;
+        $tpl = new \MiniTemplator\Engine();
+        $tpl_t = new \MiniTemplator\Engine();
         $tpl->readTemplateFromFile("templates/email_article_template.txt");
         $tpl->setVariable('USER_NAME', $_SESSION["name"], true);
         $tpl->setVariable('USER_EMAIL', $user_email, true);

@@ -71,10 +71,8 @@ class Digest
     public function prepare_headlines($user_id, $days = 1, $limit = 1000)
     {
 
-        require_once "lib/MiniTemplator.class.php";
-
-        $tpl = new MiniTemplator;
-        $tpl_t = new MiniTemplator;
+        $tpl = new \MiniTemplator\Engine();
+        $tpl_t = new \MiniTemplator\Engine();
 
         $tpl->readTemplateFromFile("templates/digest_template_html.txt");
         $tpl_t->readTemplateFromFile("templates/digest_template.txt");

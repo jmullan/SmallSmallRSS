@@ -16,9 +16,6 @@ class PublicHandler extends Handler
         $format = 'atom',
         $order = false
     ) {
-
-        require_once "lib/MiniTemplator.class.php";
-
         $note_style = "background-color: #fff7d5;"
             . " border-width: 1px;"
             . " padding: 5px; border-style: dashed; border-color: #e7d796;"
@@ -109,7 +106,7 @@ class PublicHandler extends Handler
         }
 
         if ($format == 'atom') {
-            $tpl = new MiniTemplator;
+            $tpl = new \MiniTemplator\Engine();
 
             $tpl->readTemplateFromFile("templates/generated_feed.txt");
 

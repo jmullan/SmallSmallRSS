@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "This is currently disabled"
+exit 1
+
 # This script rebuilds customized layer of Dojo for tt-rss
 # Place unpacked Dojo source release in this directory and run this script.
 # It will automatically replace previous build of Dojo in ../dojo

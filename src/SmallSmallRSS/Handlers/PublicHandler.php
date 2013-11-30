@@ -453,8 +453,11 @@ class PublicHandler extends Handler
         }
 
         header('Content-Type: text/html; charset=utf-8');
-        echo "<html><head><title>";
-        echo 'Tiny Tiny RSS';
+        echo '<!DOCTYPE html>';
+        echo "<html>";
+        echo "<head>";
+        echo "<title>";
+        echo \SmallSmallRSS\Config::get('SOFTWARE_NAME');
         echo "</title>";
         $renderer = new \SmallSmallRSS\Renderers\CSS();
         $renderer->renderStylesheetTag("css/utility.css");
@@ -635,19 +638,22 @@ class PublicHandler extends Handler
             $feed_url = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["feed_url"]));
 
             header('Content-Type: text/html; charset=utf-8');
-            echo "<html>
-                <head>
-                    <title>Tiny Tiny RSS</title>
-                    <link rel=\"stylesheet\" type=\"text/css\" href=\"css/utility.css\">
-                    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
-                </head>
-                <body>
-                <img class=\"floatingLogo\" src=\"images/logo_small.png\"
-                      alt=\"Tiny Tiny RSS\"/>
-                    <h1>".__("Subscribe to feed...")."</h1><div class='content'>";
-
+            echo "<!DOCTYPE html>";
+            echo "<html>";
+            echo "<head>";
+            echo "<title>";
+            echo \SmallSmallRSS\Config::get('SOFTWARE_NAME');
+            echo "</title>";
+            echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/utility.css\">";
+            echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
+            echo "</head>";
+            echo "<body>";
+            echo "<img class=\"floatingLogo\" src=\"images/logo_small.png\"";
+            echo " alt=\"";
+            echo \SmallSmallRSS\Config::get('SOFTWARE_NAME');
+            echo "\"/>";
+            echo "<h1>".__("Subscribe to feed...")."</h1><div class='content'>";
             $rc = subscribe_to_feed($feed_url);
-
             switch ($rc['code']) {
                 case 0:
                     \SmallSmallRSS\Renderers\Messages::renderWarning(
@@ -679,42 +685,30 @@ class PublicHandler extends Handler
                     );
                     break;
             }
-
             if ($feed_urls) {
-
                 echo "<form action=\"public.php\">";
                 echo "<input type=\"hidden\" name=\"op\" value=\"subscribe\">";
-
                 echo "<select name=\"feed_url\">";
-
                 foreach ($feed_urls as $url => $name) {
                     $url = htmlspecialchars($url);
                     $name = htmlspecialchars($name);
-
                     echo "<option value=\"$url\">$name</option>";
                 }
-
-                echo "<input type=\"submit\" value=\"".__("Subscribe to selected feed").
-                    "\">";
-
+                echo "<input type=\"submit\" value=\"" . __("Subscribe to selected feed") . "\">";
                 echo "</form>";
             }
-
             $tp_uri = get_self_url_prefix() . "/prefs.php";
             $tt_uri = get_self_url_prefix();
-
             if ($rc['code'] <= 2) {
                 $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_feeds WHERE
                     feed_url = '$feed_url' AND owner_uid = " . $_SESSION["uid"]
                 );
-
                 $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
             } else {
                 $feed_id = 0;
             }
             echo "<p>";
-
             if ($feed_id) {
                 echo "<form method=\"GET\" style='display: inline'
                     action=\"$tp_uri\">
@@ -724,12 +718,13 @@ class PublicHandler extends Handler
                     <input type=\"submit\" value=\"".__("Edit subscription options")."\">
                     </form>";
             }
-
-            echo "<form style='display: inline' method=\"GET\" action=\"$tt_uri\">
-                <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
-                </form></p>";
-
-            echo "</div></body></html>";
+            echo "<form style='display: inline' method=\"GET\" action=\"$tt_uri\">";
+            echo "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+            echo "</form>";
+            echo "</p>";
+            echo "</div>";
+            echo "</body>";
+            echo "</html>";
 
         } else {
             $renderer = new \SmallSmallRSS\Renderers\LoginPage();
@@ -848,7 +843,12 @@ class PublicHandler extends Handler
         \SmallSmallRSS\Locale::startupGettext();
 
         header('Content-Type: text/html; charset=utf-8');
-        echo "<html><head><title>Tiny Tiny RSS</title>";
+        echo "<!DOCTYPE html>";
+        echo "<html>";
+        echo "<head>";
+        echo "<title>";
+        echo \SmallSmallRSS\Config::get('SOFTWARE_NAME');
+        echo "</title>";
         $renderer = new \SmallSmallRSS\Renderers\CSS();
         $renderer->renderStylesheetTag("css/utility.css");
         $js_renderer = new \SmallSmallRSS\Renderers\JS();
@@ -958,6 +958,7 @@ class PublicHandler extends Handler
             $renderer->render();
             exit;
         }
+        echo "<!DOCTYPE html>";
         echo '<html>';
         echo '<head>';
         echo '<title>Database Updater</title>';

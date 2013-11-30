@@ -195,142 +195,101 @@ if (!$SELF_URL_PATH) {
 
 $issel_pgsql = $DB_TYPE == "pgsql" ? "selected" : "";
 $issel_mysql = $DB_TYPE == "mysql" ? "selected" : "";
-
+header('Content-Type: text/html; charset=utf-8');
 ?>
-
+<!DOCTYPE html>
 <html>
 <head>
-	<title>Tiny Tiny RSS - Installer</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<link rel="stylesheet" type="text/css" href="../css/utility.css">
-	<style type="text/css">
-	textarea { font-size: 12px; }
-	</style>
+  <title>Tiny Tiny RSS - Installer</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link rel="stylesheet" type="text/css" href="../css/utility.css">
 </head>
 <body>
-<?php
-
-?>
-
-<div class="floatingLogo"><img src="../images/logo_small.png"></div>
-
-<h1>Tiny Tiny RSS Installer</h1>
-
-<div class='content'>
-
-<?php
-
-?>
-
-<form action="" method="post">
-<input type="hidden" name="op" value="testconfig">
-
-<h2>Database settings</h2>
-
-
-<fieldset>
-	<label>Database type</label>
-	<select name="DB_TYPE">
-		<option <?php echo $issel_pgsql ?> value="pgsql">PostgreSQL</option>
-		<option <?php echo $issel_mysql ?> value="mysql">MySQL</option>
-	</select>
-</fieldset>
-
-<fieldset>
-	<label>Username</label>
-	<input required name="DB_USER" size="20" value="<?php echo $DB_USER ?>"/>
-</fieldset>
-
-<fieldset>
-	<label>Password</label>
-	<input required name="DB_PASS" size="20" type="password" value="<?php echo $DB_PASS ?>"/>
-</fieldset>
-
-<fieldset>
-	<label>Database name</label>
-	<input required name="DB_NAME" size="20" value="<?php echo $DB_NAME ?>"/>
-</fieldset>
-
-<fieldset>
-	<label>Host name</label>
-	<input name="DB_HOST" size="20" value="<?php echo $DB_HOST ?>"/>
-	<span class="hint">If needed</span>
-</fieldset>
-
-<fieldset>
-	<label>Port</label>
-	<input name="DB_PORT" type="number" size="20" value="<?php echo $DB_PORT ?>"/>
-	<span class="hint">Usually 3306 for MySQL or 5432 for PostgreSQL</span>
-</fieldset>
-
-<h2>Other settings</h2>
-
-<p>This should be set to the location your Tiny Tiny RSS will be available on.</p>
-
-<fieldset>
-	<label>Tiny Tiny RSS URL</label>
-	<input type="url" name="SELF_URL_PATH" placeholder="<?php echo $SELF_URL_PATH; ?>" size="60" value="<?php echo $SELF_URL_PATH ?>"/>
-</fieldset>
-
-
-<p><input type="submit" value="Test configuration"></p>
-
-</form>
-
+  <div class="floatingLogo"><img src="../images/logo_small.png" /></div>
+  <h1>Tiny Tiny RSS Installer</h1>
+  <div class='content'>
+  <form action="" method="post">
+    <input type="hidden" name="op" value="testconfig" />
+    <h2>Database settings</h2>
+    <fieldset>
+      <label>Database type</label>
+      <select name="DB_TYPE">
+        <option <?php echo $issel_pgsql ?> value="pgsql">PostgreSQL</option>
+        <option <?php echo $issel_mysql ?> value="mysql">MySQL</option>
+      </select>
+    </fieldset>
+    <fieldset>
+      <label>Username</label>
+      <input required name="DB_USER" size="20" value="<?php echo $DB_USER ?>"/>
+    </fieldset>
+    <fieldset>
+      <label>Password</label>
+      <input required name="DB_PASS" size="20" type="password" value="<?php echo $DB_PASS ?>"/>
+    </fieldset>
+    <fieldset>
+      <label>Database name</label>
+      <input required name="DB_NAME" size="20" value="<?php echo $DB_NAME ?>"/>
+    </fieldset>
+    <fieldset>
+      <label>Host name</label>
+      <input name="DB_HOST" size="20" value="<?php echo $DB_HOST ?>"/>
+      <span class="hint">If needed</span>
+    </fieldset>
+    <fieldset>
+      <label>Port</label>
+      <input name="DB_PORT" type="number" size="20" value="<?php echo $DB_PORT ?>"/>
+      <span class="hint">Usually 3306 for MySQL or 5432 for PostgreSQL</span>
+    </fieldset>
+    <h2>Other settings</h2>
+    <p>This should be set to the location your Tiny Tiny RSS will be available on.</p>
+    <fieldset>
+    <label>Tiny Tiny RSS URL</label>
+      <input type="url" name="SELF_URL_PATH" placeholder="<?php echo $SELF_URL_PATH; ?>"
+        size="60" value="<?php echo $SELF_URL_PATH ?>"/>
+    </fieldset>
+    <p><input type="submit" value="Test configuration" /></p>
+  </form>
 <?php
 if ($op == 'testconfig') {
     echo '<h2>Checking configuration</h2>';
     $errors = sanity_check($DB_TYPE);
     if (count($errors) > 0) {
         print "<p>Some configuration tests failed. Please correct them before continuing.</p>";
-
         print "<ul>";
-
         foreach ($errors as $error) {
             print "<li style='color : red'>$error</li>";
         }
-
         print "</ul>";
-
         exit;
     }
-
     $notices = array();
-
     if (!function_exists("curl_init")) {
         array_push($notices, "It is highly recommended to enable support for CURL in PHP.");
     }
-
     if (count($notices) > 0) {
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             "Configuration check succeeded with minor problems:"
         );
-
         print "<ul>";
-
         foreach ($notices as $notice) {
             print "<li>$notice</li>";
         }
-
         print "</ul>";
     } else {
         \SmallSmallRSS\Renderers\Messages::renderNotice("Configuration check succeeded.");
     }
     echo '<h2>Checking database</h2>';
     $link = db_connect($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_TYPE, $DB_PORT);
-
     if (!$link) {
         \SmallSmallRSS\Renderers\Messages::renderError(
             "Unable to connect to database using specified parameters."
         );
         exit;
     }
-
     \SmallSmallRSS\Renderers\Messages::renderNotice("Database test succeeded.");
-
     echo '<h2>Initialize database</h2>';
     echo '<p>Before you can start using tt-rss, database needs to be initialized. Click on the button below to do that now.</p>';
-    $result = @\SmallSmallRSS\Database::query($link, "SELECT true FROM ttrss_feeds", $DB_TYPE, false);
+    $result = \SmallSmallRSS\Database::query($link, "SELECT true FROM ttrss_feeds", $DB_TYPE, false);
     if ($result) {
         \SmallSmallRSS\Renderers\Messages::renderError(
             "Existing tt-rss tables will be removed from the database."
@@ -382,42 +341,34 @@ if ($op == 'testconfig') {
 
 <?php
 } elseif ($op == 'installschema' || $op == 'skipschema') {
-
     $link = db_connect($DB_HOST, $DB_USER, $DB_PASS, $DB_NAME, $DB_TYPE, $DB_PORT);
-
     if (!$link) {
         \SmallSmallRSS\Renderers\Messages::renderError(
             "Unable to connect to database using specified parameters."
         );
         exit;
     }
-
     if ($op == 'installschema') {
-
         print "<h2>Initializing database...</h2>";
-
-        $lines = explode(";", preg_replace("/[\r\n]/", "", file_get_contents("../schema/ttrss_schema_".basename($DB_TYPE).".sql")));
-
+        $lines = explode(
+            ";",
+            preg_replace("/[\r\n]/", "", file_get_contents("../schema/ttrss_schema_".basename($DB_TYPE).".sql"))
+        );
         foreach ($lines as $line) {
             if (strpos($line, "--") !== 0 && $line) {
                 \SmallSmallRSS\Database::query($link, $line, $DB_TYPE);
             }
         }
-
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             "Database initialization completed."
         );
-
     } else {
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             "Database initialization skipped."
         );
     }
-
     print "<h2>Generated configuration file</h2>";
-
     print "<p>Copy following text and save as <code>config.ini</code> in tt-rss main directory. It is suggested to read through the file to the end in case you need any options changed fom default values.</p>";
-
     print "<p>After copying the file, you will be able to login with default username and password combination: <code>admin</code> and <code>password</code>. Don't forget to change the password immediately!</p>";
 
 ?>

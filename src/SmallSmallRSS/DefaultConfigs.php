@@ -165,7 +165,7 @@ class DefaultConfigs
 
     // Name, address and subject for sending outgoing mail. This applies
     // to password reset notifications, digest emails and any other mail.
-    const SMTP_FROM_NAME = 'Tiny Tiny RSS';
+    const SMTP_FROM_NAME = 'Small Small RSS';
     const SMTP_FROM_ADDRESS = 'noreply@example.com';
     // Subject line for email digests
     const DIGEST_SUBJECT = '[tt-rss] New headlines for last 24 hours';
@@ -269,6 +269,8 @@ class DefaultConfigs
      * Expire cached files after one week
      */
     const CACHE_LIFETIME = 604800;
+
+    const SOFTWARE_NAME = 'Small Small RSS';
 
     public static function has($key)
     {

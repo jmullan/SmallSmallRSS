@@ -18,9 +18,10 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
     {
         $renderer = new \SmallSmallRSS\Renderers\CSS();
         ?>
-        <html>
+         <!DOCTYPE html>
+         <html>
           <head>
-            <title>Tiny Tiny RSS</title>
+            <title><?php echo \SmallSmallRSS\Config::get('SOFTWARE_NAME'); ?></title>
             <?php $renderer->renderStylesheetTag("css/utility.css"); ?>
           </head>
           <body class="otp">

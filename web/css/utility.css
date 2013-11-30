@@ -100,6 +100,33 @@ h2 {
     border-style: solid;
 }
 
+
+fieldset {
+    border-width: 0px;
+    padding: 0px 0px 5px 0px;
+    margin: 0px;
+}
+
+fieldset input {
+    font-family: sans-serif;
+    font-size: medium;
+    border-spacing: 2px;
+    border: 1px solid #b5bcc7;
+    padding: 2px;
+}
+
+fieldset label {
+    width: 120px;
+    margin-right: 20px;
+    display: inline-block;
+    text-align: right;
+    color: gray;
+}
+
+textarea {
+    font-size: 12px;
+}
+
 div.content > h2 {
     margin-top: 0px;
 }
@@ -147,35 +174,6 @@ div.rss hr {
     border-color: #e0e0e0;
 }
 
-body#sharepopup {
-    background-color: white;
-    background-image: url("images/toolbar.png");
-    background-repeat: repeat-x;
-    background-position: bottom;
-    margin: 10px;
-    padding: 0px;
-}
-
-body#sharepopup h1 {
-    font-size: 14px;
-    margin: 0px;
-    color: #88b0f0;
-}
-
-body#sharepopup table {
-    background: white;
-    border: 1px solid #88b0f0;
-    padding: 5px;
-}
-
-body#sharepopup form {
-    height: 100%;
-}
-
-body#sharepopup input {
-    width: 100%;
-}
-
 div.autocomplete {
     position: absolute;
     width: 250px;
@@ -204,28 +202,6 @@ div.autocomplete ul li {
     padding: 2px;
     height: 32px;
     cursor: pointer;
-}
-
-fieldset {
-    border-width: 0px;
-    padding: 0px 0px 5px 0px;
-    margin: 0px;
-}
-
-fieldset input {
-    font-family: sans-serif;
-    font-size: medium;
-    border-spacing: 2px;
-    border: 1px solid #b5bcc7;
-    padding: 2px;
-}
-
-fieldset label {
-    width: 120px;
-    margin-right: 20px;
-    display: inline-block;
-    text-align: right;
-    color: gray;
 }
 
 body.otp {
@@ -270,4 +246,33 @@ body.otp div.content {
 
 .insensitive {
     color: gray;
+}
+
+#sharepopup {
+    background-color: white;
+    background-image: url("images/toolbar.png");
+    background-repeat: repeat-x;
+    background-position: bottom;
+    margin: 10px;
+    padding: 0px;
+}
+
+#sharepopup h1 {
+    font-size: 14px;
+    margin: 0px;
+    color: #88b0f0;
+}
+
+#sharepopup table {
+    background: white;
+    border: 1px solid #88b0f0;
+    padding: 5px;
+}
+
+#sharepopup form {
+    height: 100%;
+}
+
+#sharepopup input {
+    width: 100%;
 }

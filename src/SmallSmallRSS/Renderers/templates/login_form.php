@@ -5,9 +5,10 @@ $fake_login = isset($fake_login) ? $fake_login : '';
 $fake_password = isset($_SESSION["fake_password"]) ? $_SESSION["fake_password"] : '';
 $return = urlencode($_SERVER["REQUEST_URI"]);
 ?>
+<!DOCTYPE html>
 <html>
 <head>
-  <title>Tiny Tiny RSS : Login</title>
+  <title><?php echo \SmallSmallRSS\Config::get('SOFTWARE_NAME'); ?> : Login</title>
   <link rel="stylesheet" type="text/css" href="lib/dijit/themes/claro/claro.css"/>
   <link rel="stylesheet" type="text/css" href="css/tt-rss.css">
   <link rel="stylesheet" type="text/css" href="css/login.css">

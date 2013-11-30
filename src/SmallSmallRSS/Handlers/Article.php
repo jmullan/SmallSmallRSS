@@ -53,7 +53,7 @@ class Article extends ProtectedHandler
         } elseif ($mode == "raw") {
             if ($_REQUEST['html']) {
                 header("Content-Type: text/html");
-                echo '<link rel="stylesheet" type="text/css" href="css/tt-rss.css"/>';
+                echo '<link rel="stylesheet" type="text/css" href="css/tt-rss.css" />';
             }
 
             $article = format_article($id, false);

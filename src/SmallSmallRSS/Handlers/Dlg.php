@@ -8,7 +8,6 @@ class Dlg extends ProtectedHandler
     {
         if (parent::before($method)) {
             header("Content-Type: text/html"); # required for iframe
-
             $this->param = \SmallSmallRSS\Database::escape_string($_REQUEST["param"]);
             return true;
         }

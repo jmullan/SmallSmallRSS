@@ -24,29 +24,31 @@ if ($registration_enabled) {
     $reg_suffix = "disabled";
 }
 
+$software_name = \SmallSmallRSS\Config::get('SOFTWARE_NAME');
+
 if ($_REQUEST["format"] == "feed") {
     header("Content-Type: text/xml");
-    print '<?xml version="1.0" encoding="utf-8"?>';
-    print "<feed xmlns=\"http://www.w3.org/2005/Atom\">";
-    print "<id>".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php")."</id>";
-    print "<title>Tiny Tiny RSS registration slots</title>";
-    print "<link rel=\"self\" href=\"";
-    print htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php?format=feed");
-    print "\"/>";
-    print "<link rel=\"alternate\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'))."\"/>";
+    echo '<?xml version="1.0" encoding="utf-8"?>';
+    echo "<feed xmlns=\"http://www.w3.org/2005/Atom\">";
+    echo "<id>".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php")."</id>";
+    echo "<title>$software_name: Registration Slots</title>";
+    echo "<link rel=\"self\" href=\"";
+    echo htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php?format=feed");
+    echo "\"/>";
+    echo "<link rel=\"alternate\" href=\"".htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'))."\"/>";
 
-    print "<entry>";
-    print "<id>";
-    print htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'));
-    print "/register.php?$num_users";
-    print "</id>";
-    print "<link rel=\"alternate\" href=\"";
-    print htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php");
-    print "\"/>";
-    print "<title>$num_users slots are currently available, registration $reg_suffix</title>";
-    print "<summary>$num_users slots are currently available, registration $reg_suffix</summary>";
-    print "</entry>";
-    print "</feed>";
+    echo "<entry>";
+    echo "<id>";
+    echo htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH'));
+    echo "/register.php?$num_users";
+    echo "</id>";
+    echo "<link rel=\"alternate\" href=\"";
+    echo htmlspecialchars(\SmallSmallRSS\Config::get('SELF_URL_PATH') . "/register.php");
+    echo "\"/>";
+    echo "<title>$num_users slots are currently available, registration $reg_suffix</title>";
+    echo "<summary>$num_users slots are currently available, registration $reg_suffix</summary>";
+    echo "</entry>";
+    echo "</feed>";
     return;
 }
 
@@ -55,9 +57,9 @@ if ($_REQUEST["format"] == "feed") {
 if ($action == "check") {
     $is_registered = \SmallSmallRSS\Users::isRegistered($_REQUEST['login']);
     header("Content-Type: application/xml");
-    print "<result>";
-    printf("%d", $is_registered);
-    print "</result>";
+    echo "<result>";
+    echof("%d", $is_registered);
+    echo "</result>";
     exit;
 }
 ?>
@@ -81,60 +83,60 @@ if ($action == "check") {
         \SmallSmallRSS\Renderers\Messages::renderError(
             __("New user registrations are administratively disabled.")
         );
-        print '<form method="GET" action="backend.php">';
-        print '<input type="hidden" name="op" value="logout" />';
-        print '<p><input type="submit" value="<?php echo __("Return to Tiny Tiny RSS"); ?>" /></p>';
-        print '</form>';
+        echo '<form method="GET" action="backend.php">';
+        echo '<input type="hidden" name="op" value="logout" />';
+        echo '<p><input type="submit" value="<?php echo __("Return to Tiny Tiny RSS"); ?>" /></p>';
+        echo '</form>';
         return;
     }
 
 if (!$max_users || $avail_users) {
     if (!$action) {
-        print '<p>';
+        echo '<p>';
         echo __('Your temporary password will be sent to the specified email. Accounts, which were not logged in once, are erased automatically 24 hours after temporary password is sent.');
-        print '</p>';
-        print '<form action="register.php" method="POST" name="register_form">';
-        print '<input type="hidden" name="action" value="do_register">';
-        print '<table>';
-        print '<tr>';
-        print '<td>';
+        echo '</p>';
+        echo '<form action="register.php" method="POST" name="register_form">';
+        echo '<input type="hidden" name="action" value="do_register">';
+        echo '<table>';
+        echo '<tr>';
+        echo '<td>';
         echo __('Desired login:');
-        print '</td><td>';
-        print '<input name="login" required>';
-        print '</td>';
-        print '<td>';
-        print '<input type="submit" value="';
+        echo '</td><td>';
+        echo '<input name="login" required>';
+        echo '</td>';
+        echo '<td>';
+        echo '<input type="submit" value="';
         echo __('Check availability');
-        print '" onclick="return checkUsername()">';
-        print '</td>';
-        print '</tr>';
-        print '<tr><td>';
+        echo '" onclick="return checkUsername()">';
+        echo '</td>';
+        echo '</tr>';
+        echo '<tr><td>';
         echo __('Email:');
-        print '</td><td>';
-        print '<input name="email" type="email" required>';
-        print '</td></tr>';
-        print '<tr><td>';
+        echo '</td><td>';
+        echo '<input name="email" type="email" required>';
+        echo '</td></tr>';
+        echo '<tr><td>';
         echo __('How much is two plus two:');
-        print '</td><td>';
-        print '<input name="turing_test" required></td></tr>';
-        print '<tr><td colspan="2" align="right">';
-        print '<input type="submit" name="sub_btn" value="';
+        echo '</td><td>';
+        echo '<input name="turing_test" required></td></tr>';
+        echo '<tr><td colspan="2" align="right">';
+        echo '<input type="submit" name="sub_btn" value="';
         echo __('Submit registration');
-        print '"';
-        print 'disabled="disabled" onclick="return validateRegForm()" />';
-        print '</td></tr>';
-        print '</table>';
-        print '</form>';
-        print "<p><form method=\"GET\" action=\"index.php\">";
-        print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
-        print "</form>";
+        echo '"';
+        echo 'disabled="disabled" onclick="return validateRegForm()" />';
+        echo '</td></tr>';
+        echo '</table>';
+        echo '</form>';
+        echo "<p><form method=\"GET\" action=\"index.php\">";
+        echo "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+        echo "</form>";
     } elseif ($action == "do_register") {
         $test = trim($_REQUEST["turing_test"]);
         if (empty($_REQUEST['login']) || empty($_REQUEST['email']) || !$test) {
             \SmallSmallRSS\Renderers\Messages::renderError(
                 __("Your registration information is incomplete.")
             );
-            print "<p><form method=\"GET\" action=\"index.php\">
+            echo "<p><form method=\"GET\" action=\"index.php\">
                 <input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">
                 </form>";
             return;
@@ -146,22 +148,22 @@ if (!$max_users || $avail_users) {
                 \SmallSmallRSS\Renderers\Messages::renderError(
                     __('Sorry, this username is already taken.')
                 );
-                print "<p><form method=\"GET\" action=\"index.php\">";
-                print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
-                print "</form>";
+                echo "<p><form method=\"GET\" action=\"index.php\">";
+                echo "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+                echo "</form>";
             } else {
                 $new_uid = \SmallSmallRSS\Users::create($_REQUEST['login'], $_REQUEST['email']);
                 if (!$new_uid) {
                     \SmallSmallRSS\Renderers\Messages::renderError(__('Registration failed.'));
-                    print "<p><form method=\"GET\" action=\"index.php\">";
-                    print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
-                    print "</form>";
+                    echo "<p><form method=\"GET\" action=\"index.php\">";
+                    echo "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+                    echo "</form>";
                 } else {
                     \SmallSmallRSS\Feeds\newUser($new_uid);
                     $reg_text = "Hi!\n".
                         "\n".
                         "You are receiving this message, because you (or somebody else) have opened\n".
-                        "an account at Tiny Tiny RSS.\n".
+                        "an account at $software_name.\n".
                         "\n".
                         "Your login information is as follows:\n".
                         "\n".
@@ -175,7 +177,13 @@ if (!$max_users || $avail_users) {
 
                     $mail = new \SmallSmallRSS\Mailer();
                     $mail->IsHTML(false);
-                    $rc = $mail->quickMail($email, "", "Registration information for Tiny Tiny RSS", $reg_text, false);
+                    $rc = $mail->quickMail(
+                        $email,
+                        "",
+                        "Registration information for $software_name",
+                        $reg_text,
+                        false
+                    );
 
                     if (!$rc) {
                         \SmallSmallRSS\Renderers\Messages::renderError($mail->ErrorInfo);
@@ -185,7 +193,7 @@ if (!$max_users || $avail_users) {
                     unset($rc);
                     $reg_text = "Hi!\n"
                         . "\n"
-                        . "A new user has registered at your Tiny Tiny RSS installation.\n"
+                        . "A new user has registered at your $software_name installation.\n"
                         . "\n"
                         . "Login: $login\n"
                         . "Email: $email\n";
@@ -198,7 +206,7 @@ if (!$max_users || $avail_users) {
                         $rc = $mail->quickMail(
                             $reg_notify_address,
                             '',
-                            "Registration notice for Tiny Tiny RSS",
+                            "Registration notice for $software_name",
                             $reg_text,
                             false
                         );
@@ -209,9 +217,9 @@ if (!$max_users || $avail_users) {
                     \SmallSmallRSS\Renderers\Messages::renderNotice(
                         __("Account created successfully.")
                     );
-                    print "<p><form method=\"GET\" action=\"index.php\">";
-                    print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
-                    print "</form>";
+                    echo "<p><form method=\"GET\" action=\"index.php\">";
+                    echo "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\">";
+                    echo "</form>";
 
                 }
 
@@ -220,16 +228,16 @@ if (!$max_users || $avail_users) {
             \SmallSmallRSS\Renderers\Messages::renderError(
                 'Plese check the form again, you have failed the robot test.'
             );
-            print "<p><form method=\"GET\" action=\"index.php\">";
-            print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />";
-            print "</form>";
+            echo "<p><form method=\"GET\" action=\"index.php\">";
+            echo "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />";
+            echo "</form>";
         }
     }
 } else {
     \SmallSmallRSS\Renderers\Messages::renderNotice(__('New user registrations are currently closed.'));
-    print "<p><form method=\"GET\" action=\"index.php\">";
-    print "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />";
-    print "</form>";
+    echo "<p><form method=\"GET\" action=\"index.php\">";
+    echo "<input type=\"submit\" value=\"".__("Return to Tiny Tiny RSS")."\" />";
+    echo "</form>";
 }
 ?>
   </div>

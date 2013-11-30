@@ -26,7 +26,11 @@ function sanity_check($db_type)
     }
 
     if (!function_exists("curl_init") && !ini_get("allow_url_fopen")) {
-        array_push($errors, "PHP configuration option allow_url_fopen is disabled, and CURL functions are not present. Either enable allow_url_fopen or install PHP extension for CURL.");
+        array_push(
+            $errors,
+            "PHP configuration option allow_url_fopen is disabled, and CURL functions are not present."
+            . " Either enable allow_url_fopen or install PHP extension for CURL."
+        );
     }
 
     if (!function_exists("json_encode")) {
@@ -195,18 +199,20 @@ if (!$SELF_URL_PATH) {
 
 $issel_pgsql = $DB_TYPE == "pgsql" ? "selected" : "";
 $issel_mysql = $DB_TYPE == "mysql" ? "selected" : "";
+$software_name = \SmallSmallRSS\Config::get('SOFTWARE_NAME');
+
 header('Content-Type: text/html; charset=utf-8');
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Tiny Tiny RSS - Installer</title>
+  <title><?php echo $software_name; ?> : Installer</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <link rel="stylesheet" type="text/css" href="../css/utility.css">
 </head>
 <body>
   <div class="floatingLogo"><img src="../images/logo_small.png" /></div>
-  <h1>Tiny Tiny RSS Installer</h1>
+  <h1><?php echo $software_name; ?> Installer</h1>
   <div class='content'>
   <form action="" method="post">
     <input type="hidden" name="op" value="testconfig" />

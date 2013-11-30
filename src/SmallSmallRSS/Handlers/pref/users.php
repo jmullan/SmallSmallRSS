@@ -378,7 +378,7 @@ class Pref_Users extends ProtectedHandler
             __('Reset password')."</button dojoType=\"dijit.form.Button\">";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
             "prefUsersToolbar"
         );
 
@@ -484,7 +484,7 @@ class Pref_Users extends ProtectedHandler
 
         print "</div>"; #pane
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB,
             "prefUsers"
         );
         print "</div>"; #container

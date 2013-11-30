@@ -6,9 +6,9 @@ class Hooks
 {
     const ARTICLE_BUTTON = 1;
     const ARTICLE_FILTER = 2;
-    const PREFS_TAB = 3;
-    const PREFS_TAB_SECTION = 4;
-    const PREFS_TABS = 5;
+    const RENDER_PREFS_TAB = 3;
+    const RENDER_PREFS_TAB_SECTION = 4;
+    const RENDER_PREFS_TABS = 5;
     const FEED_PARSED = 6;
     const UPDATE_TASK = 7;
     const AUTH_USER = 8;
@@ -31,13 +31,13 @@ class Hooks
     public static function getHookMethod($hook)
     {
         $mappings = array(
-            self::PREFS_TAB => "hookPreferencesTab",
+            self::RENDER_PREFS_TAB => "hookRenderPreferencesTab",
             self::UPDATE_TASK => "hookUpdateTask",
             self::FEED_PARSED => "hookFeedParsed",
-            self::PREFS_TAB_SECTION => "hookPreferencesTabSection",
+            self::RENDER_PREFS_TAB_SECTION => "hookRenderPreferencesTabSection",
             self::PREFS_EDIT_FEED => "hookPreferencesEditFeed",
             self::PREFS_SAVE_FEED => "hookPrefsSaveFeed",
-            self::PREFS_TAB => "hookPreferencesTab",
+            self::RENDER_PREFS_TAB => "hookRenderPreferencesTab",
             self::FILTER_ARTICLE_API => "hookFilterArticleApi",
             self::RENDER_ARTICLE_CDM => "hookRenderArticleCDM",
             self::ARTICLE_LEFT_BUTTON => "hookArticleLeftButton",

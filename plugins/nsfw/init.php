@@ -13,7 +13,7 @@ class NSFW extends \SmallSmallRSS\Plugin
     public static $provides = array(
         \SmallSmallRSS\Hooks::FILTER_ARTICLE,
         \SmallSmallRSS\Hooks::RENDER_ARTICLE_CDM,
-        \SmallSmallRSS\Hooks::PREFS_TAB
+        \SmallSmallRSS\Hooks::RENDER_PREFS_TAB
     );
 
     public function getJavascript()
@@ -55,7 +55,7 @@ class NSFW extends \SmallSmallRSS\Plugin
         return $article;
     }
 
-    public function hookPreferencesTab($args)
+    public function hookRenderPreferencesTab($args)
     {
         if ($args != "prefPrefs") {
             return;

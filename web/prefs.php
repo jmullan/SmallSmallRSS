@@ -16,16 +16,8 @@ if (!\SmallSmallRSS\PluginHost::init_all()) {
 }
 login_sequence();
 header('Content-Type: text/html; charset=utf-8');
-?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html>
-<head>
-  <title>Tiny Tiny RSS : <?php echo __("Preferences") ?></title>
-<?php
-$renderer = new \SmallSmallRSS\Renderers\CSS();
-$renderer->renderStylesheetTag("lib/dijit/themes/claro/claro.css");
-$renderer->renderStylesheetTag("css/layout.css");
+
+$css_renderer = new \SmallSmallRSS\Renderers\CSS();
 $theme_css = 'default.css';
 if ($_SESSION["uid"]) {
     $theme = \SmallSmallRSS\DBPrefs::read("USER_CSS_THEME", $_SESSION["uid"], false);
@@ -33,7 +25,19 @@ if ($_SESSION["uid"]) {
         $theme_css = "themes/$theme";
     }
 }
-$renderer->renderStylesheetTag("themes/$theme");
+$js_renderer = new \SmallSmallRSS\Renderers\JS();
+$translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Small Small RSS : <?php echo __("Preferences") ?></title>
+<?php
+
+$css_renderer->renderStylesheetTag("lib/dijit/themes/claro/claro.css");
+$css_renderer->renderStylesheetTag("css/layout.css");
+$css_renderer->renderStylesheetTag("themes/$theme");
 $stylesheet_renderer = new \SmallSmallRSS\Renderers\CSS();
 $stylesheet_renderer->renderUserStyleSheet();
 ?>
@@ -49,22 +53,18 @@ foreach (array("lib/prototype.js",
     $js_renderer->render_script_tag($jsfile);
 }
 ?>
-
 <script type="text/javascript">
     require({cache:{}});
 <?php
-$js_renderer = new \SmallSmallRSS\Renderers\JS();
 foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
     $js_renderer->render_minified($p->getPreferencesJavascript());
 }
 $js_renderer->render_minified_js_files(
     array("../lib/CheckBoxTree", "functions", "deprecated", "prefs", "PrefFeedTree", "PrefFilterTree", "PrefLabelTree")
 );
-$translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();
 $translation_renderer->render();
 ?>
 </script>
-
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 <script type="text/javascript">
   Event.observe(window, 'load', function() {
@@ -73,7 +73,6 @@ $translation_renderer->render();
 </script>
 </head>
 <body id="ttrssPrefs" class="claro">
-
 <div id="notify" class="notify" style="display: none"></div>
 <div id="cmdline" style="display: none"></div>
 <div id="overlay">
@@ -82,13 +81,15 @@ $translation_renderer->render();
     <div dojoType="dijit.ProgressBar" places="0" style="width: 300px" id="loading_bar"
       progress="0" maximum="100">
     </div>
-    <noscript><br/><?php  \SmallSmallRSS\Renderers\Messages::renderError('Javascript is disabled. Please enable it.') ?></noscript>
+    <noscript>
+      <br/>
+      <?php \SmallSmallRSS\Renderers\Messages::renderError('Javascript is disabled. Please enable it.'); ?>
+    </noscript>
     </div>
     </div>
 
     <div id="header" dojoType="dijit.layout.ContentPane" region="top">
-    <!-- <a href='#' onclick="showHelp()"><?php echo __("Keyboard shortcuts") ?></a> | -->
-    <a href="#" onclick="gotoMain()"><?php echo __('Exit preferences') ?></a>
+      <a href="#" onclick="gotoMain()"><?php echo __('Exit preferences') ?></a>
     </div>
 
     <div id="main" dojoType="dijit.layout.BorderContainer">
@@ -119,22 +120,15 @@ if ($_SESSION["access_level"] >= 10) {
 }
 ?>
 <?php
-     \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-         \SmallSmallRSS\Hooks::PREFS_TABS,
-         false
-     );
+     \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::RENDER_PREFS_TABS);
 ?>
-</div>
-
-<div id="footer" dojoType="dijit.layout.ContentPane" region="bottom">
-     <a class="insensitive" target="_blank" href="http://tt-rss.org/">
-     Tiny Tiny RSS</a>
-     &copy; 2005-<?php echo date('Y') ?>
-     <a class="insensitive" target="_blank"
-                href="http://fakecake.org/">Andrew Dolgov</a>
-                </div> <!-- footer -->
-
-                </div>
-
-                </body>
-                </html>
+      </div>
+      <div id="footer" dojoType="dijit.layout.ContentPane" region="bottom">
+        <a class="insensitive" target="_blank" href="http://tt-rss.org/">
+          Tiny Tiny RSS</a>
+          &copy; 2005-<?php echo date('Y') ?>
+        <a class="insensitive" target="_blank" href="http://fakecake.org/">Andrew Dolgov</a>
+      </div>
+    </div>
+  </body>
+</html>

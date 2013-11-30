@@ -12,7 +12,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::PREFS_TAB
+        \SmallSmallRSS\Hooks::RENDER_PREFS_TAB
     );
 
     public function addCommands()
@@ -54,7 +54,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         return file_get_contents(dirname(__FILE__) . "/import_export.js");
     }
 
-    public function hookPreferencesTab($args)
+    public function hookRenderPreferencesTab($args)
     {
         if ($args != "prefFeeds") {
             return;

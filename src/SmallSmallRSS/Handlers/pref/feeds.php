@@ -1551,7 +1551,7 @@ class Pref_Feeds extends ProtectedHandler
         echo __('Display published OPML URL')."</button> ";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
             "prefFeedsOPML"
         );
 
@@ -1611,14 +1611,14 @@ class Pref_Feeds extends ProtectedHandler
         echo "</p>";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
             "prefFeedsPublishedGenerated"
         );
 
         echo "</div>"; #pane
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB,
             "prefFeeds"
         );
 

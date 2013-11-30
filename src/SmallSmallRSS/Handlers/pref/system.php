@@ -80,7 +80,7 @@ class Pref_System extends ProtectedHandler
             );
         }
         print "</div>";
-        \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::PREFS_TAB, "prefSystem");
+        \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::RENDER_PREFS_TAB, "prefSystem");
         print "</div>"; #container
     }
 }

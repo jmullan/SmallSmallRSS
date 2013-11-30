@@ -453,7 +453,9 @@ class PublicHandler extends Handler
         }
 
         header('Content-Type: text/html; charset=utf-8');
-        echo "<html><head><title>Tiny Tiny RSS</title>";
+        echo "<html><head><title>";
+        echo 'Tiny Tiny RSS';
+        echo "</title>";
         $renderer = new \SmallSmallRSS\Renderers\CSS();
         $renderer->renderStylesheetTag("css/utility.css");
         $js_renderer = new \SmallSmallRSS\Renderers\JS();
@@ -475,7 +477,9 @@ class PublicHandler extends Handler
                 $labels = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST["labels"]));
 
                 Article::createPublishedArticle(
-                    $title, $url, $content,
+                    $title,
+                    $url,
+                    $content,
                     $labels,
                     $_SESSION["uid"]
                 );

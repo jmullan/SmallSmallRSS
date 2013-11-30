@@ -12,10 +12,10 @@ class Bookmarklets extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::PREFS_TAB
+        \SmallSmallRSS\Hooks::RENDER_PREFS_TAB
     );
 
-    public function hookPreferencesTab($args)
+    public function hookRenderPreferencesTab($args)
     {
         if ($args == "prefFeeds") {
             print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Bookmarklets')."\">";

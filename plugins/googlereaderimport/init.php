@@ -11,7 +11,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::PREFS_TAB
+        \SmallSmallRSS\Hooks::RENDER_PREFS_TAB
     );
 
     public function addCommands()
@@ -370,7 +370,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
         return $rc;
     }
 
-    public function hookPreferencesTab($args)
+    public function hookRenderPreferencesTab($args)
     {
         if ($args != "prefFeeds") {
             return;

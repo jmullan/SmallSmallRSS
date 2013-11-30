@@ -496,7 +496,7 @@ class Pref_Prefs extends ProtectedHandler
         }
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
             "prefPrefsAuth"
         );
 
@@ -749,7 +749,7 @@ class Pref_Prefs extends ProtectedHandler
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
             "prefPrefsPrefsInside"
         );
 
@@ -787,7 +787,7 @@ class Pref_Prefs extends ProtectedHandler
            __("Show additional preferences") . "</label>"; */
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
             "prefPrefsPrefsOutside"
         );
 
@@ -954,7 +954,7 @@ class Pref_Prefs extends ProtectedHandler
         print "</div>"; #pane
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB,
             "prefPrefs"
         );
 

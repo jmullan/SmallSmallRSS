@@ -365,7 +365,7 @@ class Pref_Labels extends ProtectedHandler
         print "</div>"; #pane
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::PREFS_TAB,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB,
             "prefLabels"
         );
 

@@ -785,7 +785,7 @@ class Pref_Feeds extends ProtectedHandler
         $title = htmlspecialchars($title, ENT_QUOTES);
 
         echo "<div class='dlgButtons'>
-            <div style=\"float : left\">
+            <div style=\"float: left\">
             <button dojoType=\"dijit.form.Button\" onclick='return unsubscribeFeed($feed_id, \"$title\")'>".
             __('Unsubscribe')."</button>";
 
@@ -1403,7 +1403,7 @@ class Pref_Feeds extends ProtectedHandler
 
         echo "<div region='top' dojoType=\"dijit.Toolbar\">"; #toolbar
 
-        echo "<div style='float : right; padding-right : 4px;'>
+        echo "<div style='float: right; padding-right : 4px;'>
             <input dojoType=\"dijit.form.TextBox\" id=\"feed_search\" size=\"20\" type=\"search\"
                 value=\"$feed_search\">
             <button dojoType=\"dijit.form.Button\" onclick=\"updateFeedList()\">".
@@ -1749,7 +1749,7 @@ class Pref_Feeds extends ProtectedHandler
         echo "</div>";
 
         echo "<div class='dlgButtons'>";
-        echo "<div style='float : left'>";
+        echo "<div style='float: left'>";
         echo "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').removeSelected()\">"
             .__('Unsubscribe from selected feeds')."</button> ";
         echo "</div>";
@@ -1820,7 +1820,7 @@ class Pref_Feeds extends ProtectedHandler
         echo "</div>";
 
         echo "<div class='dlgButtons'>";
-        echo "<div style='float : left'>";
+        echo "<div style='float: left'>";
         echo "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').removeSelected()\">"
             .__('Unsubscribe from selected feeds')."</button> ";
         echo "</div>";

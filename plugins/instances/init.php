@@ -232,7 +232,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         print "<p class='insensitive'>" . __("Use one access key for both linked instances.");
         print "</div>";
         print "<div class=\"dlgButtons\">
-            <div style='float : left'>
+            <div style='float: left'>
                 <button dojoType=\"dijit.form.Button\"
                     onclick=\"return dijit.byId('instanceEditDlg').regenKey()\">".
             __('Generate new key')."</button>
@@ -419,7 +419,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         print "<p class='insensitive'>" . __("Use one access key for both linked instances.");
         print "</div>";
         print "<div class=\"dlgButtons\">
-            <div style='float : left'>
+            <div style='float: left'>
                 <button dojoType=\"dijit.form.Button\"
                     onclick=\"return dijit.byId('instanceAddDlg').regenKey()\">"
             . __('Generate new key')

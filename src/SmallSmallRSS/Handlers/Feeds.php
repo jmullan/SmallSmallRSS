@@ -455,7 +455,7 @@ class Feeds extends ProtectedHandler
                             );
 
                             $reply['content'] .= "<div class='cdmFeedTitle'>".
-                                "<div style=\"float : right\">$feed_icon_img</div>".
+                                "<div style=\"float: right\">$feed_icon_img</div>".
                                 "<a class='title' href=\"#\" onclick=\"viewfeed($feed_id)\">".
                                 $line["feed_title"]."</a> $vf_catchup_link</div>";
 
@@ -564,7 +564,7 @@ class Feeds extends ProtectedHandler
                                     ."/$feed_id.ico\" alt=\"\">";
                             }
                             $reply['content'] .= "<div class='cdmFeedTitle'>".
-                                "<div style=\"float : right\">$feed_icon_img</div>".
+                                "<div style=\"float: right\">$feed_icon_img</div>".
                                 "<a href=\"#\" class='title' onclick=\"viewfeed($feed_id)\">".
                                 $line["feed_title"]."</a> $vf_catchup_link</div>";
                         }
@@ -745,7 +745,7 @@ class Feeds extends ProtectedHandler
                         $reply['content'] .= "&nbsp;($entry_comments)";
                     }
 
-                    $reply['content'] .= "<div style=\"float : right\">";
+                    $reply['content'] .= "<div style=\"float: right\">";
                     $article_button_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
                         \SmallSmallRSS\Hooks::ARTICLE_BUTTON
                     );
@@ -1061,7 +1061,7 @@ class Feeds extends ProtectedHandler
         print "<div class=\"dlgSec\">".__("Feed or site URL")."</div>";
         print "<div class=\"dlgSecCont\">";
 
-        print "<div style='float : right'>
+        print "<div style='float: right'>
             <img style='display: none'
                 id='feed_add_spinner' src='images/indicator_white.gif'></div>";
 
@@ -1137,7 +1137,7 @@ class Feeds extends ProtectedHandler
         print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"updateFeedBrowser\">";
 
         print "<div dojoType=\"dijit.Toolbar\">
-            <div style='float : right'>
+            <div style='float: right'>
             <img style='display: none'
                 id='feed_browser_spinner' src='images/indicator_white.gif'>
             <input name=\"search\" dojoType=\"dijit.form.TextBox\" size=\"20\" type=\"search\"
@@ -1215,7 +1215,7 @@ class Feeds extends ProtectedHandler
         print "</div>";
         print "<div class=\"dlgButtons\">";
         if (!\SmallSmallRSS\Config::get('SPHINX_ENABLED')) {
-            print "<div style=\"float : left\">
+            print "<div style=\"float: left\">
                    <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/wiki/SearchSyntax\">Search syntax</a>
                    </div>";
         }

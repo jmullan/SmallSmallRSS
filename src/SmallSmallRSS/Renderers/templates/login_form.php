@@ -4,11 +4,12 @@ $login_error_msg = isset($_SESSION["login_error_msg"]) ? $_SESSION["login_error_
 $fake_login = isset($fake_login) ? $fake_login : '';
 $fake_password = isset($_SESSION["fake_password"]) ? $_SESSION["fake_password"] : '';
 $return = urlencode($_SERVER["REQUEST_URI"]);
+$software_name = \SmallSmallRSS\Config::get('SOFTWARE_NAME');
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-  <title><?php echo \SmallSmallRSS\Config::get('SOFTWARE_NAME'); ?> : Login</title>
+  <title><?php echo $software_name; ?> : Login</title>
   <link rel="stylesheet" type="text/css" href="lib/dijit/themes/claro/claro.css"/>
   <link rel="stylesheet" type="text/css" href="css/tt-rss.css">
   <link rel="stylesheet" type="text/css" href="css/login.css">
@@ -103,7 +104,7 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_internal") !== false) { 
     </fieldset>
   </div>
   <div class='footer'>
-    <a href="http://tt-rss.org/">Tiny Tiny RSS</a>
+    <a href="http://tt-rss.org/"><?php echo $software_name; ?></a>
     &copy; 2005&ndash;<?php echo date('Y') ?> <a href="http://fakecake.org/">Andrew Dolgov</a>
   </div>
 </form>

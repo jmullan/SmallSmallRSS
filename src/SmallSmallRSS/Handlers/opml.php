@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class opml extends ProtectedHandler
 {
 
@@ -13,7 +14,8 @@ class opml extends ProtectedHandler
     public function export()
     {
         $output_name = $_REQUEST["filename"];
-        if (!$output_name) {  $output_name = "TinyTinyRSS.opml";
+        if (!$output_name) {
+            $output_name = "TinyTinyRSS.opml";
         }
 
         $show_settings = $_REQUEST["settings"];
@@ -123,25 +125,23 @@ class opml extends ProtectedHandler
 
     public function opml_export($name, $owner_uid, $hide_private_feeds = false, $include_settings = true)
     {
-        if (!$owner_uid) {  return;
+        if (!$owner_uid) {
+            return;
         }
-
         if (!isset($_REQUEST["debug"])) {
             header("Content-type: application/xml+opml");
             header("Content-Disposition: attachment; filename=" . $name);
         } else {
             header("Content-type: text/xml");
         }
-
+        $software_name = \SmallSmallRSS\Config::get('SOFTWARE_NAME');
         $out = "<?xml version=\"1.0\" encoding=\"utf-8\"?".">";
-
         $out .= "<opml version=\"1.0\">";
-        $out .= "<head>
-            <dateCreated>" . date("r", time()) . "</dateCreated>
-            <title>Tiny Tiny RSS Feed Export</title>
-        </head>";
+        $out .= "<head>";
+        $out .= "<dateCreated>" . date("r", time()) . "</dateCreated>";
+        $out .= "<title>$software_name : Feed Export</title>";
+        $out .= "</head>";
         $out .= "<body>";
-
         $out .= $this->opml_export_category($owner_uid, false, $hide_private_feeds);
 
         # export tt-rss settings
@@ -150,8 +150,12 @@ class opml extends ProtectedHandler
             $out .= "<outline text=\"tt-rss-prefs\" schema-version=\"".\SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
             $result = \SmallSmallRSS\Database::query(
-                "SELECT pref_name, value FROM ttrss_user_prefs WHERE
-               profile IS NULL AND owner_uid = " . $_SESSION["uid"] . " ORDER BY pref_name"
+                "SELECT pref_name, value
+                 FROM ttrss_user_prefs
+                 WHERE
+                     profile IS NULL
+                     AND owner_uid = " . $_SESSION["uid"] . "
+                     ORDER BY pref_name"
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
@@ -166,8 +170,10 @@ class opml extends ProtectedHandler
             $out .= "<outline text=\"tt-rss-labels\" schema-version=\"".\SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
             $result = \SmallSmallRSS\Database::query(
-                "SELECT * FROM ttrss_labels2 WHERE
-                owner_uid = " . $_SESSION['uid']
+                "SELECT *
+                 FROM ttrss_labels2
+                 WHERE
+                     owner_uid = " . $_SESSION['uid']
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
@@ -184,8 +190,10 @@ class opml extends ProtectedHandler
             $out .= "<outline text=\"tt-rss-filters\" schema-version=\"".\SmallSmallRSS\Constants::SCHEMA_VERSION."\">";
 
             $result = \SmallSmallRSS\Database::query(
-                "SELECT * FROM ttrss_filters2
-                WHERE owner_uid = ".$_SESSION["uid"]." ORDER BY id"
+                "SELECT *
+                 FROM ttrss_filters2
+                 WHERE owner_uid = " . $_SESSION["uid"] . "
+                 ORDER BY id"
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
@@ -285,35 +293,51 @@ class opml extends ProtectedHandler
     {
         $attrs = $node->attributes;
 
-        $feed_title = \SmallSmallRSS\Database::escape_string(mb_substr($attrs->getNamedItem('text')->nodeValue, 0, 250));
-        if (!$feed_title) {  $feed_title = \SmallSmallRSS\Database::escape_string(mb_substr($attrs->getNamedItem('title')->nodeValue, 0, 250));
+        $feed_title = \SmallSmallRSS\Database::escape_string(
+            mb_substr($attrs->getNamedItem('text')->nodeValue, 0, 250)
+        );
+        if (!$feed_title) {
+            $feed_title = \SmallSmallRSS\Database::escape_string(
+                mb_substr($attrs->getNamedItem('title')->nodeValue, 0, 250)
+            );
         }
 
-        $feed_url = \SmallSmallRSS\Database::escape_string(mb_substr($attrs->getNamedItem('xmlUrl')->nodeValue, 0, 250));
-        if (!$feed_url) {  $feed_url = \SmallSmallRSS\Database::escape_string(mb_substr($attrs->getNamedItem('xmlURL')->nodeValue, 0, 250));
+        $feed_url = \SmallSmallRSS\Database::escape_string(
+            mb_substr($attrs->getNamedItem('xmlUrl')->nodeValue, 0, 250)
+        );
+        if (!$feed_url) {
+            $feed_url = \SmallSmallRSS\Database::escape_string(
+                mb_substr($attrs->getNamedItem('xmlURL')->nodeValue, 0, 250)
+            );
         }
 
-        $site_url = \SmallSmallRSS\Database::escape_string(mb_substr($attrs->getNamedItem('htmlUrl')->nodeValue, 0, 250));
+        $site_url = \SmallSmallRSS\Database::escape_string(
+            mb_substr($attrs->getNamedItem('htmlUrl')->nodeValue, 0, 250)
+        );
 
         if ($feed_url && $feed_title) {
             $result = \SmallSmallRSS\Database::query(
-                "SELECT id FROM ttrss_feeds WHERE
-                feed_url = '$feed_url' AND owner_uid = '$owner_uid'"
+                "SELECT id
+                 FROM ttrss_feeds
+                 WHERE
+                     feed_url = '$feed_url'
+                     AND owner_uid = '$owner_uid'"
             );
 
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
                 #$this->opml_notice("[FEED] [$feed_title/$feed_url] dst_CAT=$cat_id");
                 $this->opml_notice(T_sprintf("Adding feed: %s", $feed_title));
 
-                if (!$cat_id) {  $cat_id = 'NULL';
+                if (!$cat_id) {
+                    $cat_id = 'NULL';
                 }
 
                 $query = "INSERT INTO ttrss_feeds
-                    (title, feed_url, owner_uid, cat_id, site_url, order_id) VALUES
-                    ('$feed_title', '$feed_url', '$owner_uid',
-                    $cat_id, '$site_url', 0)";
+                          (title, feed_url, owner_uid, cat_id, site_url, order_id)
+                          VALUES
+                          ('$feed_title', '$feed_url', '$owner_uid',
+                           $cat_id, '$site_url', 0)";
                 \SmallSmallRSS\Database::query($query);
-
             } else {
                 $this->opml_notice(T_sprintf("Duplicate feed: %s", $feed_title));
             }
@@ -372,8 +396,8 @@ class opml extends ProtectedHandler
 
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_filters2 (match_any_rule,enabled,inverse,title,owner_uid)
-                    VALUES ($match_any_rule, $enabled, $inverse, '$title',
-                    ".$_SESSION["uid"].")"
+                     VALUES ($match_any_rule, $enabled, $inverse, '$title',
+                     ".$_SESSION["uid"].")"
                 );
 
                 $result = \SmallSmallRSS\Database::query(

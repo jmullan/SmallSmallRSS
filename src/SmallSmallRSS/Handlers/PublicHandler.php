@@ -529,7 +529,7 @@ class PublicHandler extends Handler
                            { tokens: ',', paramName: "search" });
                      </script>
                      <tr><td colspan='2'>
-                     <div style='float : right' class='insensitive-small'>
+                     <div style='float: right' class='insensitive-small'>
                        <?php echo __("Shared article will appear in the Published feed.") ?>
                      </div>
                      <button type="submit"><?php echo __('Share') ?></button>

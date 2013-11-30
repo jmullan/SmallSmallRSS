@@ -2007,7 +2007,7 @@ function format_inline_player($url, $ctype)
         } else {
             $entry .= "<object type=\"application/x-shockwave-flash\"
                         data=\"lib/button/musicplayer.swf?song_url=$url\"
-                        width=\"17\" height=\"17\" style='float : left; margin-right : 5px;'>
+                        width=\"17\" height=\"17\" style='float: left; margin-right : 5px;'>
                          <param name=\"movie\" value=\"lib/button/musicplayer.swf?song_url=$url\" />
                        </object>";
         }
@@ -2109,11 +2109,13 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         }
         if ($zoom_mode) {
             header("Content-Type: text/html");
-            $rv['content'] .= "<html><head>
-                        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
-                        <title>Tiny Tiny RSS - ".$line["title"]."</title>
-                        <link rel=\"stylesheet\" type=\"text/css\" href=\"css/tt-rss.css\">
-                    </head><body id=\"ttrssZoom\">";
+            $rv['content'] .= "<html><head>";
+            $rv['content'] .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
+            $rv['content'] .= "<title>";
+            $rv['content'] .= \SmallSmallRSS\Config::get('SOFTWARE_NAME');
+            $rv['content'] .= " : " . $line["title"] . "</title>";
+            $rv['content'] .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"css/tt-rss.css\" />";
+            $rv['content'] .= "</head><body id=\"ttrssZoom\">";
         }
         $rv['content'] .= "<div class=\"postReply\" id=\"POST-$id\">";
         $rv['content'] .= "<div class=\"postHeader\" id=\"POSTHDR-$id\">";
@@ -2129,12 +2131,12 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         );
         $rv['content'] .= "<div class=\"postDate\">$parsed_updated</div>";
         if ($line["link"]) {
-            $rv['content'] .= "<div class='postTitle'><a target='_blank'
-                    title=\"".htmlspecialchars($line['title'])."\"
-                    href=\"" .
-                htmlspecialchars($line["link"]) . "\">" .
-                $line["title"] . "</a>" .
-                "<span class='author'>$entry_author</span></div>";
+            $rv['content'] .= "<div class='postTitle'>";
+            $rv['content'] .= "<a target='_blank' title=\"";
+            $rv['content'] .= htmlspecialchars($line['title']) . "\"";
+            $rv['content'] .= " href=\"" . htmlspecialchars($line["link"]) . "\">";
+            $rv['content'] .= $line["title"] . "</a>";
+            $rv['content'] .= "<span class='author'>$entry_author</span></div>";
         } else {
             $rv['content'] .= "<div class='postTitle'>" . $line["title"] . "$entry_author</div>";
         }
@@ -2148,10 +2150,8 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
             $entry_comments = "&nbsp;"; # placeholder
         }
 
-        $rv['content'] .= "<div class='postTags' style='float : right'>
-                <img src='images/tag.png'
-                class='tagsPic' alt='Tags' title='Tags'>&nbsp;";
-
+        $rv['content'] .= "<div class='postTags' style='float: right'>";
+        $rv['content'] .= "<img src='images/tag.png' class='tagsPic' alt='Tags' title='Tags' />&nbsp;";
         if (!$zoom_mode) {
             $rv['content'] .= "<span id=\"ATSTR-$id\">$tags_str</span>
                     <a title=\"".__('Edit tags for this article')."\"

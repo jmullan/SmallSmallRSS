@@ -77,7 +77,7 @@ div.articleNote {
 }
 
 div.articleNote div.noteEdit {
-	float : right;
+	float: right;
 	cursor : pointer;
 }
 
@@ -387,7 +387,7 @@ span.hlLabelRef {
 div.postHeader div.postDate {
 	text-align : right;
 	color : #555;
-	float : right;
+	float: right;
 }
 
 div.postHeader div {
@@ -489,7 +489,7 @@ span.subscribers {
 div.subscribers {
 	color : #808080;
 	font-size: 12px;
-	float : right;
+	float: right;
 }
 
 div.browserDetails {
@@ -642,7 +642,7 @@ div.dlgSecCont {
 	position : relative;
 	left : 150px;
 	top : -20px;
-	float : left;
+	float: left;
 	font-size: 12px;
 	font-weight : normal;
 }
@@ -875,12 +875,12 @@ div.fatalError textarea {
 
 .feedParam {
 	color : #555;
-	float : right;
+	float: right;
 	margin-right : 1em;
 }
 
 .labelParam {
-	float : right;
+	float: right;
 	margin-right : 1em;
 }
 
@@ -1122,7 +1122,7 @@ body#ttrssMain #feedTree {
 	background : #88b0f0;
 	border-radius : 4px;
 	vertical-align : middle;
-	float : right;
+	float: right;
 	margin-right : 5px;
 	position : relative;
 	top : 2px;

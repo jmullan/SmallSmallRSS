@@ -411,7 +411,7 @@ class Pref_Filters extends ProtectedHandler
 
         print "<div class=\"dlgButtons\">";
 
-        print "<div style=\"float : left\">";
+        print "<div style=\"float: left\">";
         print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').removeFilter()\">".
             __('Remove')."</button>";
         print "</div>";
@@ -677,7 +677,7 @@ class Pref_Filters extends ProtectedHandler
             $filter_search = $_SESSION["prefs_filter_search"];
         }
 
-        print "<div style='float : right; padding-right : 4px;'>
+        print "<div style='float: right; padding-right : 4px;'>
             <input dojoType=\"dijit.form.TextBox\" id=\"filter_search\" size=\"20\" type=\"search\"
                 value=\"$filter_search\">
             <button dojoType=\"dijit.form.Button\" onclick=\"updateFilterList()\">".

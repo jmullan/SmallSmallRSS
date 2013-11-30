@@ -1106,7 +1106,7 @@ class Pref_Prefs extends ProtectedHandler
             dojoType=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
-        print "<div style=\"float : right\">";
+        print "<div style=\"float: right\">";
 
         print "<input name=\"newprofile\" dojoType=\"dijit.form.ValidationTextBox\"
                 required=\"1\">
@@ -1197,7 +1197,7 @@ class Pref_Prefs extends ProtectedHandler
         print "</div>";
 
         print "<div class='dlgButtons'>
-            <div style='float : left'>
+            <div style='float: left'>
             <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').removeSelected()\">".
             __('Remove selected profiles')."</button>
             <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').activateProfile()\">".

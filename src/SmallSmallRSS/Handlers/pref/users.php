@@ -343,7 +343,7 @@ class Pref_Users extends ProtectedHandler
             $user_search = $_SESSION["prefs_user_search"];
         }
 
-        print "<div style='float : right; padding-right : 4px;'>
+        print "<div style='float: right; padding-right : 4px;'>
                 <input dojoType=\"dijit.form.TextBox\" id=\"user_search\" size=\"20\" type=\"search\"
                     value=\"$user_search\">
                 <button dojoType=\"dijit.form.Button\" onclick=\"updateUsersList()\">".

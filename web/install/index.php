@@ -247,9 +247,9 @@ header('Content-Type: text/html; charset=utf-8');
       <span class="hint">Usually 3306 for MySQL or 5432 for PostgreSQL</span>
     </fieldset>
     <h2>Other settings</h2>
-    <p>This should be set to the location your Tiny Tiny RSS will be available on.</p>
+    <p>This should be set to the location your <?php echo $software_name; ?> will be available on.</p>
     <fieldset>
-    <label>Tiny Tiny RSS URL</label>
+    <label><?php echo $software_name; ?> URL</label>
       <input type="url" name="SELF_URL_PATH" placeholder="<?php echo $SELF_URL_PATH; ?>"
         size="60" value="<?php echo $SELF_URL_PATH ?>"/>
     </fieldset>

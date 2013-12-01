@@ -256,10 +256,10 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_linked_instances
-            SET access_key = '$access_key',
-                access_url = '$access_url',
-                last_connected = '1970-01-01'
-            WHERE id = '$id'"
+             SET access_key = '$access_key',
+                 access_url = '$access_url',
+                 last_connected = '1970-01-01'
+             WHERE id = '$id'"
         );
 
     }
@@ -363,7 +363,8 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         // TODO: rate limit checking using last_connected
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id FROM ttrss_linked_instances
+            "SELECT id
+             FROM ttrss_linked_instances
              WHERE access_key = '$access_key'"
         );
 

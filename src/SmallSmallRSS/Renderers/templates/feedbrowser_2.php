@@ -15,7 +15,7 @@ foreach ($lines as $line) {
     );
 ?>
 <li id="FBROW-<?php echo $id; ?>">
-  <input onclick="toggleSelectListRow2(this);" dojoType="dijit.form.CheckBox" type="checkbox" />
+  <input onclick="toggleSelectListRow2(this);" data-dojo-type="dijit.form.CheckBox" type="checkbox" />
   <a target="_blank" class="fb_feedUrl" href="<?php echo $feed_url; ?>">
     <img src="images/pub_set.svg" style="vertical-align: middle" />
   </a>

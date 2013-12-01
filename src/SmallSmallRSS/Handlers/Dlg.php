@@ -27,7 +27,7 @@ class Dlg extends ProtectedHandler
         print "</ul>";
         print "</div>";
         print "<div align='center'>";
-        print "<button dojoType=\"dijit.form.Button\"
+        print "<button data-dojo-type=\"dijit.form.Button\"
             onclick=\"dijit.byId('opmlImportDlg').execute()\">".
             __('Close this window')."</button>";
         print "</div>";
@@ -42,9 +42,9 @@ class Dlg extends ProtectedHandler
         print "<a id='pub_opml_url' href='$url_path' target='_blank'>$url_path</a>";
         print "</div>";
         print "<div align='center'>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return opmlRegenKey()\">"
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return opmlRegenKey()\">"
             . __('Generate new URL')."</button> ";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return closeInfoBox()\">"
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return closeInfoBox()\">"
             . __('Close this window')."</button>";
         print "</div>";
     }
@@ -134,7 +134,7 @@ class Dlg extends ProtectedHandler
         }
         print "</div>";
         print "<div align='center'>";
-        print "<button dojoType=\"dijit.form.Button\"
+        print "<button data-dojo-type=\"dijit.form.Button\"
             onclick=\"return closeInfoBox()\">".
             __('Close this window')."</button>";
         print "</div>";
@@ -143,10 +143,10 @@ class Dlg extends ProtectedHandler
     public function printTagSelect()
     {
         print __("Match:"). "&nbsp;" .
-            "<input class=\"noborder\" dojoType=\"dijit.form.RadioButton\" type=\"radio\" checked value=\"any\" name=\"tag_mode\" id=\"tag_mode_any\">";
+            "<input class=\"noborder\" data-dojo-type=\"dijit.form.RadioButton\" type=\"radio\" checked value=\"any\" name=\"tag_mode\" id=\"tag_mode_any\">";
         print "<label for=\"tag_mode_any\">".__("Any")."</label>";
         print "&nbsp;";
-        print "<input class=\"noborder\" dojoType=\"dijit.form.RadioButton\" type=\"radio\" value=\"all\" name=\"tag_mode\" id=\"tag_mode_all\">";
+        print "<input class=\"noborder\" data-dojo-type=\"dijit.form.RadioButton\" type=\"radio\" value=\"all\" name=\"tag_mode\" id=\"tag_mode_all\">";
         print "<label for=\"tag_mode_all\">".__("All tags.")."</input>";
 
         print "<select id=\"all_tags\" name=\"all_tags\" title=\"" . __('Which Tags?') . "\" multiple=\"multiple\" size=\"10\" style=\"width: 100%\">";
@@ -160,10 +160,10 @@ class Dlg extends ProtectedHandler
         }
         print "</select>";
         print "<div align='right'>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"viewfeed(get_all_tags($('all_tags')),
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"viewfeed(get_all_tags($('all_tags')),
             get_radio_checked($('tag_mode')));\">" . __('Display entries') . "</button>";
         print "&nbsp;";
-        print "<button dojoType=\"dijit.form.Button\"
+        print "<button data-dojo-type=\"dijit.form.Button\"
         onclick=\"return closeInfoBox()\">" .
             __('Close this window') . "</button>";
         print "</div>";
@@ -181,9 +181,9 @@ class Dlg extends ProtectedHandler
         print "<a id='gen_feed_url' href='$url_path' target='_blank'>$url_path</a>";
         print "</div>";
         print "<div align='center'>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return genUrlChangeKey('$feed_id', '$is_cat')\">".
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return genUrlChangeKey('$feed_id', '$is_cat')\">".
             __('Generate new URL')."</button> ";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return closeInfoBox()\">".
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return closeInfoBox()\">".
             __('Close this window')."</button>";
         print "</div>";
     }

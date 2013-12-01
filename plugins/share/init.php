@@ -60,7 +60,7 @@ class Share extends \SmallSmallRSS\Plugin
             print "</div>";
         }
         print "<div align='center'>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('shareArticleDlg').hide()\">";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('shareArticleDlg').hide()\">";
         print __('Close this window');
         print "</button>";
         print "</div>";

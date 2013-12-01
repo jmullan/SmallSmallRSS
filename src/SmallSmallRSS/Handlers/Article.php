@@ -233,11 +233,11 @@ class Article extends ProtectedHandler
 
         $tags_str = join(", ", $tags);
 
-        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
-        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"article\">";
-        echo "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setArticleTags\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"article\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setArticleTags\">";
         echo "<table width='100%'><tr><td>";
-        echo "<textarea dojoType=\"dijit.form.SimpleTextarea\" rows='4'
+        echo "<textarea data-dojo-type=\"dijit.form.SimpleTextarea\" rows='4'
                 style='font-size: 12px; width: 100%' id=\"tags_str\"
                 name='tags_str'>";
         echo $tags_str;
@@ -248,9 +248,9 @@ class Article extends ProtectedHandler
 
         echo "<div class='dlgButtons'>";
 
-        echo "<button dojoType=\"dijit.form.Button\"
+        echo "<button data-dojo-type=\"dijit.form.Button\"
             onclick=\"dijit.byId('editTagsDlg').execute()\">".__('Save')."</button> ";
-        echo "<button dojoType=\"dijit.form.Button\"
+        echo "<button data-dojo-type=\"dijit.form.Button\"
             onclick=\"dijit.byId('editTagsDlg').hide()\">".__('Cancel')."</button>";
         echo "</div>";
 

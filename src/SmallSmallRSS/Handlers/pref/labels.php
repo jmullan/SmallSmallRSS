@@ -22,9 +22,9 @@ class Pref_Labels extends ProtectedHandler
 
         $line = \SmallSmallRSS\Database::fetch_assoc($result);
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$label_id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-labels\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"save\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$label_id\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-labels\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"save\">";
 
         print "<div class=\"dlgSec\">".__("Caption")."</div>";
 
@@ -36,7 +36,7 @@ class Pref_Labels extends ProtectedHandler
         print "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color: $fg_color; background-color : $bg_color; margin-bottom : 4px; margin-right : 4px'>&alpha;</span>";
 
         print "<input style=\"font-size: 16px\" name=\"caption\"
-            dojoType=\"dijit.form.ValidationTextBox\"
+            data-dojo-type=\"dijit.form.ValidationTextBox\"
             required=\"true\"
             value=\"".htmlspecialchars($line['caption'])."\">";
 
@@ -51,14 +51,14 @@ class Pref_Labels extends ProtectedHandler
 
         print "<tr><td style='padding-right : 10px'>";
 
-        print "<input dojoType=\"dijit.form.TextBox\"
+        print "<input data-dojo-type=\"dijit.form.TextBox\"
                 style=\"display: none\" id=\"labelEdit_fgColor\"
                 name=\"fg_color\" value=\"$fg_color\">";
-        print "<input dojoType=\"dijit.form.TextBox\"
+        print "<input data-dojo-type=\"dijit.form.TextBox\"
                 style=\"display: none\" id=\"labelEdit_bgColor\"
                 name=\"bg_color\" value=\"$bg_color\">";
 
-        print "<div dojoType=\"dijit.ColorPalette\">
+        print "<div data-dojo-type=\"dijit.ColorPalette\">
             <script type=\"dojo/method\" event=\"onChange\" args=\"fg_color\">
                 dijit.byId(\"labelEdit_fgColor\").attr('value', fg_color);
                 $('label-editor-indicator').setStyle({color: fg_color});
@@ -68,7 +68,7 @@ class Pref_Labels extends ProtectedHandler
 
         print "</td><td>";
 
-        print "<div dojoType=\"dijit.ColorPalette\">
+        print "<div data-dojo-type=\"dijit.ColorPalette\">
             <script type=\"dojo/method\" event=\"onChange\" args=\"bg_color\">
                 dijit.byId(\"labelEdit_bgColor\").attr('value', bg_color);
                 $('label-editor-indicator').setStyle({backgroundColor: bg_color});
@@ -82,9 +82,9 @@ class Pref_Labels extends ProtectedHandler
         #            print "</form>";
 
         print "<div class=\"dlgButtons\">";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('labelEditDlg').execute()\">".
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('labelEditDlg').execute()\">".
             __('Save')."</button>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('labelEditDlg').hide()\">".
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('labelEditDlg').hide()\">".
             __('Cancel')."</button>";
         print "</div>";
 
@@ -309,45 +309,45 @@ class Pref_Labels extends ProtectedHandler
             $label_search = $_SESSION["prefs_label_search"];
         }
 
-        print "<div id=\"pref-label-wrap\" dojoType=\"dijit.layout.BorderContainer\" gutters=\"false\">";
-        print "<div id=\"pref-label-header\" dojoType=\"dijit.layout.ContentPane\" region=\"top\">";
-        print "<div id=\"pref-label-toolbar\" dojoType=\"dijit.Toolbar\">";
+        print "<div id=\"pref-label-wrap\" data-dojo-type=\"dijit.layout.BorderContainer\" gutters=\"false\">";
+        print "<div id=\"pref-label-header\" data-dojo-type=\"dijit.layout.ContentPane\" region=\"top\">";
+        print "<div id=\"pref-label-toolbar\" data-dojo-type=\"dijit.Toolbar\">";
 
-        print "<div dojoType=\"dijit.form.DropDownButton\">".
+        print "<div data-dojo-type=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
-        print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+        print "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"dijit.byId('labelTree').model.setAllChecked(true)\"
-            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"dijit.byId('labelTree').model.setAllChecked(false)\"
-            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
-        print"<button dojoType=\"dijit.form.Button\" onclick=\"return addLabel()\">".
-            __('Create label')."</button dojoType=\"dijit.form.Button\"> ";
+        print"<button data-dojo-type=\"dijit.form.Button\" onclick=\"return addLabel()\">".
+            __('Create label')."</button data-dojo-type=\"dijit.form.Button\"> ";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"removeSelectedLabels()\">".
-            __('Remove')."</button dojoType=\"dijit.form.Button\"> ";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"removeSelectedLabels()\">".
+            __('Remove')."</button data-dojo-type=\"dijit.form.Button\"> ";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"labelColorReset()\">".
-            __('Clear colors')."</button dojoType=\"dijit.form.Button\">";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"labelColorReset()\">".
+            __('Clear colors')."</button data-dojo-type=\"dijit.form.Button\">";
 
 
         print "</div>"; #toolbar
         print "</div>"; #pane
-        print "<div id=\"pref-label-content\" dojoType=\"dijit.layout.ContentPane\" region=\"center\">";
+        print "<div id=\"pref-label-content\" data-dojo-type=\"dijit.layout.ContentPane\" region=\"center\">";
 
         print "<div id=\"labellistLoading\">
         <img src='images/indicator_tiny.gif'>".
             __("Loading, please wait...")."</div>";
 
-        print "<div dojoType=\"dojo.data.ItemFileWriteStore\" jsId=\"labelStore\"
+        print "<div data-dojo-type=\"dojo.data.ItemFileWriteStore\" jsId=\"labelStore\"
             url=\"backend.php?op=pref-labels&method=getlabeltree\">
         </div>
-        <div dojoType=\"lib.CheckBoxStoreModel\" jsId=\"labelModel\" store=\"labelStore\"
+        <div data-dojo-type=\"lib.CheckBoxStoreModel\" jsId=\"labelModel\" store=\"labelStore\"
         query=\"{id:'root'}\" rootId=\"root\"
             childrenAttrs=\"items\" checkboxStrict=\"false\" checkboxAll=\"false\">
         </div>
-        <div dojoType=\"fox.PrefLabelTree\" id=\"labelTree\"
+        <div data-dojo-type=\"fox.PrefLabelTree\" id=\"labelTree\"
             model=\"labelModel\" openOnClick=\"true\">
         <script type=\"dojo/method\" event=\"onLoad\" args=\"item\">
             Element.hide(\"labellistLoading\");

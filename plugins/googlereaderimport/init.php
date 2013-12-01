@@ -176,7 +176,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
         }
         if (!$file) {
             print "<div align='center'>";
-            print "<button dojoType=\"dijit.form.Button\"
+            print "<button data-dojo-type=\"dijit.form.Button\"
                 onclick=\"dijit.byId('starredImportDlg').execute()\">".
                 __('Close this window')."</button>";
             print "</div>";
@@ -375,7 +375,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
         if ($args != "prefFeeds") {
             return;
         }
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\""
+        print "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\""
             . __("Import starred or shared items from Google Reader")
             . "\">";
 
@@ -393,7 +393,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
             <input type=\"hidden\" name=\"op\" value=\"pluginhandler\">
             <input type=\"hidden\" name=\"method\" value=\"import\">
             <input type=\"hidden\" name=\"plugin\" value=\"googlereaderimport\">
-            <button dojoType=\"dijit.form.Button\" onclick=\"return starredImport();\" type=\"submit\">" .
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"return starredImport();\" type=\"submit\">" .
             __('Import my Starred items') . "</button>";
         print "</form>";
         print "</div>"; #pane

@@ -29,9 +29,9 @@ class Mail extends \SmallSmallRSS\Plugin
     public function emailArticle()
     {
         $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"mail\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"sendEmail\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"mail\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"sendEmail\">";
         $result = \SmallSmallRSS\Database::query(
             "SELECT email, full_name FROM ttrss_users WHERE id = " . $_SESSION["uid"]
         );
@@ -40,8 +40,8 @@ class Mail extends \SmallSmallRSS\Plugin
         if (!$user_name) {
             $user_name = $_SESSION['name'];
         }
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_email\" value=\"$user_email\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_name\" value=\"$user_name\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_email\" value=\"$user_email\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_name\" value=\"$user_name\">";
         $tpl = new \MiniTemplator\Engine();
         $tpl_t = new \MiniTemplator\Engine();
         $tpl->readTemplateFromFile("templates/email_article_template.txt");
@@ -78,12 +78,12 @@ class Mail extends \SmallSmallRSS\Plugin
         print "<table width='100%'><tr><td>";
         print __('From:');
         print "</td><td>";
-        print "<input dojoType=\"dijit.form.TextBox\" disabled=\"1\" style=\"width: 30em;\"
+        print "<input data-dojo-type=\"dijit.form.TextBox\" disabled=\"1\" style=\"width: 30em;\"
                 value=\"$user_name <$user_email>\">";
         print "</td></tr><tr><td>";
         print __('To:');
         print "</td><td>";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"true\"
+        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"true\"
                 style=\"width: 30em;\"
                 name=\"destination\" id=\"emailArticleDlg_destination\">";
         print "<div class=\"autocomplete\" id=\"emailArticleDlg_dst_choices\"
@@ -91,16 +91,16 @@ class Mail extends \SmallSmallRSS\Plugin
         print "</td></tr><tr><td>";
         print __('Subject:');
         print "</td><td>";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"true\"
+        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"true\"
                 style=\"width: 30em;\"
                 name=\"subject\" value=\"$subject\" id=\"subject\">";
         print "</td></tr>";
-        print "<tr><td colspan='2'><textarea dojoType=\"dijit.form.SimpleTextarea\" style='font-size: 12px; width: 100%' rows=\"20\"
+        print "<tr><td colspan='2'><textarea data-dojo-type=\"dijit.form.SimpleTextarea\" style='font-size: 12px; width: 100%' rows=\"20\"
             name='content'>$content</textarea>";
         print "</td></tr></table>";
         print "<div class='dlgButtons'>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').execute()\">".__('Send e-mail')."</button> ";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">".__('Cancel')."</button>";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').execute()\">".__('Send e-mail')."</button> ";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">".__('Cancel')."</button>";
         print "</div>";
     }
 

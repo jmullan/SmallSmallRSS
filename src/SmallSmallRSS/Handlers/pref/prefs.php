@@ -238,11 +238,11 @@ class Pref_Prefs extends ProtectedHandler
 
         $_SESSION["prefs_op_result"] = "";
 
-        print "<div dojoType=\"dijit.layout.AccordionContainer\" region=\"center\">";
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"";
+        print "<div data-dojo-type=\"dijit.layout.AccordionContainer\" region=\"center\">";
+        print "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"";
         print __('Personal data / Authentication');
         print "\">";
-        print "<form dojoType=\"dijit.form.Form\" id=\"changeUserdataForm\">";
+        print "<form data-dojo-type=\"dijit.form.Form\" id=\"changeUserdataForm\">";
         print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
         evt.preventDefault();
         if (this.validate()) {
@@ -271,11 +271,11 @@ class Pref_Prefs extends ProtectedHandler
         $otp_enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "otp_enabled"));
 
         print "<tr><td width=\"40%\">".__('Full name')."</td>";
-        print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\"";
+        print "<td class=\"prefValue\"><input data-dojo-type=\"dijit.form.ValidationTextBox\"";
         print " name=\"full_name\" required=\"1\" value=\"$full_name\"></td></tr>";
 
         print "<tr><td width=\"40%\">".__('E-mail')."</td>";
-        print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\"";
+        print "<td class=\"prefValue\"><input data-dojo-type=\"dijit.form.ValidationTextBox\"";
         print " name=\"email\" required=\"1\" value=\"$email\"></td></tr>";
 
         if (!\SmallSmallRSS\Auth::is_single_user_mode() && empty($_SESSION["hide_hello"])) {
@@ -286,10 +286,10 @@ class Pref_Prefs extends ProtectedHandler
 
         print "</table>";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"changeemail\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"changeemail\">";
 
-        print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
+        print "<p><button data-dojo-type=\"dijit.form.Button\" type=\"submit\">".
             __("Save data")."</button>";
 
         print "</form>";
@@ -317,7 +317,7 @@ class Pref_Prefs extends ProtectedHandler
                 );
             }
 
-            print "<form dojoType=\"dijit.form.Form\">";
+            print "<form data-dojo-type=\"dijit.form.Form\">";
 
             print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
             evt.preventDefault();
@@ -350,27 +350,27 @@ class Pref_Prefs extends ProtectedHandler
 
             print "<tr><td width=\"40%\">".__("Old password")."</td>";
             print "<td class=\"prefValue\">";
-            print "<input dojoType=\"dijit.form.ValidationTextBox\" type=\"password\"";
+            print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" type=\"password\"";
             print " required=\"1\" name=\"old_password\"></td></tr>";
 
             print "<tr><td width=\"40%\">".__("New password")."</td>";
 
-            print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\"";
+            print "<td class=\"prefValue\"><input data-dojo-type=\"dijit.form.ValidationTextBox\"";
             print " type=\"password\" required=\"1\" name=\"new_password\"></td></tr>";
 
             print "<tr><td width=\"40%\">".__("Confirm password")."</td>";
 
-            print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\"";
+            print "<td class=\"prefValue\"><input data-dojo-type=\"dijit.form.ValidationTextBox\"";
             print " type=\"password\" required=\"1\" name=\"confirm_password\"></td></tr>";
 
             print "</table>";
 
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"";
+            print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
             print " name=\"op\" value=\"pref-prefs\">";
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"";
+            print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
             print " name=\"method\" value=\"changepassword\">";
 
-            print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
+            print "<p><button data-dojo-type=\"dijit.form.Button\" type=\"submit\">".
                 __("Change password")."</button>";
 
             print "</form>";
@@ -385,7 +385,7 @@ class Pref_Prefs extends ProtectedHandler
                         __("One time passwords are currently enabled. Enter your current password below to disable.")
                     );
 
-                    print "<form dojoType=\"dijit.form.Form\">";
+                    print "<form data-dojo-type=\"dijit.form.Form\">";
 
                     print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
                 evt.preventDefault();
@@ -410,15 +410,15 @@ class Pref_Prefs extends ProtectedHandler
 
                     print "<tr><td width=\"40%\">".__("Enter your password")."</td>";
 
-                    print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" type=\"password\" required=\"1\"
+                    print "<td class=\"prefValue\"><input data-dojo-type=\"dijit.form.ValidationTextBox\" type=\"password\" required=\"1\"
                     name=\"password\"></td></tr>";
 
                     print "</table>";
 
-                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
-                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"otpdisable\">";
+                    print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+                    print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"otpdisable\">";
 
-                    print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
+                    print "<p><button data-dojo-type=\"dijit.form.Button\" type=\"submit\">".
                         __("Disable OTP")."</button>";
 
                     print "</form>";
@@ -435,10 +435,10 @@ class Pref_Prefs extends ProtectedHandler
 
                     print "<img src=\"backend.php?op=pref-prefs&method=otpqrcode&csrf_token=$csrf_token\">";
 
-                    print "<form dojoType=\"dijit.form.Form\" id=\"changeOtpForm\">";
+                    print "<form data-dojo-type=\"dijit.form.Form\" id=\"changeOtpForm\">";
 
-                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
-                    print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"otpenable\">";
+                    print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+                    print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"otpenable\">";
 
                     print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
                     evt.preventDefault();
@@ -463,12 +463,12 @@ class Pref_Prefs extends ProtectedHandler
 
                     print "<tr><td width=\"40%\">".__("Enter your password")."</td>";
 
-                    print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" type=\"password\" required=\"1\"
+                    print "<td class=\"prefValue\"><input data-dojo-type=\"dijit.form.ValidationTextBox\" type=\"password\" required=\"1\"
                         name=\"password\"></td></tr>";
 
                     print "<tr><td width=\"40%\">".__("Enter the generated one time password")."</td>";
 
-                    print "<td class=\"prefValue\"><input dojoType=\"dijit.form.ValidationTextBox\" autocomplete=\"off\"
+                    print "<td class=\"prefValue\"><input data-dojo-type=\"dijit.form.ValidationTextBox\" autocomplete=\"off\"
                         required=\"1\"
                         name=\"otp\"></td></tr>";
 
@@ -479,7 +479,7 @@ class Pref_Prefs extends ProtectedHandler
                     print "</td></tr>";
                     print "</table>";
 
-                    print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
+                    print "<p><button data-dojo-type=\"dijit.form.Button\" type=\"submit\">".
                         __("Enable OTP")."</button>";
 
                     print "</form>";
@@ -502,9 +502,9 @@ class Pref_Prefs extends ProtectedHandler
 
         print "</div>"; #pane
 
-        print "<div dojoType=\"dijit.layout.AccordionPane\" selected=\"true\" title=\"".__('Preferences')."\">";
+        print "<div data-dojo-type=\"dijit.layout.AccordionPane\" selected=\"true\" title=\"".__('Preferences')."\">";
 
-        print "<form dojoType=\"dijit.form.Form\" id=\"changeSettingsForm\">";
+        print "<form data-dojo-type=\"dijit.form.Form\" id=\"changeSettingsForm\">";
 
         print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt, quit\">
         if (evt) evt.preventDefault();
@@ -528,9 +528,9 @@ class Pref_Prefs extends ProtectedHandler
         }
         </script>";
 
-        print '<div dojoType="dijit.layout.BorderContainer" gutters="false">';
+        print '<div data-dojo-type="dijit.layout.BorderContainer" gutters="false">';
 
-        print '<div dojoType="dijit.layout.ContentPane" region="center" style="overflow-y : auto">';
+        print '<div data-dojo-type="dijit.layout.ContentPane" region="center" style="overflow-y : auto">';
 
         if (!empty($_SESSION["profile"])) {
             \SmallSmallRSS\Renderers\Messages::renderNotice(
@@ -634,7 +634,7 @@ class Pref_Prefs extends ProtectedHandler
                     $pref_name,
                     $value,
                     \SmallSmallRSS\Locale::$translations,
-                    "style='width: 220px; margin : 0px' dojoType='dijit.form.Select'"
+                    "style='width: 220px; margin : 0px' data-dojo-type='dijit.form.Select'"
                 );
 
             } elseif ($pref_name == "USER_TIMEZONE") {
@@ -645,11 +645,11 @@ class Pref_Prefs extends ProtectedHandler
                     $pref_name,
                     $value,
                     $timezone_array,
-                    'dojoType="dijit.form.FilteringSelect"'
+                    'data-dojo-type="dijit.form.FilteringSelect"'
                 );
             } elseif ($pref_name == "USER_STYLESHEET") {
 
-                print "<button dojoType=\"dijit.form.Button\"
+                print "<button data-dojo-type=\"dijit.form.Button\"
                     onclick=\"customizeCSS()\">" . __('Customize') . "</button>";
 
             } elseif ($pref_name == "USER_CSS_THEME") {
@@ -661,7 +661,7 @@ class Pref_Prefs extends ProtectedHandler
                     $pref_name,
                     $value,
                     $themes,
-                    'dojoType="dijit.form.Select"'
+                    'data-dojo-type="dijit.form.Select"'
                 );
 
 
@@ -670,7 +670,7 @@ class Pref_Prefs extends ProtectedHandler
                     $pref_name,
                     $value,
                     \SmallSmallRSS\Constants::update_intervals_nodefault(),
-                    'dojoType="dijit.form.Select"'
+                    'data-dojo-type="dijit.form.Select"'
                 );
 
             } elseif ($type_name == "bool") {
@@ -687,7 +687,7 @@ class Pref_Prefs extends ProtectedHandler
                 }
 
                 print "<input type='checkbox' name='$pref_name' $checked $disabled
-                    dojoType='dijit.form.CheckBox' id='CB_$pref_name' value='1'>";
+                    data-dojo-type='dijit.form.CheckBox' id='CB_$pref_name' value='1'>";
 
             } elseif (array_search($pref_name, array('FRESH_ARTICLE_MAX_AGE',
                                                       'PURGE_OLD_DAYS', 'LONG_DATE_FORMAT', 'SHORT_DATE_FORMAT')) !== false) {
@@ -701,36 +701,36 @@ class Pref_Prefs extends ProtectedHandler
                     $disabled = "";
                 }
 
-                print "<input dojoType=\"dijit.form.ValidationTextBox\"
+                print "<input data-dojo-type=\"dijit.form.ValidationTextBox\"
                     required=\"1\" $regexp $disabled
                     name=\"$pref_name\" value=\"$value\">";
 
             } elseif ($pref_name == "SSL_CERT_SERIAL") {
 
-                print "<input dojoType=\"dijit.form.ValidationTextBox\"
+                print "<input data-dojo-type=\"dijit.form.ValidationTextBox\"
                     id=\"SSL_CERT_SERIAL\" readonly=\"1\"
                     name=\"$pref_name\" value=\"$value\">";
                 $cert_id = \Auth_Remote::getSSLCertificateId();
                 $cert_serial = htmlspecialchars($cert_id);
                 $has_serial = ($cert_serial) ? "false" : "true";
 
-                print " <button dojoType=\"dijit.form.Button\" disabled=\"$has_serial\"
+                print " <button data-dojo-type=\"dijit.form.Button\" disabled=\"$has_serial\"
                     onclick=\"insertSSLserial('$cert_serial')\">" .
                     __('Register') . "</button>";
 
-                print " <button dojoType=\"dijit.form.Button\"
+                print " <button data-dojo-type=\"dijit.form.Button\"
                     onclick=\"insertSSLserial('')\">" .
                     __('Clear') . "</button>";
 
             } elseif ($pref_name == 'DIGEST_PREFERRED_TIME') {
-                print "<input dojoType=\"dijit.form.ValidationTextBox\"
+                print "<input data-dojo-type=\"dijit.form.ValidationTextBox\"
                     id=\"$pref_name\" regexp=\"[012]?\d:\d\d\" placeHolder=\"12:00\"
                     name=\"$pref_name\" value=\"$value\"><div class=\"insensitive\">".
                     T_sprintf("Current server time: %s (UTC)", date("H:i")) . "</div>";
             } else {
                 $regexp = ($type_name == 'integer') ? 'regexp="^\d*$"' : '';
 
-                print "<input dojoType=\"dijit.form.ValidationTextBox\"
+                print "<input data-dojo-type=\"dijit.form.ValidationTextBox\"
                     $regexp
                     name=\"$pref_name\" value=\"$value\">";
             }
@@ -746,7 +746,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $listed_boolean_prefs = htmlspecialchars(join(",", $listed_boolean_prefs));
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
@@ -754,24 +754,24 @@ class Pref_Prefs extends ProtectedHandler
         );
 
         print '</div>'; # inside pane
-        print '<div dojoType="dijit.layout.ContentPane" region="bottom">';
+        print '<div data-dojo-type="dijit.layout.ContentPane" region="bottom">';
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"saveconfig\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"saveconfig\">";
 
-        print "<div dojoType=\"dijit.form.ComboButton\" type=\"submit\">
+        print "<div data-dojo-type=\"dijit.form.ComboButton\" type=\"submit\">
             <span>".__('Save configuration')."</span>
-            <div dojoType=\"dijit.DropDownMenu\">
-                <div dojoType=\"dijit.MenuItem\"
+            <div data-dojo-type=\"dijit.DropDownMenu\">
+                <div data-dojo-type=\"dijit.MenuItem\"
                     onclick=\"dijit.byId('changeSettingsForm').onSubmit(null, true)\">".
             __("Save and exit preferences")."</div>
             </div>
             </div>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return editProfiles()\">".
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return editProfiles()\">".
             __('Manage profiles')."</button> ";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return validatePrefsReset()\">".
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return validatePrefsReset()\">".
             __('Reset to defaults')."</button>";
 
         print "&nbsp;";
@@ -780,7 +780,7 @@ class Pref_Prefs extends ProtectedHandler
 
            print "<input onclick='toggleAdvancedPrefs()'
            id='prefs_show_advanced'
-           dojoType=\"dijit.form.CheckBox\"
+           data-dojo-type=\"dijit.form.CheckBox\"
            $checked
            type=\"checkbox\"></input>
            <label for='prefs_show_advanced'>" .
@@ -797,7 +797,7 @@ class Pref_Prefs extends ProtectedHandler
 
         print "</div>"; #pane
 
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Plugins')."\">";
+        print "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__('Plugins')."\">";
 
         print "<p>" . __("You will need to reload Tiny Tiny RSS for plugin changes to take effect.") . "</p>";
 
@@ -805,7 +805,7 @@ class Pref_Prefs extends ProtectedHandler
             __("Download more plugins at tt-rss.org <a class=\"visibleLink\" target=\"_blank\" href=\"http://tt-rss.org/forum/viewforum.php?f=22\">forums</a> or <a target=\"_blank\" class=\"visibleLink\" href=\"http://tt-rss.org/wiki/Plugins\">wiki</a>.")
         );
 
-        print "<form dojoType=\"dijit.form.Form\" id=\"changePluginsForm\">";
+        print "<form data-dojo-type=\"dijit.form.Form\" id=\"changePluginsForm\">";
 
         print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
         evt.preventDefault();
@@ -824,8 +824,8 @@ class Pref_Prefs extends ProtectedHandler
         }
         </script>";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setplugins\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setplugins\">";
 
         print "<table width='100%' class='prefPluginsList'>";
 
@@ -857,7 +857,7 @@ class Pref_Prefs extends ProtectedHandler
                 print "<tr>";
 
                 print "<td align='center'><input disabled='1'
-                        dojoType=\"dijit.form.CheckBox\" $checked
+                        data-dojo-type=\"dijit.form.CheckBox\" $checked
                         type=\"checkbox\"></td>";
 
                 print "<td>$name</td>";
@@ -915,7 +915,7 @@ class Pref_Prefs extends ProtectedHandler
 
                 print "<td align='center'>";
                 print "<input id='FPCHK-$name' name='plugins[]' value='$name' onclick='toggleSelectRow2(this);'
-                       dojoType=\"dijit.form.CheckBox\" $checked $disabled
+                       data-dojo-type=\"dijit.form.CheckBox\" $checked $disabled
                        type=\"checkbox\"></td>";
 
                 print "<td><label for='FPCHK-$name'>$name</label></td>";
@@ -946,7 +946,7 @@ class Pref_Prefs extends ProtectedHandler
 
         print "</table>";
 
-        print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">".
+        print "<p><button data-dojo-type=\"dijit.form.Button\" type=\"submit\">".
             __("Enable selected plugins")."</button></p>";
 
         print "</form>";
@@ -1073,21 +1073,21 @@ class Pref_Prefs extends ProtectedHandler
             )
         );
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setpref\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"key\" value=\"USER_STYLESHEET\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setpref\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"key\" value=\"USER_STYLESHEET\">";
 
         print "<table width='100%'><tr><td>";
-        print "<textarea dojoType=\"dijit.form.SimpleTextarea\"
+        print "<textarea data-dojo-type=\"dijit.form.SimpleTextarea\"
             style='font-size: 12px; width: 100%; height: 200px;'
             placeHolder='body#ttrssMain { font-size: 14px; };'
             name='value'>$value</textarea>";
         print "</td></tr></table>";
 
         print "<div class='dlgButtons'>";
-        print "<button dojoType=\"dijit.form.Button\"
+        print "<button data-dojo-type=\"dijit.form.Button\"
             onclick=\"dijit.byId('cssEditDlg').execute()\">".__('Save')."</button> ";
-        print "<button dojoType=\"dijit.form.Button\"
+        print "<button data-dojo-type=\"dijit.form.Button\"
             onclick=\"dijit.byId('cssEditDlg').hide()\">".__('Cancel')."</button>";
         print "</div>";
 
@@ -1095,22 +1095,22 @@ class Pref_Prefs extends ProtectedHandler
 
     public function editPrefProfiles()
     {
-        print "<div dojoType=\"dijit.Toolbar\">";
+        print "<div data-dojo-type=\"dijit.Toolbar\">";
 
-        print "<div dojoType=\"dijit.form.DropDownButton\">".
+        print "<div data-dojo-type=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
-        print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+        print "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"selectTableRows('prefFeedProfileList', 'all')\"
-            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"selectTableRows('prefFeedProfileList', 'none')\"
-            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
         print "<div style=\"float: right\">";
 
-        print "<input name=\"newprofile\" dojoType=\"dijit.form.ValidationTextBox\"
+        print "<input name=\"newprofile\" data-dojo-type=\"dijit.form.ValidationTextBox\"
                 required=\"1\">
-            <button dojoType=\"dijit.form.Button\"
+            <button data-dojo-type=\"dijit.form.Button\"
             onclick=\"dijit.byId('profileEditDlg').addProfile()\">".
             __('Create profile')."</button></div>";
 
@@ -1133,7 +1133,7 @@ class Pref_Prefs extends ProtectedHandler
         print "<td width='5%' align='center'><input
             id='FCATC-0'
             onclick='toggleSelectRow2(this);'
-            dojoType=\"dijit.form.CheckBox\"
+            data-dojo-type=\"dijit.form.CheckBox\"
             type=\"checkbox\"></td>";
 
         if (!$_SESSION["profile"]) {
@@ -1161,7 +1161,7 @@ class Pref_Prefs extends ProtectedHandler
             print "<td width='5%' align='center'><input
                 onclick='toggleSelectRow2(this);'
                 id='FCATC-$profile_id'
-                dojoType=\"dijit.form.CheckBox\"
+                data-dojo-type=\"dijit.form.CheckBox\"
                 type=\"checkbox\"></td>";
 
             if ($_SESSION["profile"] == $line["id"]) {
@@ -1170,7 +1170,7 @@ class Pref_Prefs extends ProtectedHandler
                 $is_active = "";
             }
 
-            print "<td><span dojoType=\"dijit.InlineEditBox\"
+            print "<td><span data-dojo-type=\"dijit.InlineEditBox\"
                 width=\"300px\" autoSave=\"false\"
                 profile-id=\"$profile_id\">" . $edit_title .
                 "<script type=\"dojo/method\" event=\"onChange\" args=\"item\">
@@ -1198,13 +1198,13 @@ class Pref_Prefs extends ProtectedHandler
 
         print "<div class='dlgButtons'>
             <div style='float: left'>
-            <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').removeSelected()\">".
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').removeSelected()\">".
             __('Remove selected profiles')."</button>
-            <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').activateProfile()\">".
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').activateProfile()\">".
             __('Activate profile')."</button>
             </div>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').hide()\">".
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').hide()\">".
             __('Close this window')."</button>";
         print "</div>";
 

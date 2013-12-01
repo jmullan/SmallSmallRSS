@@ -28,8 +28,8 @@ class Pref_System extends ProtectedHandler
 
     public function index()
     {
-        print "<div dojoType=\"dijit.layout.AccordionContainer\" region=\"center\">";
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Error Log')."\">";
+        print "<div data-dojo-type=\"dijit.layout.AccordionContainer\" region=\"center\">";
+        print "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__('Error Log')."\">";
         if (\SmallSmallRSS\Config::get('LOG_DESTINATION') == "sql") {
             $result = \SmallSmallRSS\Database::query(
                 "SELECT
@@ -39,11 +39,11 @@ class Pref_System extends ProtectedHandler
                  ORDER BY ttrss_error_log.id DESC
                  LIMIT 100"
             );
-            print "<button dojoType=\"dijit.form.Button\" onclick=\"updateSystemList()\">";
+            print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"updateSystemList()\">";
             print __('Refresh');
             print "</button> ";
 
-            print "&nbsp;<button dojoType=\"dijit.form.Button\" onclick=\"clearSqlLog()\">";
+            print "&nbsp;<button data-dojo-type=\"dijit.form.Button\" onclick=\"clearSqlLog()\">";
             print __('Clear log');
             print "</button> ";
 

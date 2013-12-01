@@ -72,7 +72,7 @@ class MailTo extends \SmallSmallRSS\Plugin
         print __("You should be able to edit the message before sending in your mail client.");
         print "<p>";
         print "<div style='text-align : center'>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">";
         print __('Close this dialog');
         print "</button>";
         print "</div>";

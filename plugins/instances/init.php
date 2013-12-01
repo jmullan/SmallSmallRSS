@@ -135,7 +135,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     public function hookRenderPreferencesTabs($args)
     {
         if ($_SESSION["access_level"] >= 10 || \SmallSmallRSS\Auth::is_single_user_mode()) {
-            echo '<div id="instanceConfigTab" dojoType="dijit.layout.ContentPane"';
+            echo '<div id="instanceConfigTab" data-dojo-type="dijit.layout.ContentPane"';
             echo ' href="backend.php?op=pref-instances"';
             echo ' title="';
             echo __('Linked');
@@ -206,16 +206,16 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_linked_instances WHERE id = '$id'"
         );
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"id\" value=\"$id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"editSave\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"id\" value=\"$id\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"editSave\">";
         print "<div class=\"dlgSec\">".__("Instance")."</div>";
         print "<div class=\"dlgSecCont\">";
 
         /* URL */
         $access_url = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "access_url"));
         print __("URL:") . " ";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
+        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Instance URL")."\"
             regExp='^(http|https)://.*'
             style=\"font-size: 16px; width: 20em\" name=\"access_url\"
@@ -225,7 +225,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         /* Access key */
         print __("Access key:") . " ";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
+        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Access key")."\" regExp='\w{40}'
             style=\"width: 20em\" name=\"access_key\" id=\"instance_edit_key\"
             value=\"$access_key\">";
@@ -233,14 +233,14 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         print "</div>";
         print "<div class=\"dlgButtons\">
             <div style='float: left'>
-                <button dojoType=\"dijit.form.Button\"
+                <button data-dojo-type=\"dijit.form.Button\"
                     onclick=\"return dijit.byId('instanceEditDlg').regenKey()\">".
             __('Generate new key')."</button>
             </div>
-            <button dojoType=\"dijit.form.Button\"
+            <button data-dojo-type=\"dijit.form.Button\"
                 onclick=\"return dijit.byId('instanceEditDlg').execute()\">".
             __('Save')."</button>
-            <button dojoType=\"dijit.form.Button\"
+            <button data-dojo-type=\"dijit.form.Button\"
                 onclick=\"return dijit.byId('instanceEditDlg').hide()\"\">".
             __('Cancel')."</button></div>";
 
@@ -274,25 +274,25 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
             );
             print "</div>";
         }
-        print "<div id=\"pref-instance-wrap\" dojoType=\"dijit.layout.BorderContainer\" gutters=\"false\">";
-        print "<div id=\"pref-instance-header\" dojoType=\"dijit.layout.ContentPane\" region=\"top\">";
-        print "<div id=\"pref-instance-toolbar\" dojoType=\"dijit.Toolbar\">";
+        print "<div id=\"pref-instance-wrap\" data-dojo-type=\"dijit.layout.BorderContainer\" gutters=\"false\">";
+        print "<div id=\"pref-instance-header\" data-dojo-type=\"dijit.layout.ContentPane\" region=\"top\">";
+        print "<div id=\"pref-instance-toolbar\" data-dojo-type=\"dijit.Toolbar\">";
         $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);
         if (!$sort || $sort == "undefined") {
             $sort = "access_url";
         }
-        print "<div dojoType=\"dijit.form.DropDownButton\">".
+        print "<div data-dojo-type=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
-        print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+        print "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"selectTableRows('prefInstanceList', 'all')\"
-            dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"selectTableRows('prefInstanceList', 'none')\"
-            dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"addInstance()\">".__('Link instance')."</button>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"editSelectedInstance()\">".__('Edit')."</button>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"removeSelectedInstances()\">".__('Remove')."</button>";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"addInstance()\">".__('Link instance')."</button>";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"editSelectedInstance()\">".__('Edit')."</button>";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"removeSelectedInstances()\">".__('Remove')."</button>";
 
         print "</div>"; #toolbar
 
@@ -395,14 +395,14 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function addInstance()
     {
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"add\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"add\">";
         print "<div class=\"dlgSec\">".__("Instance")."</div>";
         print "<div class=\"dlgSecCont\">";
 
         /* URL */
         print __("URL:") . " ";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
+        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Instance URL")."\"
             regExp='^(http|https)://.*'
             style=\"font-size: 16px; width: 20em\" name=\"access_url\">";
@@ -412,7 +412,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         /* Access key */
         print __("Access key:") . " ";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
+        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Access key")."\" regExp='\w{40}'
             style=\"width: 20em\" name=\"access_key\" id=\"instance_add_key\"
             value=\"$access_key\">";
@@ -420,15 +420,15 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         print "</div>";
         print "<div class=\"dlgButtons\">
             <div style='float: left'>
-                <button dojoType=\"dijit.form.Button\"
+                <button data-dojo-type=\"dijit.form.Button\"
                     onclick=\"return dijit.byId('instanceAddDlg').regenKey()\">"
             . __('Generate new key')
             . "</button>
             </div>
-            <button dojoType=\"dijit.form.Button\"
+            <button data-dojo-type=\"dijit.form.Button\"
                 onclick=\"return dijit.byId('instanceAddDlg').execute()\">"
             . __('Create link')."</button>
-            <button dojoType=\"dijit.form.Button\"
+            <button data-dojo-type=\"dijit.form.Button\"
                 onclick=\"return dijit.byId('instanceAddDlg').hide()\"\">"
             . __('Cancel')."</button></div>";
     }

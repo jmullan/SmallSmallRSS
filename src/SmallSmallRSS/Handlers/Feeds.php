@@ -108,7 +108,7 @@ class Feeds extends ProtectedHandler
 
         $reply .= " ";
 
-        $reply .= "<select dojoType=\"dijit.form.Select\"
+        $reply .= "<select data-dojo-type=\"dijit.form.Select\"
             onchange=\"headlineActionsChange(this)\">";
         $reply .= "<option value=\"false\">".__('More...')."</option>";
 
@@ -469,7 +469,7 @@ class Feeds extends ProtectedHandler
 
                     $reply['content'] .= "<div class='hlLeft'>";
 
-                    $reply['content'] .= "<input dojoType=\"dijit.form.CheckBox\"
+                    $reply['content'] .= "<input data-dojo-type=\"dijit.form.CheckBox\"
                             type=\"checkbox\" onclick=\"toggleSelectRow2(this)\"
                             class='rchk'>";
 
@@ -581,7 +581,7 @@ class Feeds extends ProtectedHandler
                     $reply['content'] .= "<div class=\"cdmHeader\">";
                     $reply['content'] .= "<div style=\"vertical-align : middle\">";
 
-                    $reply['content'] .= "<input dojoType=\"dijit.form.CheckBox\"
+                    $reply['content'] .= "<input data-dojo-type=\"dijit.form.CheckBox\"
                             type=\"checkbox\" onclick=\"toggleSelectRow2(this, false, true)\"
                             class='rchk'>";
 
@@ -1055,8 +1055,8 @@ class Feeds extends ProtectedHandler
 
     public function quickAddFeed()
     {
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"addfeed\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"addfeed\">";
 
         print "<div class=\"dlgSec\">".__("Feed or site URL")."</div>";
         print "<div class=\"dlgSecCont\">";
@@ -1067,13 +1067,13 @@ class Feeds extends ProtectedHandler
 
         print "<input style=\"font-size: 16px; width: 20em;\"
             placeHolder=\"".__("Feed or site URL")."\"
-            dojoType=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"feed\" id=\"feedDlg_feedUrl\">";
+            data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"feed\" id=\"feedDlg_feedUrl\">";
 
         print "<hr/>";
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
             print __('Place in category:') . " ";
-            print_feed_cat_select("cat", false, 'dojoType="dijit.form.Select"');
+            print_feed_cat_select("cat", false, 'data-dojo-type="dijit.form.Select"');
         }
 
         print "</div>";
@@ -1083,7 +1083,7 @@ class Feeds extends ProtectedHandler
                 <div class="dlgSec">' . __('Available feeds') . '</div>
                 <div class="dlgSecCont">'.
             '<select id="feedDlg_feedContainerSelect"
-                    dojoType="dijit.form.Select" size="3">
+                    data-dojo-type="dijit.form.Select" size="3">
                     <script type="dojo/method" event="onChange" args="value">
                         dijit.byId("feedDlg_feedUrl").attr("value", value);
                     </script>
@@ -1095,18 +1095,18 @@ class Feeds extends ProtectedHandler
                 <div class=\"dlgSec\">".__("Authentication")."</div>
                 <div class=\"dlgSecCont\">".
 
-            " <input dojoType=\"dijit.form.TextBox\" name='login'\"
+            " <input data-dojo-type=\"dijit.form.TextBox\" name='login'\"
                     placeHolder=\"".__("Login")."\"
                     style=\"width: 10em;\"> ".
             " <input
                     placeHolder=\"".__("Password")."\"
-                    dojoType=\"dijit.form.TextBox\" type='password'
+                    data-dojo-type=\"dijit.form.TextBox\" type='password'
                     style=\"width: 10em;\" name='pass'\">
             </div></div>";
 
 
         print "<div style=\"clear : both\">
-            <input type=\"checkbox\" name=\"need_auth\" dojoType=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"
+            <input type=\"checkbox\" name=\"need_auth\" data-dojo-type=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"
                     onclick='checkboxToggleElement(this, \"feedDlg_loginContainer\")'>
                 <label for=\"feedDlg_loginCheck\">".
             __('This feed requires authentication.')."</div>";
@@ -1114,13 +1114,13 @@ class Feeds extends ProtectedHandler
         print "</form>";
 
         print "<div class=\"dlgButtons\">
-            <button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedAddDlg').execute()\">".__('Subscribe')."</button>";
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('feedAddDlg').execute()\">".__('Subscribe')."</button>";
 
         if (!(defined('_DISABLE_FEED_BROWSER') && _DISABLE_FEED_BROWSER)) {
-            print "<button dojoType=\"dijit.form.Button\" onclick=\"return feedBrowser()\">".__('More feeds')."</button>";
+            print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return feedBrowser()\">".__('More feeds')."</button>";
         }
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return dijit.byId('feedAddDlg').hide()\">".__('Cancel')."</button>
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('feedAddDlg').hide()\">".__('Cancel')."</button>
             </div>";
 
         //return;
@@ -1133,26 +1133,26 @@ class Feeds extends ProtectedHandler
 
         $browser_search = $this->getSQLEscapedStringFromRequest("search");
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"updateFeedBrowser\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"rpc\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"updateFeedBrowser\">";
 
-        print "<div dojoType=\"dijit.Toolbar\">
+        print "<div data-dojo-type=\"dijit.Toolbar\">
             <div style='float: right'>
             <img style='display: none'
                 id='feed_browser_spinner' src='images/indicator_white.gif'>
-            <input name=\"search\" dojoType=\"dijit.form.TextBox\" size=\"20\" type=\"search\"
+            <input name=\"search\" data-dojo-type=\"dijit.form.TextBox\" size=\"20\" type=\"search\"
                 onchange=\"dijit.byId('feedBrowserDlg').update()\" value=\"$browser_search\">
-            <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').update()\">".__('Search')."</button>
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').update()\">".__('Search')."</button>
         </div>";
 
-        print " <select name=\"mode\" dojoType=\"dijit.form.Select\" onchange=\"dijit.byId('feedBrowserDlg').update()\">
+        print " <select name=\"mode\" data-dojo-type=\"dijit.form.Select\" onchange=\"dijit.byId('feedBrowserDlg').update()\">
             <option value='1'>" . __('Popular feeds') . "</option>
             <option value='2'>" . __('Feed archive') . "</option>
             </select> ";
 
         print __("limit:");
 
-        print " <select dojoType=\"dijit.form.Select\" name=\"limit\" onchange=\"dijit.byId('feedBrowserDlg').update()\">";
+        print " <select data-dojo-type=\"dijit.form.Select\" name=\"limit\" onchange=\"dijit.byId('feedBrowserDlg').update()\">";
 
         foreach (array(25, 50, 100, 200) as $l) {
             $issel = ($l == $limit) ? "selected=\"1\"" : "";
@@ -1175,9 +1175,9 @@ class Feeds extends ProtectedHandler
         print "</ul>";
 
         print "<div align='center'>
-            <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').execute()\">".__('Subscribe')."</button>
-            <button dojoType=\"dijit.form.Button\" style='display: none' id='feed_archive_remove' onclick=\"dijit.byId('feedBrowserDlg').removeFromArchive()\">".__('Remove')."</button>
-            <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').hide()\" >".__('Cancel')."</button></div>";
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').execute()\">".__('Subscribe')."</button>
+            <button data-dojo-type=\"dijit.form.Button\" style='display: none' id='feed_archive_remove' onclick=\"dijit.byId('feedBrowserDlg').removeFromArchive()\">".__('Remove')."</button>
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').hide()\" >".__('Cancel')."</button></div>";
 
     }
 
@@ -1188,11 +1188,11 @@ class Feeds extends ProtectedHandler
         $is_cat = $this->params[1] != "false";
         print "<div class=\"dlgSec\">".__('Look for')."</div>";
         print "<div class=\"dlgSecCont\">";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\"
+        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\"
             style=\"font-size: 16px; width: 20em;\"
             required=\"1\" name=\"query\" type=\"search\" value=''>";
         print "<hr/>".__('Limit search to:')." ";
-        print "<select name=\"search_mode\" dojoType=\"dijit.form.Select\">
+        print "<select name=\"search_mode\" data-dojo-type=\"dijit.form.Select\">
             <option value=\"all_feeds\">".__('All feeds')."</option>";
         $feed_title = self::getTitle($active_feed_id);
         if (!$is_cat) {
@@ -1220,8 +1220,8 @@ class Feeds extends ProtectedHandler
                    </div>";
         }
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').execute()\">".__('Search')."</button>
-        <button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').hide()\">".__('Cancel')."</button>
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').execute()\">".__('Search')."</button>
+        <button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('searchDlg').hide()\">".__('Cancel')."</button>
         </div>";
     }
 

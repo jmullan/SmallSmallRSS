@@ -18,7 +18,7 @@ class Bookmarklets extends \SmallSmallRSS\Plugin
     public function hookRenderPreferencesTab($args)
     {
         if ($args == "prefFeeds") {
-            print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Bookmarklets')."\">";
+            print "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__('Bookmarklets')."\">";
             \SmallSmallRSS\Renderers\Messages::renderNotice(
                 __("Drag the link below to your browser toolbar, open the feed you're interested in in your browser and click on the link to subscribe to it.")
             );

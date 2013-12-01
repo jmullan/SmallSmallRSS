@@ -2157,7 +2157,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
                     <a title=\"".__('Edit tags for this article')."\"
                     href=\"#\" onclick=\"editArticleTags($id, $feed_id)\">(+)</a>";
 
-            $rv['content'] .= "<div dojoType=\"dijit.Tooltip\"
+            $rv['content'] .= "<div data-dojo-type=\"dijit.Tooltip\"
                     id=\"ATSTRTIP-$id\" connectId=\"ATSTR-$id\"
                     position=\"below\">$tags_str_full</div>";
             foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::ARTICLE_BUTTON) as $p) {
@@ -2553,7 +2553,7 @@ function format_article_enclosures(
             }
 
             $entry = "<div onclick=\"window.open('".htmlspecialchars($url)."')\"
-                    dojoType=\"dijit.MenuItem\">$filename ($ctype)</div>";
+                    data-dojo-type=\"dijit.MenuItem\">$filename ($ctype)</div>";
 
             array_push($entries_html, $entry);
 

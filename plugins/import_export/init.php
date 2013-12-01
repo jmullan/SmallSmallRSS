@@ -59,12 +59,12 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         if ($args != "prefFeeds") {
             return;
         }
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__('Import and export')."\">";
+        print "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__('Import and export')."\">";
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             __("You can export and import your Starred and Archived articles for safekeeping or when migrating between tt-rss instances of same version.")
         );
         print "<p>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"return exportData()\">".
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return exportData()\">".
             __('Export my data')."</button> ";
         print "<hr>";
         print "<iframe id=\"data_upload_iframe\"
@@ -77,7 +77,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
             <input type=\"hidden\" name=\"op\" value=\"pluginhandler\">
             <input type=\"hidden\" name=\"plugin\" value=\"import_export\">
             <input type=\"hidden\" name=\"method\" value=\"dataimport\">
-            <button dojoType=\"dijit.form.Button\" onclick=\"return importData();\" type=\"submit\">" .
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"return importData();\" type=\"submit\">" .
             __('Import') . "</button>";
 
         print "</form>";
@@ -414,11 +414,11 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
         print "You need to prepare exported data first by clicking the button below.</p>";
 
         print "<div align='center'>";
-        print "<button dojoType=\"dijit.form.Button\"
+        print "<button data-dojo-type=\"dijit.form.Button\"
             onclick=\"dijit.byId('dataExportDlg').prepare()\">".
             __('Prepare data')."</button>";
 
-        print "<button dojoType=\"dijit.form.Button\"
+        print "<button data-dojo-type=\"dijit.form.Button\"
             onclick=\"dijit.byId('dataExportDlg').hide()\">".
             __('Close this window')."</button>";
 
@@ -470,7 +470,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
             return;
         }
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('dataImportDlg').hide()\">"
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('dataImportDlg').hide()\">"
             . __('Close this window')
             ."</button>";
 

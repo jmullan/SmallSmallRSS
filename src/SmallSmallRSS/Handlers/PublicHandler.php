@@ -295,7 +295,7 @@ class PublicHandler extends Handler
                  AND login = '$login'
              ORDER BY title"
         );
-        echo "<select dojoType='dijit.form.Select' style='width: 220px; margin : 0px' name='profile'>";
+        echo "<select data-dojo-type='dijit.form.Select' style='width: 220px; margin : 0px' name='profile'>";
         echo "<option value='0'>" . __("Default profile") . "</option>";
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line["id"];

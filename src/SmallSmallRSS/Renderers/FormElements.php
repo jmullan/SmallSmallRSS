@@ -33,7 +33,7 @@ class FormElements extends \SmallSmallRSS\Renderers\Base
             } else {
                 $sel .= ' value="0"';
             }
-            print "<input type=\"radio\" class=\"noborder\" dojoType=\"dijit.form.RadioButton\"";
+            print "<input type=\"radio\" class=\"noborder\" data-dojo-type=\"dijit.form.RadioButton\"";
             print " $sel $attributes name=\"$id\" id=\"$id\" />";
             print "<label for=\"$id\">$v</label>";
             print "\n";

@@ -78,7 +78,7 @@ $translation_renderer->render();
 <div id="overlay">
   <div id="overlay_inner">
     <div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
-    <div dojoType="dijit.ProgressBar" places="0" style="width: 300px" id="loading_bar"
+    <div data-dojo-type="dijit.ProgressBar" places="0" style="width: 300px" id="loading_bar"
       progress="0" maximum="100">
     </div>
     <noscript>
@@ -88,32 +88,32 @@ $translation_renderer->render();
     </div>
     </div>
 
-    <div id="header" dojoType="dijit.layout.ContentPane" region="top">
+    <div id="header" data-dojo-type="dijit.layout.ContentPane" region="top">
       <a href="#" onclick="gotoMain()"><?php echo __('Exit preferences') ?></a>
     </div>
 
-    <div id="main" dojoType="dijit.layout.BorderContainer">
+    <div id="main" data-dojo-type="dijit.layout.BorderContainer">
 
-    <div dojoType="dijit.layout.TabContainer" region="center" id="pref-tabs">
-    <div id="genConfigTab" dojoType="dijit.layout.ContentPane"
+    <div data-dojo-type="dijit.layout.TabContainer" region="center" id="pref-tabs">
+    <div id="genConfigTab" data-dojo-type="dijit.layout.ContentPane"
     href="backend.php?op=pref-prefs"
     title="<?php echo __('Preferences') ?>"></div>
-    <div id="feedConfigTab" dojoType="dijit.layout.ContentPane"
+    <div id="feedConfigTab" data-dojo-type="dijit.layout.ContentPane"
     href="backend.php?op=pref-feeds"
     title="<?php echo __('Feeds') ?>"></div>
-    <div id="filterConfigTab" dojoType="dijit.layout.ContentPane"
+    <div id="filterConfigTab" data-dojo-type="dijit.layout.ContentPane"
     href="backend.php?op=pref-filters"
     title="<?php echo __('Filters') ?>"></div>
-    <div id="labelConfigTab" dojoType="dijit.layout.ContentPane"
+    <div id="labelConfigTab" data-dojo-type="dijit.layout.ContentPane"
     href="backend.php?op=pref-labels"
     title="<?php echo __('Labels') ?>"></div>
 <?php
 if ($_SESSION["access_level"] >= 10) {
 ?>
-    <div id="userConfigTab" dojoType="dijit.layout.ContentPane"
+    <div id="userConfigTab" data-dojo-type="dijit.layout.ContentPane"
      href="backend.php?op=pref-users"
      title="<?php echo __('Users') ?>"></div>
-     <div id="systemConfigTab" dojoType="dijit.layout.ContentPane"
+     <div id="systemConfigTab" data-dojo-type="dijit.layout.ContentPane"
      href="backend.php?op=pref-system"
      title="<?php echo __('System') ?>"></div>
 <?php
@@ -123,7 +123,7 @@ if ($_SESSION["access_level"] >= 10) {
      \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::RENDER_PREFS_TABS);
 ?>
       </div>
-      <div id="footer" dojoType="dijit.layout.ContentPane" region="bottom">
+      <div id="footer" data-dojo-type="dijit.layout.ContentPane" region="bottom">
         <a class="insensitive" target="_blank" href="http://tt-rss.org/">
           Tiny Tiny RSS</a>
           &copy; 2005-<?php echo date('Y') ?>

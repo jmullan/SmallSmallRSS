@@ -89,7 +89,7 @@ class Pref_Users extends ProtectedHandler
         print "</ul>";
 
         print "<div align='center'>
-                <button dojoType=\"dijit.form.Button\" type=\"submit\">".__("Close this window").
+                <button data-dojo-type=\"dijit.form.Button\" type=\"submit\">".__("Close this window").
             "</button></div>";
 
         return;
@@ -100,11 +100,11 @@ class Pref_Users extends ProtectedHandler
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
 
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
-        print "<form id=\"user_edit_form\" onsubmit='return false' dojoType=\"dijit.form.Form\">";
+        print "<form id=\"user_edit_form\" onsubmit='return false' data-dojo-type=\"dijit.form.Form\">";
 
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$id\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-users\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$id\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-users\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
 
         $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_users WHERE id = '$id'");
 
@@ -118,11 +118,11 @@ class Pref_Users extends ProtectedHandler
         print "<div class=\"dlgSecCont\">";
 
         if ($sel_disabled) {
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"login\" value=\"$login\">";
+            print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"login\" value=\"$login\">";
         }
 
         print "<input size=\"30\" style=\"font-size: 16px\"
-                dojoType=\"dijit.form.ValidationTextBox\" required=\"1\"
+                data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
                 onkeypress=\"return filterCR(event, userEditSave)\" $sel_disabled
                 name=\"login\" value=\"$login\">";
 
@@ -139,37 +139,37 @@ class Pref_Users extends ProtectedHandler
                 "access_level",
                 $access_level,
                 $access_level_names,
-                "dojoType=\"dijit.form.Select\" $sel_disabled"
+                "data-dojo-type=\"dijit.form.Select\" $sel_disabled"
             );
         } else {
             $form_elements_renderer->renderSelect(
                 "",
                 $access_level,
                 $access_level_names,
-                "dojoType=\"dijit.form.Select\" $sel_disabled"
+                "data-dojo-type=\"dijit.form.Select\" $sel_disabled"
             );
-            print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\"";
+            print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
             print " name=\"access_level\" value=\"$access_level\">";
         }
 
         print "<hr/>";
-        print "<input dojoType=\"dijit.form.TextBox\" type=\"password\" size=\"20\"";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" type=\"password\" size=\"20\"";
         print " onkeypress=\"return filterCR(event, userEditSave)\"";
         print " placeholder=\"Change password\" name=\"password\">";
         print "</div>";
         print "<div class=\"dlgSec\">".__("Options")."</div>";
         print "<div class=\"dlgSecCont\">";
-        print "<input dojoType=\"dijit.form.TextBox\" size=\"30\" name=\"email\"";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" size=\"30\" name=\"email\"";
         print " onkeypress=\"return filterCR(event, userEditSave)\" placeholder=\"E-mail\"";
         print " value=\"$email\">";
         print "</div>";
         print "</table>";
         print "</form>";
         print "<div class=\"dlgButtons\">";
-        print "<button dojoType=\"dijit.form.Button\" type=\"submit\">";
+        print "<button data-dojo-type=\"dijit.form.Button\" type=\"submit\">";
         print __('Save');
         print "</button>";
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"dijit.byId('userEditDlg').hide()\">";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('userEditDlg').hide()\">";
         print __('Cancel');
         print "</button></div>";
     }
@@ -330,10 +330,10 @@ class Pref_Users extends ProtectedHandler
 
         $access_level_names = \SmallSmallRSS\Constants::access_level_names();
 
-        print "<div id=\"pref-user-wrap\" dojoType=\"dijit.layout.BorderContainer\" gutters=\"false\">";
-        print "<div id=\"pref-user-header\" dojoType=\"dijit.layout.ContentPane\" region=\"top\">";
+        print "<div id=\"pref-user-wrap\" data-dojo-type=\"dijit.layout.BorderContainer\" gutters=\"false\">";
+        print "<div id=\"pref-user-header\" data-dojo-type=\"dijit.layout.ContentPane\" region=\"top\">";
 
-        print "<div id=\"pref-user-toolbar\" dojoType=\"dijit.Toolbar\">";
+        print "<div id=\"pref-user-toolbar\" data-dojo-type=\"dijit.Toolbar\">";
 
         $user_search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
 
@@ -344,9 +344,9 @@ class Pref_Users extends ProtectedHandler
         }
 
         print "<div style='float: right; padding-right : 4px;'>
-                <input dojoType=\"dijit.form.TextBox\" id=\"user_search\" size=\"20\" type=\"search\"
+                <input data-dojo-type=\"dijit.form.TextBox\" id=\"user_search\" size=\"20\" type=\"search\"
                     value=\"$user_search\">
-                <button dojoType=\"dijit.form.Button\" onclick=\"updateUsersList()\">".
+                <button data-dojo-type=\"dijit.form.Button\" onclick=\"updateUsersList()\">".
             __('Search')."</button>
                 </div>";
 
@@ -356,26 +356,26 @@ class Pref_Users extends ProtectedHandler
             $sort = "login";
         }
 
-        print "<div dojoType=\"dijit.form.DropDownButton\">".
+        print "<div data-dojo-type=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
-        print "<div dojoType=\"dijit.Menu\" style=\"display: none;\">";
+        print "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
         print "<div onclick=\"selectTableRows('prefUserList', 'all')\"
-                dojoType=\"dijit.MenuItem\">".__('All')."</div>";
+                data-dojo-type=\"dijit.MenuItem\">".__('All')."</div>";
         print "<div onclick=\"selectTableRows('prefUserList', 'none')\"
-                dojoType=\"dijit.MenuItem\">".__('None')."</div>";
+                data-dojo-type=\"dijit.MenuItem\">".__('None')."</div>";
         print "</div></div>";
 
-        print "<button dojoType=\"dijit.form.Button\" onclick=\"addUser()\">".__('Create user')."</button>";
+        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"addUser()\">".__('Create user')."</button>";
 
         print "
-                <button dojoType=\"dijit.form.Button\" onclick=\"selectedUserDetails()\">".
-            __('Details')."</button dojoType=\"dijit.form.Button\">
-                <button dojoType=\"dijit.form.Button\" onclick=\"editSelectedUser()\">".
-            __('Edit')."</button dojoType=\"dijit.form.Button\">
-                <button dojoType=\"dijit.form.Button\" onclick=\"removeSelectedUsers()\">".
-            __('Remove')."</button dojoType=\"dijit.form.Button\">
-                <button dojoType=\"dijit.form.Button\" onclick=\"resetSelectedUserPass()\">".
-            __('Reset password')."</button dojoType=\"dijit.form.Button\">";
+                <button data-dojo-type=\"dijit.form.Button\" onclick=\"selectedUserDetails()\">".
+            __('Details')."</button data-dojo-type=\"dijit.form.Button\">
+                <button data-dojo-type=\"dijit.form.Button\" onclick=\"editSelectedUser()\">".
+            __('Edit')."</button data-dojo-type=\"dijit.form.Button\">
+                <button data-dojo-type=\"dijit.form.Button\" onclick=\"removeSelectedUsers()\">".
+            __('Remove')."</button data-dojo-type=\"dijit.form.Button\">
+                <button data-dojo-type=\"dijit.form.Button\" onclick=\"resetSelectedUserPass()\">".
+            __('Reset password')."</button data-dojo-type=\"dijit.form.Button\">";
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
@@ -384,7 +384,7 @@ class Pref_Users extends ProtectedHandler
 
         print "</div>"; #toolbar
         print "</div>"; #pane
-        print "<div id=\"pref-user-content\" dojoType=\"dijit.layout.ContentPane\" region=\"center\">";
+        print "<div id=\"pref-user-content\" data-dojo-type=\"dijit.layout.ContentPane\" region=\"center\">";
 
         print "<div id=\"sticky-status-msg\"></div>";
 
@@ -451,7 +451,7 @@ class Pref_Users extends ProtectedHandler
                 $line["last_login"] = make_local_datetime($line["last_login"], false);
 
                 print "<td align='center'><input onclick='toggleSelectRow2(this);'
-                    dojoType=\"dijit.form.CheckBox\" type=\"checkbox\"
+                    data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\"
                     id=\"UMCHK-$uid\"></td>";
 
                 $onclick = "onclick='editUser($uid, event)' title='".__('Click to edit')."'";

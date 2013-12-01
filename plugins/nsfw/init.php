@@ -60,10 +60,10 @@ class NSFW extends \SmallSmallRSS\Plugin
         if ($args != "prefPrefs") {
             return;
         }
-        print "<div dojoType=\"dijit.layout.AccordionPane\" title=\"".__("NSFW Plugin")."\">";
+        print "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__("NSFW Plugin")."\">";
         print "<br/>";
         $tags = $this->host->get($this, "tags");
-        print "<form dojoType=\"dijit.form.Form\">";
+        print "<form data-dojo-type=\"dijit.form.Form\">";
         print "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
                  evt.preventDefault();
                  if (this.validate()) {
@@ -75,17 +75,17 @@ class NSFW extends \SmallSmallRSS\Plugin
                    });
                  }
                </script>";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"save\">";
-        print "<input dojoType=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"nsfw\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"save\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"nsfw\">";
         print "<table width=\"100%\" class=\"prefPrefsList\">";
         print "<tr><td width=\"40%\">".__("Tags to consider NSFW (comma-separated)")."</td>";
         print "<td class=\"prefValue\">";
-        print "<input dojoType=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"tags\" value=\"$tags\">";
+        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\" name=\"tags\" value=\"$tags\">";
         print "</td>";
         print "</tr>";
         print "</table>";
-        print "<p><button dojoType=\"dijit.form.Button\" type=\"submit\">";
+        print "<p><button data-dojo-type=\"dijit.form.Button\" type=\"submit\">";
         print __("Save");
         print "</button>";
         print "</form>";

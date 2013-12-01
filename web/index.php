@@ -101,16 +101,17 @@ foreach ($js_files as $jsfile) {
 <div id="cmdline" style="display: none"></div>
 <div id="headlines-tmp" style="display: none"></div>
 <div id="main" data-dojo-type="dijit.layout.BorderContainer">
-  <div id="feeds-holder" data-dojo-type="dijit.layout.ContentPane" region="leading" style="width: 20%" splitter="true">
+  <div id="feeds-holder" data-dojo-type="dijit.layout.ContentPane"
+    data-dojo-props="region: 'leading', splitter=true" style="width: 20%">
     <div id="feedlistLoading">
       <img src="images/indicator_tiny.gif" />
       <?php echo  __("Loading, please wait..."); ?>
     </div>
     <div id="feedTree"></div>
   </div>
-  <div data-dojo-type="dijit.layout.BorderContainer" region="center" id="header-wrap" gutters="false">
-    <div data-dojo-type="dijit.layout.BorderContainer" region="center" id="content-wrap">
-      <div id="toolbar" data-dojo-type="dijit.layout.ContentPane" region="top">
+  <div data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="region: 'center', gutters: false" id="header-wrap">
+    <div data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="region: 'center'" id="content-wrap">
+      <div id="toolbar" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'">
         <div id="main-toolbar" data-dojo-type="dijit.Toolbar">
           <form id="main_toolbar_form" action="" onsubmit="return false;">
           <button data-dojo-type="dijit.form.Button" id="collapse_feeds_btn"
@@ -194,16 +195,17 @@ if (empty($_SESSION["hide_logout"])) {
       </div>
     </div> <!-- toolbar -->
   </div> <!-- toolbar pane -->
-  <div id="headlines-wrap-inner" data-dojo-type="dijit.layout.BorderContainer" region="center">
-    <div id="headlines-toolbar" data-dojo-type="dijit.layout.ContentPane" region="top"></div>
+  <div id="headlines-wrap-inner" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="region: 'center'">
+    <div id="headlines-toolbar" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'"></div>
       <div id="floatingTitle" style="display: none"></div>
         <div id="headlines-frame" data-dojo-type="dijit.layout.ContentPane"
-          onscroll="headlines_scroll_handler(this)" region="center">
+          onscroll="headlines_scroll_handler(this)" data-dojo-props="region: 'center'">
           <div id="headlinesInnerContainer">
-                <div class="whiteBox"><?php echo __('Loading, please wait...'); ?></div>
+            <div class="whiteBox"><?php echo __('Loading, please wait...'); ?></div>
           </div>
         </div>
-        <div id="content-insert" data-dojo-type="dijit.layout.ContentPane" region="bottom" style="height : 50%" splitter="true">
+        <div id="content-insert" data-dojo-type="dijit.layout.ContentPane"
+          data-dojo-props="region: 'bottom', splitter=true" style="height : 50%">
         </div>
       </div>
     </div>

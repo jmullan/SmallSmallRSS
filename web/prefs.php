@@ -88,13 +88,13 @@ $translation_renderer->render();
     </div>
     </div>
 
-    <div id="header" data-dojo-type="dijit.layout.ContentPane" region="top">
+    <div id="header" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'">
       <a href="#" onclick="gotoMain()"><?php echo __('Exit preferences') ?></a>
     </div>
 
     <div id="main" data-dojo-type="dijit.layout.BorderContainer">
 
-    <div data-dojo-type="dijit.layout.TabContainer" region="center" id="pref-tabs">
+    <div data-dojo-type="dijit.layout.TabContainer" data-dojo-props="region: 'center'" id="pref-tabs">
     <div id="genConfigTab" data-dojo-type="dijit.layout.ContentPane"
     href="backend.php?op=pref-prefs"
     title="<?php echo __('Preferences') ?>"></div>
@@ -123,7 +123,7 @@ if ($_SESSION["access_level"] >= 10) {
      \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::RENDER_PREFS_TABS);
 ?>
       </div>
-      <div id="footer" data-dojo-type="dijit.layout.ContentPane" region="bottom">
+      <div id="footer" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'bottom'">
         <a class="insensitive" target="_blank" href="http://tt-rss.org/">
           Tiny Tiny RSS</a>
           &copy; 2005-<?php echo date('Y') ?>

@@ -530,7 +530,7 @@ class Pref_Prefs extends ProtectedHandler
 
         print '<div data-dojo-type="dijit.layout.BorderContainer" gutters="false">';
 
-        print '<div data-dojo-type="dijit.layout.ContentPane" region="center" style="overflow-y : auto">';
+        print '<div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'center'" style="overflow-y : auto">';
 
         if (!empty($_SESSION["profile"])) {
             \SmallSmallRSS\Renderers\Messages::renderNotice(
@@ -754,7 +754,7 @@ class Pref_Prefs extends ProtectedHandler
         );
 
         print '</div>'; # inside pane
-        print '<div data-dojo-type="dijit.layout.ContentPane" region="bottom">';
+        print '<div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'bottom'">';
 
         print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-prefs\">";
         print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"saveconfig\">";

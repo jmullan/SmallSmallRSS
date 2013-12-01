@@ -239,7 +239,7 @@ var BorderContainer = declare("dijit.layout.BorderContainer", _LayoutWidget, {
 	//		Provides layout in up to 5 regions, a mandatory center with optional borders along its 4 sides.
 	// description:
 	//		A BorderContainer is a box with a specified size, such as style="width: 500px; height: 500px;",
-	//		that contains a child widget marked region="center" and optionally children widgets marked
+	//		that contains a child widget marked data-dojo-props="region: 'center'" and optionally children widgets marked
 	//		region equal to "top", "bottom", "leading", "trailing", "left" or "right".
 	//		Children along the edges will be laid out according to width or height dimensions and may
 	//		include optional splitters (splitter="true") to make them resizable by the user.  The remaining

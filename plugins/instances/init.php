@@ -153,7 +153,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     {
         if ($_SESSION["uid"]) {
             if ($_SESSION["access_level"] < 10) {
-                print __("Your access level is insufficient to open this tab.");
+                echo __("Your access level is insufficient to open this tab.");
                 return false;
             }
             return true;
@@ -206,44 +206,46 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_linked_instances WHERE id = '$id'"
         );
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"id\" value=\"$id\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"editSave\">";
-        print "<div class=\"dlgSec\">".__("Instance")."</div>";
-        print "<div class=\"dlgSecCont\">";
-
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"id\" value=\"$id\" />";
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"  name="op" value="pref-instances" />';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="editSave" />';
+        echo '<div class="dlgSec">"';
+        echo __("Instance");
+        echo '"</div>';
+        echo '<div class="dlgSecCont">';
         /* URL */
         $access_url = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "access_url"));
-        print __("URL:") . " ";
-        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
+        echo __("URL:") . " ";
+        echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Instance URL")."\"
             regExp='^(http|https)://.*'
             style=\"font-size: 16px; width: 20em\" name=\"access_url\"
             value=\"$access_url\">";
-        print "<hr/>";
+        echo "<hr/>";
         $access_key = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "access_key"));
 
         /* Access key */
-        print __("Access key:") . " ";
-        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
+        echo __("Access key:") . " ";
+        echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Access key")."\" regExp='\w{40}'
             style=\"width: 20em\" name=\"access_key\" id=\"instance_edit_key\"
             value=\"$access_key\">";
-        print "<p class='insensitive'>" . __("Use one access key for both linked instances.");
-        print "</div>";
-        print "<div class=\"dlgButtons\">
+        echo "<p class='insensitive'>" . __("Use one access key for both linked instances.");
+        echo "</div>";
+        echo "<div class=\"dlgButtons\">
             <div style='float: left'>
                 <button data-dojo-type=\"dijit.form.Button\"
-                    onclick=\"return dijit.byId('instanceEditDlg').regenKey()\">".
-            __('Generate new key')."</button>
-            </div>
-            <button data-dojo-type=\"dijit.form.Button\"
-                onclick=\"return dijit.byId('instanceEditDlg').execute()\">".
-            __('Save')."</button>
-            <button data-dojo-type=\"dijit.form.Button\"
-                onclick=\"return dijit.byId('instanceEditDlg').hide()\"\">".
-            __('Cancel')."</button></div>";
-
+                    onclick=\"return dijit.byId('instanceEditDlg').regenKey()\">";
+        echo __('Generate new key');
+        echo "</button>";
+        echo '</div>';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'instanceEditDlg\').execute();">';
+        echo __('Save');
+        echo '</button>';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'instanceEditDlg\').hide();">';
+        echo __('Cancel');
+        echo '</button>';
+        echo '</div>';
     }
 
     public function editSave()
@@ -265,36 +267,36 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     public function index()
     {
         if (!function_exists('curl_init')) {
-            print "<div style='padding : 1em'>";
+            echo "<div style='padding : 1em'>";
             \SmallSmallRSS\Renderers\Messages::renderError(
                 "This functionality requires CURL functions."
                 . " Please enable CURL in your PHP configuration"
                 . " (you might also want to disable open_basedir in php.ini)"
                 . " and reload this page."
             );
-            print "</div>";
+            echo "</div>";
         }
-        print "<div id=\"pref-instance-wrap\" data-dojo-type=\"dijit.layout.BorderContainer\" gutters=\"false\">";
-        print "<div id=\"pref-instance-header\" data-dojo-type=\"dijit.layout.ContentPane\" region=\"top\">";
-        print "<div id=\"pref-instance-toolbar\" data-dojo-type=\"dijit.Toolbar\">";
+        echo "<div id=\"pref-instance-wrap\" data-dojo-type=\"dijit.layout.BorderContainer\" gutters=\"false\">";
+        echo "<div id=\"pref-instance-header\" data-dojo-type=\"dijit.layout.ContentPane\" region=\"top\">";
+        echo "<div id=\"pref-instance-toolbar\" data-dojo-type=\"dijit.Toolbar\">";
         $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);
         if (!$sort || $sort == "undefined") {
             $sort = "access_url";
         }
-        print "<div data-dojo-type=\"dijit.form.DropDownButton\">".
+        echo "<div data-dojo-type=\"dijit.form.DropDownButton\">".
             "<span>" . __('Select')."</span>";
-        print "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
-        print "<div onclick=\"selectTableRows('prefInstanceList', 'all')\"
+        echo "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
+        echo "<div onclick=\"selectTableRows('prefInstanceList', 'all')\"
             data-dojo-type=\"dijit.MenuItem\">".__('All')."</div>";
-        print "<div onclick=\"selectTableRows('prefInstanceList', 'none')\"
+        echo "<div onclick=\"selectTableRows('prefInstanceList', 'none')\"
             data-dojo-type=\"dijit.MenuItem\">".__('None')."</div>";
-        print "</div></div>";
+        echo "</div></div>";
 
-        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"addInstance()\">".__('Link instance')."</button>";
-        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"editSelectedInstance()\">".__('Edit')."</button>";
-        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"removeSelectedInstances()\">".__('Remove')."</button>";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"addInstance()\">".__('Link instance')."</button>";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"editSelectedInstance()\">".__('Edit')."</button>";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"removeSelectedInstances()\">".__('Remove')."</button>";
 
-        print "</div>"; #toolbar
+        echo "</div>"; #toolbar
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT
@@ -305,11 +307,11 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
              ORDER BY $sort"
         );
 
-        print "<p class=\"insensitive\" style='margin-left : 1em;'>"
+        echo "<p class=\"insensitive\" style='margin-left : 1em;'>"
             . __("You can connect other instances of Tiny Tiny RSS to this one to share Popular feeds. Link to this instance of Tiny Tiny RSS by using this URL:");
-        print " <a href=\"#\" onclick=\"alert('".htmlspecialchars(get_self_url_prefix())."')\">(display url)</a>";
-        print "<p><table width='100%' id='prefInstanceList' class='prefInstanceList' cellspacing='0'>";
-        print "<tr class=\"title\">
+        echo " <a href=\"#\" onclick=\"alert('".htmlspecialchars(get_self_url_prefix())."')\">(display url)</a>";
+        echo "<p><table width='100%' id='prefInstanceList' class='prefInstanceList' cellspacing='0'>";
+        echo "<tr class=\"title\">
             <td align='center' width=\"5%\">&nbsp;</td>
             <td width=''><a href=\"#\" onclick=\"updateInstanceList('access_url')\">".__('Instance URL')."</a></td>
             <td width='20%'><a href=\"#\" onclick=\"updateInstanceList('access_key')\">".__('Access key')."</a></td>
@@ -328,9 +330,9 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
             $line["last_connected"] = make_local_datetime($line["last_connected"], false);
 
-            print "<tr class=\"$class\" $this_row_id>";
+            echo "<tr class=\"$class\" $this_row_id>";
 
-            print "<td align='center'><input onclick='toggleSelectRow(this);'
+            echo "<td align='center'><input onclick='toggleSelectRow(this);'
                 type=\"checkbox\" id=\"LICHK-$id\"></td>";
 
             $onclick = "onclick='editInstance($id, event)' title='".__('Click to edit')."'";
@@ -338,20 +340,20 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
             $access_key = mb_substr($line['access_key'], 0, 4) . '...' .
                 mb_substr($line['access_key'], -4);
 
-            print "<td $onclick>" . htmlspecialchars($line['access_url']) . "</td>";
-            print "<td $onclick>" . htmlspecialchars($access_key) . "</td>";
-            print "<td $onclick>" . htmlspecialchars($line['last_connected']) . "</td>";
-            print "<td $onclick>" . $this->status_codes[$line['last_status_out']] . "</td>";
-            print "<td $onclick>" . htmlspecialchars($line['num_feeds']) . "</td>";
+            echo "<td $onclick>" . htmlspecialchars($line['access_url']) . "</td>";
+            echo "<td $onclick>" . htmlspecialchars($access_key) . "</td>";
+            echo "<td $onclick>" . htmlspecialchars($line['last_connected']) . "</td>";
+            echo "<td $onclick>" . $this->status_codes[$line['last_status_out']] . "</td>";
+            echo "<td $onclick>" . htmlspecialchars($line['num_feeds']) . "</td>";
 
-            print "</tr>";
+            echo "</tr>";
 
             ++$lnum;
         }
-        print "</table>";
-        print "</div>"; #pane
+        echo "</table>";
+        echo "</div>"; #pane
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(\SmallSmallRSS\Hooks::RENDER_PREFS_TAB, "prefInstances");
-        print "</div>"; #container
+        echo "</div>"; #container
 
     }
 
@@ -386,7 +388,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
                  WHERE id = '$instance_id'"
             );
 
-            print json_encode(array("feeds" => $feeds));
+            echo json_encode(array("feeds" => $feeds));
         } else {
             $renderer = new \SmallSmallRSS\Renderers\JSONError(6);
             $renderer->render();
@@ -395,30 +397,30 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function addInstance()
     {
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"add\">";
-        print "<div class=\"dlgSec\">".__("Instance")."</div>";
-        print "<div class=\"dlgSecCont\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"op\" value=\"pref-instances\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"  name=\"method\" value=\"add\">";
+        echo "<div class=\"dlgSec\">".__("Instance")."</div>";
+        echo "<div class=\"dlgSecCont\">";
 
         /* URL */
-        print __("URL:") . " ";
-        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
+        echo __("URL:") . " ";
+        echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Instance URL")."\"
             regExp='^(http|https)://.*'
             style=\"font-size: 16px; width: 20em\" name=\"access_url\">";
-        print "<hr/>";
+        echo "<hr/>";
 
         $access_key = sha1(uniqid(rand(), true));
 
         /* Access key */
-        print __("Access key:") . " ";
-        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
+        echo __("Access key:") . " ";
+        echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Access key")."\" regExp='\w{40}'
             style=\"width: 20em\" name=\"access_key\" id=\"instance_add_key\"
             value=\"$access_key\">";
-        print "<p class='insensitive'>" . __("Use one access key for both linked instances.");
-        print "</div>";
-        print "<div class=\"dlgButtons\">
+        echo "<p class='insensitive'>" . __("Use one access key for both linked instances.");
+        echo "</div>";
+        echo "<div class=\"dlgButtons\">
             <div style='float: left'>
                 <button data-dojo-type=\"dijit.form.Button\"
                     onclick=\"return dijit.byId('instanceAddDlg').regenKey()\">"
@@ -436,6 +438,6 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     public function genHash()
     {
         $hash = sha1(uniqid(rand(), true));
-        print json_encode(array("hash" => $hash));
+        echo json_encode(array("hash" => $hash));
     }
 }

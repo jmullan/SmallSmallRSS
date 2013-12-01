@@ -20,17 +20,20 @@ class Pref_Feeds extends ProtectedHandler
 
     public function ignoreCSRF($method)
     {
-        $csrf_ignored = array("index", "getfeedtree", "add", "editcats", "editfeed",
-                              "savefeedorder", "uploadicon", "feedswitherrors", "inactivefeeds",
-                              "batchsubscribe");
+        $csrf_ignored = array(
+            'index', 'getfeedtree', 'add', 'editcats', 'editfeed',
+            'savefeedorder', 'uploadicon', 'feedswitherrors', 'inactivefeeds',
+            'batchsubscribe'
+        );
 
         return array_search($method, $csrf_ignored) !== false;
     }
 
     public function renderBatchEditCheckbox($elem, $label = false)
     {
-        echo "<input type=\"checkbox\" title=\"".__("Check to enable field")."\"
-               onchange=\"dijit.byId('feedEditDlg').toggleField(this, '$elem', '$label')\">";
+        echo "<input type=\"checkbox\" title=\"";
+        echo __('Check to enable field');
+        echo "\" onchange=\"dijit.byId('feedEditDlg').toggleField(this, '$elem', '$label')\">";
     }
 
     public function renamecat()
@@ -42,7 +45,7 @@ class Pref_Feeds extends ProtectedHandler
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feed_categories
                  SET title = '$title'
-                 WHERE id = '$id' AND owner_uid = " . $_SESSION["uid"]
+                 WHERE id = '$id' AND owner_uid = " . $_SESSION['uid']
             );
         }
         return;
@@ -52,9 +55,9 @@ class Pref_Feeds extends ProtectedHandler
     {
 
         if ($this->getMode() != 2) {
-            $search = isset($_SESSION["prefs_feed_search"]) ? $_SESSION["prefs_feed_search"] : '';
+            $search = isset($_SESSION['prefs_feed_search']) ? $_SESSION['prefs_feed_search'] : '';
         } else {
-            $search = "";
+            $search = '';
         }
 
         if ($search) {
@@ -70,8 +73,8 @@ class Pref_Feeds extends ProtectedHandler
         $items = array();
 
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id, title FROM ttrss_feed_categories
-                WHERE owner_uid = " . $_SESSION["uid"] . " AND parent_cat = '$cat_id' ORDER BY order_id, title"
+            'SELECT id, title FROM ttrss_feed_categories
+                WHERE owner_uid = ' . $_SESSION['uid'] . " AND parent_cat = '$cat_id' ORDER BY order_id, title"
         );
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
@@ -99,12 +102,12 @@ class Pref_Feeds extends ProtectedHandler
         }
         $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
         $feed_result = \SmallSmallRSS\Database::query(
-            "SELECT id, title, last_error,
-            " . $substring_for_date . "(last_updated,1,19) AS last_updated
+            'SELECT id, title, last_error,
+            ' . $substring_for_date . "(last_updated,1,19) AS last_updated
             FROM ttrss_feeds
             WHERE
                 cat_id = '$cat_id'
-                AND owner_uid = " . $_SESSION["uid"] . "
+                AND owner_uid = " . $_SESSION['uid'] . "
                 $search_qpart
             ORDER BY order_id, title"
         );
@@ -135,10 +138,10 @@ class Pref_Feeds extends ProtectedHandler
     public function makefeedtree()
     {
 
-        if ($this->getMode() != 2 && isset($_SESSION["prefs_feed_search"])) {
-            $search = $_SESSION["prefs_feed_search"];
+        if ($this->getMode() != 2 && isset($_SESSION['prefs_feed_search'])) {
+            $search = $_SESSION['prefs_feed_search'];
         } else {
-            $search = "";
+            $search = '';
         }
 
         if ($search) {
@@ -221,12 +224,12 @@ class Pref_Feeds extends ProtectedHandler
                 || ($this->getMode() != 2 && !$search)
             );
             $result = \SmallSmallRSS\Database::query(
-                "SELECT id, title
+                'SELECT id, title
                  FROM ttrss_feed_categories
                  WHERE
-                     owner_uid = " . $_SESSION["uid"] . "
+                     owner_uid = ' . $_SESSION['uid'] . '
                      AND parent_cat IS NULL
-                 ORDER BY order_id, title"
+                 ORDER BY order_id, title'
             );
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $cat = array();
@@ -254,7 +257,7 @@ class Pref_Feeds extends ProtectedHandler
             $cat['id'] = 'CAT:0';
             $cat['bare_id'] = 0;
             $cat['auxcounter'] = 0;
-            $cat['name'] = __("Uncategorized");
+            $cat['name'] = __('Uncategorized');
             $cat['items'] = array();
             $cat['type'] = 'category';
             $cat['checkbox'] = false;
@@ -262,12 +265,12 @@ class Pref_Feeds extends ProtectedHandler
             $cat['child_unread'] = 0;
             $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $feed_result = \SmallSmallRSS\Database::query(
-                "SELECT id, title,last_error,
-                " . $substring_for_date . "(last_updated,1,19) AS last_updated
+                'SELECT id, title,last_error,
+                ' . $substring_for_date . '(last_updated,1,19) AS last_updated
                 FROM ttrss_feeds
                 WHERE
                     cat_id IS NULL
-                    AND owner_uid = " . $_SESSION["uid"] . "
+                    AND owner_uid = ' . $_SESSION['uid'] . "
                     $search_qpart
                 ORDER BY order_id, title"
             );
@@ -300,11 +303,11 @@ class Pref_Feeds extends ProtectedHandler
         } else {
             $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $feed_result = \SmallSmallRSS\Database::query(
-                "SELECT id, title, last_error,
-                " . $substring_for_date . "(last_updated,1,19) AS last_updated
+                'SELECT id, title, last_error,
+                ' . $substring_for_date . '(last_updated,1,19) AS last_updated
                 FROM ttrss_feeds
                 WHERE
-                    owner_uid = " . $_SESSION["uid"] . "
+                    owner_uid = ' . $_SESSION['uid'] . "
                     $search_qpart
                 ORDER BY order_id, title"
             );
@@ -344,8 +347,8 @@ class Pref_Feeds extends ProtectedHandler
     public function catsortreset()
     {
         \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_feed_categories
-                SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
+            'UPDATE ttrss_feed_categories
+                SET order_id = 0 WHERE owner_uid = ' . $_SESSION['uid']
         );
         return;
     }
@@ -353,17 +356,17 @@ class Pref_Feeds extends ProtectedHandler
     public function feedsortreset()
     {
         \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_feeds
-                SET order_id = 0 WHERE owner_uid = " . $_SESSION["uid"]
+            'UPDATE ttrss_feeds
+                SET order_id = 0 WHERE owner_uid = ' . $_SESSION['uid']
         );
         return;
     }
 
     private function processCategoryOrder(&$data_map, $item_id, $parent_id = false, $nest_level = 0)
     {
-        $prefix = "";
+        $prefix = '';
         for ($i = 0; $i < $nest_level; $i++) {
-            $prefix .= "   ";
+            $prefix .= '   ';
         }
 
         $bare_item_id = substr($item_id, strpos($item_id, ':')+1);
@@ -379,7 +382,7 @@ class Pref_Feeds extends ProtectedHandler
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feed_categories
                 SET parent_cat = $parent_qpart WHERE id = '$bare_item_id' AND
-                owner_uid = " . $_SESSION["uid"]
+                owner_uid = " . $_SESSION['uid']
             );
         }
 
@@ -392,22 +395,22 @@ class Pref_Feeds extends ProtectedHandler
                 $id = $item['_reference'];
                 $bare_id = substr($id, strpos($id, ':')+1);
                 if ($item['_reference']) {
-                    if (strpos($id, "FEED") === 0) {
+                    if (strpos($id, 'FEED') === 0) {
 
-                        $cat_id = ($item_id != "root") ?
-                            \SmallSmallRSS\Database::escape_string($bare_item_id) : "NULL";
+                        $cat_id = ($item_id != 'root') ?
+                            \SmallSmallRSS\Database::escape_string($bare_item_id) : 'NULL';
 
                         $cat_qpart = ($cat_id != 0) ? "cat_id = '$cat_id'" :
-                            "cat_id = NULL";
+                            'cat_id = NULL';
 
                         \SmallSmallRSS\Database::query(
                             "UPDATE ttrss_feeds
                             SET order_id = $order_id, $cat_qpart
                             WHERE id = '$bare_id' AND
-                                owner_uid = " . $_SESSION["uid"]
+                                owner_uid = " . $_SESSION['uid']
                         );
 
-                    } elseif (strpos($id, "CAT:") === 0) {
+                    } elseif (strpos($id, 'CAT:') === 0) {
                         $this->processCategoryOrder(
                             $data_map, $item['_reference'], $item_id,
                             $nest_level+1
@@ -422,7 +425,7 @@ class Pref_Feeds extends ProtectedHandler
                         \SmallSmallRSS\Database::query(
                             "UPDATE ttrss_feed_categories
                                 SET order_id = '$order_id' WHERE id = '$bare_id' AND
-                                owner_uid = " . $_SESSION["uid"]
+                                owner_uid = " . $_SESSION['uid']
                         );
                     }
                 }
@@ -460,13 +463,13 @@ class Pref_Feeds extends ProtectedHandler
 
     public function removeicon()
     {
-        $feed_id = $this->getSQLEscapedStringFromRequest("feed_id");
+        $feed_id = $this->getSQLEscapedStringFromRequest('feed_id');
         $result = \SmallSmallRSS\Database::query(
             "SELECT id
             FROM ttrss_feeds
             WHERE
                 id = '$feed_id'
-                AND owner_uid = ". $_SESSION["uid"]
+                AND owner_uid = ". $_SESSION['uid']
         );
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
             @unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico");
@@ -482,7 +485,7 @@ class Pref_Feeds extends ProtectedHandler
 
     public function uploadicon()
     {
-        header("Content-type: text/html");
+        header('Content-type: text/html');
         $tmp_file = false;
         if (is_uploaded_file($_FILES['icon_file']['tmp_name'])) {
             $tmp_file = tempnam(\SmallSmallRSS\Config::get('CACHE_DIR') . '/upload', 'icon');
@@ -497,7 +500,7 @@ class Pref_Feeds extends ProtectedHandler
             return;
         }
         $icon_file = $tmp_file;
-        $feed_id = $this->getSQLEscapedStringFromRequest("feed_id");
+        $feed_id = $this->getSQLEscapedStringFromRequest('feed_id');
         if (is_file($icon_file) && $feed_id) {
             if (filesize($icon_file) < 20000) {
                 $result = \SmallSmallRSS\Database::query(
@@ -505,7 +508,7 @@ class Pref_Feeds extends ProtectedHandler
                      FROM ttrss_feeds
                      WHERE
                          id = '$feed_id'
-                         AND owner_uid = ". $_SESSION["uid"]
+                         AND owner_uid = ". $_SESSION['uid']
                 );
 
                 if (\SmallSmallRSS\Database::num_rows($result) != 0) {
@@ -533,27 +536,27 @@ class Pref_Feeds extends ProtectedHandler
 
         echo "<script type=\"text/javascript\">";
         echo "parent.uploadIconHandler($rc);";
-        echo "</script>";
+        echo '</script>';
         return;
     }
 
     public function editfeed()
     {
-        $feed_id = $this->getSQLEscapedStringFromRequest("id");
+        $feed_id = $this->getSQLEscapedStringFromRequest('id');
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT *
              FROM ttrss_feeds
              WHERE
                  id = '$feed_id' AND
-                 owner_uid = " . $_SESSION["uid"]
+                 owner_uid = " . $_SESSION['uid']
         );
 
         $auth_pass_encrypted = sql_bool_to_bool(
             \SmallSmallRSS\Database::fetch_result(
                 $result,
                 0,
-                "auth_pass_encrypted"
+                'auth_pass_encrypted'
             )
         );
 
@@ -561,38 +564,38 @@ class Pref_Feeds extends ProtectedHandler
             \SmallSmallRSS\Database::fetch_result(
                 $result,
                 0,
-                "title"
+                'title'
             )
         );
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"editSave\">";
-        echo "<div class=\"dlgSec\">".__("Feed")."</div>";
+        echo "<div class=\"dlgSec\">".__('Feed').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
         /* Title */
         echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
-                placeHolder=\"".__("Feed Title")."\"
+                placeHolder=\"".__('Feed Title')."\"
                 style=\"font-size: 16px; width: 20em\" name=\"title\" value=\"$title\">";
 
         /* Feed URL */
 
-        $feed_url = \SmallSmallRSS\Database::fetch_result($result, 0, "feed_url");
+        $feed_url = \SmallSmallRSS\Database::fetch_result($result, 0, 'feed_url');
         $feed_url = htmlspecialchars(\SmallSmallRSS\Database::fetch_result(
             $result,
-            0, "feed_url"
+            0, 'feed_url'
         ));
 
-        echo "<hr/>";
+        echo '<hr/>';
 
-        echo __('URL:') . " ";
+        echo __('URL:') . ' ';
         echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
-            placeHolder=\"".__("Feed URL")."\"
+            placeHolder=\"".__('Feed URL')."\"
             regExp='^(http|https)://.*' style=\"width: 20em\"
             name=\"feed_url\" value=\"$feed_url\">";
 
-        $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, "last_error");
+        $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_error');
 
         if ($last_error) {
             echo "&nbsp;<span title=\"".htmlspecialchars($last_error)."\"
@@ -604,30 +607,30 @@ class Pref_Feeds extends ProtectedHandler
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
 
-            $cat_id = \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
+            $cat_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'cat_id');
 
-            echo "<hr/>";
+            echo '<hr/>';
 
-            echo __('Place in category:') . " ";
+            echo __('Place in category:') . ' ';
 
             print_feed_cat_select(
-                "cat_id", $cat_id,
+                'cat_id', $cat_id,
                 'data-dojo-type="dijit.form.Select"'
             );
         }
 
-        echo "</div>";
+        echo '</div>';
 
-        echo "<div class=\"dlgSec\">".__("Update")."</div>";
+        echo "<div class=\"dlgSec\">".__('Update').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
         /* Update Interval */
 
-        $update_interval = \SmallSmallRSS\Database::fetch_result($result, 0, "update_interval");
+        $update_interval = \SmallSmallRSS\Database::fetch_result($result, 0, 'update_interval');
 
         $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
         $form_elements_renderer->renderSelect(
-            "update_interval",
+            'update_interval',
             $update_interval,
             \SmallSmallRSS\Constants::update_intervals(),
             'data-dojo-type="dijit.form.Select"'
@@ -635,30 +638,30 @@ class Pref_Feeds extends ProtectedHandler
 
         /* Purge intl */
 
-        $purge_interval = \SmallSmallRSS\Database::fetch_result($result, 0, "purge_interval");
+        $purge_interval = \SmallSmallRSS\Database::fetch_result($result, 0, 'purge_interval');
 
-        echo "<hr/>";
-        echo __('Article purging:') . " ";
+        echo '<hr/>';
+        echo __('Article purging:') . ' ';
 
         $form_elements_renderer->renderSelect(
-            "purge_interval",
+            'purge_interval',
             $purge_interval,
             \SmallSmallRSS\Constants::purge_intervals(),
             'data-dojo-type="dijit.form.Select" '
-            . ((\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) ? "" : 'disabled="1"')
+            . ((\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) ? '' : 'disabled="1"')
         );
 
-        echo "</div>";
-        echo "<div class=\"dlgSec\">".__("Authentication")."</div>";
+        echo '</div>';
+        echo "<div class=\"dlgSec\">".__('Authentication').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
-        $auth_login = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "auth_login"));
+        $auth_login = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'auth_login'));
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" id=\"feedEditDlg_login\"
-            placeHolder=\"".__("Login")."\"
+            placeHolder=\"".__('Login')."\"
             name=\"auth_login\" value=\"$auth_login\"><hr/>";
 
-        $auth_pass = \SmallSmallRSS\Database::fetch_result($result, 0, "auth_pass");
+        $auth_pass = \SmallSmallRSS\Database::fetch_result($result, 0, 'auth_pass');
 
         if ($auth_pass_encrypted) {
             $auth_pass = \SmallSmallRSS\Crypt::de($auth_pass);
@@ -667,96 +670,96 @@ class Pref_Feeds extends ProtectedHandler
         $auth_pass = htmlspecialchars($auth_pass);
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
-            placeHolder=\"".__("Password")."\"
+            placeHolder=\"".__('Password')."\"
             value=\"$auth_pass\">";
 
         echo "<div data-dojo-type=\"dijit.Tooltip\" connectId=\"feedEditDlg_login\" position=\"below\">
-            ".__('<b>Hint:</b> you need to fill in your login information if your feed requires authentication, except for Twitter feeds.')."
-            </div>";
+            ".__('<b>Hint:</b> you need to fill in your login information if your feed requires authentication, except for Twitter feeds.').'
+            </div>';
 
-        echo "</div>";
-        echo "<div class=\"dlgSec\">".__("Options")."</div>";
+        echo '</div>';
+        echo "<div class=\"dlgSec\">".__('Options').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
-        $private = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "private"));
+        $private = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'private'));
 
         if ($private) {
             $checked = "checked=\"1\"";
         } else {
-            $checked = "";
+            $checked = '';
         }
 
         echo "<input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"private\" id=\"private\"
-            $checked>&nbsp;<label for=\"private\">".__('Hide from Popular feeds')."</label>";
+            $checked>&nbsp;<label for=\"private\">".__('Hide from Popular feeds').'</label>';
 
-        $include_in_digest = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "include_in_digest"));
+        $include_in_digest = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'include_in_digest'));
 
         if ($include_in_digest) {
             $checked = "checked=\"1\"";
         } else {
-            $checked = "";
+            $checked = '';
         }
 
         echo "<hr/><input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"include_in_digest\"
             name=\"include_in_digest\"
-            $checked>&nbsp;<label for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
+            $checked>&nbsp;<label for=\"include_in_digest\">".__('Include in e-mail digest').'</label>';
 
 
-        $always_display_enclosures = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "always_display_enclosures"));
+        $always_display_enclosures = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'always_display_enclosures'));
 
         if ($always_display_enclosures) {
-            $checked = "checked";
+            $checked = 'checked';
         } else {
-            $checked = "";
+            $checked = '';
         }
 
         echo "<hr/><input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"always_display_enclosures\"
             name=\"always_display_enclosures\"
-            $checked>&nbsp;<label for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
+            $checked>&nbsp;<label for=\"always_display_enclosures\">".__('Always display image attachments').'</label>';
 
-        $hide_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "hide_images"));
+        $hide_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'hide_images'));
 
         if ($hide_images) {
             $checked = "checked=\"1\"";
         } else {
-            $checked = "";
+            $checked = '';
         }
 
         echo "<hr/><input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"hide_images\"
         name=\"hide_images\"
             $checked>&nbsp;<label for=\"hide_images\">".
-            __('Do not embed images')."</label>";
+            __('Do not embed images').'</label>';
 
-        $cache_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "cache_images"));
+        $cache_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images'));
 
         if ($cache_images) {
             $checked = "checked=\"1\"";
         } else {
-            $checked = "";
+            $checked = '';
         }
 
         echo "<hr/><input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"cache_images\"
         name=\"cache_images\"
             $checked>&nbsp;<label for=\"cache_images\">".
-            __('Cache images locally')."</label>";
+            __('Cache images locally').'</label>';
 
-        $mark_unread_on_update = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, "mark_unread_on_update"));
+        $mark_unread_on_update = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'mark_unread_on_update'));
 
         if ($mark_unread_on_update) {
-            $checked = "checked";
+            $checked = 'checked';
         } else {
-            $checked = "";
+            $checked = '';
         }
 
         echo "<hr/><input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" id=\"mark_unread_on_update\"
             name=\"mark_unread_on_update\"
-            $checked>&nbsp;<label for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
+            $checked>&nbsp;<label for=\"mark_unread_on_update\">".__('Mark updated articles as unread').'</label>';
 
-        echo "</div>";
+        echo '</div>';
 
         /* Icon */
 
-        echo "<div class=\"dlgSec\">".__("Icon")."</div>";
+        echo "<div class=\"dlgSec\">".__('Icon').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
         echo "<iframe name=\"icon_upload_iframe\"
@@ -772,10 +775,10 @@ class Pref_Feeds extends ProtectedHandler
             <button data-dojo-type=\"dijit.form.Button\" onclick=\"return uploadFeedIcon();\"
                 type=\"submit\">".__('Replace')."</button>
             <button data-dojo-type=\"dijit.form.Button\" onclick=\"return removeFeedIcon($feed_id);\"
-                type=\"submit\">".__('Remove')."</button>
-            </form>";
+                type=\"submit\">".__('Remove').'</button>
+            </form>';
 
-        echo "</div>";
+        echo '</div>';
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::PREFS_EDIT_FEED,
@@ -787,25 +790,25 @@ class Pref_Feeds extends ProtectedHandler
         echo "<div class='dlgButtons'>
             <div style=\"float: left\">
             <button data-dojo-type=\"dijit.form.Button\" onclick='return unsubscribeFeed($feed_id, \"$title\")'>".
-            __('Unsubscribe')."</button>";
+            __('Unsubscribe').'</button>';
 
         if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED')) {
-            $pubsub_state = \SmallSmallRSS\Database::fetch_result($result, 0, "pubsub_state");
-            $pubsub_btn_disabled = ($pubsub_state == 2) ? "" : "disabled=\"1\"";
+            $pubsub_state = \SmallSmallRSS\Database::fetch_result($result, 0, 'pubsub_state');
+            $pubsub_btn_disabled = ($pubsub_state == 2) ? '' : "disabled=\"1\"";
 
             echo "<button data-dojo-type=\"dijit.form.Button\" id=\"pubsubReset_Btn\" $pubsub_btn_disabled
                     onclick='return resetPubSub($feed_id, \"$title\")'>".__('Resubscribe to push updates').
-                "</button>";
+                '</button>';
         }
 
-        echo "</div>";
+        echo '</div>';
 
         echo "<div data-dojo-type=\"dijit.Tooltip\" connectId=\"pubsubReset_Btn\" position=\"below\">".
-            __('Resets PubSubHubbub subscription status for push-enabled feeds.')."</div>";
+            __('Resets PubSubHubbub subscription status for push-enabled feeds.').'</div>';
 
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').execute()\">".__('Save')."</button>
-            <button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').hide()\">".__('Cancel')."</button>
-        </div>";
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('feedEditDlg').hide()\">".__('Cancel').'</button>
+        </div>';
 
         return;
     }
@@ -813,19 +816,19 @@ class Pref_Feeds extends ProtectedHandler
     public function editfeeds()
     {
 
-        $feed_ids = $this->getSQLEscapedStringFromRequest("ids");
+        $feed_ids = $this->getSQLEscapedStringFromRequest('ids');
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            "Enable the options you wish to apply using checkboxes on the right:"
+            'Enable the options you wish to apply using checkboxes on the right:'
         );
 
-        echo "<p>";
+        echo '<p>';
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"ids\" value=\"$feed_ids\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchEditSave\">";
 
-        echo "<div class=\"dlgSec\">".__("Feed")."</div>";
+        echo "<div class=\"dlgSec\">".__('Feed').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
         /* Title */
@@ -834,135 +837,135 @@ class Pref_Feeds extends ProtectedHandler
             disabled=\"1\" style=\"font-size: 16px; width: 20em;\" required=\"1\"
             name=\"title\" value=\"\">";
 
-        $this->renderBatchEditCheckbox("title");
+        $this->renderBatchEditCheckbox('title');
 
         /* Feed URL */
 
-        echo "<br/>";
+        echo '<br/>';
 
-        echo __('URL:') . " ";
+        echo __('URL:') . ' ';
         echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" disabled=\"1\"
             required=\"1\" regExp='^(http|https)://.*' style=\"width: 20em\"
             name=\"feed_url\" value=\"\">";
 
-        $this->renderBatchEditCheckbox("feed_url");
+        $this->renderBatchEditCheckbox('feed_url');
 
         /* Category */
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
 
-            echo "<br/>";
+            echo '<br/>';
 
-            echo __('Place in category:') . " ";
+            echo __('Place in category:') . ' ';
 
             print_feed_cat_select(
-                "cat_id", false,
+                'cat_id', false,
                 'disabled="1" data-dojo-type="dijit.form.Select"'
             );
 
-            $this->renderBatchEditCheckbox("cat_id");
+            $this->renderBatchEditCheckbox('cat_id');
 
         }
 
-        echo "</div>";
+        echo '</div>';
 
-        echo "<div class=\"dlgSec\">".__("Update")."</div>";
+        echo "<div class=\"dlgSec\">".__('Update').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
         /* Update Interval */
 
         $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
         $form_elements_renderer->renderSelect(
-            "update_interval",
-            "",
+            'update_interval',
+            '',
             \SmallSmallRSS\Constants::update_intervals(),
             'disabled="1" data-dojo-type="dijit.form.Select"'
         );
 
-        $this->renderBatchEditCheckbox("update_interval");
+        $this->renderBatchEditCheckbox('update_interval');
 
         /* Purge intl */
 
         if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
-            echo "<br/>";
-            echo __('Article purging:') . " ";
+            echo '<br/>';
+            echo __('Article purging:') . ' ';
             $renderer = new \SmallSmallRSS\Renderers\FormElements();
             $renderer->renderSelect(
-                "purge_interval",
-                "",
+                'purge_interval',
+                '',
                 \SmallSmallRSS\Constants::purge_intervals(),
                 'disabled="1" data-dojo-type="dijit.form.Select"'
             );
 
-            $this->renderBatchEditCheckbox("purge_interval");
+            $this->renderBatchEditCheckbox('purge_interval');
         }
 
-        echo "</div>";
-        echo "<div class=\"dlgSec\">".__("Authentication")."</div>";
+        echo '</div>';
+        echo "<div class=\"dlgSec\">".__('Authentication').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\"
-            placeHolder=\"".__("Login")."\" disabled=\"1\"
+            placeHolder=\"".__('Login')."\" disabled=\"1\"
             name=\"auth_login\" value=\"\">";
 
-        $this->renderBatchEditCheckbox("auth_login");
+        $this->renderBatchEditCheckbox('auth_login');
 
         echo "<br/><input data-dojo-type=\"dijit.form.TextBox\" type=\"password\" name=\"auth_pass\"
-            placeHolder=\"".__("Password")."\" disabled=\"1\"
+            placeHolder=\"".__('Password')."\" disabled=\"1\"
             value=\"\">";
 
-        $this->renderBatchEditCheckbox("auth_pass");
+        $this->renderBatchEditCheckbox('auth_pass');
 
-        echo "</div>";
-        echo "<div class=\"dlgSec\">".__("Options")."</div>";
+        echo '</div>';
+        echo "<div class=\"dlgSec\">".__('Options').'</div>';
         echo "<div class=\"dlgSecCont\">";
 
         echo "<input disabled=\"1\" type=\"checkbox\" name=\"private\" id=\"private\"
-            data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label id=\"private_l\" class='insensitive' for=\"private\">".__('Hide from Popular feeds')."</label>";
+            data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label id=\"private_l\" class='insensitive' for=\"private\">".__('Hide from Popular feeds').'</label>';
 
-        echo "&nbsp;";
-        $this->renderBatchEditCheckbox("private", "private_l");
+        echo '&nbsp;';
+        $this->renderBatchEditCheckbox('private', 'private_l');
 
         echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"include_in_digest\"
             name=\"include_in_digest\"
-            data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label id=\"include_in_digest_l\" class='insensitive' for=\"include_in_digest\">".__('Include in e-mail digest')."</label>";
+            data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label id=\"include_in_digest_l\" class='insensitive' for=\"include_in_digest\">".__('Include in e-mail digest').'</label>';
 
-        echo "&nbsp;";
-        $this->renderBatchEditCheckbox("include_in_digest", "include_in_digest_l");
+        echo '&nbsp;';
+        $this->renderBatchEditCheckbox('include_in_digest', 'include_in_digest_l');
 
         echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"always_display_enclosures\"
             name=\"always_display_enclosures\"
-            data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label id=\"always_display_enclosures_l\" class='insensitive' for=\"always_display_enclosures\">".__('Always display image attachments')."</label>";
+            data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label id=\"always_display_enclosures_l\" class='insensitive' for=\"always_display_enclosures\">".__('Always display image attachments').'</label>';
 
-        echo "&nbsp;";
-        $this->renderBatchEditCheckbox("always_display_enclosures", "always_display_enclosures_l");
+        echo '&nbsp;';
+        $this->renderBatchEditCheckbox('always_display_enclosures', 'always_display_enclosures_l');
 
         echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"hide_images\"
             name=\"hide_images\"
             data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label class='insensitive' id=\"hide_images_l\"
             for=\"hide_images\">".
-            __('Do not embed images')."</label>";
+            __('Do not embed images').'</label>';
 
-        echo "&nbsp;";
-        $this->renderBatchEditCheckbox("hide_images", "hide_images_l");
+        echo '&nbsp;';
+        $this->renderBatchEditCheckbox('hide_images', 'hide_images_l');
 
         echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"cache_images\"
             name=\"cache_images\"
             data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label class='insensitive' id=\"cache_images_l\"
             for=\"cache_images\">".
-            __('Cache images locally')."</label>";
+            __('Cache images locally').'</label>';
 
-        echo "&nbsp;";
-        $this->renderBatchEditCheckbox("cache_images", "cache_images_l");
+        echo '&nbsp;';
+        $this->renderBatchEditCheckbox('cache_images', 'cache_images_l');
 
         echo "<br/><input disabled=\"1\" type=\"checkbox\" id=\"mark_unread_on_update\"
             name=\"mark_unread_on_update\"
-            data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label id=\"mark_unread_on_update_l\" class='insensitive' for=\"mark_unread_on_update\">".__('Mark updated articles as unread')."</label>";
+            data-dojo-type=\"dijit.form.CheckBox\">&nbsp;<label id=\"mark_unread_on_update_l\" class='insensitive' for=\"mark_unread_on_update\">".__('Mark updated articles as unread').'</label>';
 
-        echo "&nbsp;";
-        $this->renderBatchEditCheckbox("mark_unread_on_update", "mark_unread_on_update_l");
+        echo '&nbsp;';
+        $this->renderBatchEditCheckbox('mark_unread_on_update', 'mark_unread_on_update_l');
 
-        echo "</div>";
+        echo '</div>';
 
         echo "<div class='dlgButtons'>
             <button data-dojo-type=\"dijit.form.Button\"
@@ -970,8 +973,8 @@ class Pref_Feeds extends ProtectedHandler
             __('Save')."</button>
             <button data-dojo-type=\"dijit.form.Button\"
             onclick=\"return dijit.byId('feedEditDlg').hide()\">".
-            __('Cancel')."</button>
-            </div>";
+            __('Cancel').'</button>
+            </div>';
 
         return;
     }
@@ -989,31 +992,31 @@ class Pref_Feeds extends ProtectedHandler
     public function editsaveops($batch)
     {
 
-        $feed_title = \SmallSmallRSS\Database::escape_string(trim($_POST["title"]));
-        $feed_link = \SmallSmallRSS\Database::escape_string(trim($_POST["feed_url"]));
-        $upd_intl = (int) \SmallSmallRSS\Database::escape_string($_POST["update_interval"]);
-        $purge_intl = (int) \SmallSmallRSS\Database::escape_string($_POST["purge_interval"]);
-        $feed_id = (int) \SmallSmallRSS\Database::escape_string($_POST["id"]); /* editSave */
-        $feed_ids = \SmallSmallRSS\Database::escape_string($_POST["ids"]); /* batchEditSave */
-        $cat_id = (int) \SmallSmallRSS\Database::escape_string($_POST["cat_id"]);
-        $auth_login = \SmallSmallRSS\Database::escape_string(trim($_POST["auth_login"]));
-        $auth_pass = trim($_POST["auth_pass"]);
-        $private = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_POST["private"]));
+        $feed_title = \SmallSmallRSS\Database::escape_string(trim($_POST['title']));
+        $feed_link = \SmallSmallRSS\Database::escape_string(trim($_POST['feed_url']));
+        $upd_intl = (int) \SmallSmallRSS\Database::escape_string($_POST['update_interval']);
+        $purge_intl = (int) \SmallSmallRSS\Database::escape_string($_POST['purge_interval']);
+        $feed_id = (int) \SmallSmallRSS\Database::escape_string($_POST['id']); /* editSave */
+        $feed_ids = \SmallSmallRSS\Database::escape_string($_POST['ids']); /* batchEditSave */
+        $cat_id = (int) \SmallSmallRSS\Database::escape_string($_POST['cat_id']);
+        $auth_login = \SmallSmallRSS\Database::escape_string(trim($_POST['auth_login']));
+        $auth_pass = trim($_POST['auth_pass']);
+        $private = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_POST['private']));
         $include_in_digest = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST["include_in_digest"])
+            \SmallSmallRSS\Database::escape_string($_POST['include_in_digest'])
         );
         $cache_images = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST["cache_images"])
+            \SmallSmallRSS\Database::escape_string($_POST['cache_images'])
         );
         $hide_images = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST["hide_images"])
+            \SmallSmallRSS\Database::escape_string($_POST['hide_images'])
         );
         $always_display_enclosures = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST["always_display_enclosures"])
+            \SmallSmallRSS\Database::escape_string($_POST['always_display_enclosures'])
         );
 
         $mark_unread_on_update = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST["mark_unread_on_update"])
+            \SmallSmallRSS\Database::escape_string($_POST['mark_unread_on_update'])
         );
 
         if (\SmallSmallRSS\Crypt::is_enabled()) {
@@ -1034,8 +1037,8 @@ class Pref_Feeds extends ProtectedHandler
                 $category_qpart_nocomma = 'cat_id = NULL';
             }
         } else {
-            $category_qpart = "";
-            $category_qpart_nocomma = "";
+            $category_qpart = '';
+            $category_qpart_nocomma = '';
         }
 
         if (!$batch) {
@@ -1055,7 +1058,7 @@ class Pref_Feeds extends ProtectedHandler
                 include_in_digest = $include_in_digest,
                 always_display_enclosures = $always_display_enclosures,
                 mark_unread_on_update = $mark_unread_on_update
-            WHERE id = '$feed_id' AND owner_uid = " . $_SESSION["uid"]
+            WHERE id = '$feed_id' AND owner_uid = " . $_SESSION['uid']
             );
 
             \SmallSmallRSS\PluginHost::getInstance()->runHooks(
@@ -1067,68 +1070,68 @@ class Pref_Feeds extends ProtectedHandler
             $feed_data = array();
 
             foreach (array_keys($_POST) as $k) {
-                if ($k != "op" && $k != "method" && $k != "ids") {
+                if ($k != 'op' && $k != 'method' && $k != 'ids') {
                     $feed_data[$k] = $_POST[$k];
                 }
             }
 
-            \SmallSmallRSS\Database::query("BEGIN");
+            \SmallSmallRSS\Database::query('BEGIN');
 
             foreach (array_keys($feed_data) as $k) {
 
-                $qpart = "";
+                $qpart = '';
 
                 switch ($k) {
-                    case "title":
+                    case 'title':
                         $qpart = "title = '$feed_title'";
                         break;
 
-                    case "feed_url":
+                    case 'feed_url':
                         $qpart = "feed_url = '$feed_link'";
                         break;
 
-                    case "update_interval":
+                    case 'update_interval':
                         $qpart = "update_interval = '$upd_intl'";
                         break;
 
-                    case "purge_interval":
+                    case 'purge_interval':
                         $qpart = "purge_interval = '$purge_intl'";
                         break;
 
-                    case "auth_login":
+                    case 'auth_login':
                         $qpart = "auth_login = '$auth_login'";
                         break;
 
-                    case "auth_pass":
+                    case 'auth_pass':
                         $qpart = "auth_pass = '$auth_pass' AND
                             auth_pass_encrypted = $auth_pass_encrypted";
                         break;
 
-                    case "private":
+                    case 'private':
                         $qpart = "private = $private";
                         break;
 
-                    case "include_in_digest":
+                    case 'include_in_digest':
                         $qpart = "include_in_digest = $include_in_digest";
                         break;
 
-                    case "always_display_enclosures":
+                    case 'always_display_enclosures':
                         $qpart = "always_display_enclosures = $always_display_enclosures";
                         break;
 
-                    case "mark_unread_on_update":
+                    case 'mark_unread_on_update':
                         $qpart = "mark_unread_on_update = $mark_unread_on_update";
                         break;
 
-                    case "cache_images":
+                    case 'cache_images':
                         $qpart = "cache_images = $cache_images";
                         break;
 
-                    case "hide_images":
+                    case 'hide_images':
                         $qpart = "hide_images = $hide_images";
                         break;
 
-                    case "cat_id":
+                    case 'cat_id':
                         $qpart = $category_qpart_nocomma;
                         break;
 
@@ -1137,13 +1140,13 @@ class Pref_Feeds extends ProtectedHandler
                 if ($qpart) {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_feeds SET $qpart WHERE id IN ($feed_ids)
-                        AND owner_uid = " . $_SESSION["uid"]
+                        AND owner_uid = " . $_SESSION['uid']
                     );
-                    echo "<br/>";
+                    echo '<br/>';
                 }
             }
 
-            \SmallSmallRSS\Database::query("COMMIT");
+            \SmallSmallRSS\Database::query('COMMIT');
         }
         return;
     }
@@ -1151,11 +1154,11 @@ class Pref_Feeds extends ProtectedHandler
     public function resetPubSub()
     {
 
-        $ids = $this->getSQLEscapedStringFromRequest("ids");
+        $ids = $this->getSQLEscapedStringFromRequest('ids');
 
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_feeds SET pubsub_state = 0 WHERE id IN ($ids)
-            AND owner_uid = " . $_SESSION["uid"]
+            AND owner_uid = " . $_SESSION['uid']
         );
 
         return;
@@ -1164,10 +1167,10 @@ class Pref_Feeds extends ProtectedHandler
     public function remove()
     {
 
-        $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
+        $ids = explode(',', $this->getSQLEscapedStringFromRequest('ids'));
 
         foreach ($ids as $id) {
-            Pref_Feeds::removeFeed($id, $_SESSION["uid"]);
+            Pref_Feeds::removeFeed($id, $_SESSION['uid']);
         }
 
         return;
@@ -1175,22 +1178,22 @@ class Pref_Feeds extends ProtectedHandler
 
     public function clear()
     {
-        $id = $this->getSQLEscapedStringFromRequest("id");
+        $id = $this->getSQLEscapedStringFromRequest('id');
         $this->clearFeedArticles($id);
     }
 
     public function rescore()
     {
-        $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
+        $ids = explode(',', $this->getSQLEscapedStringFromRequest('ids'));
 
         foreach ($ids as $id) {
 
-            $filters = load_filters($id, $_SESSION["uid"], 6);
+            $filters = load_filters($id, $_SESSION['uid'], 6);
             $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $result = \SmallSmallRSS\Database::query(
-                "SELECT
+                'SELECT
                      title, content, link, ref_id, author,
-                 " . $substring_for_date . "(updated, 1, 19) AS updated
+                 ' . $substring_for_date . "(updated, 1, 19) AS updated
                  FROM
                      ttrss_user_entries, ttrss_entries
                  WHERE
@@ -1200,7 +1203,7 @@ class Pref_Feeds extends ProtectedHandler
             );
             $scores = array();
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-                $tags = get_article_tags($line["ref_id"]);
+                $tags = get_article_tags($line['ref_id']);
                 $article_filters = \SmallSmallRSS\ArticleFilters::get(
                     $filters,
                     $line['title'],
@@ -1225,24 +1228,24 @@ class Pref_Feeds extends ProtectedHandler
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries SET score = '$s',
                         marked = true WHERE
-                        ref_id IN (" . join(',', $scores[$s]) . ")"
+                        ref_id IN (" . join(',', $scores[$s]) . ')'
                     );
                 } elseif ($s < -500) {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries SET score = '$s',
                         unread = false WHERE
-                        ref_id IN (" . join(',', $scores[$s]) . ")"
+                        ref_id IN (" . join(',', $scores[$s]) . ')'
                     );
                 } else {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries SET score = '$s' WHERE
-                        ref_id IN (" . join(',', $scores[$s]) . ")"
+                        ref_id IN (" . join(',', $scores[$s]) . ')'
                     );
                 }
             }
         }
 
-        echo __("All done.");
+        echo __('All done.');
 
     }
 
@@ -1250,17 +1253,17 @@ class Pref_Feeds extends ProtectedHandler
     {
 
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id FROM ttrss_feeds WHERE owner_uid = " . $_SESSION['uid']
+            'SELECT id FROM ttrss_feeds WHERE owner_uid = ' . $_SESSION['uid']
         );
 
         while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            $id = $feed_line["id"];
-            $filters = load_filters($id, $_SESSION["uid"], 6);
+            $id = $feed_line['id'];
+            $filters = load_filters($id, $_SESSION['uid'], 6);
             $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
             $tmp_result = \SmallSmallRSS\Database::query(
-                "SELECT
+                'SELECT
                      title, content, link, ref_id, author,
-                 " . $substring_for_date . "(updated, 1, 19) AS updated
+                 ' . $substring_for_date . "(updated, 1, 19) AS updated
                  FROM
                      ttrss_user_entries, ttrss_entries
                  WHERE
@@ -1270,7 +1273,7 @@ class Pref_Feeds extends ProtectedHandler
             );
             $scores = array();
             while ($line = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
-                $tags = get_article_tags($line["ref_id"]);
+                $tags = get_article_tags($line['ref_id']);
                 $article_filters = \SmallSmallRSS\ArticleFilters::get(
                     $filters,
                     $line['title'],
@@ -1292,26 +1295,26 @@ class Pref_Feeds extends ProtectedHandler
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries SET score = '$s',
                         marked = true WHERE
-                        ref_id IN (" . join(',', $scores[$s]) . ")"
+                        ref_id IN (" . join(',', $scores[$s]) . ')'
                     );
                 } else {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries SET score = '$s' WHERE
-                        ref_id IN (" . join(',', $scores[$s]) . ")"
+                        ref_id IN (" . join(',', $scores[$s]) . ')'
                     );
                 }
             }
         }
 
-        echo __("All done.");
+        echo __('All done.');
 
     }
 
     public function categorize()
     {
-        $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
+        $ids = explode(',', $this->getSQLEscapedStringFromRequest('ids'));
 
-        $cat_id = $this->getSQLEscapedStringFromRequest("cat_id");
+        $cat_id = $this->getSQLEscapedStringFromRequest('cat_id');
 
         if ($cat_id == 0) {
             $cat_id_qpart = 'NULL';
@@ -1319,32 +1322,32 @@ class Pref_Feeds extends ProtectedHandler
             $cat_id_qpart = "'$cat_id'";
         }
 
-        \SmallSmallRSS\Database::query("BEGIN");
+        \SmallSmallRSS\Database::query('BEGIN');
 
         foreach ($ids as $id) {
 
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds SET cat_id = $cat_id_qpart
                 WHERE id = '$id'
-                  AND owner_uid = " . $_SESSION["uid"]
+                  AND owner_uid = " . $_SESSION['uid']
             );
 
         }
 
-        \SmallSmallRSS\Database::query("COMMIT");
+        \SmallSmallRSS\Database::query('COMMIT');
     }
 
     public function removeCat()
     {
-        $ids = explode(",", $this->getSQLEscapedStringFromRequest("ids"));
+        $ids = explode(',', $this->getSQLEscapedStringFromRequest('ids'));
         foreach ($ids as $id) {
-            $this->removeFeedCategory($id, $_SESSION["uid"]);
+            $this->removeFeedCategory($id, $_SESSION['uid']);
         }
     }
 
     public function addCat()
     {
-        $feed_cat = \SmallSmallRSS\Database::escape_string(trim($_REQUEST["cat"]));
+        $feed_cat = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['cat']));
 
         \SmallSmallRSS\FeedCategories::add($feed_cat);
     }
@@ -1356,23 +1359,23 @@ class Pref_Feeds extends ProtectedHandler
         echo "<div id=\"pref-feeds-feeds\" data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__('Feeds')."\">";
 
         $result = \SmallSmallRSS\Database::query(
-            "SELECT COUNT(id) AS num_errors
-            FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
+            'SELECT COUNT(id) AS num_errors
+             FROM ttrss_feeds WHERE last_error != \'\' AND owner_uid = ' . $_SESSION['uid']
         );
 
-        $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, "num_errors");
+        $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_errors');
 
         if ($num_errors > 0) {
 
             $error_button = "<button data-dojo-type=\"dijit.form.Button\"
                       onclick=\"showFeedsWithErrors()\" id=\"errorButton\">" .
-                __("Feeds with errors") . "</button>";
+                __('Feeds with errors') . '</button>';
         }
 
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
             $interval_qpart = "NOW() - INTERVAL '3 months'";
         } else {
-            $interval_qpart = "DATE_SUB(NOW(), INTERVAL 3 MONTH)";
+            $interval_qpart = 'DATE_SUB(NOW(), INTERVAL 3 MONTH)';
         }
 
         $result = \SmallSmallRSS\Database::query(
@@ -1380,23 +1383,23 @@ class Pref_Feeds extends ProtectedHandler
                     (SELECT MAX(updated) FROM ttrss_entries, ttrss_user_entries WHERE
                         ttrss_entries.id = ref_id AND
                             ttrss_user_entries.feed_id = ttrss_feeds.id) < $interval_qpart AND
-            ttrss_feeds.owner_uid = ".$_SESSION["uid"]
+            ttrss_feeds.owner_uid = ".$_SESSION['uid']
         );
 
-        $num_inactive = \SmallSmallRSS\Database::fetch_result($result, 0, "num_inactive");
+        $num_inactive = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_inactive');
 
         if ($num_inactive > 0) {
             $inactive_button = "<button data-dojo-type=\"dijit.form.Button\"
                       onclick=\"showInactiveFeeds()\">" .
-                __("Inactive feeds") . "</button>";
+                __('Inactive feeds') . '</button>';
         }
 
-        $feed_search = $this->getSQLEscapedStringFromRequest("search");
+        $feed_search = $this->getSQLEscapedStringFromRequest('search');
 
-        if (array_key_exists("search", $_REQUEST)) {
-            $_SESSION["prefs_feed_search"] = $feed_search;
-        } elseif (isset($_SESSION["prefs_feed_search"])) {
-            $feed_search = $_SESSION["prefs_feed_search"];
+        if (array_key_exists('search', $_REQUEST)) {
+            $_SESSION['prefs_feed_search'] = $feed_search;
+        } elseif (isset($_SESSION['prefs_feed_search'])) {
+            $feed_search = $_SESSION['prefs_feed_search'];
         }
 
         echo '<div data-dojo-type="dijit.layout.BorderContainer" gutters="false">';
@@ -1407,44 +1410,44 @@ class Pref_Feeds extends ProtectedHandler
             <input data-dojo-type=\"dijit.form.TextBox\" id=\"feed_search\" size=\"20\" type=\"search\"
                 value=\"$feed_search\">
             <button data-dojo-type=\"dijit.form.Button\" onclick=\"updateFeedList()\">".
-            __('Search')."</button>
-            </div>";
+            __('Search').'</button>
+            </div>';
 
         echo "<div data-dojo-type=\"dijit.form.DropDownButton\">".
-            "<span>" . __('Select')."</span>";
+            '<span>' . __('Select').'</span>';
         echo "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
         echo "<div onclick=\"dijit.byId('feedTree').model.setAllChecked(true)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('All')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('All').'</div>';
         echo "<div onclick=\"dijit.byId('feedTree').model.setAllChecked(false)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('None')."</div>";
-        echo "</div></div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
+        echo '</div></div>';
 
         echo "<div data-dojo-type=\"dijit.form.DropDownButton\">".
-            "<span>" . __('Feeds')."</span>";
+            '<span>' . __('Feeds').'</span>';
         echo "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
         echo "<div onclick=\"quickAddFeed()\"
-            data-dojo-type=\"dijit.MenuItem\">".__('Subscribe to feed')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('Subscribe to feed').'</div>';
         echo "<div onclick=\"editSelectedFeed()\"
-            data-dojo-type=\"dijit.MenuItem\">".__('Edit selected feeds')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('Edit selected feeds').'</div>';
         echo "<div onclick=\"resetFeedOrder()\"
-            data-dojo-type=\"dijit.MenuItem\">".__('Reset sort order')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('Reset sort order').'</div>';
         echo "<div onclick=\"batchSubscribe()\"
-            data-dojo-type=\"dijit.MenuItem\">".__('Batch subscribe')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('Batch subscribe').'</div>';
         echo "<div data-dojo-type=\"dijit.MenuItem\" onclick=\"removeSelectedFeeds()\">"
-            .__('Unsubscribe')."</div> ";
-        echo "</div></div>";
+            .__('Unsubscribe').'</div> ';
+        echo '</div></div>';
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
             echo "<div data-dojo-type=\"dijit.form.DropDownButton\">".
-                "<span>" . __('Categories')."</span>";
+                '<span>' . __('Categories').'</span>';
             echo "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
             echo "<div onclick=\"createCategory()\"
-                data-dojo-type=\"dijit.MenuItem\">".__('Add category')."</div>";
+                data-dojo-type=\"dijit.MenuItem\">".__('Add category').'</div>';
             echo "<div onclick=\"resetCatOrder()\"
-                data-dojo-type=\"dijit.MenuItem\">".__('Reset sort order')."</div>";
+                data-dojo-type=\"dijit.MenuItem\">".__('Reset sort order').'</div>';
             echo "<div onclick=\"removeSelectedCategories()\"
-                data-dojo-type=\"dijit.MenuItem\">".__('Remove selected')."</div>";
-            echo "</div></div>";
+                data-dojo-type=\"dijit.MenuItem\">".__('Remove selected').'</div>';
+            echo '</div></div>';
 
         }
 
@@ -1454,28 +1457,28 @@ class Pref_Feeds extends ProtectedHandler
         if (defined('_ENABLE_FEED_DEBUGGING')) {
 
             echo "<select id=\"feedActionChooser\" onchange=\"feedActionChange()\">
-                <option value=\"facDefault\" selected>".__('More actions...')."</option>";
+                <option value=\"facDefault\" selected>".__('More actions...').'</option>';
 
             if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
-                echo "<option value=\"facPurge\">".__('Manual purge')."</option>";
+                echo "<option value=\"facPurge\">".__('Manual purge').'</option>';
             }
 
             echo "
                 <option value=\"facClear\">".__('Clear feed data')."</option>
-                <option value=\"facRescore\">".__('Rescore articles')."</option>";
+                <option value=\"facRescore\">".__('Rescore articles').'</option>';
 
-            echo "</select>";
+            echo '</select>';
 
         }
 
-        echo "</div>"; # toolbar
+        echo '</div>'; # toolbar
 
         //print '</div>';
-        echo '<div data-dojo-type="dijit.layout.ContentPane" region="center">';
+        echo '<div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: \'center\'">';
 
         echo "<div id=\"feedlistLoading\">
         <img src='images/indicator_tiny.gif'>".
-            __("Loading, please wait...")."</div>";
+            __('Loading, please wait...').'</div>';
 
         echo "<div data-dojo-type=\"fox.PrefFeedStore\" jsId=\"feedStore\"
             url=\"backend.php?op=pref-feeds&method=getfeedtree\">
@@ -1506,13 +1509,13 @@ class Pref_Feeds extends ProtectedHandler
         echo '</div>';
         echo '</div>';
 
-        echo "</div>"; # feeds pane
+        echo '</div>'; # feeds pane
 
         echo "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__('OPML')."\">";
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            __("Using OPML you can export and import your feeds, filters, labels and Tiny Tiny RSS settings.")
-            . __("Only main settings profile can be migrated using OPML.")
+            __('Using OPML you can export and import your feeds, filters, labels and Tiny Tiny RSS settings.')
+            . __('Only main settings profile can be migrated using OPML.')
         );
 
         echo "<iframe id=\"upload_iframe\"
@@ -1526,112 +1529,107 @@ class Pref_Feeds extends ProtectedHandler
             <input type=\"hidden\" name=\"op\" value=\"dlg\">
             <input type=\"hidden\" name=\"method\" value=\"importOpml\">
             <button data-dojo-type=\"dijit.form.Button\" onclick=\"return opmlImport();\" type=\"submit\">" .
-            __('Import my OPML') . "</button>";
+            __('Import my OPML') . '</button>';
 
-        echo "<hr>";
+        echo '<hr>';
 
-        echo "<p>" . __('Filename:') .
+        echo '<p>' . __('Filename:') .
             " <input type=\"text\" id=\"filename\" value=\"TinyTinyRSS.opml\" />&nbsp;" .
             __('Include settings') . "<input type=\"checkbox\" id=\"settings\" checked=\"1\"/>";
 
         echo "</p><button data-dojo-type=\"dijit.form.Button\"
             onclick=\"gotoExportOpml(document.opml_form.filename.value, document.opml_form.settings.checked)\" >" .
-            __('Export OPML') . "</button></p></form>";
+            __('Export OPML') . '</button></p></form>';
 
-        echo "<hr>";
+        echo '<hr>';
 
-        echo "<p>";
-        echo __('Your OPML can be published publicly and can be subscribed by anyone who knows the URL below.') . " ";
+        echo '<p>';
+        echo __('Your OPML can be published publicly and can be subscribed by anyone who knows the URL below.') . ' ';
 
-        echo __("Published OPML does not include your Tiny Tiny RSS settings, feeds that require authentication or feeds hidden from Popular feeds.");
-        echo "</p>";
+        echo __('Published OPML does not include your Tiny Tiny RSS settings, feeds that require authentication or feeds hidden from Popular feeds.');
+        echo '</p>';
 
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return displayDlg('";
-        echo __("Public OPML URL")."','pubOPMLUrl')\">";
-        echo __('Display published OPML URL')."</button> ";
+        echo __('Public OPML URL')."','pubOPMLUrl')\">";
+        echo __('Display published OPML URL').'</button> ';
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
-            "prefFeedsOPML"
+            'prefFeedsOPML'
         );
 
-        echo "</div>"; # pane
+        echo '</div>'; # pane
 
-        if (strpos($_SERVER['HTTP_USER_AGENT'], "Firefox") !== false) {
-
+        if (strpos($_SERVER['HTTP_USER_AGENT'], 'Firefox') !== false) {
             echo "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__('Firefox integration')."\">";
-
             \SmallSmallRSS\Renderers\Messages::renderNotice(
                 __('This Tiny Tiny RSS site can be used as a Firefox Feed Reader by clicking the link below.')
             );
-
-            echo "<p>";
-
-            echo "<button onclick='window.navigator.registerContentHandler(" .
-                "\"application/vnd.mozilla.maybe.feed\", " .
-                "\"" . add_feed_url() . "\", " . " \"Tiny Tiny RSS\")'>" .
-                __('Click here to register this site as a feed reader.') .
-                "</button>";
-
-            echo "</p>";
-
-            echo "</div>"; # pane
+            echo '<p>';
+            echo '<button onclick="window.navigator.registerContentHandler(\'' .
+                '"application/vnd.mozilla.maybe.feed", "'
+                . add_feed_url()
+                . '", '
+                . ' "Tiny Tiny RSS")">'
+                . __('Click here to register this site as a feed reader.')
+                . '</button>';
+            echo '</p>';
+            echo '</div>';
         }
-
-        echo "<div data-dojo-type=\"dijit.layout.AccordionPane\" title=\"".__('Published & shared articles / Generated feeds')."\">";
-
+        echo '<div data-dojo-type="dijit.layout.AccordionPane" title="';
+        echo __('Published & shared articles / Generated feeds');
+        "\">";
         \SmallSmallRSS\Renderers\Messages::renderNotice(
             __('Published articles are exported as a public RSS feed and can be subscribed by anyone who knows the URL specified below.')
         );
 
         $rss_url = '-2::' . htmlspecialchars(
             get_self_url_prefix() .
-            "/public.php?op=rss&id=-2&view-mode=all_articles"
+            '/public.php?op=rss&id=-2&view-mode=all_articles'
         );
 
-        echo "<p>";
+        echo '<p>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return displayDlg('".__("View as RSS")."','generatedFeed', '$rss_url')\">".
-            __('Display URL')."</button> ";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return displayDlg('".__('View as RSS')."','generatedFeed', '$rss_url')\">".
+            __('Display URL').'</button> ';
 
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return clearFeedAccessKeys()\">".
-            __('Clear all generated URLs')."</button> ";
+            __('Clear all generated URLs').'</button> ';
 
-        echo "</p>";
+        echo '</p>';
 
         \SmallSmallRSS\Renderers\Messages::renderWarning(
-            __("You can disable all articles shared by unique URLs here.")
+            __('You can disable all articles shared by unique URLs here.')
         );
 
-        echo "<p>";
+        echo '<p>';
 
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return clearArticleAccessKeys()\">".
-            __('Unshare all articles')."</button> ";
+            __('Unshare all articles').'</button> ';
 
-        echo "</p>";
+        echo '</p>';
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
-            "prefFeedsPublishedGenerated"
+            'prefFeedsPublishedGenerated'
         );
 
-        echo "</div>"; #pane
+        echo '</div>'; #pane
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::RENDER_PREFS_TAB,
-            "prefFeeds"
+            'prefFeeds'
         );
 
-        echo "</div>"; #container
+        echo '</div>'; #container
     }
 
-    private function initFeedlistCat($cat_id)
-    {
+    private function initFeedlistCat($cat_id) {
         $obj = array();
         $cat_id = (int) $cat_id;
 
         if ($cat_id > 0) {
-            $cat_unread = \SmallSmallRSS\CountersCache::find($cat_id, $_SESSION["uid"], true);
+            $cat_unread = \SmallSmallRSS\CountersCache::find($cat_id, $_SESSION['uid'], true);
         } elseif ($cat_id == 0 || $cat_id == -2) {
             $cat_unread = getCategoryUnread($cat_id);
         } else {
@@ -1677,10 +1675,10 @@ class Pref_Feeds extends ProtectedHandler
     public function inactiveFeeds()
     {
 
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
             $interval_qpart = "NOW() - INTERVAL '3 months'";
         } else {
-            $interval_qpart = "DATE_SUB(NOW(), INTERVAL 3 MONTH)";
+            $interval_qpart = 'DATE_SUB(NOW(), INTERVAL 3 MONTH)';
         }
 
         $result = \SmallSmallRSS\Database::query(
@@ -1690,25 +1688,25 @@ class Pref_Feeds extends ProtectedHandler
                 (SELECT MAX(updated) FROM ttrss_entries, ttrss_user_entries WHERE
                     ttrss_entries.id = ref_id AND
                         ttrss_user_entries.feed_id = ttrss_feeds.id) < $interval_qpart
-            AND ttrss_feeds.owner_uid = ".$_SESSION["uid"]." AND
+            AND ttrss_feeds.owner_uid = ".$_SESSION['uid'].' AND
                 ttrss_user_entries.feed_id = ttrss_feeds.id AND
                 ttrss_entries.id = ref_id
             GROUP BY ttrss_feeds.title, ttrss_feeds.id, ttrss_feeds.site_url, ttrss_feeds.feed_url
-            ORDER BY last_article"
+            ORDER BY last_article'
         );
 
-        echo "<p" .__("These feeds have not been updated with new content for 3 months (oldest first):") . "</p>";
+        echo '<p' .__('These feeds have not been updated with new content for 3 months (oldest first):') . '</p>';
 
         echo "<div data-dojo-type=\"dijit.Toolbar\">";
         echo "<div data-dojo-type=\"dijit.form.DropDownButton\">".
-            "<span>" . __('Select')."</span>";
+            '<span>' . __('Select').'</span>';
         echo "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
         echo "<div onclick=\"selectTableRows('prefInactiveFeedList', 'all')\"
-            data-dojo-type=\"dijit.MenuItem\">".__('All')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('All').'</div>';
         echo "<div onclick=\"selectTableRows('prefInactiveFeedList', 'none')\"
-            data-dojo-type=\"dijit.MenuItem\">".__('None')."</div>";
-        echo "</div></div>";
-        echo "</div>"; #toolbar
+            data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
+        echo '</div></div>';
+        echo '</div>'; #toolbar
 
         echo "<div class=\"inactiveFeedHolder\">";
 
@@ -1718,46 +1716,47 @@ class Pref_Feeds extends ProtectedHandler
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
-            $feed_id = $line["id"];
+            $feed_id = $line['id'];
             $this_row_id = "id=\"FUPDD-$feed_id\"";
 
             # class needed for selectTableRows()
             echo "<tr class=\"placeholder\" $this_row_id>";
 
-            $edit_title = htmlspecialchars($line["title"]);
+            $edit_title = htmlspecialchars($line['title']);
 
             # id needed for selectTableRows()
             echo "<td width='5%' align='center'><input
                 onclick='toggleSelectRow2(this);' data-dojo-type=\"dijit.form.CheckBox\"
                 type=\"checkbox\" id=\"FUPDC-$feed_id\"></td>";
-            echo "<td>";
+            echo '<td>';
 
             echo "<a class=\"visibleLink\" href=\"#\" ".
-                "title=\"".__("Click to edit feed")."\" ".
-                "onclick=\"editFeed(".$line["id"].")\">".
-                htmlspecialchars($line["title"])."</a>";
+                "title=\"".__('Click to edit feed')."\" ".
+                "onclick=\"editFeed(".$line['id'].")\">".
+                htmlspecialchars($line['title']).'</a>';
 
             echo "</td><td class=\"insensitive\" align='right'>";
             echo make_local_datetime($line['last_article'], false);
-            echo "</td>";
-            echo "</tr>";
+            echo '</td>';
+            echo '</tr>';
 
             ++$lnum;
         }
 
-        echo "</table>";
-        echo "</div>";
+        echo '</table>';
+        echo '</div>';
 
-        echo "<div class='dlgButtons'>";
-        echo "<div style='float: left'>";
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').removeSelected()\">"
-            .__('Unsubscribe from selected feeds')."</button> ";
-        echo "</div>";
+        echo '<div class="dlgButtons">';
+        echo '<div style="float: left">';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').removeSelected()\">";
+        echo __('Unsubscribe from selected feeds');
+        echo '</button> ';
+        echo '</div>';
 
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').hide()\">".
-            __('Close this window')."</button>";
+            __('Close this window').'</button>';
 
-        echo "</div>";
+        echo '</div>';
 
     }
 
@@ -1765,19 +1764,19 @@ class Pref_Feeds extends ProtectedHandler
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT id,title,feed_url,last_error,site_url
-        FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION["uid"]
+             FROM ttrss_feeds WHERE last_error != '' AND owner_uid = " . $_SESSION['uid']
         );
 
         echo "<div data-dojo-type=\"dijit.Toolbar\">";
         echo "<div data-dojo-type=\"dijit.form.DropDownButton\">".
-            "<span>" . __('Select')."</span>";
+            '<span>' . __('Select').'</span>';
         echo "<div data-dojo-type=\"dijit.Menu\" style=\"display: none;\">";
         echo "<div onclick=\"selectTableRows('prefErrorFeedList', 'all')\"
-            data-dojo-type=\"dijit.MenuItem\">".__('All')."</div>";
+            data-dojo-type=\"dijit.MenuItem\">".__('All').'</div>';
         echo "<div onclick=\"selectTableRows('prefErrorFeedList', 'none')\"
-            data-dojo-type=\"dijit.MenuItem\">".__('None')."</div>";
-        echo "</div></div>";
-        echo "</div>"; #toolbar
+            data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
+        echo '</div></div>';
+        echo '</div>'; #toolbar
 
         echo "<div class=\"inactiveFeedHolder\">";
 
@@ -1787,48 +1786,48 @@ class Pref_Feeds extends ProtectedHandler
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
 
-            $feed_id = $line["id"];
+            $feed_id = $line['id'];
             $this_row_id = "id=\"FERDD-$feed_id\"";
 
             # class needed for selectTableRows()
             echo "<tr class=\"placeholder\" $this_row_id>";
 
-            $edit_title = htmlspecialchars($line["title"]);
+            $edit_title = htmlspecialchars($line['title']);
 
             # id needed for selectTableRows()
             echo "<td width='5%' align='center'><input
                 onclick='toggleSelectRow2(this);' data-dojo-type=\"dijit.form.CheckBox\"
                 type=\"checkbox\" id=\"FERDC-$feed_id\"></td>";
-            echo "<td>";
+            echo '<td>';
 
             echo "<a class=\"visibleLink\" href=\"#\" ".
-                "title=\"".__("Click to edit feed")."\" ".
-                "onclick=\"editFeed(".$line["id"].")\">".
-                htmlspecialchars($line["title"])."</a>: ";
+                "title=\"".__('Click to edit feed')."\" ".
+                "onclick=\"editFeed(".$line['id'].")\">".
+                htmlspecialchars($line['title']).'</a>: ';
 
             echo "<span class=\"insensitive\">";
-            echo htmlspecialchars($line["last_error"]);
-            echo "</span>";
+            echo htmlspecialchars($line['last_error']);
+            echo '</span>';
 
-            echo "</td>";
-            echo "</tr>";
+            echo '</td>';
+            echo '</tr>';
 
             ++$lnum;
         }
 
-        echo "</table>";
-        echo "</div>";
+        echo '</table>';
+        echo '</div>';
 
-        echo "<div class='dlgButtons'>";
-        echo "<div style='float: left'>";
+        echo '<div class="dlgButtons">';
+        echo '<div style="float: left">';
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').removeSelected()\">"
-            .__('Unsubscribe from selected feeds')."</button> ";
-        echo "</div>";
+            .__('Unsubscribe from selected feeds').'</button> ';
+        echo '</div>';
 
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').hide()\">".
-            __('Close this window')."</button>";
+            __('Close this window').'</button>';
 
-        echo "</div>";
+        echo '</div>';
     }
 
     /**
@@ -1844,22 +1843,22 @@ class Pref_Feeds extends ProtectedHandler
         if ($id != 0) {
             $result = \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_user_entries
-            WHERE feed_id = '$id' AND marked = false AND owner_uid = " . $_SESSION["uid"]
+            WHERE feed_id = '$id' AND marked = false AND owner_uid = " . $_SESSION['uid']
             );
         } else {
             $result = \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_user_entries
-            WHERE feed_id IS NULL AND marked = false AND owner_uid = " . $_SESSION["uid"]
+                'DELETE FROM ttrss_user_entries
+            WHERE feed_id IS NULL AND marked = false AND owner_uid = ' . $_SESSION['uid']
             );
         }
 
         $result = \SmallSmallRSS\Database::query(
-            "DELETE FROM ttrss_entries WHERE
-            (SELECT COUNT(int_id) FROM ttrss_user_entries WHERE ref_id = id) = 0"
+            'DELETE FROM ttrss_entries WHERE
+            (SELECT COUNT(int_id) FROM ttrss_user_entries WHERE ref_id = id) = 0'
         );
 
         \SmallSmallRSS\CountersCache::update($id, $_SESSION['uid']);
-    } // function clearFeedArticles
+    }
 
     private function removeFeedCategory($id, $owner_uid)
     {
@@ -1876,7 +1875,7 @@ class Pref_Feeds extends ProtectedHandler
     {
         if ($id > 0) {
             /* save starred articles in Archived feed */
-            \SmallSmallRSS\Database::query("BEGIN");
+            \SmallSmallRSS\Database::query('BEGIN');
             /* prepare feed if necessary */
             $result = \SmallSmallRSS\Database::query(
                 "SELECT feed_url
@@ -1886,7 +1885,7 @@ class Pref_Feeds extends ProtectedHandler
                      AND owner_uid = $owner_uid"
             );
             $feed_url = \SmallSmallRSS\Database::escape_string(
-                \SmallSmallRSS\Database::fetch_result($result, 0, "feed_url")
+                \SmallSmallRSS\Database::fetch_result($result, 0, 'feed_url')
             );
             $result = \SmallSmallRSS\Database::query(
                 "SELECT id
@@ -1896,8 +1895,8 @@ class Pref_Feeds extends ProtectedHandler
                      AND owner_uid = $owner_uid"
             );
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-                $result = \SmallSmallRSS\Database::query("SELECT MAX(id) AS id FROM ttrss_archived_feeds");
-                $new_feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "id") + 1;
+                $result = \SmallSmallRSS\Database::query('SELECT MAX(id) AS id FROM ttrss_archived_feeds');
+                $new_feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'id') + 1;
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_archived_feeds
                      (id, owner_uid, title, feed_url, site_url)
@@ -1907,7 +1906,7 @@ class Pref_Feeds extends ProtectedHandler
                 );
                 $archive_id = $new_feed_id;
             } else {
-                $archive_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+                $archive_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
             }
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries
@@ -1926,7 +1925,7 @@ class Pref_Feeds extends ProtectedHandler
                 "DELETE FROM ttrss_feeds
                  WHERE id = '$id' AND owner_uid = $owner_uid"
             );
-            \SmallSmallRSS\Database::query("COMMIT");
+            \SmallSmallRSS\Database::query('COMMIT');
             if (file_exists(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico")) {
                 unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$id.ico");
             }
@@ -1941,52 +1940,59 @@ class Pref_Feeds extends ProtectedHandler
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pref-feeds\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"batchaddfeeds\">";
 
-        echo "<table width='100%'><tr><td>
-            ".__("Add one valid RSS feed per line (no feed detection is done)")."
-        </td><td align='right'>";
+        echo '<table width="100%">';
+        echo '<tr>';
+        echo '<td>';
+        echo __('Add one valid RSS feed per line (no feed detection is done)');
+        echo '</td>';
+        echo '<td align="right">';
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
-            echo __('Place in category:') . " ";
-            print_feed_cat_select("cat", false, 'data-dojo-type="dijit.form.Select"');
+            echo __('Place in category:') . ' ';
+            print_feed_cat_select('cat', false, 'data-dojo-type="dijit.form.Select"');
         }
-        echo "</td></tr><tr><td colspan='2'>";
-        echo "<textarea
-            style='font-size: 12px; width: 100%; height: 200px;'
-            placeHolder=\"".__("Feeds to subscribe, One per line")."\"
-            data-dojo-type=\"dijit.form.SimpleTextarea\" required=\"1\" name=\"feeds\"></textarea>";
+        echo '</td>';
+        echo '</tr>';
+        echo '<tr>';
+        echo '<td colspan="2">';
+        echo '<textarea style="font-size: 12px; width: 100%; height: 200px;"';
+        echo ' placeHolder="';
+        echo __('Feeds to subscribe, One per line');
+        echo '"data-dojo-type="dijit.form.SimpleTextarea" required="1" name="feeds">';
+        echo '</textarea>';
+        echo '</td>';
+        echo '</tr>';
+        echo '<tr>';
+        echo '<td colspan="2">';
+        echo '<div id="feedDlg_loginContainer" style="display: none">';
+        echo '<input data-dojo-type="dijit.form.TextBox" name="login" placeHolder="';
+        echo __('Login');
+        echo '" style="width: 10em;">';
+        echo '<input type="password"  name="pass" placeHolder="';
+        echo __('Password');
+        echo '" data-dojo-type="dijit.form.TextBox" style="width: 10em;" />';
+        echo '</div>';
+        echo '</td></tr><tr><td colspan="2">';
 
-        echo "</td></tr><tr><td colspan='2'>";
+        echo "<div style=\"clear : both\">";
+        echo "<input type=\"checkbox\" name=\"need_auth\"";
+        echo " data-dojo-type=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"";
+        echo " onclick='checkboxToggleElement(this, \"feedDlg_loginContainer\")'>";
+        echo "<label for=\"feedDlg_loginCheck\">";
+        echo __('Feeds require authentication.');
+        echo '</div>';
 
-        echo "<div id='feedDlg_loginContainer' style='display: none'>
-                " .
-            " <input data-dojo-type=\"dijit.form.TextBox\" name='login'\"
-                    placeHolder=\"".__("Login")."\"
-                    style=\"width: 10em;\"> ".
-            " <input
-                    placeHolder=\"".__("Password")."\"
-                    data-dojo-type=\"dijit.form.TextBox\" type='password'
-                    style=\"width: 10em;\" name='pass'\">".
-            "</div>";
+        echo '</form>';
 
-        echo "</td></tr><tr><td colspan='2'>";
-
-        echo "<div style=\"clear : both\">
-            <input type=\"checkbox\" name=\"need_auth\" data-dojo-type=\"dijit.form.CheckBox\" id=\"feedDlg_loginCheck\"
-                    onclick='checkboxToggleElement(this, \"feedDlg_loginContainer\")'>
-                <label for=\"feedDlg_loginCheck\">".
-            __('Feeds require authentication.')."</div>";
-
-        echo "</form>";
-
-        echo "</td></tr></table>";
+        echo '</td></tr></table>';
 
         echo "<div class=\"dlgButtons\">";
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').execute()\">";
-        echo "__('Subscribe')";
-        echo "</button>";
+        echo __('Subscribe');
+        echo '</button>';
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('batchSubDlg').hide()\">";
         echo __('Cancel');
-        echo "</button>";
-        echo "</div>";
+        echo '</button>';
+        echo '</div>';
     }
 
     public function batchAddFeeds()
@@ -2001,17 +2007,17 @@ class Pref_Feeds extends ProtectedHandler
 
             if (validate_feed_url($feed)) {
 
-                \SmallSmallRSS\Database::query("BEGIN");
+                \SmallSmallRSS\Database::query('BEGIN');
 
-                if ($cat_id == "0" || !$cat_id) {
-                    $cat_qpart = "NULL";
+                if ($cat_id == '0' || !$cat_id) {
+                    $cat_qpart = 'NULL';
                 } else {
                     $cat_qpart = "'$cat_id'";
                 }
 
                 $result = \SmallSmallRSS\Database::query(
                     "SELECT id FROM ttrss_feeds
-                    WHERE feed_url = '$feed' AND owner_uid = ".$_SESSION["uid"]
+                    WHERE feed_url = '$feed' AND owner_uid = ".$_SESSION['uid']
                 );
 
                 if (\SmallSmallRSS\Crypt::is_enabled()) {
@@ -2027,11 +2033,11 @@ class Pref_Feeds extends ProtectedHandler
                     $result = \SmallSmallRSS\Database::query(
                         "INSERT INTO ttrss_feeds
                             (owner_uid,feed_url,title,cat_id,auth_login,auth_pass,update_method,auth_pass_encrypted)
-                        VALUES ('".$_SESSION["uid"]."', '$feed',
+                        VALUES ('" . $_SESSION['uid'] . "', '$feed',
                             '[Unknown]', $cat_qpart, '$login', '$pass', 0, $auth_pass_encrypted)"
                     );
                 }
-                \SmallSmallRSS\Database::query("COMMIT");
+                \SmallSmallRSS\Database::query('COMMIT');
             }
         }
     }
@@ -2041,38 +2047,43 @@ class Pref_Feeds extends ProtectedHandler
         $this->updateFeedAccessKey(
             'OPML:Publish',
             false,
-            $_SESSION["uid"]
+            $_SESSION['uid']
         );
         $new_link = Opml::opml_publish_url();
-        echo json_encode(array("link" => $new_link));
+        echo json_encode(array('link' => $new_link));
     }
 
     public function regenFeedKey()
     {
         $feed_id = $this->getSQLEscapedStringFromRequest('id');
-        $is_cat = $this->getSQLEscapedStringFromRequest('is_cat') == "true";
+        $is_cat = $this->getSQLEscapedStringFromRequest('is_cat') == 'true';
         $new_key = $this->updateFeedAccessKey($feed_id, $is_cat);
-        echo json_encode(array("link" => $new_key));
+        echo json_encode(array('link' => $new_key));
     }
 
 
     private function updateFeedAccessKey($feed_id, $is_cat, $owner_uid = false)
     {
         if (!$owner_uid) {
-            $owner_uid = $_SESSION["uid"];
+            $owner_uid = $_SESSION['uid'];
         }
         $sql_is_cat = bool_to_sql_bool($is_cat);
         $result = \SmallSmallRSS\Database::query(
             "SELECT access_key FROM ttrss_access_keys
-            WHERE feed_id = '$feed_id'    AND is_cat = $sql_is_cat
-            AND owner_uid = " . $owner_uid
+             WHERE
+                 feed_id = '$feed_id'
+                 AND is_cat = $sql_is_cat
+                 AND owner_uid = " . $owner_uid
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             $key = \SmallSmallRSS\Database::escape_string(sha1(uniqid(rand(), true)));
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_access_keys SET access_key = '$key'
-                WHERE feed_id = '$feed_id' AND is_cat = $sql_is_cat
-                AND owner_uid = " . $owner_uid
+                "UPDATE ttrss_access_keys
+                 SET access_key = '$key'
+                 WHERE
+                     feed_id = '$feed_id'
+                     AND is_cat = $sql_is_cat
+                     AND owner_uid = " . $owner_uid
             );
             return $key;
         } else {
@@ -2082,7 +2093,7 @@ class Pref_Feeds extends ProtectedHandler
 
     public function clearKeys()
     {
-        \SmallSmallRSS\AccessKeys::clearForOwner($_SESSION["uid"]);
+        \SmallSmallRSS\AccessKeys::clearForOwner($_SESSION['uid']);
     }
 
     private function countChildren($cat)

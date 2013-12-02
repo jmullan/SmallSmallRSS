@@ -8,8 +8,8 @@ class PDOWrapper implements DatabaseInterface
     public function connect($host, $user, $pass, $db, $port)
     {
         $connstr = \SmallSmallRSS\Config::get('DB_TYPE') . ":host=$host;dbname=$db";
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
-            $connstr .= ";charset=utf8";
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'mysql') {
+            $connstr .= ';charset=utf8';
         }
         try {
             $this->pdo = new PDO($connstr, $user, $pass);
@@ -23,7 +23,8 @@ class PDOWrapper implements DatabaseInterface
 
     public function escape_string($s, $strip_tags = true)
     {
-        if ($strip_tags) {  $s = strip_tags($s);
+        if ($strip_tags) {
+            $s = strip_tags($s);
         }
         $qs = $this->pdo->quote($s);
         return mb_substr($qs, 1, mb_strlen($qs)-2);
@@ -89,17 +90,17 @@ class PDOWrapper implements DatabaseInterface
 
     public function last_error()
     {
-        return join(" ", $this->pdo->errorInfo());
+        return join(' ', $this->pdo->errorInfo());
     }
 
     public function init()
     {
         switch (\SmallSmallRSS\Config::get('DB_TYPE')) {
-            case "pgsql":
+            case 'pgsql':
                 $this->query("set client_encoding = 'UTF-8'");
                 $this->query("set datestyle = 'ISO, european'");
-                $this->query("set TIME ZONE 0");
-            case "mysql":
+                $this->query('set TIME ZONE 0');
+            case 'mysql':
                 $this->query("SET time_zone = '+0:0'");
                 return;
         }

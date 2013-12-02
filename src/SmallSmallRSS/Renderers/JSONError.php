@@ -11,7 +11,7 @@ class JSONError extends \SmallSmallRSS\Renderers\Base
     }
     public function render()
     {
-        header("Content-Type: application/json");
-        print json_encode(array("error" => array("code" => $this->error_code)));
+        header('Content-Type: application/json');
+        print json_encode(array('error' => array('code' => $this->error_code)));
     }
 }

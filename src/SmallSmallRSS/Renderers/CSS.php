@@ -7,9 +7,9 @@ class CSS
     {
         $value = \SmallSmallRSS\DBPrefs::read('USER_STYLESHEET');
         if ($value) {
-            echo "<style type=\"text/css\">";
-            echo str_replace("<br/>", "\n", $value);
-            echo "</style>";
+            echo '<style type="text/css">';
+            echo str_replace('<br/>', "\n", $value);
+            echo '</style>';
         }
     }
     public function renderStylesheetTag($filename)

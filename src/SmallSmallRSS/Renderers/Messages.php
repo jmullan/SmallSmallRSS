@@ -17,17 +17,17 @@ class Messages extends \SmallSmallRSS\Renderers\Base
     }
     public static function renderMessage($class, $image, $msg, $id = '')
     {
-            echo '<div class="' . $class . '"';
-            if (strlen($id)) {
-                echo ' id="' . $id . '"';
-            }
-            echo '>"';
-            echo '<span>';
-            echo '<img src="' . $image . '" alt="">';
-            echo '</span>';
-            echo '<span>';
-            echo $msg;
-            echo '</span>';
-            echo '</div>';
+        echo '<div class="' . $class . '"';
+        if (strlen($id)) {
+            echo ' id="' . $id . '"';
+        }
+        echo '>"';
+        echo '<span>';
+        echo '<img src="' . $image . '" alt="">';
+        echo '</span>';
+        echo '<span>';
+        echo $msg;
+        echo '</span>';
+        echo '</div>';
     }
 }

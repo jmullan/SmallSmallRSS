@@ -27,7 +27,8 @@ class PostgreSQL implements DatabaseInterface
 
     public function escape_string($s, $strip_tags = true)
     {
-        if ($strip_tags) {  $s = strip_tags($s);
+        if ($strip_tags) {
+            $s = strip_tags($s);
         }
         return \pg_escape_string($s);
     }
@@ -38,7 +39,7 @@ class PostgreSQL implements DatabaseInterface
         if (!$result) {
             $query = htmlspecialchars($query); // just in case
             user_error(
-                "Query $query failed: " . ($this->link ? \pg_last_error($this->link) : "No connection"),
+                "Query $query failed: " . ($this->link ? \pg_last_error($this->link) : 'No connection'),
                 $die_on_error ? E_USER_ERROR : E_USER_WARNING
             );
         }
@@ -79,9 +80,9 @@ class PostgreSQL implements DatabaseInterface
     public function init()
     {
         $this->query("set client_encoding = 'UTF-8'");
-        \pg_set_client_encoding("UNICODE");
+        \pg_set_client_encoding('UNICODE');
         $this->query("set datestyle = 'ISO, european'");
-        $this->query("set TIME ZONE 0");
+        $this->query('set TIME ZONE 0');
         return true;
     }
 }

@@ -3,7 +3,7 @@ namespace SmallSmallRSS\Renderers;
 
 class FormElements extends \SmallSmallRSS\Renderers\Base
 {
-    public function renderSelect($id, $default, $values, $attributes = "")
+    public function renderSelect($id, $default, $values, $attributes = '')
     {
         print "<select name=\"$id\" id='$id' $attributes>";
         foreach ($values as $k => $v) {
@@ -20,7 +20,7 @@ class FormElements extends \SmallSmallRSS\Renderers\Base
         print '</select>';
     }
 
-    public function renderRadio($id, $default, $true_is, $values, $attributes = "")
+    public function renderRadio($id, $default, $true_is, $values, $attributes = '')
     {
         foreach ($values as $v) {
             if ($v == $default) {
@@ -33,7 +33,7 @@ class FormElements extends \SmallSmallRSS\Renderers\Base
             } else {
                 $sel .= ' value="0"';
             }
-            print "<input type=\"radio\" class=\"noborder\" data-dojo-type=\"dijit.form.RadioButton\"";
+            print '<input type="radio" class="noborder" data-dojo-type="dijit.form.RadioButton"';
             print " $sel $attributes name=\"$id\" id=\"$id\" />";
             print "<label for=\"$id\">$v</label>";
             print "\n";

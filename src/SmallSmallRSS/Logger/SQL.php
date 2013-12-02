@@ -16,7 +16,7 @@ class Logger_SQL extends Logger_Abstract implements Logger_Interface
                 trigger_error('Tried to access $_SESSION before it was created');
             }
             if (!empty($_SESSION['uid'])) {
-                $owner_uid = $_SESSION["uid"];
+                $owner_uid = $_SESSION['uid'];
             }
             $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_error_log
@@ -32,15 +32,15 @@ class Logger_SQL extends Logger_Abstract implements Logger_Interface
 
     public static function clearExpired()
     {
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
             \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_error_log
                  WHERE created_at < NOW() - INTERVAL '7 days'"
             );
         } else {
             \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_error_log
-                 WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)"
+                'DELETE FROM ttrss_error_log
+                 WHERE created_at < DATE_SUB(NOW(), INTERVAL 7 DAY)'
             );
         }
         return true;

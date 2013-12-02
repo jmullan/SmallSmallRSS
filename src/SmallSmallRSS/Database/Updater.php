@@ -5,8 +5,8 @@ class Updater
 {
     public function getSchemaVersion()
     {
-        $result = \SmallSmallRSS\Database::query("SELECT schema_version FROM ttrss_version");
-        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, "schema_version");
+        $result = \SmallSmallRSS\Database::query('SELECT schema_version FROM ttrss_version');
+        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'schema_version');
     }
 
     public function isUpdateRequired()
@@ -16,9 +16,9 @@ class Updater
 
     public function getSchemaLines($version)
     {
-        $filename = __DIR__ . "/schema/versions/" . \SmallSmallRSS\Config::get('DB_TYPE') . "/$version.sql";
+        $filename = __DIR__ . '/schema/versions/' . \SmallSmallRSS\Config::get('DB_TYPE') . "/$version.sql";
         if (file_exists($filename)) {
-            return explode(";", preg_replace("/[\r\n]/", "", file_get_contents($filename)));
+            return explode(';', preg_replace("/[\r\n]/", '', file_get_contents($filename)));
         } else {
             return false;
         }
@@ -29,18 +29,18 @@ class Updater
         if ($this->getSchemaVersion() == $version - 1) {
             $lines = $this->getSchemaLines($version);
             if (is_array($lines)) {
-                \SmallSmallRSS\Database::query("BEGIN");
+                \SmallSmallRSS\Database::query('BEGIN');
                 foreach ($lines as $line) {
-                    if (strpos($line, "--") !== 0 && $line) {
+                    if (strpos($line, '--') !== 0 && $line) {
                         \SmallSmallRSS\Database::query($line);
                     }
                 }
                 $db_version = $this->getSchemaVersion();
                 if ($db_version == $version) {
-                    \SmallSmallRSS\Database::query("COMMIT");
+                    \SmallSmallRSS\Database::query('COMMIT');
                     return true;
                 } else {
-                    \SmallSmallRSS\Database::query("ROLLBACK");
+                    \SmallSmallRSS\Database::query('ROLLBACK');
                     return false;
                 }
             } else {
@@ -53,7 +53,7 @@ class Updater
 
     public static function dropIndexes()
     {
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
             $result = \SmallSmallRSS\Database::query(
                 "SELECT relname
                  FROM pg_catalog.pg_class
@@ -71,10 +71,10 @@ class Updater
         }
 
         while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-            if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
-                $statement = "DROP INDEX " . $line["relname"];
+            if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
+                $statement = 'DROP INDEX ' . $line['relname'];
             } else {
-                $statement = "ALTER TABLE " . $line['table_name'] . " DROP INDEX ".$line['index_name'];
+                $statement = 'ALTER TABLE ' . $line['table_name'] . ' DROP INDEX '.$line['index_name'];
             }
             \SmallSmallRSS\Database::query($statement, false);
         }
@@ -82,7 +82,7 @@ class Updater
 
     public static function createIndexes()
     {
-        $fp = fopen(__DIR__ . "/schema/ttrss_schema_" . \SmallSmallRSS\Config::get('DB_TYPE') . ".sql", "r");
+        $fp = fopen(__DIR__ . '/schema/ttrss_schema_' . \SmallSmallRSS\Config::get('DB_TYPE') . '.sql', 'r');
         if ($fp) {
             while (($line = fgets($fp))) {
                 $matches = array();
@@ -96,7 +96,7 @@ class Updater
             }
             fclose($fp);
         } else {
-            \SmallSmallRSS\Logger::debug("unable to open schema file.");
+            \SmallSmallRSS\Logger::debug('unable to open schema file.');
         }
     }
 }

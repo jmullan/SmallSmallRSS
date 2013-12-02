@@ -16,7 +16,7 @@ class JS extends \SmallSmallRSS\Renderers\Base
     public function render_minified_js_file($js)
     {
         if (self::$minify) {
-            $cached_file = \SmallSmallRSS\Config::get('CACHE_DIR') . "/js/" . basename($js) . ".js";
+            $cached_file = \SmallSmallRSS\Config::get('CACHE_DIR') . '/js/' . basename($js) . '.js';
             if (file_exists($cached_file)
                 && is_readable($cached_file)
                 && filemtime($cached_file) >= filemtime("js/$js.js")) {
@@ -35,10 +35,10 @@ class JS extends \SmallSmallRSS\Renderers\Base
     {
         $parts = parse_url($filename);
         $query = $parts['query'];
-        $query = "";
-        if (!(strpos($filename, "?") === false)) {
-            $query = substr($filename, strpos($filename, "?") + 1);
-            $filename = substr($filename, 0, strpos($filename, "?"));
+        $query = '';
+        if (!(strpos($filename, '?') === false)) {
+            $query = substr($filename, strpos($filename, '?') + 1);
+            $filename = substr($filename, 0, strpos($filename, '?'));
         }
         $timestamp = filemtime($filename);
         if ($query) {

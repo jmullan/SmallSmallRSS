@@ -4,18 +4,17 @@ class backend extends Handler
 {
     public function loading()
     {
-        header("Content-type: text/html");
-        print __("Loading, please wait...") . " " .
-            "<img src='images/indicator_tiny.gif'>";
+        header('Content-type: text/html');
+        echo __('Loading, please wait...');
+        echo ' ';
+        echo '<img src="images/indicator_tiny.gif">';
     }
 
     public function digestTest()
     {
-        header("Content-type: text/html");
+        header('Content-type: text/html');
         $rv = \SmallSmallRSS\Digest::prepare_headlines($_SESSION['uid'], 1, 1000);
-
-        $rv[3] = "<pre>" . $rv[3] . "</pre>";
-
+        $rv[3] = '<pre>' . $rv[3] . '</pre>';
         print_r($rv);
     }
 
@@ -24,41 +23,28 @@ class backend extends Handler
         $info = get_hotkeys_info();
         $imap = get_hotkeys_map();
         $omap = array();
-
         foreach ($imap[1] as $sequence => $action) {
-            if (!isset($omap[$action])) {  $omap[$action] = array();
+            if (!isset($omap[$action])) {
+                $omap[$action] = array();
             }
-
-            array_push($omap[$action], $sequence);
+            $omap[$action][] = $sequence;
         }
-
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            "<a target=\"_blank\" href=\"http://tt-rss.org/wiki/InterfaceTips\">"
-            . __("Other interface tips are available in the Tiny Tiny RSS wiki.")
-            . "</a>"
+            '<a target="_blank" href="http://tt-rss.org/wiki/InterfaceTips">'
+            . __('Other interface tips are available in the Tiny Tiny RSS wiki.')
+            . '</a>'
         );
-
-        print "<ul class='helpKbList' id='helpKbList'>";
-
-        print "<h2>" . __("Keyboard Shortcuts") . "</h2>";
-
+        echo '<ul class="helpKbLis" id="helpKbList">';
+        echo '<h2>' . __('Keyboard Shortcuts') . '</h2>';
         foreach ($info as $section => $hotkeys) {
-
-            print "<li><h3>" . $section . "</h3></li>";
-
+            echo '<li><h3>' . $section . '</h3></li>';
             foreach ($hotkeys as $action => $description) {
-
                 if (is_array($omap[$action])) {
                     foreach ($omap[$action] as $sequence) {
-                        if (strpos($sequence, "|") !== false) {
-                            $sequence = substr(
-                                $sequence,
-                                strpos($sequence, "|")+1,
-                                strlen($sequence)
-                            );
+                        if (strpos($sequence, '|') !== false) {
+                            $sequence = substr($sequence, strpos($sequence, '|') + 1, strlen($sequence));
                         } else {
-                            $keys = explode(" ", $sequence);
-
+                            $keys = explode(' ', $sequence);
                             for ($i = 0; $i < count($keys); $i++) {
                                 if (strlen($keys[$i]) > 1) {
                                     $tmp = '';
@@ -77,40 +63,40 @@ class backend extends Handler
                                     $keys[$i] = $tmp;
                                 }
                             }
-                            $sequence = join(" ", $keys);
+                            $sequence = join(' ', $keys);
                         }
 
-                        print "<li>";
-                        print "<span class='hksequence'>$sequence</span>";
-                        print $description;
-                        print "</li>";
+                        echo '<li>';
+                        echo '<span class="hksequence">';
+                        echo $sequence;
+                        echo '</span>';
+                        echo $description;
+                        echo '</li>';
                     }
                 }
             }
         }
-
-        print "</ul>";
+        echo '</ul>';
     }
 
     public function help()
     {
-        $topic = basename($_REQUEST["topic"]);
-
+        $topic = basename($_REQUEST['topic']);
         switch ($topic) {
-            case "main":
+            case 'main':
                 $this->display_main_help();
                 break;
-            case "prefs":
+            case 'prefs':
                 //$this->display_prefs_help();
                 break;
             default:
-                print "<p>".__("Help topic not found.")."</p>";
+                echo '<p>'.__('Help topic not found.').'</p>';
         }
-
-        print "<div align='center'>";
-        print "<button data-dojo-type=\"dijit.form.Button\"
-            onclick=\"return dijit.byId('helpDlg').hide()\">".
-            __('Close this window')."</button>";
-        print "</div>";
+        echo "<div align='center'>";
+        echo '<button data-dojo-type="dijit.form.Button"';
+        echo " onclick=\"return dijit.byId('helpDlg').hide()\">";
+        echo __('Close this window');
+        echo '</button>';
+        echo '</div>';
     }
 }

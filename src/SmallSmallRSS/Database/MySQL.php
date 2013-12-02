@@ -32,7 +32,7 @@ class MySQL implements DatabaseInterface
         $result = mysql_query($query, $this->link);
         if (!$result) {
             user_error(
-                "Query $query failed: " . ($this->link ? mysql_error($this->link) : "No connection"),
+                "Query $query failed: " . ($this->link ? mysql_error($this->link) : 'No connection'),
                 $die_on_error ? E_USER_ERROR : E_USER_WARNING
             );
         }
@@ -73,7 +73,7 @@ class MySQL implements DatabaseInterface
     public function init()
     {
         $this->query("SET time_zone = '+0:0'");
-        $this->query("SET NAMES " . \SmallSmallRSS\Config::get('MYSQL_CHARSET'));
+        $this->query('SET NAMES ' . \SmallSmallRSS\Config::get('MYSQL_CHARSET'));
         return true;
     }
 }

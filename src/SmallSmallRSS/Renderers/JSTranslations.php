@@ -29,10 +29,10 @@ class JSTranslations
     public static function T_js_decl($s1, $s2)
     {
         if ($s1 && $s2) {
-            $s1 = preg_replace("/\n/", "", $s1);
-            $s2 = preg_replace("/\n/", "", $s2);
-            $s1 = preg_replace("/\"/", "\\\"", $s1);
-            $s2 = preg_replace("/\"/", "\\\"", $s2);
+            $s1 = preg_replace("/\n/", '', $s1);
+            $s2 = preg_replace("/\n/", '', $s2);
+            $s1 = preg_replace('/"/', "\\\"", $s1);
+            $s2 = preg_replace('/"/', "\\\"", $s2);
             echo "T_messages[\"$s1\"] = \"$s2\";\n";
         }
     }

@@ -107,7 +107,7 @@ class Users
              WHERE id = $id"
         );
     }
-    public static function getByUid($uid)
+    public static function getByUid($user_id)
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT

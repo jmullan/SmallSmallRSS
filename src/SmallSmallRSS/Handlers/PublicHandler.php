@@ -580,21 +580,19 @@ class PublicHandler extends Handler
 
             if (authenticate_user($login, $password)) {
                 $_POST['password'] = '';
-
                 if (\SmallSmallRSS\Sanity::getSchemaVersion() >= 120) {
                     $_SESSION['language'] = \SmallSmallRSS\DBPrefs::read('USER_LANGUAGE', $_SESSION['uid']);
                 }
-
                 $_SESSION['ref_schema_version'] = \SmallSmallRSS\Sanity::getSchemaVersion(true);
                 $_SESSION['bw_limit'] = !empty($_POST['bw_limit']);
-
                 if (!empty($_POST['profile'])) {
-
                     $profile = \SmallSmallRSS\Database::escape_string($_POST['profile']);
-
                     $result = \SmallSmallRSS\Database::query(
-                        "SELECT id FROM ttrss_settings_profiles
-                                                 WHERE id = '$profile' AND owner_uid = " . $_SESSION['uid']
+                        "SELECT id
+                         FROM ttrss_settings_profiles
+                         WHERE
+                             id = '$profile'
+                             AND owner_uid = " . $_SESSION['uid']
                     );
 
                     if (\SmallSmallRSS\Database::num_rows($result) != 0) {

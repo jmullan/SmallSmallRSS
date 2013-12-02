@@ -34,6 +34,7 @@ function authenticate_user($login, $password, $check_only = false)
             $_SESSION['version'] = \SmallSmallRSS\Constants::VERSION;
             $user_record = \SmallSmallRSS\Users::getByUid($user_id);
             if (!$user_record) {
+                \SmallSmallRSS\Logger::log("Did not find user $user_id");
                 return false;
             }
             $_SESSION['name'] = $user_record['login'];

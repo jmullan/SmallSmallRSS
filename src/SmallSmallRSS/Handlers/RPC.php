@@ -695,7 +695,7 @@ class RPC extends ProtectedHandler
                      ttrss_feeds.last_update_started < DATE_SUB(NOW(), INTERVAL 5 MINUTE)
                  )';
         }
-        $random_qpart = sql_random_function();
+        $random_qpart = \SmallSmallRSS\Database::getRandomFunction();
         // We search for feed needing update.
         $result = \SmallSmallRSS\Database::query(
             "SELECT ttrss_feeds.feed_url,ttrss_feeds.id
@@ -705,9 +705,11 @@ class RPC extends ProtectedHandler
                 ttrss_feeds.owner_uid = ttrss_users.id
                 AND ttrss_users.id = ttrss_user_prefs.owner_uid
                 AND ttrss_user_prefs.pref_name = 'DEFAULT_UPDATE_INTERVAL'
-                AND ttrss_feeds.owner_uid = ".$_SESSION['uid']."
-                $update_limit_qpart $updstart_thresh_qpart
-            ORDER BY $random_qpart LIMIT 30"
+                AND ttrss_feeds.owner_uid = " . $_SESSION['uid'] . "
+                $update_limit_qpart
+                $updstart_thresh_qpart
+            ORDER BY $random_qpart
+            LIMIT 30"
         );
 
         $feed_id = -1;

@@ -347,8 +347,8 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
                             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
-                                $marked = bool_to_sql_bool(sql_bool_to_bool($article['marked']));
-                                $published = bool_to_sql_bool(sql_bool_to_bool($article['published']));
+                                $marked = \SmallSmallRSS\Database::toSQLBool(\SmallSmallRSS\Database::fromSQLBool($article['marked']));
+                                $published = \SmallSmallRSS\Database::toSQLBool(\SmallSmallRSS\Database::fromSQLBool($article['published']));
                                 $score = (int) $article['score'];
 
                                 $tag_cache = $article['tag_cache'];

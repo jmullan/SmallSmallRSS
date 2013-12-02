@@ -15,7 +15,7 @@ class AccessKeys
 
     public static function getForFeed($feed_id, $is_cat, $owner_uid)
     {
-        $sql_is_cat = bool_to_sql_bool($is_cat);
+        $sql_is_cat = \SmallSmallRSS\Database::toSQLBool($is_cat);
         $result = \SmallSmallRSS\Database::query(
             "SELECT access_key FROM ttrss_access_keys
             WHERE feed_id = '$feed_id' AND is_cat = $sql_is_cat

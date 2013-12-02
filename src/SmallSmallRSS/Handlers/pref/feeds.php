@@ -556,7 +556,7 @@ class Pref_Feeds extends ProtectedHandler
                  owner_uid = " . $_SESSION['uid']
         );
 
-        $auth_pass_encrypted = sql_bool_to_bool(
+        $auth_pass_encrypted = \SmallSmallRSS\Database::fromSQLBool(
             \SmallSmallRSS\Database::fetch_result(
                 $result,
                 0,
@@ -663,7 +663,7 @@ class Pref_Feeds extends ProtectedHandler
         echo __('Options');
         echo '</div>';
         echo '<div class="dlgSecCont">';
-        $private = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'private'));
+        $private = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'private'));
         if ($private) {
             $checked = ' checked="checked"';
         } else {
@@ -676,7 +676,7 @@ class Pref_Feeds extends ProtectedHandler
         echo __('Hide from Popular feeds');
         echo '</label>';
 
-        $include_in_digest = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'include_in_digest'));
+        $include_in_digest = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'include_in_digest'));
 
         if ($include_in_digest) {
             $checked = ' checked="checked"';
@@ -690,7 +690,7 @@ class Pref_Feeds extends ProtectedHandler
             $checked>&nbsp;<label for=\"include_in_digest\">";
         echo __('Include in e-mail digest');
         echo '</label>';
-        $always_display_enclosures = sql_bool_to_bool(
+        $always_display_enclosures = \SmallSmallRSS\Database::fromSQLBool(
             \SmallSmallRSS\Database::fetch_result($result, 0, 'always_display_enclosures')
         );
 
@@ -708,7 +708,7 @@ class Pref_Feeds extends ProtectedHandler
         echo __('Always display image attachments');
         echo '</label>';
 
-        $hide_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'hide_images'));
+        $hide_images = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'hide_images'));
         if ($hide_images) {
             $checked = ' checked="checked"';
         } else {
@@ -723,7 +723,7 @@ class Pref_Feeds extends ProtectedHandler
         echo __('Do not embed images');
         echo '</label>';
 
-        $cache_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images'));
+        $cache_images = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images'));
 
         if ($cache_images) {
             $checked = ' checked="checked"';
@@ -739,7 +739,7 @@ class Pref_Feeds extends ProtectedHandler
         echo __('Cache images locally');
         echo '</label>';
 
-        $mark_unread_on_update = sql_bool_to_bool(
+        $mark_unread_on_update = \SmallSmallRSS\Database::fromSQLBool(
             \SmallSmallRSS\Database::fetch_result($result, 0, 'mark_unread_on_update')
         );
 
@@ -1717,7 +1717,7 @@ class Pref_Feeds extends ProtectedHandler
 
         $obj['id'] = 'CAT:' . $cat_id;
         $obj['items'] = array();
-        $obj['name'] = getCategoryTitle($cat_id);
+        $obj['name'] = \SmallSmallRSS\FeedCategories::getTitle($cat_id);
         $obj['type'] = 'category';
         $obj['unread'] = (int) $cat_unread;
         $obj['bare_id'] = $cat_id;
@@ -2165,7 +2165,7 @@ class Pref_Feeds extends ProtectedHandler
         if (!$owner_uid) {
             $owner_uid = $_SESSION['uid'];
         }
-        $sql_is_cat = bool_to_sql_bool($is_cat);
+        $sql_is_cat = \SmallSmallRSS\Database::toSQLBool($is_cat);
         $result = \SmallSmallRSS\Database::query(
             "SELECT access_key FROM ttrss_access_keys
              WHERE

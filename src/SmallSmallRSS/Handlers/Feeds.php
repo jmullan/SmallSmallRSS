@@ -223,7 +223,7 @@ class Feeds extends ProtectedHandler
 
             if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                 $last_updated = strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated'));
-                $cache_images = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images'));
+                $cache_images = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images'));
 
                 if (!$cache_images && time() - $last_updated > 120 || isset($_REQUEST['DevForceUpdate'])) {
                     \SmallSmallRSS\RSSUpdater::updateFeed($feed, true);
@@ -390,12 +390,12 @@ class Feeds extends ProtectedHandler
 
                 $class = '';
 
-                if (sql_bool_to_bool($line['unread'])) {
+                if (\SmallSmallRSS\Database::fromSQLBool($line['unread'])) {
                     $class .= ' Unread';
                     ++$num_unread;
                 }
 
-                if (sql_bool_to_bool($line['marked'])) {
+                if (\SmallSmallRSS\Database::fromSQLBool($line['marked'])) {
                     $marked_pic = "<img
                         src=\"images/mark_set.svg\"
                         class=\"markedPic\" alt=\"Unstar article\"
@@ -408,7 +408,7 @@ class Feeds extends ProtectedHandler
                         onclick='toggleMark($id)'>";
                 }
 
-                if (sql_bool_to_bool($line['published'])) {
+                if (\SmallSmallRSS\Database::fromSQLBool($line['published'])) {
                     $published_pic = "<img src=\"images/pub_set.svg\"
                         class=\"pubPic\"
                             alt=\"Unpublish article\" onclick='togglePub($id)'>";
@@ -550,7 +550,7 @@ class Feeds extends ProtectedHandler
                     }
                     $line['content'] = sanitize(
                         $line['content_preview'],
-                        sql_bool_to_bool($line['hide_images']),
+                        \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
                         false,
                         $entry_site_url
                     );
@@ -707,12 +707,12 @@ class Feeds extends ProtectedHandler
                     echo htmlspecialchars($line['content']);
                     echo '</span.';
                     echo '</span>';
-                    $always_display_enclosures = sql_bool_to_bool($line['always_display_enclosures']);
+                    $always_display_enclosures = \SmallSmallRSS\Database::fromSQLBool($line['always_display_enclosures']);
                     echo format_article_enclosures(
                         $id,
                         $always_display_enclosures,
                         $line['content'],
-                        sql_bool_to_bool($line['hide_images'])
+                        \SmallSmallRSS\Database::fromSQLBool($line['hide_images'])
                     );
                     echo '</div>';
                     echo '<div class="cdmFooter">';
@@ -1227,7 +1227,7 @@ class Feeds extends ProtectedHandler
         if (!$is_cat) {
             $feed_cat_title = getFeedCatTitle($active_feed_id);
         } else {
-            $feed_cat_title = getCategoryTitle($active_feed_id);
+            $feed_cat_title = \SmallSmallRSS\FeedCategories::getTitle($active_feed_id);
         }
         if ($active_feed_id && !$is_cat) {
             echo "<option selected=\"1\" value=\"this_feed\">$feed_title</option>";

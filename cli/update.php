@@ -183,7 +183,7 @@ if (isset($options["convert-filters"])) {
         if ($line["filter_type"] != 5) {
             $filter = array();
 
-            if (sql_bool_to_bool($line["cat_filter"])) {
+            if (\SmallSmallRSS\Database::fromSQLBool($line["cat_filter"])) {
                 $feed_id = "CAT:" . (int) $line["cat_id"];
             } else {
                 $feed_id = (int) $line["feed_id"];

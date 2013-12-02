@@ -199,7 +199,7 @@ class opml extends ProtectedHandler
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 foreach (array('enabled', 'match_any_rule', 'inverse') as $b) {
-                    $line[$b] = sql_bool_to_bool($line[$b]);
+                    $line[$b] = \SmallSmallRSS\Database::fromSQLBool($line[$b]);
                 }
 
                 $line['rules'] = array();
@@ -214,11 +214,11 @@ class opml extends ProtectedHandler
                     unset($tmp_line['id']);
                     unset($tmp_line['filter_id']);
 
-                    $cat_filter = sql_bool_to_bool($tmp_line['cat_filter']);
+                    $cat_filter = \SmallSmallRSS\Database::fromSQLBool($tmp_line['cat_filter']);
 
                     if ($cat_filter && $tmp_line['cat_id'] || $tmp_line['feed_id']) {
                         if ($cat_filter) {
-                            $tmp_line['feed'] = getCategoryTitle($id);
+                            $tmp_line['feed'] = \SmallSmallRSS\FeedCategories::getTitle($id);
                         } else {
                             $tmp_line['feed'] = \SmallSmallRSS\Feeds::getTitle($tmp_line['feed_id']);
                         }
@@ -226,7 +226,7 @@ class opml extends ProtectedHandler
                         $tmp_line['feed'] = '';
                     }
 
-                    $tmp_line['cat_filter'] = sql_bool_to_bool($tmp_line['cat_filter']);
+                    $tmp_line['cat_filter'] = \SmallSmallRSS\Database::fromSQLBool($tmp_line['cat_filter']);
 
                     unset($tmp_line['feed_id']);
                     unset($tmp_line['cat_id']);
@@ -366,9 +366,9 @@ class opml extends ProtectedHandler
             $filter = json_decode($node->nodeValue, true);
 
             if ($filter) {
-                $match_any_rule = bool_to_sql_bool($filter['match_any_rule']);
-                $enabled = bool_to_sql_bool($filter['enabled']);
-                $inverse = bool_to_sql_bool($filter['inverse']);
+                $match_any_rule = \SmallSmallRSS\Database::toSQLBool($filter['match_any_rule']);
+                $enabled = \SmallSmallRSS\Database::toSQLBool($filter['enabled']);
+                $inverse = \SmallSmallRSS\Database::toSQLBool($filter['inverse']);
                 $title = \SmallSmallRSS\Database::escape_string($filter['title']);
 
                 \SmallSmallRSS\Database::query('BEGIN');
@@ -415,7 +415,7 @@ class opml extends ProtectedHandler
                                 $cat_id = \SmallSmallRSS\Database::fetch_result($tmp_result, 0, 'id');
                             }
                         }
-                        $cat_filter = bool_to_sql_bool($rule['cat_filter']);
+                        $cat_filter = \SmallSmallRSS\Database::toSQLBool($rule['cat_filter']);
                         $reg_exp = \SmallSmallRSS\Database::escape_string($rule['reg_exp']);
                         $filter_type = (int) $rule['filter_type'];
 

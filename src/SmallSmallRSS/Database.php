@@ -94,4 +94,30 @@ class Database
     {
         return self::adapter()->close();
     }
+
+    public static function getRandomFunction()
+    {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'mysql') {
+            return 'RAND()';
+        } else {
+            return 'RANDOM()';
+        }
+    }
+
+    public static function toSQLBool($boolean)
+    {
+        if ($s) {
+            return 'true';
+        } else {
+            return 'false';
+        }
+    }
+    public static function fromSQLBool($boolean)
+    {
+        if ($s == 't' || strtolower($s) == 'true' || $s == '1') {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }

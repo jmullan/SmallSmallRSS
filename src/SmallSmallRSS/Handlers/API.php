@@ -16,7 +16,7 @@ class API extends Handler
         if (isset($_REQUEST[$key])) {
             $value = $_REQUEST[$key];
         }
-        return sql_bool_to_bool($value);
+        return \SmallSmallRSS\Database::fromSQLBool($value);
     }
 
     public function getSQLEscapedStringFromRequest($key)
@@ -212,7 +212,7 @@ class API extends Handler
                 if ($unread || !$unread_only) {
                     $cats[] = array(
                         'id' => $cat_id,
-                        'title' => getCategoryTitle($cat_id),
+                        'title' => \SmallSmallRSS\FeedCategories::getTitle($cat_id),
                         'unread' => $unread
                     );
                 }
@@ -411,9 +411,9 @@ class API extends Handler
                         'title' => $line['title'],
                         'link' => $line['link'],
                         'labels' => \SmallSmallRSS\Labels::getForArticle($line['id'], $_SESSION['uid']),
-                        'unread' => sql_bool_to_bool($line['unread']),
-                        'marked' => sql_bool_to_bool($line['marked']),
-                        'published' => sql_bool_to_bool($line['published']),
+                        'unread' => \SmallSmallRSS\Database::fromSQLBool($line['unread']),
+                        'marked' => \SmallSmallRSS\Database::fromSQLBool($line['marked']),
+                        'published' => \SmallSmallRSS\Database::fromSQLBool($line['published']),
                         'comments' => $line['comments'],
                         'author' => $line['author'],
                         'updated' => (int) strtotime($line['updated']),
@@ -729,9 +729,9 @@ class API extends Handler
 
             $headline_row = array(
                 'id' => (int) $line['id'],
-                'unread' => sql_bool_to_bool($line['unread']),
-                'marked' => sql_bool_to_bool($line['marked']),
-                'published' => sql_bool_to_bool($line['published']),
+                'unread' => \SmallSmallRSS\Database::fromSQLBool($line['unread']),
+                'marked' => \SmallSmallRSS\Database::fromSQLBool($line['marked']),
+                'published' => \SmallSmallRSS\Database::fromSQLBool($line['published']),
                 'updated' => (int) strtotime($line['updated']),
                 'is_updated' => $is_updated,
                 'title' => $line['title'],
@@ -760,7 +760,7 @@ class API extends Handler
                 if ($sanitize_content) {
                     $headline_row['content'] = sanitize(
                         $line['content_preview'],
-                        sql_bool_to_bool($line['hide_images']),
+                        \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
                         false,
                         $line['site_url']
                     );
@@ -782,7 +782,7 @@ class API extends Handler
             );
             $headline_row['comments_count'] = (int) $line['num_comments'];
             $headline_row['comments_link'] = $line['comments'];
-            $headline_row['always_display_attachments'] = sql_bool_to_bool($line['always_display_enclosures']);
+            $headline_row['always_display_attachments'] = \SmallSmallRSS\Database::fromSQLBool($line['always_display_enclosures']);
             $headline_row['author'] = $line['author'];
             $headline_row['score'] = (int) $line['score'];
             $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(

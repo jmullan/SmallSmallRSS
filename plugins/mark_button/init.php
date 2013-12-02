@@ -20,7 +20,7 @@ class Mark_Button extends \SmallSmallRSS\Plugin
         $id = $line["id"];
 
         if (\SmallSmallRSS\DBPrefs::read("COMBINED_DISPLAY_MODE")) {
-            if (sql_bool_to_bool($line["marked"])) {
+            if (\SmallSmallRSS\Database::fromSQLBool($line["marked"])) {
                 $image = 'images/mark_set.svg';
                 $action = __('Star article');
             } else {

@@ -1,4 +1,5 @@
 <?php
+
 function initialize_user_prefs($uid, $profile = false)
 {
     \SmallSmallRSS\Database::query('BEGIN');
@@ -210,33 +211,6 @@ function smart_date_time($timestamp, $tz_offset = 0, $owner_uid = false)
     }
 }
 
-function sql_bool_to_bool($s)
-{
-    if ($s == 't' || $s == '1' || strtolower($s) == 'true') {
-        return true;
-    } else {
-        return false;
-    }
-}
-
-function bool_to_sql_bool($s)
-{
-    if ($s) {
-        return 'true';
-    } else {
-        return 'false';
-    }
-}
-
-function sql_random_function()
-{
-    if (\SmallSmallRSS\Config::get('DB_TYPE') == 'mysql') {
-        return 'RAND()';
-    } else {
-        return 'RANDOM()';
-    }
-}
-
 function getAllCounters()
 {
     $data = getGlobalCounters();
@@ -245,11 +219,6 @@ function getAllCounters()
     $data = array_merge($data, getFeedCounters());
     $data = array_merge($data, getCategoryCounters());
     return $data;
-}
-
-function getCategoryTitle($cat_id)
-{
-    return \SmallSmallRSS\FeedCategories::getTitle($cat_id);
 }
 
 function getCategoryCounters()
@@ -1407,7 +1376,7 @@ function queryFeedHeadlines(
         $feed_title = T_sprintf('Search results: %s', $search);
     } else {
         if ($cat_view) {
-            $feed_title = getCategoryTitle($feed);
+            $feed_title = \SmallSmallRSS\FeedCategories::getTitle($feed);
         } else {
             if (is_numeric($feed) && $feed > 0) {
                 $result = \SmallSmallRSS\Database::query(
@@ -1881,7 +1850,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         unset($line['tag_cache']);
         $line['content'] = sanitize(
             $line['content'],
-            sql_bool_to_bool($line['hide_images']),
+            \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
             $owner_uid,
             $line['site_url']
         );
@@ -2010,9 +1979,9 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         $rv['content'] .= $line['content'];
         $rv['content'] .= format_article_enclosures(
             $id,
-            sql_bool_to_bool($line['always_display_enclosures']),
+            \SmallSmallRSS\Database::fromSQLBool($line['always_display_enclosures']),
             $line['content'],
-            sql_bool_to_bool($line['hide_images'])
+            \SmallSmallRSS\Database::fromSQLBool($line['hide_images'])
         );
         $rv['content'] .= '</div>';
         $rv['content'] .= '</div>';
@@ -2109,7 +2078,7 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
             $rule = array();
             $rule['reg_exp'] = $rule_line['reg_exp'];
             $rule['type'] = $rule_line['type_name'];
-            $rule['inverse'] = sql_bool_to_bool($rule_line['inverse']);
+            $rule['inverse'] = \SmallSmallRSS\Database::fromSQLBool($rule_line['inverse']);
 
             array_push($rules, $rule);
         }
@@ -2133,8 +2102,8 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
             array_push($actions, $action);
         }
         $filter = array();
-        $filter['match_any_rule'] = sql_bool_to_bool($filter_line['match_any_rule']);
-        $filter['inverse'] = sql_bool_to_bool($filter_line['inverse']);
+        $filter['match_any_rule'] = \SmallSmallRSS\Database::fromSQLBool($filter_line['match_any_rule']);
+        $filter['inverse'] = \SmallSmallRSS\Database::fromSQLBool($filter_line['inverse']);
         $filter['rules'] = $rules;
         $filter['actions'] = $actions;
         if (count($rules) > 0 && count($actions) > 0) {

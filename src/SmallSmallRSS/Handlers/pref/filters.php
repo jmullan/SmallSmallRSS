@@ -61,10 +61,10 @@ class Pref_Filters extends ProtectedHandler
         $filter = array();
 
         $filter['enabled'] = true;
-        $filter['match_any_rule'] = sql_bool_to_bool(
+        $filter['match_any_rule'] = \SmallSmallRSS\Database::fromSQLBool(
             checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST['match_any_rule']))
         );
-        $filter['inverse'] = sql_bool_to_bool(
+        $filter['inverse'] = \SmallSmallRSS\Database::fromSQLBool(
             checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST['inverse']))
         );
 
@@ -236,7 +236,7 @@ class Pref_Filters extends ProtectedHandler
             $filter['name'] = $name[0];
             $filter['param'] = $name[1];
             $filter['checkbox'] = false;
-            $filter['enabled'] = sql_bool_to_bool($line['enabled']);
+            $filter['enabled'] = \SmallSmallRSS\Database::fromSQLBool($line['enabled']);
 
             if (!$filter_search || $match_ok) {
                 array_push($folder['items'], $filter);
@@ -267,9 +267,9 @@ class Pref_Filters extends ProtectedHandler
             "SELECT * FROM ttrss_filters2 WHERE id = '$filter_id' AND owner_uid = " . $_SESSION['uid']
         );
 
-        $enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'enabled'));
-        $match_any_rule = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'match_any_rule'));
-        $inverse = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'inverse'));
+        $enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'enabled'));
+        $match_any_rule = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'match_any_rule'));
+        $inverse = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'inverse'));
         $title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'title'));
 
         echo "<form id=\"filter_edit_form\" onsubmit='return false'>";
@@ -314,7 +314,7 @@ class Pref_Filters extends ProtectedHandler
         );
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($rules_result)) {
-            if (sql_bool_to_bool($line['cat_filter'])) {
+            if (\SmallSmallRSS\Database::fromSQLBool($line['cat_filter'])) {
                 $line['feed_id'] = 'CAT:' . (int) $line['cat_id'];
             }
 
@@ -322,7 +322,7 @@ class Pref_Filters extends ProtectedHandler
             unset($line['cat_id']);
             unset($line['filter_id']);
             unset($line['id']);
-            if (!sql_bool_to_bool($line['inverse'])) {  unset($line['inverse']);
+            if (!\SmallSmallRSS\Database::fromSQLBool($line['inverse'])) {  unset($line['inverse']);
             }
 
             $data = htmlspecialchars(json_encode($line));
@@ -438,7 +438,7 @@ class Pref_Filters extends ProtectedHandler
 
         if (strpos($feed_id, 'CAT:') === 0) {
             $feed_id = (int) substr($feed_id, 4);
-            $feed = getCategoryTitle($feed_id);
+            $feed = \SmallSmallRSS\FeedCategories::getTitle($feed_id);
         } else {
             $feed_id = (int) $feed_id;
             if ($rule['feed_id']) {
@@ -565,14 +565,14 @@ class Pref_Filters extends ProtectedHandler
 
                     if (strpos($feed_id, 'CAT:') === 0) {
 
-                        $cat_filter = bool_to_sql_bool(true);
+                        $cat_filter = \SmallSmallRSS\Database::toSQLBool(true);
                         $cat_id = (int) substr($feed_id, 4);
                         $feed_id = 'NULL';
 
                         if (!$cat_id) {  $cat_id = 'NULL'; // Uncategorized
                         }
                     } else {
-                        $cat_filter = bool_to_sql_bool(false);
+                        $cat_filter = \SmallSmallRSS\Database::toSQLBool(false);
                         $feed_id = (int) $feed_id;
                         $cat_id = 'NULL';
 

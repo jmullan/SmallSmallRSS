@@ -189,15 +189,15 @@ class RSSUpdater
             $last_article_timestamp = 0;
         }
         $owner_uid = $row['owner_uid'];
-        $mark_unread_on_update = sql_bool_to_bool($row['mark_unread_on_update']);
+        $mark_unread_on_update = \SmallSmallRSS\Database::fromSQLBool($row['mark_unread_on_update']);
         $pubsub_state = $row['pubsub_state'];
-        $auth_pass_encrypted = sql_bool_to_bool($row['auth_pass_encrypted']);
+        $auth_pass_encrypted = \SmallSmallRSS\Database::fromSQLBool($row['auth_pass_encrypted']);
         $auth_login = $row['auth_login'];
         $auth_pass = $row['auth_pass'];
         if ($auth_pass_encrypted) {
             $auth_pass = \SmallSmallRSS\Crypt::de($auth_pass);
         }
-        $cache_images = sql_bool_to_bool($row['cache_images']);
+        $cache_images = \SmallSmallRSS\Database::fromSQLBool($row['cache_images']);
         $fetch_url = $row['feed_url'];
         \SmallSmallRSS\Feeds::markUpdateStarted(array($feed));
         $feed = \SmallSmallRSS\Database::escape_string($feed);
@@ -322,7 +322,7 @@ class RSSUpdater
 
         $registered_title = \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
         $orig_site_url = \SmallSmallRSS\Database::fetch_result($result, 0, 'site_url');
-        $favicon_needs_check = sql_bool_to_bool(
+        $favicon_needs_check = \SmallSmallRSS\Database::fromSQLBool(
             \SmallSmallRSS\Database::fetch_result($result, 0, 'favicon_needs_check')
         );
         $favicon_avg_color = \SmallSmallRSS\Database::fetch_result($result, 0, 'favicon_avg_color');

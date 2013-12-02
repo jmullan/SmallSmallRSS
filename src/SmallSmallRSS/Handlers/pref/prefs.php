@@ -269,7 +269,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $email = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'email'));
         $full_name = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'full_name'));
-        $otp_enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'otp_enabled'));
+        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'otp_enabled'));
 
         echo '<tr><td width="40%">'.__('Full name').'</td>';
         echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox"';
@@ -854,7 +854,7 @@ class Pref_Prefs extends ProtectedHandler
 
         $base32 = new \OTPHP\Base32();
         $login = \SmallSmallRSS\Database::fetch_result($result, 0, 'login');
-        $otp_enabled = sql_bool_to_bool(\SmallSmallRSS\Database::fetch_result($result, 0, 'otp_enabled'));
+        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'otp_enabled'));
 
         if (!$otp_enabled) {
             $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetch_result($result, 0, 'salt')));

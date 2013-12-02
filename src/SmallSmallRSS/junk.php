@@ -1184,28 +1184,6 @@ function search_to_sql($search)
     return $search_query_part;
 }
 
-function getParentCategories($cat, $owner_uid)
-{
-    # TODO: make this more efficient
-    $parents = \SmallSmallRSS\getParents($cat, $owner_uid);
-    $ancestors = $parents;
-    foreach ($parents as $parent_id) {
-        $ancestors = array_merge($ancestors, getParentCategories($parent_id, $owner_uid));
-    }
-    return $rv;
-}
-
-function getChildCategories($cat, $owner_uid)
-{
-    # TODO: make this more efficient
-    $children = \SmallSmallRSS\FeedCategories::getChildren($cat, $owner_uid);
-    $descendents = $children;
-    foreach ($children as $child_id) {
-        $descendents = array_merge($descendents, getChildCategories($child_id, $owner_uid));
-    }
-    return array_unique($descendents);
-}
-
 function queryFeedHeadlines(
     $feed,
     $limit,
@@ -1324,7 +1302,7 @@ function queryFeedHeadlines(
         $vfeed_query_part = 'ttrss_feeds.title AS feed_title,';
         if ($feed > 0) {
             if ($include_children) {
-                $subcats = getChildCategories($feed, $owner_uid);
+                $subcats = \SmallSmallRSS\FeedCategories::getDescendents($feed, $owner_uid);
                 array_push($subcats, $feed);
                 $cats_qpart = join(',', $subcats);
             } else {
@@ -1339,7 +1317,7 @@ function queryFeedHeadlines(
             if ($feed > 0) {
                 if ($include_children) {
                     // sub-cats
-                    $subcats = getChildCategories($feed, $owner_uid);
+                    $subcats = \SmallSmallRSS\FeedCategories::getDescendents($feed, $owner_uid);
                     array_push($subcats, $feed);
                     $query_strategy_part = 'cat_id IN (' . implode(',', $subcats) . ')';
                 } else {
@@ -2106,7 +2084,7 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
     $cat_id = \SmallSmallRSS\Feeds::getCategory($feed_id);
     $check_cats = join(
         ',',
-        array_merge(getParentCategories($cat_id, $owner_uid), array($cat_id))
+        array_merge(\SmallSmallRSS\FeedCategories::getAncestors($cat_id, $owner_uid), array($cat_id))
     );
     $filter_lines = \SmallSmallRSS\Filters::getEnabled($owner_uid);
     foreach ($filter_lines as $filter_line) {
@@ -2553,7 +2531,7 @@ function filter_to_sql($filter, $owner_uid)
             }
             if (isset($rule['cat_id'])) {
                 if ($rule['cat_id'] > 0) {
-                    $children = getChildCategories($rule['cat_id'], $owner_uid);
+                    $children = \SmallSmallRSS\FeedCategories::getDescendents($rule['cat_id'], $owner_uid);
                     array_push($children, $rule['cat_id']);
                     $children = join(',', $children);
                     $cat_qpart = "cat_id IN ($children)";

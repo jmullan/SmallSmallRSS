@@ -152,4 +152,24 @@ class FeedCategories
         }
         return $parents;
     }
+    public static function getDescendents($cat, $owner_uid)
+    {
+        # TODO: make this more efficient
+        $children = self::getChildren($cat, $owner_uid);
+        $descendents = $children;
+        foreach ($children as $child_id) {
+            $descendents = array_merge($descendents, self::getDescendents($child_id, $owner_uid));
+        }
+        return array_unique($descendents);
+    }
+    public static function getAncestors($cat, $owner_uid)
+    {
+        # TODO: make this more efficient
+        $parents = self::getParents($cat, $owner_uid);
+        $ancestors = $parents;
+        foreach ($parents as $parent_id) {
+            $ancestors = array_merge($ancestors, self::getAncestors($parent_id, $owner_uid));
+        }
+        return array_unique($ancestors);
+    }
 }

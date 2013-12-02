@@ -65,7 +65,7 @@ class UserEntries
             if ($cat_view) {
                 if ($feed_id >= 0) {
                     if ($feed_id > 0) {
-                        $children = getChildCategories($feed_id, $owner_uid);
+                        $children = \SmallSmallRSS\FeedCategories::getDescendents($feed_id, $owner_uid);
                         array_push($children, $feed_id);
                         $children = join(',', $children);
                         $cat_qpart = "cat_id IN ($children)";

@@ -820,7 +820,7 @@ class RSSUpdater
             // check for manual tags (we have to do it here since they're loaded from filters)
             foreach ($article_filters as $f) {
                 if ($f['type'] == 'tag') {
-                    $manual_tags = trim_array(explode(',', $f['param']));
+                    $manual_tags = array_map('trim', explode(',', $f['param']));
                     foreach ($manual_tags as $tag) {
                         if (tag_is_valid($tag)) {
                             array_push($entry_tags, $tag);
@@ -830,23 +830,10 @@ class RSSUpdater
             }
 
             // Skip boring tags
-            $boring_tags = trim_array(
-                explode(
-                    ',',
-                    mb_strtolower(
-                        \SmallSmallRSS\DBPrefs::read(
-                            'BLACKLISTED_TAGS',
-                            $owner_uid,
-                            ''
-                        ),
-                        'utf-8'
-                    )
-                )
-            );
-
+            $blacklisted = mb_strtolower(\SmallSmallRSS\DBPrefs::read('BLACKLISTED_TAGS', $owner_uid, ''), 'utf-8');
+            $boring_tags = array_map('trim', explode(',', $blacklisted));
             $filtered_tags = array();
             $tags_to_cache = array();
-
             if ($entry_tags && is_array($entry_tags)) {
                 foreach ($entry_tags as $tag) {
                     if (array_search($tag, $boring_tags) === false) {

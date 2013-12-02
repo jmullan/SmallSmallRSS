@@ -1782,13 +1782,6 @@ function get_article_tags($id, $owner_uid = 0, $tag_cache = false)
     return $tags;
 }
 
-function trim_array($array)
-{
-    $tmp = $array;
-    array_walk($tmp, 'trim');
-    return $tmp;
-}
-
 function tag_is_valid($tag)
 {
     if ($tag == '') {

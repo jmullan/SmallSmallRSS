@@ -264,7 +264,7 @@ class Article extends ProtectedHandler
     {
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
         $tags_str = \SmallSmallRSS\Database::escape_string($_REQUEST['tags_str']);
-        $tags = array_unique(trim_array(explode(',', $tags_str)));
+        $tags = array_unique(array_map('trim', (explode(',', $tags_str))));
         \SmallSmallRSS\Database::query('BEGIN');
         $result = \SmallSmallRSS\Database::query(
             "SELECT int_id FROM ttrss_user_entries

@@ -352,5 +352,24 @@ class Feeds
         $file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico";
         return (is_file($file) && filesize($file));
     }
-
+    public static function getForCategory($cat_id, $owner_id)
+    {
+        if ($cat != 0) {
+            $cat_query = "cat_id = '$cat'";
+        } else {
+            $cat_query = 'cat_id IS NULL';
+        }
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id
+             FROM ttrss_feeds
+             WHERE
+                 $cat_query
+                 AND owner_uid = " . $owner_uid
+        );
+        $feed_ids = array();
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $feed_ids[] = $line['id'];
+        }
+        return $feed_ids;
+    }
 }

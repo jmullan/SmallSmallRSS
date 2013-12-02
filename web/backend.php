@@ -29,7 +29,7 @@ if (array_search($op, $public_calls) !== false) {
 
 $csrf_token = (isset($_REQUEST['csrf_token']) ? $_REQUEST['csrf_token'] : '');
 
-\SmallSmallRSS\Session::init();
+\SmallSmallRSS\Sessions::init();
 
 \SmallSmallRSS\Locale::startupGettext();
 
@@ -45,7 +45,7 @@ if (\SmallSmallRSS\Auth::is_single_user_mode()) {
 }
 
 if ($_SESSION['uid']) {
-    if (!\SmallSmallRSS\Session::validate()) {
+    if (!\SmallSmallRSS\Sessions::validate()) {
         $renderer = new \SmallSmallRSS\Renderers\JSONError(6);
         $renderer->render();
         return;

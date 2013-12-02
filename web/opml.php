@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
-\SmallSmallRSS\Session::init();
+\SmallSmallRSS\Sessions::init();
 if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }

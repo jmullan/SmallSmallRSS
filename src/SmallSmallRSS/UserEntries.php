@@ -253,9 +253,29 @@ class UserEntries
     {
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries
-             SET last_read = null,
+             SET
+                 last_read = null,
                  unread = true
              WHERE ref_id = '$ref_id'"
         );
+    }
+    public static function countUnread($feed_ids, $owner_uid)
+    {
+        $unread = 0;
+        if ($feed_ids) {
+            $in_feed_ids = join(', ', array_map('intval', $feed_ids));
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT COUNT(int_id) AS unread
+                 FROM ttrss_user_entries
+                 WHERE
+                     unread = true
+                     AND feed_id IN($in_feed_ids)
+                     AND owner_uid = $owner_uid"
+            );
+            while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+                $unread += $line['unread'];
+            }
+        }
+        return $unread;
     }
 }

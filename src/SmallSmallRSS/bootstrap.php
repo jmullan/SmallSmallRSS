@@ -18,7 +18,7 @@ if (defined('E_DEPRECATED')) {
     error_reporting(-1);
 }
 
-\SmallSmallRSS\Session::init();
+\SmallSmallRSS\Sessions::init();
 
 
 \SmallSmallRSS\Config::set(

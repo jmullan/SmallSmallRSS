@@ -34,12 +34,12 @@ class Session
         );
         if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
             session_set_save_handler(
-                '\SmallSmallRSS\Session::open',
-                '\SmallSmallRSS\Session::close',
-                '\SmallSmallRSS\Session::read',
-                '\SmallSmallRSS\Session::write',
-                '\SmallSmallRSS\Session::destroy',
-                '\SmallSmallRSS\Session::gc'
+                '\SmallSmallRSS\Sessions::open',
+                '\SmallSmallRSS\Sessions::close',
+                '\SmallSmallRSS\Sessions::read',
+                '\SmallSmallRSS\Sessions::write',
+                '\SmallSmallRSS\Sessions::destroy',
+                '\SmallSmallRSS\Sessions::gc'
             );
             register_shutdown_function('session_write_close');
         }
@@ -88,25 +88,17 @@ class Session
             return false;
         }
         if ($_SESSION['uid']) {
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT pwd_hash FROM ttrss_users WHERE id = '" . $_SESSION['uid'] . "'"
-            );
-
-            // user not found
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            $user_record = \SmallSmallRSS\Users::getByUid($_SESSION['uid']);
+            if (!$user_record) {
+                // user not found
                 return false;
-            } else {
-                $pwd_hash = \SmallSmallRSS\Database::fetch_result($result, 0, 'pwd_hash');
-
-                if ($pwd_hash != $_SESSION['pwd_hash']) {
-                    return false;
-                }
+            }
+            if ($user_record['pwd_hash'] != $_SESSION['pwd_hash']) {
+                return false;
             }
         }
-
         return true;
     }
-
 
     public static function open($s, $n)
     {
@@ -115,16 +107,18 @@ class Session
 
     public static function read($id)
     {
-        $res = \SmallSmallRSS\Database::query("SELECT data FROM ttrss_sessions WHERE id='$id'");
-
+        $res = \SmallSmallRSS\Database::query(
+            "SELECT data
+             FROM ttrss_sessions
+             WHERE id='$id'"
+        );
         if (\SmallSmallRSS\Database::num_rows($res) != 1) {
-
-            $expire = time() + \SmallSmallRSS\Session::$session_expire;
-
+            $expire = time() + \SmallSmallRSS\Sessions::$session_expire;
             \SmallSmallRSS\Database::query(
-                "INSERT INTO ttrss_sessions (id, data, expire) VALUES ('$id', '', '$expire')"
+                "INSERT INTO ttrss_sessions
+                 (id, data, expire)
+                 VALUES ('$id', '', $expire)"
             );
-
             return '';
         } else {
             return base64_decode(\SmallSmallRSS\Database::fetch_result($res, 0, 'data'));
@@ -135,8 +129,14 @@ class Session
     public static function write($id, $data)
     {
         $data = base64_encode($data);
-        $expire = time() + \SmallSmallRSS\Session::$session_expire;
-        \SmallSmallRSS\Database::query("UPDATE ttrss_sessions SET data='$data', expire='$expire' WHERE id='$id'");
+        $expire = time() + \SmallSmallRSS\Sessions::$session_expire;
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_sessions
+             SET
+                data='$data',
+                expire=$expire
+             WHERE id='$id'"
+        );
         return true;
     }
 
@@ -147,13 +147,20 @@ class Session
 
     public static function destroy($id)
     {
-        \SmallSmallRSS\Database::query("DELETE FROM ttrss_sessions WHERE id = '$id'");
+        \SmallSmallRSS\Database::query(
+            "DELETE FROM ttrss_sessions
+             WHERE id = '$id'"
+        );
 
         return true;
     }
 
     public static function gc($expire)
     {
-        \SmallSmallRSS\Database::query('DELETE FROM ttrss_sessions WHERE expire < ' . time());
+        $expire = time();
+        \SmallSmallRSS\Database::query(
+            'DELETE FROM ttrss_sessions
+             WHERE expire < $expire'
+        );
     }
 }

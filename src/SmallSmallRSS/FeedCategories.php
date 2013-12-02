@@ -3,6 +3,30 @@ namespace SmallSmallRSS;
 
 class FeedCategories
 {
+    const SPECIAL = -1;
+    const LABELS = -2;
+
+    public static function getTitle($cat_id)
+    {
+
+        if ($cat_id == self::SPECIAL) {
+            return __('Special');
+        } elseif ($cat_id == self::LABELS) {
+            return __('Labels');
+        } else {
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT title
+                 FROM ttrss_feed_categories
+                 WHERE id = '$cat_id'"
+            );
+            if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+                return \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
+            } else {
+                return __('Uncategorized');
+            }
+        }
+    }
+
     public static function get($feed_cat, $parent_cat_id = false)
     {
         if ($parent_cat_id) {
@@ -57,5 +81,21 @@ class FeedCategories
             return true;
         }
         return false;
+    }
+
+    public static function getChildren($cat, $owner_uid)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id
+             FROM ttrss_feed_categories
+             WHERE
+                 parent_cat = '$cat'
+                 AND owner_uid = $owner_uid"
+        );
+        $ids = array();
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $ids[] = $line['id'];
+        }
+        return $ids;
     }
 }

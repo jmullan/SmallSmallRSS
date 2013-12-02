@@ -31,21 +31,14 @@ function authenticate_user($login, $password, $check_only = false)
             $_SESSION['auth_module'] = $auth_module;
             $_SESSION['uid'] = $user_id;
             $_SESSION['version'] = \SmallSmallRSS\Constants::VERSION;
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT
-                     login,
-                     access_level,
-                     pwd_hash
-                 FROM ttrss_users
-                 WHERE id = '$user_id'"
-            );
-            $_SESSION['name'] = \SmallSmallRSS\Database::fetch_result($result, 0, 'login');
-            $_SESSION['access_level'] = \SmallSmallRSS\Database::fetch_result($result, 0, 'access_level');
+            $user_record = \SmallSmallRSS\Users::getByUid($user_id);
+            $_SESSION['name'] = $user_record['login'];
+            $_SESSION['access_level'] = $user_record['access_level'];
             $_SESSION['csrf_token'] = sha1(uniqid(rand(), true));
             \SmallSmallRSS\Database::query('UPDATE ttrss_users SET last_login = NOW() WHERE id = ' . $_SESSION['uid']);
             $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
             $_SESSION['user_agent'] = sha1($_SERVER['HTTP_USER_AGENT']);
-            $_SESSION['pwd_hash'] = \SmallSmallRSS\Database::fetch_result($result, 0, 'pwd_hash');
+            $_SESSION['pwd_hash'] = $user_record['pwd_hash'];
             $_SESSION['last_version_check'] = time();
             initialize_user_prefs($_SESSION['uid']);
             return true;
@@ -101,7 +94,7 @@ function login_sequence()
         authenticate_user('admin', null);
         load_user_plugins($_SESSION['uid']);
     } else {
-        if (!\SmallSmallRSS\Session::validate()) {
+        if (!\SmallSmallRSS\Sessions::validate()) {
             $_SESSION['uid'] = false;
         }
         if (!$_SESSION['uid']) {
@@ -253,18 +246,7 @@ function getAllCounters()
 
 function getCategoryTitle($cat_id)
 {
-    if ($cat_id == -1) {
-        return __('Special');
-    } elseif ($cat_id == -2) {
-        return __('Labels');
-    } else {
-        $result = \SmallSmallRSS\Database::query("SELECT title FROM ttrss_feed_categories WHERE id = '$cat_id'");
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
-        } else {
-            return __('Uncategorized');
-        }
-    }
+    return \SmallSmallRSS\FeedCategories::getTitle($cat_id);
 }
 
 function getCategoryCounters()
@@ -315,20 +297,19 @@ function getCategoryCounters()
 // only accepts real cats (>= 0)
 function getCategoryChildrenUnread($cat, $owner_uid = false)
 {
+    if ($cat == \SmallSmallRSS\FeedCategories::SPECIAL
+        || $cat == \SmallSmallRSS\FeedCategories::LABELS) {
+        return 0;
+    }
     if (!$owner_uid) {
         $owner_uid = $_SESSION['uid'];
     }
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT id
-         FROM ttrss_feed_categories
-         WHERE
-             parent_cat = '$cat'
-             AND owner_uid = $owner_uid"
-    );
+    $cat_ids = \SmallSmallRSS\FeedCategories::getChildren($cat, $owner_uid);
     $unread = 0;
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        $unread += getCategoryUnread($line['id'], $owner_uid);
-        $unread += getCategoryChildrenUnread($line['id'], $owner_uid);
+    foreach ($cat_ids as $cat_id) {
+        # TODO: This is pretty inefficient.
+        $unread += getCategoryUnread($cat_id, $owner_uid);
+        $unread += getCategoryChildrenUnread($cat_id, $owner_uid);
     }
     return $unread;
 }
@@ -339,49 +320,17 @@ function getCategoryUnread($cat, $owner_uid = false)
         $owner_uid = $_SESSION['uid'];
     }
     if ($cat >= 0) {
-        if ($cat != 0) {
-            $cat_query = "cat_id = '$cat'";
-        } else {
-            $cat_query = 'cat_id IS NULL';
-        }
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT id
-             FROM ttrss_feeds
-             WHERE
-                 $cat_query
-                 AND owner_uid = " . $owner_uid
-        );
-        $cat_feeds = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-            $cat_feeds[] = 'feed_id = ' . $line['id'];
-        }
-
-        if (count($cat_feeds) == 0) {
-            return 0;
-        }
-
-        $match_part = implode(' OR ', $cat_feeds);
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT COUNT(int_id) AS unread
-             FROM ttrss_user_entries
-             WHERE
-                 unread = true
-                 AND ($match_part)
-                 AND owner_uid = " . $owner_uid
-        );
-        $unread = 0;
-        // this needs to be rewritten
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-            $unread += $line['unread'];
-        }
-
+        $feed_ids = \SmallSmallRSS\Feeds::getForCat($cat, $owner_uid);
+        $unread = \SmallSmallRSS\UserEntries::countUnread($cat, $owner_uid);
         return $unread;
-    } elseif ($cat == -1) {
+    } elseif ($cat == \SmallSmallRSS\FeedCategories::SPECIAL) {
         return getFeedUnread(-1) + getFeedUnread(-2) + getFeedUnread(-3) + getFeedUnread(0);
-    } elseif ($cat == -2) {
+    } elseif ($cat == \SmallSmallRSS\FeedCategories::LABELS) {
         $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(unread) AS unread
-             FROM ttrss_user_entries, ttrss_user_labels2
+             FROM
+                 ttrss_user_entries,
+                 ttrss_user_labels2
              WHERE
                  article_id = ref_id
                  AND unread = true

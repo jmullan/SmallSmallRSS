@@ -87,7 +87,8 @@ class Users
              ('$login', '$pwd_hash', 0, null, '$email', NOW(), '$salt')"
         );
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id FROM ttrss_users
+            "SELECT id
+             FROM ttrss_users
              WHERE
                  login = '$login'
                  AND pwd_hash = '$pwd_hash'"
@@ -105,5 +106,17 @@ class Users
              SET last_login = NOW()
              WHERE id = $id"
         );
+    }
+    public static function getByUid($uid)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT
+                 login,
+                 access_level,
+                 pwd_hash
+             FROM ttrss_users
+             WHERE id = '$user_id'"
+        );
+        return \SmallSmallRSS\Database::fetch_assoc($result);
     }
 }

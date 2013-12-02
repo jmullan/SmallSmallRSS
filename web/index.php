@@ -1,9 +1,9 @@
 <?php
-if (file_exists(__DIR__ . "/install") && !file_exists(__DIR__ . "/../config.ini")) {
-    header("Location: install/");
+if (file_exists(__DIR__ . '/install') && !file_exists(__DIR__ . '/../config.ini')) {
+    header('Location: install/');
 }
 
-if (!file_exists(__DIR__ . "/../config.ini")) {
+if (!file_exists(__DIR__ . '/../config.ini')) {
     print "<b>Fatal Error</b>: You forgot to copy
            <b>config.ini-dist</b> to <b>config.ini</b> and edit it.\n";
     exit;
@@ -22,15 +22,15 @@ if (!\SmallSmallRSS\PluginHost::init_all()) {
 
 if (empty($_REQUEST['mobile'])) {
     if ($mobile->isTablet()
-        && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("digest")) {
+        && \SmallSmallRSS\PluginHost::getInstance()->get_plugin('digest')) {
         header('Location: backend.php?op=digest');
         exit;
     } elseif ($mobile->isMobile()
-              && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("mobile")) {
+              && \SmallSmallRSS\PluginHost::getInstance()->get_plugin('mobile')) {
         header('Location: backend.php?op=mobile');
         exit;
     } elseif ($mobile->isMobile()
-              && \SmallSmallRSS\PluginHost::getInstance()->get_plugin("digest")) {
+              && \SmallSmallRSS\PluginHost::getInstance()->get_plugin('digest')) {
         header('Location: backend.php?op=digest');
         exit;
     }
@@ -41,19 +41,19 @@ login_sequence();
 header('Content-Type: text/html; charset=utf-8');
 
 $theme_css = 'themes/default.css';
-if ($_SESSION["uid"]) {
-    $theme = \SmallSmallRSS\DBPrefs::read("USER_CSS_THEME", $_SESSION["uid"], false);
+if ($_SESSION['uid']) {
+    $theme = \SmallSmallRSS\DBPrefs::read('USER_CSS_THEME', $_SESSION['uid'], false);
     if ($theme && file_exists("themes/$theme")) {
         $theme_css = "themes/$theme";
     }
 }
 $js_renderer = new \SmallSmallRSS\Renderers\JS();
 $js_files = array(
-    "lib/prototype.js",
-    "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
-    "lib/dojo/dojo.js",
-    "lib/dojo/tt-rss-layer.js",
-    "errors.php?mode=js"
+    'lib/prototype.js',
+    'lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls',
+    'lib/dojo/dojo.js',
+    'lib/dojo/tt-rss-layer.js',
+    'errors.php?mode=js'
 );
 ?>
 <!DOCTYPE html>
@@ -62,8 +62,8 @@ $js_files = array(
   <title>Small Small RSS</title>
 <?php
 $stylesheet_tag_renderer = new \SmallSmallRSS\Renderers\CSS();
-$stylesheet_tag_renderer->renderStylesheetTag("lib/dijit/themes/claro/claro.css");
-$stylesheet_tag_renderer->renderStylesheetTag("css/layout.css");
+$stylesheet_tag_renderer->renderStylesheetTag('lib/dijit/themes/claro/claro.css');
+$stylesheet_tag_renderer->renderStylesheetTag('css/layout.css');
 $stylesheet_tag_renderer->renderStylesheetTag($theme_css);
 
 $stylesheet_renderer = new \SmallSmallRSS\Renderers\CSS();
@@ -105,7 +105,7 @@ foreach ($js_files as $jsfile) {
     data-dojo-props="region: 'leading', splitter=true" style="width: 20%">
     <div id="feedlistLoading">
       <img src="images/indicator_tiny.gif" />
-      <?php echo  __("Loading, please wait..."); ?>
+      <?php echo  __('Loading, please wait...'); ?>
     </div>
     <div id="feedTree"></div>
   </div>
@@ -160,7 +160,7 @@ $toolbar_plugins = \SmallSmallRSS\PluginHost::getInstance()->runHooks(
 );
 ?>
           <button id="net-alert" data-dojo-type="dijit.form.Button" style="display: none" disabled="true"
-            title="<?php echo __("Communication problem with server.") ?>">
+            title="<?php echo __('Communication problem with server.') ?>">
           <img src="images/alert.png" />
         </button>
         <div data-dojo-type="dijit.form.DropDownButton">
@@ -184,7 +184,7 @@ $toolbar_plugins = \SmallSmallRSS\PluginHost::getInstance()->runHooks(
 ?>
 
 <?php
-if (empty($_SESSION["hide_logout"])) {
+if (empty($_SESSION['hide_logout'])) {
 ?>
     <div data-dojo-type="dijit.MenuItem" onclick="quickMenuGo('qmcLogout')"><?php echo __('Logout'); ?></div>
 <?php
@@ -217,7 +217,7 @@ if (empty($_SESSION["hide_logout"])) {
 require({cache:{}});
 <?php
 $js_renderer->render_minified_js_files(
-    array("tt-rss", "functions", "feedlist", "viewfeed", "FeedTree", "PluginHost")
+    array('tt-rss', 'functions', 'feedlist', 'viewfeed', 'FeedTree', 'PluginHost')
 );
 foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
     $js_renderer->render_minified($p->getJavascript());

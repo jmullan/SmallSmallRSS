@@ -107,7 +107,7 @@ class API extends Handler
 
     public function logout()
     {
-        logout_user();
+        \SmallSmallRSS\Sessions::logout();
         $this->wrap(self::STATUS_OK, array('status' => 'OK'));
     }
 

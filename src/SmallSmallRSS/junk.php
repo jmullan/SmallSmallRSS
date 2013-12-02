@@ -64,19 +64,6 @@ function authenticate_user($login, $password, $check_only = false)
     }
 }
 
-function logout_user()
-{
-    session_destroy();
-    if (isset($_COOKIE[session_name()])) {
-        setcookie(session_name(), '', time()-42000, '/');
-    }
-}
-
-function validate_csrf($csrf_token)
-{
-    return $csrf_token == $_SESSION['csrf_token'];
-}
-
 function load_user_plugins($owner_uid)
 {
     if ($owner_uid) {

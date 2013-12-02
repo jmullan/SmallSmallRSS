@@ -343,7 +343,7 @@ class PublicHandler extends Handler
     }
     public function logout()
     {
-        logout_user();
+        \SmallSmallRSS\Sessions::logout();
         header('Location: index.php');
     }
 

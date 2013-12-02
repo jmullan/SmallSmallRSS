@@ -6,7 +6,7 @@ namespace SmallSmallRSS;
 
 \SmallSmallRSS\ErrorHandler::register();
 
-class Session
+class Sessions
 {
     public static $session_expire = 86400;
     public static $session_name = 'ttrss_sid';
@@ -162,5 +162,18 @@ class Session
             'DELETE FROM ttrss_sessions
              WHERE expire < $expire'
         );
+    }
+
+    public static function validateCSRF($csrf_token)
+    {
+        return $csrf_token == $_SESSION['csrf_token'];
+    }
+
+    public static function logout()
+    {
+        session_destroy();
+        if (isset($_COOKIE[session_name()])) {
+            setcookie(session_name(), '', time() - 42000, '/');
+        }
     }
 }

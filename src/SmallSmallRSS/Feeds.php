@@ -372,4 +372,95 @@ class Feeds
         }
         return $feed_ids;
     }
+    public static function getForSelectByCategory($cat_id, $owner_id)
+    {
+        if ($cat != 0) {
+            $cat_query = "cat_id = '$cat'";
+        } else {
+            $cat_query = 'cat_id IS NULL';
+        }
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id, title
+             FROM ttrss_feeds
+             WHERE
+                 $cat_query
+                 AND owner_uid = $owner_uid
+             ORDER BY title ASC"
+        );
+        $feeds = array();
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $feeds[] = $line;
+        }
+        return $feeds;
+    }
+    public static function getAllForSelectByCategory($owner_id)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id, title
+             FROM ttrss_feeds
+             WHERE owner_uid = $owner_uid
+             ORDER BY title ASC"
+        );
+        $feeds = array();
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $feeds[] = $line;
+        }
+        return $feeds;
+    }
+    public static function getByUrl($url, $owner_uid)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id
+             FROM ttrss_feeds
+             WHERE
+                 feed_url = '$url'
+                 AND owner_uid = $owner_uid"
+        );
+        $feed_id = false;
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $feed_id = $line['id'];
+        }
+        return $feed_id;
+    }
+    public static function add($url, $cat_id, $owner_uid, $auth_login, $auth_pass)
+    {
+        if ($cat_id == '0' || !$cat_id) {
+            $cat_qpart = 'NULL';
+        } else {
+            $cat_qpart = "'$cat_id'";
+        }
+        if (\SmallSmallRSS\Crypt::is_enabled()) {
+            $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
+            $auth_pass_encrypted = 'true';
+        } else {
+            $auth_pass_encrypted = 'false';
+        }
+        $auth_pass = \SmallSmallRSS\Database::escape_string($auth_pass);
+        $result = \SmallSmallRSS\Database::query(
+            "INSERT INTO ttrss_feeds
+             (owner_uid,feed_url,title,cat_id, auth_login,auth_pass,update_method,auth_pass_encrypted)
+             VALUES (
+                 '$owner_uid', '$url',
+                 '[Unknown]', $cat_qpart, '$auth_login', '$auth_pass', 0, $auth_pass_encrypted)"
+        );
+
+    }
+    public static function getCounts($owner_uid)
+    {
+        $counts = array(
+            'max_feed_id' => 0,
+            'num_feeds' => 0
+        );
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT
+                 MAX(id) AS max_feed_id,
+                 COUNT(*) AS num_feeds
+             FROM ttrss_feeds
+             WHERE owner_uid = $owner_uid");
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $counts = $line;
+        }
+        return $counts;
+
+    }
 }

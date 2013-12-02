@@ -3,12 +3,12 @@ namespace SmallSmallRSS;
 
 class FeedCategories
 {
+    const NONE = 0;
     const SPECIAL = -1;
     const LABELS = -2;
 
     public static function getTitle($cat_id)
     {
-
         if ($cat_id == self::SPECIAL) {
             return __('Special');
         } elseif ($cat_id == self::LABELS) {
@@ -39,7 +39,10 @@ class FeedCategories
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_feed_categories
-             WHERE $parent_qpart AND title = '$feed_cat' AND owner_uid = ".$_SESSION['uid']
+             WHERE
+                 $parent_qpart
+                 AND title = '$feed_cat'
+                 AND owner_uid = ".$_SESSION['uid']
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
             return false;
@@ -67,8 +70,12 @@ class FeedCategories
         $feed_cat = mb_substr($feed_cat, 0, 250);
 
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id FROM ttrss_feed_categories
-            WHERE $parent_qpart AND title = '$feed_cat' AND owner_uid = ".$_SESSION['uid']
+            "SELECT id
+             FROM ttrss_feed_categories
+             WHERE
+                 $parent_qpart
+                 AND title = '$feed_cat'
+                 AND owner_uid = " . $_SESSION['uid']
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
@@ -97,5 +104,52 @@ class FeedCategories
             $ids[] = $line['id'];
         }
         return $ids;
+    }
+    public static function getChildrenForSelect($root_id, $owner_uid)
+    {
+        if ($root_id) {
+            $parent_qpart = "parent_cat = '$root_id'";
+        } else {
+            $parent_qpart = 'parent_cat IS NULL';
+        }
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT
+                 id,
+                 title,
+                 (
+                      SELECT COUNT(id)
+                      FROM ttrss_feed_categories AS c2
+                      WHERE c2.parent_cat = ttrss_feed_categories.id
+                 ) AS num_children
+             FROM ttrss_feed_categories
+             WHERE
+                 owner_uid = $owner_uid
+                 AND $parent_qpart
+             ORDER BY title ASC"
+        );
+        $children = array();
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $children[] = $line;
+        }
+        return $children;
+    }
+    public static function getParents($cat, $owner_uid)
+    {
+        if (!$cat) {
+            return array();
+        }
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT parent_cat
+             FROM ttrss_feed_categories
+             WHERE
+                  id = '$cat'
+                  AND parent_cat IS NOT NULL
+                  AND owner_uid = $owner_uid"
+        );
+        $parents = array();
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $parents[] = $line['parent_cat'];
+        }
+        return $parents;
     }
 }

@@ -259,6 +259,52 @@ class UserEntries
              WHERE ref_id = '$ref_id'"
         );
     }
+    public static function markIdsUnread($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET unread = true
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
+    public static function markIdsRead($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET
+                 unread = false,
+                 last_read = NOW()
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
+    public static function toggleIdsUnread($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET
+                 unread = NOT unread,
+                 last_read = NOW()
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
     public static function countUnread($feed_ids, $owner_uid)
     {
         $unread = 0;
@@ -277,5 +323,42 @@ class UserEntries
             }
         }
         return $unread;
+    }
+    public static function getMatchingFeeds($ref_ids, $owner_uid)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT DISTINCT feed_id
+             FROM ttrss_user_entries
+             WHERE
+                 AND owner_uid = $owner_uid"
+        );
+        $feed_ids = array();
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $feed_ids[] = $line['feed_id'];
+        }
+        return $feed_ids;
+    }
+    public static function getCachedTags($ref_id, $owner_uid)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT tag_cache
+             FROM ttrss_user_entries
+             WHERE
+                 ref_id = '$ref_id'
+                 AND owner_uid = $owner_uid"
+        );
+        return \SmallSmallRSS\Database::fetch_result($result, 0, 'tag_cache');
+    }
+    public static function setCachedTags($ref_id, $owner_uid, $tags_str)
+    {
+        $tags_str = \SmallSmallRSS\Database::escape_string($tags_str);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET tag_cache = '$tags_str'
+             WHERE
+                 ref_id = '$ref_id'
+                 AND owner_uid = $owner_uid"
+        );
+
     }
 }

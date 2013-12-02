@@ -1,10 +1,10 @@
 <?php
-if (file_exists("install") && !file_exists("config.ini")) {
-    header("Location: install/");
+if (file_exists('install') && !file_exists('config.ini')) {
+    header('Location: install/');
 }
 
-if (!file_exists("config.ini")) {
-    print "<b>Fatal Error</b>:";
+if (!file_exists('config.ini')) {
+    print '<b>Fatal Error</b>:';
     print "You forgot to copy <b>config.ini-dist</b> to <b>config.ini</b> and edit it.\n";
     exit;
 }
@@ -19,8 +19,8 @@ header('Content-Type: text/html; charset=utf-8');
 
 $css_renderer = new \SmallSmallRSS\Renderers\CSS();
 $theme_css = 'default.css';
-if ($_SESSION["uid"]) {
-    $theme = \SmallSmallRSS\DBPrefs::read("USER_CSS_THEME", $_SESSION["uid"], false);
+if ($_SESSION['uid']) {
+    $theme = \SmallSmallRSS\DBPrefs::read('USER_CSS_THEME', $_SESSION['uid'], false);
     if ($theme && file_exists("themes/$theme")) {
         $theme_css = "themes/$theme";
     }
@@ -32,11 +32,11 @@ $translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Small Small RSS : <?php echo __("Preferences") ?></title>
+  <title>Small Small RSS : <?php echo __('Preferences') ?></title>
 <?php
 
-$css_renderer->renderStylesheetTag("lib/dijit/themes/claro/claro.css");
-$css_renderer->renderStylesheetTag("css/layout.css");
+$css_renderer->renderStylesheetTag('lib/dijit/themes/claro/claro.css');
+$css_renderer->renderStylesheetTag('css/layout.css');
 $css_renderer->renderStylesheetTag("themes/$theme");
 $stylesheet_renderer = new \SmallSmallRSS\Renderers\CSS();
 $stylesheet_renderer->renderUserStyleSheet();
@@ -44,11 +44,11 @@ $stylesheet_renderer->renderUserStyleSheet();
   <link rel="shortcut icon" type="image/png" href="images/favicon.png"/>
   <link rel="icon" type="image/png" sizes="72x72" href="images/favicon-72px.png" />
 <?php
-foreach (array("lib/prototype.js",
-               "lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls",
-               "lib/dojo/dojo.js",
-               "lib/dojo/tt-rss-layer.js",
-               "errors.php?mode=js") as $jsfile) {
+foreach (array('lib/prototype.js',
+               'lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls',
+               'lib/dojo/dojo.js',
+               'lib/dojo/tt-rss-layer.js',
+               'errors.php?mode=js') as $jsfile) {
     $js_renderer = new \SmallSmallRSS\Renderers\JS();
     $js_renderer->render_script_tag($jsfile);
 }
@@ -60,7 +60,7 @@ foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
     $js_renderer->render_minified($p->getPreferencesJavascript());
 }
 $js_renderer->render_minified_js_files(
-    array("../lib/CheckBoxTree", "functions", "deprecated", "prefs", "PrefFeedTree", "PrefFilterTree", "PrefLabelTree")
+    array('../lib/CheckBoxTree', 'functions', 'deprecated', 'prefs', 'PrefFeedTree', 'PrefFilterTree', 'PrefLabelTree')
 );
 $translation_renderer->render();
 ?>
@@ -77,7 +77,7 @@ $translation_renderer->render();
 <div id="cmdline" style="display: none"></div>
 <div id="overlay">
   <div id="overlay_inner">
-    <div class="insensitive"><?php echo __("Loading, please wait...") ?></div>
+    <div class="insensitive"><?php echo __('Loading, please wait...') ?></div>
     <div data-dojo-type="dijit.ProgressBar" places="0" style="width: 300px" id="loading_bar"
       progress="0" maximum="100">
     </div>
@@ -108,7 +108,7 @@ $translation_renderer->render();
     href="backend.php?op=pref-labels"
     title="<?php echo __('Labels') ?>"></div>
 <?php
-if ($_SESSION["access_level"] >= 10) {
+if ($_SESSION['access_level'] >= 10) {
 ?>
     <div id="userConfigTab" data-dojo-type="dijit.layout.ContentPane"
      href="backend.php?op=pref-users"

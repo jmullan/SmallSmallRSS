@@ -9,8 +9,8 @@ $script_started = microtime(true);
 if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
-$method = $_REQUEST["op"];
-$override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler("public", $method);
+$method = $_REQUEST['op'];
+$override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler('public', $method);
 if ($override) {
     $handler = $override;
 } else {

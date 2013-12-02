@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 
-$op = (isset($_REQUEST['op']) ? $_REQUEST["op"] : '');
-$method = (!empty($_REQUEST['subop']) ? $_REQUEST['subop'] : $_REQUEST["method"]);
+$op = (isset($_REQUEST['op']) ? $_REQUEST['op'] : '');
+$method = (!empty($_REQUEST['subop']) ? $_REQUEST['subop'] : $_REQUEST['method']);
 if (!$method) {
     $method = 'index';
 } else {
@@ -12,18 +12,18 @@ if (!$method) {
 /* Public calls compatibility shim */
 
 $public_calls = array(
-    "globalUpdateFeeds",
-    "rss",
-    "getUnread",
-    "getProfiles",
-    "share",
-    "fbexport",
-    "logout",
-    "pubsub"
+    'globalUpdateFeeds',
+    'rss',
+    'getUnread',
+    'getProfiles',
+    'share',
+    'fbexport',
+    'logout',
+    'pubsub'
 );
 
 if (array_search($op, $public_calls) !== false) {
-    header("Location: public.php?" . $_SERVER['QUERY_STRING']);
+    header('Location: public.php?' . $_SERVER['QUERY_STRING']);
     return;
 }
 
@@ -38,21 +38,21 @@ $script_started = microtime(true);
 if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
-header("Content-Type: application/json; charset=utf-8");
+header('Content-Type: application/json; charset=utf-8');
 
 if (\SmallSmallRSS\Auth::is_single_user_mode()) {
-    authenticate_user("admin", null);
+    authenticate_user('admin', null);
 }
 
-if ($_SESSION["uid"]) {
+if ($_SESSION['uid']) {
     if (!\SmallSmallRSS\Session::validate()) {
         $renderer = new \SmallSmallRSS\Renderers\JSONError(6);
         $renderer->render();
         return;
     }
-    load_user_plugins($_SESSION["uid"]);
+    load_user_plugins($_SESSION['uid']);
 }
-$op = str_replace("-", "_", $op);
+$op = str_replace('-', '_', $op);
 $legacy_ops = array(
     'api' => 'API',
     'rpc' => 'RPC',
@@ -80,7 +80,7 @@ if (class_exists($handler) || $override) {
                 if ($method && method_exists($handler, $method)) {
                     $handler->$method();
                 } else {
-                    if (method_exists($handler, "catchall")) {
+                    if (method_exists($handler, 'catchall')) {
                         $handler->catchall($method);
                     }
                 }

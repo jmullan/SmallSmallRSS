@@ -8,11 +8,11 @@ class Lockfiles
         $num_deleted = 0;
         if (!is_writable(\SmallSmallRSS\Config::get('LOCK_DIRECTORY'))) {
             \SmallSmallRSS\Logger::debug(
-                \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . " is not writable"
+                \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . ' is not writable'
             );
             return;
         }
-        $files = glob(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/*.lock");
+        $files = glob(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . '/*.lock');
         if ($files) {
             foreach ($files as $file) {
                 if (!self::is_locked(basename($file)) && time() - filemtime($file) > 86400 * 2) {
@@ -48,7 +48,7 @@ class Lockfiles
             \SmallSmallRSS\Logger::Log("Could not touch $full_path");
             return false;
         }
-        $fp = fopen($full_path, "w");
+        $fp = fopen($full_path, 'w');
         if (!$fp) {
             \SmallSmallRSS\Logger::Log("Could not get lockfile pointer to $full_path");
             return false;
@@ -60,8 +60,8 @@ class Lockfiles
         $stat_h = fstat($fp);
         $stat_f = stat($full_path);
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
-            if ($stat_h["ino"] != $stat_f["ino"] ||
-                $stat_h["dev"] != $stat_f["dev"]) {
+            if ($stat_h['ino'] != $stat_f['ino'] ||
+                $stat_h['dev'] != $stat_f['dev']) {
                 \SmallSmallRSS\Logger::log('lockfile stats do not match.');
                 return false;
             }
@@ -81,7 +81,7 @@ class Lockfiles
         if (!function_exists('flock')) {
             return true; // consider the file always locked and skip the test
         }
-        $fp = @fopen($full_path, "r");
+        $fp = @fopen($full_path, 'r');
         if (!$fp) {
             return false;
         }
@@ -108,7 +108,7 @@ class Lockfiles
     {
         $lockfile = $stamp . '.stamp';
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
-        $fp = fopen($full_path, "w");
+        $fp = fopen($full_path, 'w');
         if (!$fp) {
             \SmallSmallRSS\Logger::Log("Could not get write handle on $full_path");
             return false;

@@ -90,13 +90,13 @@ class PluginHost
     }
     public function load_all($kind, $owner_uid = false)
     {
-        $plugins = array_map("basename", glob("plugins/*"));
-        $this->load(join(",", $plugins), $kind, $owner_uid);
+        $plugins = array_map('basename', glob('plugins/*'));
+        $this->load(join(',', $plugins), $kind, $owner_uid);
     }
 
     public function load($classlist, $kind, $owner_uid = false)
     {
-        $plugins = explode(",", $classlist);
+        $plugins = explode(',', $classlist);
         $this->owner_uid = (int) $owner_uid;
         foreach ($plugins as $class) {
             $class = trim($class);
@@ -124,7 +124,7 @@ class PluginHost
                     Logger::log("Wrong class type $class: $subclassing");
                     continue;
                 }
-                $plugin = new $class($this);
+                $plugin = new $class ($this);
                 if ($plugin::API_VERSION < \SmallSmallRSS\PluginHost::API_VERSION) {
                     user_error(
                         "Plugin $class is not compatible with current API version (need: "
@@ -160,7 +160,7 @@ class PluginHost
     // only system plugins are allowed to modify routing
     public function add_handler($handler, $method, $sender)
     {
-        $handler = str_replace("-", "_", strtolower($handler));
+        $handler = str_replace('-', '_', strtolower($handler));
         $method = strtolower($method);
         if ($sender::IS_SYSTEM) {
             if (!isset($this->handlers[$handler])
@@ -173,7 +173,7 @@ class PluginHost
 
     public function del_handler($handler, $method, $sender)
     {
-        $handler = str_replace("-", "_", strtolower($handler));
+        $handler = str_replace('-', '_', strtolower($handler));
         $method = strtolower($method);
         if ($sender::IS_SYSTEM) {
             unset($this->handlers[$handler][$method]);
@@ -182,12 +182,12 @@ class PluginHost
 
     public function lookup_handler($handler, $method)
     {
-        $handler = str_replace("-", "_", strtolower($handler));
+        $handler = str_replace('-', '_', strtolower($handler));
         $method = strtolower($method);
 
         if (!empty($this->handlers[$handler]) && is_array($this->handlers[$handler])) {
-            if (isset($this->handlers[$handler]["*"])) {
-                return $this->handlers[$handler]["*"];
+            if (isset($this->handlers[$handler]['*'])) {
+                return $this->handlers[$handler]['*'];
             } else {
                 return $this->handlers[$handler][$method];
             }
@@ -196,35 +196,35 @@ class PluginHost
         return false;
     }
 
-    public function addCommand($command, $description, $sender, $suffix = "", $arghelp = "")
+    public function addCommand($command, $description, $sender, $suffix = '', $arghelp = '')
     {
         // turn the command from foo-bar to fooBar
-        $parts = explode("-", $command);
+        $parts = explode('-', $command);
         $command = array_shift($parts);
         foreach ($parts as $part) {
             $command .= ucfirst($part);
         }
         $this->commands[$command] = array(
-            "description" => $description,
-            "suffix" => $suffix,
-            "arghelp" => $arghelp,
-            "class" => $sender
+            'description' => $description,
+            'suffix' => $suffix,
+            'arghelp' => $arghelp,
+            'class' => $sender
         );
     }
 
     public function del_command($command)
     {
-        $command = "-" . strtolower($command);
+        $command = '-' . strtolower($command);
 
         unset($this->commands[$command]);
     }
 
     public function lookup_command($command)
     {
-        $command = "-" . strtolower($command);
+        $command = '-' . strtolower($command);
 
         if (is_array($this->commands[$command])) {
-            return $this->commands[$command]["class"];
+            return $this->commands[$command]['class'];
         } else {
             return false;
         }
@@ -241,8 +241,8 @@ class PluginHost
     {
         foreach ($this->get_commands() as $command => $data) {
             if (isset($args[$command])) {
-                $command = str_replace("-", "", $command);
-                $data["class"]->$command($args);
+                $command = str_replace('-', '', $command);
+                $data['class']->$command($args);
             }
         }
     }
@@ -256,7 +256,7 @@ class PluginHost
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-                $this->storage[$line["name"]] = unserialize($line["content"]);
+                $this->storage[$line['name']] = unserialize($line['content']);
             }
         }
     }
@@ -266,7 +266,7 @@ class PluginHost
         if ($this->owner_uid) {
             $plugin = \SmallSmallRSS\Database::escape_string($plugin);
 
-            \SmallSmallRSS\Database::query("BEGIN");
+            \SmallSmallRSS\Database::query('BEGIN');
 
             $result = \SmallSmallRSS\Database::query(
                 "SELECT id FROM ttrss_plugin_storage WHERE
@@ -296,7 +296,7 @@ class PluginHost
                 );
             }
 
-            \SmallSmallRSS\Database::query("COMMIT");
+            \SmallSmallRSS\Database::query('COMMIT');
         }
     }
 
@@ -420,7 +420,7 @@ class PluginHost
     }
     public function init_user($owner_uid)
     {
-        $user_plugins = \SmallSmallRSS\DBPrefs::read("_ENABLED_PLUGINS", $owner_uid);
+        $user_plugins = \SmallSmallRSS\DBPrefs::read('_ENABLED_PLUGINS', $owner_uid);
         $this->load($user_plugins, self::KIND_USER, $owner_uid);
         return true;
     }

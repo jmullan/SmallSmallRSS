@@ -28,7 +28,7 @@ class Utils
 
     public static function buildUrl($parts)
     {
-        return $parts['scheme'] . "://" . $parts['host'] . $parts['path'];
+        return $parts['scheme'] . '://' . $parts['host'] . $parts['path'];
     }
 
     /**
@@ -41,7 +41,7 @@ class Utils
      */
     public static function rewriteRelativeUrl($url, $rel_url)
     {
-        if (strpos($rel_url, "magnet:") === 0) {
+        if (strpos($rel_url, 'magnet:') === 0) {
             return $rel_url;
         }
         $source_parts = parse_url($url);
@@ -73,7 +73,7 @@ class Utils
         if (!isset($relative_parts['path'])) {
             $relative_parts['path'] = '';
         }
-        if (strpos($relative_parts['path'], "/") === 0) {
+        if (strpos($relative_parts['path'], '/') === 0) {
             $source_parts['path'] = $relative_parts['path'];
             return self::buildUrl($source_parts);
         } else {

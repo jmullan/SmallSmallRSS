@@ -20,7 +20,7 @@ class Enclosures
     }
     public static function add($entry_ref_id, $enclosures)
     {
-        \SmallSmallRSS\Database::query("BEGIN");
+        \SmallSmallRSS\Database::query('BEGIN');
         foreach ($enclosures as $enc) {
             $enc_url = \SmallSmallRSS\Database::escape_string($enc[0]);
             $enc_type = \SmallSmallRSS\Database::escape_string($enc[1]);
@@ -42,7 +42,7 @@ class Enclosures
             }
         }
 
-        \SmallSmallRSS\Database::query("COMMIT");
+        \SmallSmallRSS\Database::query('COMMIT');
 
     }
 }

@@ -18,18 +18,18 @@ class Session
             self::$session_name = $session_name;
         }
 
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on") {
-            self::$session_name .= "_ssl";
-            ini_set("session.cookie_secure", true);
+        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
+            self::$session_name .= '_ssl';
+            ini_set('session.cookie_secure', true);
         }
 
-        ini_set("session.auto_start", false);
-        ini_set("session.gc_probability", 75);
-        ini_set("session.name", self::$session_name);
-        ini_set("session.use_only_cookies", true);
-        ini_set("session.gc_maxlifetime", self::$session_expire);
+        ini_set('session.auto_start', false);
+        ini_set('session.gc_probability', 75);
+        ini_set('session.name', self::$session_name);
+        ini_set('session.use_only_cookies', true);
+        ini_set('session.gc_maxlifetime', self::$session_expire);
         ini_set(
-            "session.cookie_lifetime",
+            'session.cookie_lifetime',
             min(0, \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'))
         );
         if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
@@ -52,11 +52,11 @@ class Session
             return true;
         }
 
-        if (!isset($_COOKIE[session_name()]) || !isset($_SESSION) || !isset($_SESSION["version"])) {
+        if (!isset($_COOKIE[session_name()]) || !isset($_SESSION) || !isset($_SESSION['version'])) {
             return false;
         }
 
-        if (\SmallSmallRSS\Constants::VERSION != $_SESSION["version"]) {
+        if (\SmallSmallRSS\Constants::VERSION != $_SESSION['version']) {
             return false;
         }
 
@@ -76,29 +76,29 @@ class Session
         };
 
         if ($check_ip && strpos($_SERVER['REMOTE_ADDR'], $check_ip) !== 0) {
-            $_SESSION["login_error_msg"] = __("Session failed to validate (incorrect IP)");
+            $_SESSION['login_error_msg'] = __('Session failed to validate (incorrect IP)');
             return false;
         }
 
-        if ($_SESSION["ref_schema_version"] != \SmallSmallRSS\Sanity::getSchemaVersion(true)) {
+        if ($_SESSION['ref_schema_version'] != \SmallSmallRSS\Sanity::getSchemaVersion(true)) {
             return false;
         }
 
-        if (sha1($_SERVER['HTTP_USER_AGENT']) != $_SESSION["user_agent"]) {
+        if (sha1($_SERVER['HTTP_USER_AGENT']) != $_SESSION['user_agent']) {
             return false;
         }
-        if ($_SESSION["uid"]) {
+        if ($_SESSION['uid']) {
             $result = \SmallSmallRSS\Database::query(
-                "SELECT pwd_hash FROM ttrss_users WHERE id = '" . $_SESSION["uid"] . "'"
+                "SELECT pwd_hash FROM ttrss_users WHERE id = '" . $_SESSION['uid'] . "'"
             );
 
             // user not found
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
                 return false;
             } else {
-                $pwd_hash = \SmallSmallRSS\Database::fetch_result($result, 0, "pwd_hash");
+                $pwd_hash = \SmallSmallRSS\Database::fetch_result($result, 0, 'pwd_hash');
 
-                if ($pwd_hash != $_SESSION["pwd_hash"]) {
+                if ($pwd_hash != $_SESSION['pwd_hash']) {
                     return false;
                 }
             }
@@ -125,9 +125,9 @@ class Session
                 "INSERT INTO ttrss_sessions (id, data, expire) VALUES ('$id', '', '$expire')"
             );
 
-            return "";
+            return '';
         } else {
-            return base64_decode(\SmallSmallRSS\Database::fetch_result($res, 0, "data"));
+            return base64_decode(\SmallSmallRSS\Database::fetch_result($res, 0, 'data'));
         }
 
     }
@@ -154,6 +154,6 @@ class Session
 
     public static function gc($expire)
     {
-        \SmallSmallRSS\Database::query("DELETE FROM ttrss_sessions WHERE expire < " . time());
+        \SmallSmallRSS\Database::query('DELETE FROM ttrss_sessions WHERE expire < ' . time());
     }
 }

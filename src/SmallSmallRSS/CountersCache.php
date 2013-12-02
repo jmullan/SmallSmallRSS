@@ -12,7 +12,7 @@ class CountersCache
                  owner_uid = '$owner_uid'
                  AND feed_id > 0"
         );
-        $c_id = \SmallSmallRSS\Database::fetch_result($result, 0, "c_id");
+        $c_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'c_id');
         return $c_id;
     }
     public static function cleanup($owner_uid)
@@ -46,9 +46,9 @@ class CountersCache
     {
 
         if (!$is_cat) {
-            $table = "ttrss_counters_cache";
+            $table = 'ttrss_counters_cache';
         } else {
-            $table = "ttrss_cat_counters_cache";
+            $table = 'ttrss_cat_counters_cache';
         }
 
         \SmallSmallRSS\Database::query(
@@ -69,7 +69,7 @@ class CountersCache
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-                self::update($line["feed_id"], $owner_uid, true);
+                self::update($line['feed_id'], $owner_uid, true);
             }
 
             /* We have to manually include category 0 */
@@ -83,7 +83,7 @@ class CountersCache
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-                print self::update($line["feed_id"], $owner_uid);
+                print self::update($line['feed_id'], $owner_uid);
 
             }
 
@@ -95,22 +95,23 @@ class CountersCache
         $owner_uid,
         $is_cat = false,
         $no_update = false
-    ) {
+    )
+    {
 
         if (!is_numeric($feed_id)) {
             return;
         }
 
         if (!$is_cat) {
-            $table = "ttrss_counters_cache";
+            $table = 'ttrss_counters_cache';
         } else {
-            $table = "ttrss_cat_counters_cache";
+            $table = 'ttrss_cat_counters_cache';
         }
 
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
             $date_qpart = "updated > NOW() - INTERVAL '15 minutes'";
-        } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
-            $date_qpart = "updated > DATE_SUB(NOW(), INTERVAL 15 MINUTE)";
+        } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == 'mysql') {
+            $date_qpart = 'updated > DATE_SUB(NOW(), INTERVAL 15 MINUTE)';
         }
 
         $result = \SmallSmallRSS\Database::query(
@@ -122,7 +123,7 @@ class CountersCache
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "value");
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'value');
         } else {
             if ($no_update) {
                 return -1;
@@ -138,7 +139,8 @@ class CountersCache
         $owner_uid,
         $is_cat = false,
         $update_pcat = true
-    ) {
+    )
+    {
 
         if (!is_numeric($feed_id)) {
             return;
@@ -154,16 +156,16 @@ class CountersCache
         }
 
         if (!$is_cat) {
-            $table = "ttrss_counters_cache";
+            $table = 'ttrss_counters_cache';
         } else {
-            $table = "ttrss_cat_counters_cache";
+            $table = 'ttrss_cat_counters_cache';
         }
 
         if ($is_cat && $feed_id >= 0) {
             if ($feed_id != 0) {
                 $cat_qpart = "cat_id = '$feed_id'";
             } else {
-                $cat_qpart = "cat_id IS NULL";
+                $cat_qpart = 'cat_id IS NULL';
             }
 
             /* Recalculate counters for child feeds */
@@ -174,7 +176,7 @@ class CountersCache
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-                self::update($line["id"], $owner_uid, false, false);
+                self::update($line['id'], $owner_uid, false, false);
             }
 
             $result = \SmallSmallRSS\Database::query(
@@ -184,13 +186,13 @@ class CountersCache
                 ttrss_feeds.owner_uid = '$owner_uid'"
             );
 
-            $unread = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "sv");
+            $unread = (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'sv');
 
         } else {
             $unread = (int) getFeedArticles($feed_id, $is_cat, true, $owner_uid);
         }
 
-        \SmallSmallRSS\Database::query("BEGIN");
+        \SmallSmallRSS\Database::query('BEGIN');
         $result = \SmallSmallRSS\Database::query(
             "SELECT feed_id FROM $table
              WHERE owner_uid = '$owner_uid' AND feed_id = '$feed_id' LIMIT 1"
@@ -210,7 +212,7 @@ class CountersCache
                  ($feed_id, $unread, $owner_uid, NOW())"
             );
         }
-        \SmallSmallRSS\Database::query("COMMIT");
+        \SmallSmallRSS\Database::query('COMMIT');
         if ($feed_id > 0 && $prev_unread != $unread) {
             if (!$is_cat) {
                 /* Update parent category */
@@ -219,7 +221,7 @@ class CountersCache
                         "SELECT cat_id FROM ttrss_feeds
                          WHERE owner_uid = '$owner_uid' AND id = '$feed_id'"
                     );
-                    $cat_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
+                    $cat_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'cat_id');
                     self::update($cat_id, $owner_uid, true);
                 }
             }

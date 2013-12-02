@@ -31,20 +31,20 @@ class Hooks
     public static function getHookMethod($hook)
     {
         $mappings = array(
-            self::RENDER_PREFS_TAB => "hookRenderPreferencesTab",
-            self::UPDATE_TASK => "hookUpdateTask",
-            self::FEED_PARSED => "hookFeedParsed",
-            self::RENDER_PREFS_TAB_SECTION => "hookRenderPreferencesTabSection",
-            self::PREFS_EDIT_FEED => "hookPreferencesEditFeed",
-            self::PREFS_SAVE_FEED => "hookPrefsSaveFeed",
-            self::RENDER_PREFS_TAB => "hookRenderPreferencesTab",
-            self::FILTER_ARTICLE_API => "hookFilterArticleApi",
-            self::RENDER_ARTICLE_CDM => "hookRenderArticleCDM",
-            self::ARTICLE_LEFT_BUTTON => "hookArticleLeftButton",
-            self::ARTICLE_BUTTON => "hookArticleButton",
-            self::RENDER_TOOLBAR_BUTTON => "hookRenderToolbarButton",
-            self::RENDER_ACTION_ITEM => "hookRenderActionItem",
-            self::RENDER_HEADLINE_TOOLBAR_BUTTON => "hookRenderHeadlineToolbarButton",
+            self::RENDER_PREFS_TAB => 'hookRenderPreferencesTab',
+            self::UPDATE_TASK => 'hookUpdateTask',
+            self::FEED_PARSED => 'hookFeedParsed',
+            self::RENDER_PREFS_TAB_SECTION => 'hookRenderPreferencesTabSection',
+            self::PREFS_EDIT_FEED => 'hookPreferencesEditFeed',
+            self::PREFS_SAVE_FEED => 'hookPrefsSaveFeed',
+            self::RENDER_PREFS_TAB => 'hookRenderPreferencesTab',
+            self::FILTER_ARTICLE_API => 'hookFilterArticleApi',
+            self::RENDER_ARTICLE_CDM => 'hookRenderArticleCDM',
+            self::ARTICLE_LEFT_BUTTON => 'hookArticleLeftButton',
+            self::ARTICLE_BUTTON => 'hookArticleButton',
+            self::RENDER_TOOLBAR_BUTTON => 'hookRenderToolbarButton',
+            self::RENDER_ACTION_ITEM => 'hookRenderActionItem',
+            self::RENDER_HEADLINE_TOOLBAR_BUTTON => 'hookRenderHeadlineToolbarButton',
         );
         if (isset($mappings[$hook])) {
             return $mappings[$hook];

@@ -47,10 +47,10 @@ class Logger
     public function __construct()
     {
         switch (\SmallSmallRSS\Config::get('LOG_DESTINATION')) {
-            case "sql":
+            case 'sql':
                 $this->adapter = new Logger_SQL();
                 break;
-            case "syslog":
+            case 'syslog':
                 $this->adapter = new Logger_Syslog();
                 break;
             default:
@@ -72,13 +72,13 @@ class Logger
      * @param string $msg The debug message.
      * @return void
      */
-    public static function debug($msg, $show=true, $is_debug=true)
+    public static function debug($msg, $show = true, $is_debug = true)
     {
         if (!$is_debug) {
             return;
         }
 
-        $ts = strftime("%H:%M:%S", time());
+        $ts = strftime('%H:%M:%S', time());
         if (function_exists('posix_getpid')) {
             $ts = "$ts/" . posix_getpid();
         }

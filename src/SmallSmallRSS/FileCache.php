@@ -3,13 +3,13 @@ namespace SmallSmallRSS;
 
 class FileCache
 {
-    private static $default_caches = array("simplepie", "images", "export", "upload");
+    private static $default_caches = array('simplepie', 'images', 'export', 'upload');
 
     public static function clearExpired()
     {
         $num_deleted = 0;
         foreach (self::$default_caches as $subdir) {
-          $num_deleted += self::clearExpiredDirContents($subdir);
+            $num_deleted += self::clearExpiredDirContents($subdir);
         }
         return $num_deleted;
     }

@@ -13,22 +13,22 @@ class Database
                 self::$adapter = new \SmallSmallRSS\Database\PDOWrapper();
             } else {
                 switch (\SmallSmallRSS\Config::get('DB_TYPE')) {
-                    case "mysql":
-                        if (function_exists("mysqli_connect")) {
+                    case 'mysql':
+                        if (function_exists('mysqli_connect')) {
                             self::$adapter = new \SmallSmallRSS\Database\MySQLi();
                         } else {
                             self::$adapter = new \SmallSmallRSS\Database\MySQL();
                         }
                         break;
-                    case "pgsql":
+                    case 'pgsql':
                         self::$adapter = new \SmallSmallRSS\Database\PostgreSQL();
                         break;
                     default:
-                        die("Unknown DB_TYPE: " . \SmallSmallRSS\Config::get('DB_TYPE'));
+                        die('Unknown DB_TYPE: ' . \SmallSmallRSS\Config::get('DB_TYPE'));
                 }
             }
             if (!self::adapter()) {
-                die("Error initializing database adapter for " . \SmallSmallRSS\Config::get('DB_TYPE'));
+                die('Error initializing database adapter for ' . \SmallSmallRSS\Config::get('DB_TYPE'));
             }
             self::$link = self::adapter()->connect(
                 \SmallSmallRSS\Config::get('DB_HOST'),
@@ -38,7 +38,7 @@ class Database
                 \SmallSmallRSS\Config::get('DB_PORT')
             );
             if (!self::$link) {
-                die("Error connecting through adapter: " . self::adapter()->last_error());
+                die('Error connecting through adapter: ' . self::adapter()->last_error());
             }
             error_reporting($er);
         }

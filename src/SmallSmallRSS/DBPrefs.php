@@ -7,15 +7,15 @@ class DBPrefs
     public static function cache()
     {
         $profile = false;
-        $user_id = (!empty($_SESSION["uid"]) ? $_SESSION["uid"] : null);
-        $profile = (!empty($_SESSION["profile"]) ? $_SESSION["profile"] : null);
+        $user_id = (!empty($_SESSION['uid']) ? $_SESSION['uid'] : null);
+        $profile = (!empty($_SESSION['profile']) ? $_SESSION['profile'] : null);
         if ($profile) {
             $profile_qpart = "profile = '$profile' AND";
         } else {
-            $profile_qpart = "profile IS NULL AND";
+            $profile_qpart = 'profile IS NULL AND';
         }
         if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
-            $profile_qpart = "";
+            $profile_qpart = '';
         }
         $result = \SmallSmallRSS\Database::query(
             "SELECT
@@ -32,10 +32,10 @@ class DBPrefs
                  ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
         );
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            if ($user_id == $_SESSION["uid"]) {
-                $pref_name = $line["pref_name"];
-                self::$cache[$pref_name]["type"] = $line["type_name"];
-                self::$cache[$pref_name]["value"] = $line["value"];
+            if ($user_id == $_SESSION['uid']) {
+                $pref_name = $line['pref_name'];
+                self::$cache[$pref_name]['type'] = $line['type_name'];
+                self::$cache[$pref_name]['value'] = $line['value'];
             }
         }
     }
@@ -47,25 +47,25 @@ class DBPrefs
         $profile = false;
 
         if (!$user_id) {
-            $user_id = $_SESSION["uid"];
-            @$profile = $_SESSION["profile"];
+            $user_id = $_SESSION['uid'];
+            @$profile = $_SESSION['profile'];
         } else {
-            $user_id = sprintf("%d", $user_id);
+            $user_id = sprintf('%d', $user_id);
         }
 
         if (isset(self::$cache[$pref_name])) {
             $tuple = self::$cache[$pref_name];
-            return self::convert($tuple["value"], $tuple["type"]);
+            return self::convert($tuple['value'], $tuple['type']);
         }
 
         if ($profile) {
             $profile_qpart = "profile = '$profile' AND";
         } else {
-            $profile_qpart = "profile IS NULL AND";
+            $profile_qpart = 'profile IS NULL AND';
         }
 
         if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
-            $profile_qpart = "";
+            $profile_qpart = '';
         }
 
         $result = \SmallSmallRSS\Database::query(
@@ -83,12 +83,12 @@ class DBPrefs
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            $value = \SmallSmallRSS\Database::fetch_result($result, 0, "value");
-            $type_name = \SmallSmallRSS\Database::fetch_result($result, 0, "type_name");
+            $value = \SmallSmallRSS\Database::fetch_result($result, 0, 'value');
+            $type_name = \SmallSmallRSS\Database::fetch_result($result, 0, 'type_name');
 
-            if (!empty($_SESSION["uid"]) && $user_id == $_SESSION["uid"]) {
-                self::$cache[$pref_name]["type"] = $type_name;
-                self::$cache[$pref_name]["value"] = $value;
+            if (!empty($_SESSION['uid']) && $user_id == $_SESSION['uid']) {
+                self::$cache[$pref_name]['type'] = $type_name;
+                self::$cache[$pref_name]['value'] = $value;
             }
 
             return self::convert($value, $type_name);
@@ -103,9 +103,9 @@ class DBPrefs
 
     public static function convert($value, $type_name)
     {
-        if ($type_name == "bool") {
-            return $value == "true";
-        } elseif ($type_name == "integer") {
+        if ($type_name == 'bool') {
+            return $value == 'true';
+        } elseif ($type_name == 'integer') {
             return (int) $value;
         } else {
             return $value;
@@ -118,29 +118,29 @@ class DBPrefs
         $value = \SmallSmallRSS\Database::escape_string($value, $strip_tags);
 
         if (!$user_id) {
-            $user_id = $_SESSION["uid"];
-            @$profile = $_SESSION["profile"];
+            $user_id = $_SESSION['uid'];
+            @$profile = $_SESSION['profile'];
         } else {
-            $user_id = sprintf("%d", $user_id);
+            $user_id = sprintf('%d', $user_id);
             $prefs_cache = false;
         }
 
         if ($profile) {
             $profile_qpart = "AND profile = '$profile'";
         } else {
-            $profile_qpart = "AND profile IS NULL";
+            $profile_qpart = 'AND profile IS NULL';
         }
 
         if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
-            $profile_qpart = "";
+            $profile_qpart = '';
         }
 
-        $type_name = "";
-        $current_value = "";
+        $type_name = '';
+        $current_value = '';
 
         if (isset(self::$cache[$pref_name])) {
-            $type_name = self::$cache[$pref_name]["type"];
-            $current_value = self::$cache[$pref_name]["value"];
+            $type_name = self::$cache[$pref_name]['type'];
+            $current_value = self::$cache[$pref_name]['value'];
         }
 
         if (!$type_name) {
@@ -155,21 +155,21 @@ class DBPrefs
             );
 
             if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-                $type_name = \SmallSmallRSS\Database::fetch_result($result, 0, "type_name");
+                $type_name = \SmallSmallRSS\Database::fetch_result($result, 0, 'type_name');
             }
         } elseif ($current_value == $value) {
             return;
         }
 
         if ($type_name) {
-            if ($type_name == "bool") {
-                if ($value == "1" || $value == "true") {
-                    $value = "true";
+            if ($type_name == 'bool') {
+                if ($value == '1' || $value == 'true') {
+                    $value = 'true';
                 } else {
-                    $value = "false";
+                    $value = 'false';
                 }
-            } elseif ($type_name == "integer") {
-                $value = sprintf("%d", $value);
+            } elseif ($type_name == 'integer') {
+                $value = sprintf('%d', $value);
             }
 
             if ($pref_name == 'USER_TIMEZONE' && $value == '') {
@@ -182,12 +182,12 @@ class DBPrefs
                  WHERE
                      pref_name = '$pref_name'
                      $profile_qpart
-                     AND owner_uid = " . $_SESSION["uid"]
+                     AND owner_uid = " . $_SESSION['uid']
             );
 
-            if ($user_id == $_SESSION["uid"]) {
-                self::$cache[$pref_name]["type"] = $type_name;
-                self::$cache[$pref_name]["value"] = $value;
+            if ($user_id == $_SESSION['uid']) {
+                self::$cache[$pref_name]['type'] = $type_name;
+                self::$cache[$pref_name]['value'] = $value;
             }
         }
     }

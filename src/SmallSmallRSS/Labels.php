@@ -14,7 +14,7 @@ class Labels
              LIMIT 1"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
         } else {
             return 0;
         }
@@ -31,10 +31,10 @@ class Labels
                  AND owner_uid = '$owner_uid'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            $label_cache = \SmallSmallRSS\Database::fetch_result($result, 0, "label_cache");
+            $label_cache = \SmallSmallRSS\Database::fetch_result($result, 0, 'label_cache');
             if ($label_cache) {
                 $label_cache = json_decode($label_cache, true);
-                if ($label_cache["no-labels"] == 1) {
+                if ($label_cache['no-labels'] == 1) {
                     return $rv;
                 } else {
                     return $label_cache;
@@ -58,17 +58,17 @@ class Labels
         );
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $rk = array(
-                $line["label_id"],
-                $line["caption"],
-                $line["fg_color"],
-                $line["bg_color"]
+                $line['label_id'],
+                $line['caption'],
+                $line['fg_color'],
+                $line['bg_color']
             );
             array_push($rv, $rk);
         }
         if (count($rv) > 0) {
             self::updateCache($owner_uid, $id, $rv);
         } else {
-            self::updateCache($owner_uid, $id, array("no-labels" => 1));
+            self::updateCache($owner_uid, $id, array('no-labels' => 1));
         }
         return $rv;
     }
@@ -85,9 +85,9 @@ class Labels
              LIMIT 1"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "caption");
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'caption');
         } else {
-            return "";
+            return '';
         }
     }
 
@@ -164,13 +164,13 @@ class Labels
 
     public static function remove($id, $owner_uid)
     {
-        \SmallSmallRSS\Database::query("BEGIN");
+        \SmallSmallRSS\Database::query('BEGIN');
         $result = \SmallSmallRSS\Database::query(
             "SELECT caption
              FROM ttrss_labels2
              WHERE id = '$id'"
         );
-        $caption = \SmallSmallRSS\Database::fetch_result($result, 0, "caption");
+        $caption = \SmallSmallRSS\Database::fetch_result($result, 0, 'caption');
         $result = \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_labels2
              WHERE id = '$id'
@@ -187,12 +187,12 @@ class Labels
                      AND owner_uid = $owner_uid"
             );
         }
-        \SmallSmallRSS\Database::query("COMMIT");
+        \SmallSmallRSS\Database::query('COMMIT');
     }
 
     public static function create($caption, $owner_uid, $fg_color = '', $bg_color = '')
     {
-        \SmallSmallRSS\Database::query("BEGIN");
+        \SmallSmallRSS\Database::query('BEGIN');
         $result = \SmallSmallRSS\Database::query(
             "SELECT id
              FROM ttrss_labels2
@@ -208,7 +208,7 @@ class Labels
             );
             $result = \SmallSmallRSS\Database::affected_rows($result) != 0;
         }
-        \SmallSmallRSS\Database::query("COMMIT");
+        \SmallSmallRSS\Database::query('COMMIT');
         return $result;
     }
 
@@ -238,11 +238,11 @@ class Labels
             array_push(
                 $rv,
                 array(
-                    "id" => (int) $line['id'],
-                    "caption" => $line['caption'],
-                    "fg_color" => $line['fg_color'],
-                    "bg_color" => $line['bg_color'],
-                    "checked" => $checked
+                    'id' => (int) $line['id'],
+                    'caption' => $line['caption'],
+                    'fg_color' => $line['fg_color'],
+                    'bg_color' => $line['bg_color'],
+                    'checked' => $checked
                 )
             );
         }

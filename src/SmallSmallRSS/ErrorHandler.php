@@ -7,7 +7,7 @@ class ErrorHandler
         if (error_reporting() == 0 || !$errno) {
             return false;
         }
-        $file = substr(str_replace(dirname(dirname(__FILE__)), "", $file), 1);
+        $file = substr(str_replace(dirname(dirname(__FILE__)), '', $file), 1);
         return \SmallSmallRSS\Logger::logError($errno, $errstr, $file, $line, $context);
     }
 
@@ -15,16 +15,16 @@ class ErrorHandler
     {
         $error = error_get_last();
         if ($error !== null) {
-            $errno = $error["type"];
-            $file = $error["file"];
-            $line = $error["line"];
-            $errstr = $error["message"];
+            $errno = $error['type'];
+            $file = $error['file'];
+            $line = $error['line'];
+            $errstr = $error['message'];
 
             if (!$errno) {
                 return false;
             }
             $context = debug_backtrace();
-            $file = substr(str_replace(dirname(dirname(__FILE__)), "", $file), 1);
+            $file = substr(str_replace(dirname(dirname(__FILE__)), '', $file), 1);
             return \SmallSmallRSS\Logger::logError($errno, $errstr, $file, $line, $context);
         }
         return false;

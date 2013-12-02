@@ -79,14 +79,14 @@ class Feeds
             $label_id = feed_to_label_id($id);
             $result = \SmallSmallRSS\Database::query("SELECT caption FROM ttrss_labels2 WHERE id = '$label_id'");
             if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-                return \SmallSmallRSS\Database::fetch_result($result, 0, "caption");
+                return \SmallSmallRSS\Database::fetch_result($result, 0, 'caption');
             } else {
                 return "Unknown label ($label_id)";
             }
         } elseif (is_numeric($id) && $id > 0) {
             $result = \SmallSmallRSS\Database::query("SELECT title FROM ttrss_feeds WHERE id = '$id'");
             if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-                return \SmallSmallRSS\Database::fetch_result($result, 0, "title");
+                return \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
             } else {
                 return "Unknown feed ($id)";
             }
@@ -103,8 +103,8 @@ class Feeds
              WHERE id = '$feed_id'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            $purge_interval = \SmallSmallRSS\Database::fetch_result($result, 0, "purge_interval");
-            $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
+            $purge_interval = \SmallSmallRSS\Database::fetch_result($result, 0, 'purge_interval');
+            $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, 'owner_uid');
             if ($purge_interval == 0) {
                 $purge_interval = \SmallSmallRSS\DBPrefs::read('PURGE_OLD_DAYS', $owner_uid);
             }
@@ -134,7 +134,7 @@ class Feeds
         );
         $owner_uid = false;
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
+            $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, 'owner_uid');
         }
         if ($purge_interval == -1 || !$purge_interval) {
             if ($owner_uid) {
@@ -148,19 +148,19 @@ class Feeds
         }
 
         if (\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) {
-            $purge_unread = \SmallSmallRSS\DBPrefs::read("PURGE_UNREAD_ARTICLES", $owner_uid, false);
+            $purge_unread = \SmallSmallRSS\DBPrefs::read('PURGE_UNREAD_ARTICLES', $owner_uid, false);
         } else {
             $purge_unread = true;
             $purge_interval = \SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE');
         }
 
         if (!$purge_unread) {
-            $query_limit = "AND unread = false";
+            $query_limit = 'AND unread = false';
         } else {
             $query_limit = '';
         }
 
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
             $pg_version = get_pgsql_version();
 
             if (preg_match("/^7\./", $pg_version) || preg_match("/^8\.0/", $pg_version)) {
@@ -244,8 +244,8 @@ class Feeds
              FROM ttrss_feeds WHERE id = '$feed_id'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            $update_interval = \SmallSmallRSS\Database::fetch_result($result, 0, "update_interval");
-            $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
+            $update_interval = \SmallSmallRSS\Database::fetch_result($result, 0, 'update_interval');
+            $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, 'owner_uid');
             if ($update_interval != 0) {
                 return $update_interval;
             } else {
@@ -264,7 +264,7 @@ class Feeds
              WHERE id = '$feed_id'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            return (int) \SmallSmallRSS\Database::fetch_result($result, 0, "cat_id");
+            return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'cat_id');
         } else {
             return false;
         }
@@ -281,9 +281,9 @@ class Feeds
         }
         \SmallSmallRSS\Database::query(
             sprintf(
-                "UPDATE ttrss_feeds
+                'UPDATE ttrss_feeds
                  SET last_update_started = NOW()
-                 WHERE id IN (%s)",
+                 WHERE id IN (%s)',
                 implode(',', $quoted_feed_ids)
             )
         );
@@ -340,14 +340,14 @@ class Feeds
     {
         $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
         $result = \SmallSmallRSS\Database::query(
-            "SELECT COUNT(id) AS fn
+            'SELECT COUNT(id) AS fn
              FROM ttrss_feeds
-             WHERE owner_uid = " . $owner_uid
+             WHERE owner_uid = ' . $owner_uid
         );
-        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, "fn");
+        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'fn');
     }
 
-    static public function hasIcon($feed_id)
+    public static function hasIcon($feed_id)
     {
         $file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico";
         return (is_file($file) && filesize($file));

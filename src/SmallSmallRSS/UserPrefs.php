@@ -3,18 +3,18 @@ namespace SmallSmallRSS;
 
 class UserPrefs
 {
-    static public function getActive($owner_uid, $profile = false)
+    public static function getActive($owner_uid, $profile = false)
     {
         $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
         if (!$profile) {
-            $profile = "NULL";
-            $profile_qpart = "AND profile IS NULL";
+            $profile = 'NULL';
+            $profile_qpart = 'AND profile IS NULL';
         } else {
             $profile = \SmallSmallRSS\Database::escape_string($profile);
             $profile_qpart = "AND profile = '$profile'";
         }
         if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
-            $profile_qpart = "";
+            $profile_qpart = '';
         }
         $u_result = \SmallSmallRSS\Database::query(
             "SELECT pref_name, value
@@ -24,10 +24,10 @@ class UserPrefs
         );
         $active_prefs = array();
         while (($line = \SmallSmallRSS\Database::fetch_assoc($u_result))) {
-            $active_prefs[$line["pref_name"]] = $line['value'];
+            $active_prefs[$line['pref_name']] = $line['value'];
         }
     }
-    static public function insert($pref_name, $value, $owner_uid, $profile = false)
+    public static function insert($pref_name, $value, $owner_uid, $profile = false)
     {
         $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
         $profile = \SmallSmallRSS\Database::escape_string($profile);

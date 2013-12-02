@@ -22,7 +22,7 @@ class AccessKeys
             AND owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "access_key");
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'access_key');
         } else {
             $key = \SmallSmallRSS\Database::escape_string(sha1(uniqid(rand(), true)));
             $result = \SmallSmallRSS\Database::query(
@@ -51,7 +51,7 @@ class AccessKeys
                  AND feed_id = 'OPML:Publish'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "owner_uid");
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'owner_uid');
         }
         return false;
     }

@@ -26,7 +26,8 @@ class Fetcher
         $post_query = false,
         $timeout = false,
         $timestamp = 0
-    ) {
+    )
+    {
         $fetcher = new self();
         return $fetcher->getFileContents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
     }
@@ -39,11 +40,12 @@ class Fetcher
         $post_query = false,
         $timeout = false,
         $timestamp = 0
-    ) {
+    )
+    {
         $url = str_replace(' ', '%20', $url);
         if (!defined('NO_CURL') && function_exists('curl_init')) {
             $this->fetch_curl_used = true;
-            if (ini_get("safe_mode") || ini_get("open_basedir")) {
+            if (ini_get('safe_mode') || ini_get('open_basedir')) {
                 $new_url = $this->curlResolveUrl($url);
                 if (!$new_url) {
                     // geturl has already populated $this->fetch_last_error
@@ -57,7 +59,7 @@ class Fetcher
                 curl_setopt(
                     $ch,
                     CURLOPT_HTTPHEADER,
-                    array("If-Modified-Since: ".gmdate('D, d M Y H:i:s \G\M\T', $timestamp))
+                    array('If-Modified-Since: '.gmdate('D, d M Y H:i:s \G\M\T', $timestamp))
                 );
             }
             curl_setopt(
@@ -70,14 +72,14 @@ class Fetcher
                 CURLOPT_TIMEOUT,
                 ($timeout ? $timeout : \SmallSmallRSS\Config::get('FILE_FETCH_TIMEOUT'))
             );
-            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, !ini_get("safe_mode") && !ini_get("open_basedir"));
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, !ini_get('safe_mode') && !ini_get('open_basedir'));
             curl_setopt($ch, CURLOPT_MAXREDIRS, 20);
             curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
             curl_setopt($ch, CURLOPT_USERAGENT, SELF_USER_AGENT);
-            curl_setopt($ch, CURLOPT_ENCODING, "");
+            curl_setopt($ch, CURLOPT_ENCODING, '');
             if (false !== $this->site_url) {
                 curl_setopt($ch, CURLOPT_REFERER, $this->site_url);
             } else {
@@ -99,7 +101,7 @@ class Fetcher
                 $contents = @curl_exec($ch);
             }
             if ($contents === false) {
-                $this->fetch_last_error = curl_errno($ch) . " " . curl_error($ch);
+                $this->fetch_last_error = curl_errno($ch) . ' ' . curl_error($ch);
                 curl_close($ch);
                 return false;
             }
@@ -111,7 +113,7 @@ class Fetcher
 
             if ($http_code != 200 || $type && strpos($this->fetch_last_content_type, "$type") === false) {
                 if (curl_errno($ch) != 0) {
-                    $this->fetch_last_error = curl_errno($ch) . " " . curl_error($ch);
+                    $this->fetch_last_error = curl_errno($ch) . ' ' . curl_error($ch);
                 } else {
                     $this->fetch_last_error = "HTTP Code: $http_code";
                 }
@@ -142,7 +144,7 @@ class Fetcher
                     array(
                         'http' => array(
                             'method' => 'GET',
-                            'header' => "If-Modified-Since: " . gmdate("D, d M Y H:i:s \\G\\M\\T\r\n", $timestamp)
+                            'header' => 'If-Modified-Since: ' . gmdate("D, d M Y H:i:s \\G\\M\\T\r\n", $timestamp)
                         )
                     )
                 );
@@ -173,7 +175,7 @@ class Fetcher
                 $error = error_get_last();
 
                 if ($error['message'] != $old_error['message']) {
-                    $this->fetch_last_error = $error["message"];
+                    $this->fetch_last_error = $error['message'];
                 } else {
                     $this->fetch_last_error = "HTTP Code: $this->fetch_last_error_code";
                 }
@@ -197,14 +199,14 @@ class Fetcher
         }
 
         $curl = curl_init();
-        $header[0] = "Accept: text/xml,application/xml,application/xhtml+xml,";
-        $header[0] .= "text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5";
-        $header[] = "Cache-Control: max-age=0";
-        $header[] = "Connection: keep-alive";
-        $header[] = "Keep-Alive: 300";
-        $header[] = "Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7";
-        $header[] = "Accept-Language: en-us,en;q=0.5";
-        $header[] = "Pragma: ";
+        $header[0] = 'Accept: text/xml,application/xml,application/xhtml+xml,';
+        $header[0] .= 'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5';
+        $header[] = 'Cache-Control: max-age=0';
+        $header[] = 'Connection: keep-alive';
+        $header[] = 'Keep-Alive: 300';
+        $header[] = 'Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7';
+        $header[] = 'Accept-Language: en-us,en;q=0.5';
+        $header[] = 'Pragma: ';
 
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt(
@@ -236,12 +238,12 @@ class Fetcher
                 list($header) = explode("\r\n\r\n", $html, 2);
                 $matches = array();
                 preg_match("/(Location:|URI:)[^(\n)]*/", $header, $matches);
-                $url = trim(str_replace($matches[1], "", $matches[0]));
+                $url = trim(str_replace($matches[1], '', $matches[0]));
                 $url_parsed = parse_url($url);
                 return (isset($url_parsed))? geturl($url):'';
             }
 
-            $this->fetch_last_error = curl_errno($curl) . " " . curl_error($curl);
+            $this->fetch_last_error = curl_errno($curl) . ' ' . curl_error($curl);
             curl_close($curl);
 
             $oline = '';

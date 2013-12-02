@@ -10,7 +10,7 @@ class Crypt
     public static function de($str)
     {
         $key = hash('SHA256', \SmallSmallRSS\Config::get('FEED_CRYPT_KEY'), true);
-        $pair = explode(":", $str);
+        $pair = explode(':', $str);
         if (count($pair) == 2) {
             @$iv = base64_decode($pair[0]);
             @$encstr = base64_decode($pair[1]);

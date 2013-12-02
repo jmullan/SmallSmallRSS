@@ -6,9 +6,9 @@ class Tags
     public function clearExpired($days = 14)
     {
         $limit = 50000;
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
             $before_date = "NOW() - INTERVAL '$days days'";
-        } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == "mysql") {
+        } elseif (\SmallSmallRSS\Config::get('DB_TYPE') == 'mysql') {
             $before_date = "DATE_SUB(NOW(), INTERVAL $days DAY)";
         }
         $tags_deleted = 0;
@@ -28,7 +28,7 @@ class Tags
                 array_push($ids, $line['id']);
             }
             if (count($ids) > 0) {
-                $ids = join(",", $ids);
+                $ids = join(',', $ids);
                 $tmp_result = \SmallSmallRSS\Database::query("DELETE FROM ttrss_tags WHERE id IN ($ids)");
                 $tags_deleted += \SmallSmallRSS\Database::affected_rows($tmp_result);
             } else {

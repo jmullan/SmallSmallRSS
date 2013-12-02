@@ -5,12 +5,12 @@ class Users
 {
     public static function count()
     {
-        $result = \SmallSmallRSS\Database::query("SELECT COUNT(*) AS cu FROM ttrss_users");
-        return \SmallSmallRSS\Database::fetch_result($result, 0, "cu");
+        $result = \SmallSmallRSS\Database::query('SELECT COUNT(*) AS cu FROM ttrss_users');
+        return \SmallSmallRSS\Database::fetch_result($result, 0, 'cu');
     }
     public static function clearExpired()
     {
-        if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
             \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_users
                  WHERE
@@ -20,11 +20,11 @@ class Users
             );
         } else {
             \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_users
+                'DELETE FROM ttrss_users
                  WHERE
                      last_login IS NULL
                      AND created < DATE_SUB(NOW(), INTERVAL 1 DAY)
-                     AND access_level = 0"
+                     AND access_level = 0'
             );
         }
     }
@@ -38,7 +38,7 @@ class Users
              WHERE login = '$login'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
         } else {
             return false;
         }
@@ -58,7 +58,7 @@ class Users
 
     public static function makePassword($length = 8)
     {
-        $password = "";
+        $password = '';
         $possible = '0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ+-_=!$#';
         $i = 0;
         while ($i < $length) {
@@ -95,7 +95,7 @@ class Users
         if (\SmallSmallRSS\Database::num_rows($result) != 1) {
             return false;
         }
-        return \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+        return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
     }
     public static function markLogin($id)
     {

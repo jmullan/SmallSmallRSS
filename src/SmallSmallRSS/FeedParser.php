@@ -28,7 +28,7 @@ class FeedParser
             libxml_clear_errors();
 
             // we might want to try guessing input encoding here too
-            $data = iconv("UTF-8", "UTF-8//IGNORE", $data);
+            $data = iconv('UTF-8', 'UTF-8//IGNORE', $data);
 
             $this->doc = new \DOMDocument();
             $this->doc->loadXML($data);
@@ -56,25 +56,25 @@ class FeedParser
 
         $this->xpath = $xpath;
 
-        $root = $xpath->query("(//atom03:feed|//atom:feed|//channel|//rdf:rdf|//rdf:RDF)");
+        $root = $xpath->query('(//atom03:feed|//atom:feed|//channel|//rdf:rdf|//rdf:RDF)');
 
         if ($root) {
             $root = $root->item(0);
 
             if ($root) {
                 switch (mb_strtolower($root->tagName)) {
-                    case "rdf:rdf":
+                    case 'rdf:rdf':
                         $this->type = self::FEED_RDF;
                         break;
-                    case "channel":
+                    case 'channel':
                         $this->type = self::FEED_RSS;
                         break;
-                    case "feed":
+                    case 'feed':
                         $this->type = self::FEED_ATOM;
                         break;
                     default:
                         if (!isset($this->error)) {
-                            $this->error = "Unknown/unsupported feed type";
+                            $this->error = 'Unknown/unsupported feed type';
                         }
                         return;
                 }
@@ -83,30 +83,30 @@ class FeedParser
             switch ($this->type) {
                 case self::FEED_ATOM:
 
-                    $title = $xpath->query("//atom:feed/atom:title")->item(0);
+                    $title = $xpath->query('//atom:feed/atom:title')->item(0);
 
                     if (!$title) {
-                        $title = $xpath->query("//atom03:feed/atom03:title")->item(0);
+                        $title = $xpath->query('//atom03:feed/atom03:title')->item(0);
                     }
 
                     if ($title) {
                         $this->title = $title->nodeValue;
                     }
 
-                    $link = $xpath->query("//atom:feed/atom:link[not(@rel)]")->item(0);
+                    $link = $xpath->query('//atom:feed/atom:link[not(@rel)]')->item(0);
 
                     if (!$link) {
-                        $link = $xpath->query("//atom03:feed/atom03:link[not(@rel)]")->item(0);
+                        $link = $xpath->query('//atom03:feed/atom03:link[not(@rel)]')->item(0);
                     }
 
                     if ($link && $link->hasAttributes()) {
-                        $this->link = $link->getAttribute("href");
+                        $this->link = $link->getAttribute('href');
                     }
 
-                    $articles = $xpath->query("//atom:entry");
+                    $articles = $xpath->query('//atom:entry');
 
                     if (!$articles || $articles->length == 0) {
-                        $articles = $xpath->query("//atom03:entry");
+                        $articles = $xpath->query('//atom03:entry');
                     }
                     foreach ($articles as $article) {
                         array_push($this->items, new \SmallSmallRSS\FeedItem_Atom($article, $this->doc, $this->xpath));
@@ -114,23 +114,23 @@ class FeedParser
 
                     break;
                 case self::FEED_RSS:
-                    $title = $xpath->query("//channel/title")->item(0);
+                    $title = $xpath->query('//channel/title')->item(0);
 
                     if ($title) {
                         $this->title = $title->nodeValue;
                     }
 
-                    $link = $xpath->query("//channel/link")->item(0);
+                    $link = $xpath->query('//channel/link')->item(0);
 
                     if ($link) {
-                        if ($link->getAttribute("href")) {
-                            $this->link = $link->getAttribute("href");
+                        if ($link->getAttribute('href')) {
+                            $this->link = $link->getAttribute('href');
                         } elseif ($link->nodeValue) {
                             $this->link = $link->nodeValue;
                         }
                     }
 
-                    $articles = $xpath->query("//channel/item");
+                    $articles = $xpath->query('//channel/item');
 
                     foreach ($articles as $article) {
                         array_push($this->items, new \SmallSmallRSS\FeedItem_RSS($article, $this->doc, $this->xpath));
@@ -140,19 +140,19 @@ class FeedParser
                 case self::FEED_RDF:
                     $xpath->registerNamespace('rssfake', 'http://purl.org/rss/1.0/');
 
-                    $title = $xpath->query("//rssfake:channel/rssfake:title")->item(0);
+                    $title = $xpath->query('//rssfake:channel/rssfake:title')->item(0);
 
                     if ($title) {
                         $this->title = $title->nodeValue;
                     }
 
-                    $link = $xpath->query("//rssfake:channel/rssfake:link")->item(0);
+                    $link = $xpath->query('//rssfake:channel/rssfake:link')->item(0);
 
                     if ($link) {
                         $this->link = $link->nodeValue;
                     }
 
-                    $articles = $xpath->query("//rssfake:item");
+                    $articles = $xpath->query('//rssfake:item');
 
                     foreach ($articles as $article) {
                         array_push($this->items, new \SmallSmallRSS\FeedItem_RSS($article, $this->doc, $this->xpath));
@@ -163,7 +163,7 @@ class FeedParser
             }
         } else {
             if (!isset($this->error)) {
-                $this->error = "Unknown/unsupported feed type";
+                $this->error = 'Unknown/unsupported feed type';
             }
             return;
         }
@@ -173,14 +173,14 @@ class FeedParser
     {
         if ($error) {
             return sprintf(
-                "LibXML error %s at line %d (column %d): %s",
+                'LibXML error %s at line %d (column %d): %s',
                 $error->code,
                 $error->line,
                 $error->column,
                 $error->message
             );
         } else {
-            return "";
+            return '';
         }
     }
 
@@ -210,7 +210,7 @@ class FeedParser
 
         switch ($this->type) {
             case self::FEED_ATOM:
-                $links = $this->xpath->query("//atom:feed/atom:link");
+                $links = $this->xpath->query('//atom:feed/atom:link');
 
                 foreach ($links as $link) {
                     if (!$rel || $link->hasAttribute('rel') && $link->getAttribute('rel') == $rel) {
@@ -219,7 +219,7 @@ class FeedParser
                 }
                 break;
             case self::FEED_RSS:
-                $links = $this->xpath->query("//atom:link");
+                $links = $this->xpath->query('//atom:link');
 
                 foreach ($links as $link) {
                     if (!$rel || $link->hasAttribute('rel') && $link->getAttribute('rel') == $rel) {

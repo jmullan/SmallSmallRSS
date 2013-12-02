@@ -13,7 +13,7 @@ class UserEntries
                  AND owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "feed_id");
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'feed_id');
         } else {
             return 0;
         }
@@ -25,7 +25,7 @@ class UserEntries
              WHERE owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
         } else {
             return -1;
         }
@@ -34,31 +34,31 @@ class UserEntries
     public static function catchupFeed($feed_id, $cat_view, $owner_uid, $max_id = false, $mode = 'all')
     {
         // Todo: all this interval stuff needs some generic generator function
-        $date_qpart = "false";
+        $date_qpart = 'false';
         switch ($mode) {
-            case "1day":
-                if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+            case '1day':
+                if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
                     $date_qpart = "date_entered < NOW() - INTERVAL '1 day' ";
                 } else {
-                    $date_qpart = "date_entered < DATE_SUB(NOW(), INTERVAL 1 DAY) ";
+                    $date_qpart = 'date_entered < DATE_SUB(NOW(), INTERVAL 1 DAY) ';
                 }
                 break;
-            case "1week":
-                if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+            case '1week':
+                if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
                     $date_qpart = "date_entered < NOW() - INTERVAL '1 week' ";
                 } else {
-                    $date_qpart = "date_entered < DATE_SUB(NOW(), INTERVAL 1 WEEK) ";
+                    $date_qpart = 'date_entered < DATE_SUB(NOW(), INTERVAL 1 WEEK) ';
                 }
                 break;
-            case "2weeks":
-                if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+            case '2weeks':
+                if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
                     $date_qpart = "date_entered < NOW() - INTERVAL '2 week' ";
                 } else {
-                    $date_qpart = "date_entered < DATE_SUB(NOW(), INTERVAL 2 WEEK) ";
+                    $date_qpart = 'date_entered < DATE_SUB(NOW(), INTERVAL 2 WEEK) ';
                 }
                 break;
             default:
-                $date_qpart = "true";
+                $date_qpart = 'true';
         }
 
         if (is_numeric($feed_id)) {
@@ -67,10 +67,10 @@ class UserEntries
                     if ($feed_id > 0) {
                         $children = getChildCategories($feed_id, $owner_uid);
                         array_push($children, $feed_id);
-                        $children = join(",", $children);
+                        $children = join(',', $children);
                         $cat_qpart = "cat_id IN ($children)";
                     } else {
-                        $cat_qpart = "cat_id IS NULL";
+                        $cat_qpart = 'cat_id IS NULL';
                     }
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries
@@ -166,8 +166,8 @@ class UserEntries
                     );
                 }
                 if ($feed_id == -3) {
-                    $intl = \SmallSmallRSS\DBPrefs::read("FRESH_ARTICLE_MAX_AGE");
-                    if (\SmallSmallRSS\Config::get('DB_TYPE') == "pgsql") {
+                    $intl = \SmallSmallRSS\DBPrefs::read('FRESH_ARTICLE_MAX_AGE');
+                    if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
                         $match_part = "date_entered > NOW() - INTERVAL '$intl hour' ";
                     } else {
                         $match_part = "date_entered > DATE_SUB(NOW(), INTERVAL $intl HOUR) ";

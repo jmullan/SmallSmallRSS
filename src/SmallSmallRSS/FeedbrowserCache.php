@@ -5,14 +5,14 @@ class FeedbrowserCache
 {
     public function update($lines)
     {
-        \SmallSmallRSS\Database::query("BEGIN");
-        \SmallSmallRSS\Database::query("DELETE FROM ttrss_feedbrowser_cache");
+        \SmallSmallRSS\Database::query('BEGIN');
+        \SmallSmallRSS\Database::query('DELETE FROM ttrss_feedbrowser_cache');
         $count = 0;
         foreach ($lines as $line) {
-            $subscribers = \SmallSmallRSS\Database::escape_string($line["subscribers"]);
-            $feed_url = \SmallSmallRSS\Database::escape_string($line["feed_url"]);
-            $title = \SmallSmallRSS\Database::escape_string($line["title"]);
-            $site_url = \SmallSmallRSS\Database::escape_string($line["site_url"]);
+            $subscribers = \SmallSmallRSS\Database::escape_string($line['subscribers']);
+            $feed_url = \SmallSmallRSS\Database::escape_string($line['feed_url']);
+            $title = \SmallSmallRSS\Database::escape_string($line['title']);
+            $site_url = \SmallSmallRSS\Database::escape_string($line['site_url']);
             $tmp_result = \SmallSmallRSS\Database::query(
                 "SELECT subscribers
                  FROM ttrss_feedbrowser_cache
@@ -27,7 +27,7 @@ class FeedbrowserCache
                 $count += 1;
             }
         }
-        \SmallSmallRSS\Database::query("COMMIT");
+        \SmallSmallRSS\Database::query('COMMIT');
         return $count;
     }
 }

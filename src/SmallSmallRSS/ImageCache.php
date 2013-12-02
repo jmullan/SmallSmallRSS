@@ -15,7 +15,7 @@ class ImageCache
 
     public static function processImages($html, $site_url, $download_if_missing = true)
     {
-        $cache_dir = \SmallSmallRSS\Config::get('CACHE_DIR') . "/images";
+        $cache_dir = \SmallSmallRSS\Config::get('CACHE_DIR') . '/images';
         libxml_use_internal_errors(true);
         $charset_hack = '<head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head>';
         $doc = new \DOMDocument();

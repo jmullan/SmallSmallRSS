@@ -11,9 +11,9 @@ namespace SmallSmallRSS;
 class Mailer extends \PHPMailer
 {
     //define all items that we want to override with defaults in PHPMailer
-    public $CharSet = "UTF-8";
-    public $PluginDir = "lib/phpmailer/";
-    public $ContentType = "text/html"; //default email type is HTML
+    public $CharSet = 'UTF-8';
+    public $PluginDir = 'lib/phpmailer/';
+    public $ContentType = 'text/html'; //default email type is HTML
 
     public function __construct()
     {
@@ -21,8 +21,8 @@ class Mailer extends \PHPMailer
         $this->FromName = \SmallSmallRSS\Config::get('SMTP_FROM_NAME');
 
         if (\SmallSmallRSS\Config::get('SMTP_SERVER')) {
-            $pair = explode(":", \SmallSmallRSS\Config::get('SMTP_SERVER'), 2);
-            $this->Mailer = "smtp";
+            $pair = explode(':', \SmallSmallRSS\Config::get('SMTP_SERVER'), 2);
+            $this->Mailer = 'smtp';
             $this->Host = $pair[0];
             $this->Port = $pair[1];
 
@@ -54,7 +54,7 @@ class Mailer extends \PHPMailer
      * @param $subject A string with the emails subject
      * @param $body A string containing the body of the email
      */
-    public function quickMail($toAddress, $toName, $subject, $body, $altbody = "")
+    public function quickMail($toAddress, $toName, $subject, $body, $altbody = '')
     {
         $this->addAddress($toAddress, $toName);
         $this->Subject = $subject;

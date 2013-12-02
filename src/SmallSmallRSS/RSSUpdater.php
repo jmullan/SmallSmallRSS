@@ -1011,5 +1011,4 @@ class RSSUpdater
         }
         return $favicon_url;
     }
-
 }

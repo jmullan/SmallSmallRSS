@@ -102,7 +102,7 @@ foreach ($js_files as $jsfile) {
 <div id="headlines-tmp" style="display: none"></div>
 <div id="main" data-dojo-type="dijit.layout.BorderContainer">
   <div id="feeds-holder" data-dojo-type="dijit.layout.ContentPane"
-    data-dojo-props="region: 'leading', splitter=true" style="width: 20%">
+    data-dojo-props="region: 'leading', splitter: true" style="width: 20%">
     <div id="feedlistLoading">
       <img src="images/indicator_tiny.gif" />
       <?php echo  __('Loading, please wait...'); ?>
@@ -205,7 +205,7 @@ if (empty($_SESSION['hide_logout'])) {
           </div>
         </div>
         <div id="content-insert" data-dojo-type="dijit.layout.ContentPane"
-          data-dojo-props="region: 'bottom', splitter=true" style="height : 50%">
+          data-dojo-props="region: 'bottom', splitter: true" style="height : 50%">
         </div>
       </div>
     </div>

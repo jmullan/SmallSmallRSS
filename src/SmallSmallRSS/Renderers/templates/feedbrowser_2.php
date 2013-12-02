@@ -1,14 +1,14 @@
 <?php
 foreach ($lines as $line) {
-    $id = $line["id"];
-    $feed_url = htmlspecialchars($line["feed_url"]);
-    $site_url = htmlspecialchars($line["site_url"]);
-    $title = htmlspecialchars($line["title"]);
+    $id = $line['id'];
+    $feed_url = htmlspecialchars($line['feed_url']);
+    $site_url = htmlspecialchars($line['site_url']);
+    $title = htmlspecialchars($line['title']);
 
     $archived = sprintf(
         ngettext(
-            "%d archived article",
-            "%d archived articles",
+            '%d archived article',
+            '%d archived articles',
             $line['articles_archived']
         ),
         $line['articles_archived']

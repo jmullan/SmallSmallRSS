@@ -84,8 +84,7 @@ class Sanity
                 array_push($errors, 'PHP version 5.3.0 or newer required.');
             }
 
-            if (\SmallSmallRSS\Config::get('CONFIG_VERSION')
-                != \SmallSmallRSS\Constants::EXPECTED_CONFIG_VERSION) {
+            if (\SmallSmallRSS\Config::get('CONFIG_VERSION') != \SmallSmallRSS\Constants::EXPECTED_CONFIG_VERSION) {
                 array_push(
                     $errors,
                     'Configuration file (config.ini) has incorrect version.'

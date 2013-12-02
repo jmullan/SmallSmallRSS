@@ -602,7 +602,7 @@ class Pref_Prefs extends ProtectedHandler
                 }
                 echo '<input  value="1" type="checkbox"';
                 echo " id=\"CB_$pref_name\" name=\"$pref_name\" $checked $disabled";
-                echo " data-dojo-type=\"dijit.form.CheckBox\">";
+                echo ' data-dojo-type="dijit.form.CheckBox">';
             } elseif (
                 false !== array_search(
                     $pref_name,
@@ -621,7 +621,7 @@ class Pref_Prefs extends ProtectedHandler
                 } else {
                     $disabled = '';
                 }
-                echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\"";
+                echo '<input data-dojo-type="dijit.form.ValidationTextBox"';
                 echo " required=\"1\" $regexp $disabled";
                 echo " name=\"$pref_name\" value=\"$value\">";
             } elseif ($pref_name == 'SSL_CERT_SERIAL') {
@@ -639,14 +639,14 @@ class Pref_Prefs extends ProtectedHandler
                 echo __('Clear');
                 echo '</button>';
             } elseif ($pref_name == 'DIGEST_PREFERRED_TIME') {
-                echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\"";
+                echo '<input data-dojo-type="dijit.form.ValidationTextBox"';
                 echo "id=\"$pref_name\" regexp=\"[012]?\d:\d\d\" placeHolder=\"12:00\"";
                 echo "name=\"$pref_name\" value=\"$value\"><div class=\"insensitive\">";
                 echo T_sprintf('Current server time: %s (UTC)', date('H:i'));
                 echo '</div>';
             } else {
                 $regexp = ($type_name == 'integer') ? 'regexp="^\d*$"' : '';
-                echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\"";
+                echo '<input data-dojo-type="dijit.form.ValidationTextBox"';
                 echo " $regexp";
                 echo " name=\"$pref_name\" value=\"$value\">";
             }
@@ -670,8 +670,8 @@ class Pref_Prefs extends ProtectedHandler
         echo '<span>';
         echo __('Save configuration');
         echo '</span>';
-        echo "<div data-dojo-type=\"dijit.DropDownMenu\">";
-        echo "<div data-dojo-type=\"dijit.MenuItem\"";
+        echo '<div data-dojo-type="dijit.DropDownMenu">';
+        echo '<div data-dojo-type="dijit.MenuItem"';
         echo " onclick=\"dijit.byId('changeSettingsForm').onSubmit(null, true)\">";
         echo __('Save and exit preferences');
         echo '</div>';
@@ -731,10 +731,10 @@ class Pref_Prefs extends ProtectedHandler
         echo '</td>';
         echo '<td width="">';
         echo __('Description');
-        echo "</td>";
+        echo '</td>';
         echo '<td width="5%">';
         echo __('Version');
-        echo "</td>";
+        echo '</td>';
         echo '<td width="10%">';
         echo __('Author');
         echo '</td>';
@@ -781,12 +781,12 @@ class Pref_Prefs extends ProtectedHandler
             }
         }
         echo "<tr><td colspan='4'><h3>".__('User plugins').'</h3></td></tr>';
-        echo "<tr class=\"title\">";
-        echo "<td width=\"5%\">&nbsp;</td>";
-        echo "<td width=\"10%\">".__('Plugin')."</td>";
-        echo "<td width=\"\">".__('Description')."</td>";
-        echo "<td width=\"5%\">".__('Version')."</td>";
-        echo "<td width=\"10%\">".__('Author').'</td></tr>';
+        echo '<tr class="title">';
+        echo '<td width="5%">&nbsp;</td>';
+        echo '<td width="10%">'.__('Plugin').'</td>';
+        echo '<td width="">'.__('Description').'</td>';
+        echo '<td width="5%">'.__('Version').'</td>';
+        echo '<td width="10%">'.__('Author').'</td></tr>';
 
         foreach ($tmppluginhost->get_plugins() as $name => $plugin) {
             $about = $plugin->about();
@@ -976,14 +976,14 @@ class Pref_Prefs extends ProtectedHandler
         echo '</span>';
         echo '<div data-dojo-type="dijit.Menu" style="display: none;">';
         echo "<div onclick=\"selectTableRows('prefFeedProfileList', 'all')\"";
-        echo " data-dojo-type=\"dijit.MenuItem\">";
+        echo ' data-dojo-type="dijit.MenuItem">';
         echo __('All');
         echo '</div>';
         echo "<div onclick=\"selectTableRows('prefFeedProfileList', 'none')\"";
-        echo " data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
+        echo ' data-dojo-type="dijit.MenuItem">'.__('None').'</div>';
         echo '</div></div>';
         echo '<div style="float: right">';
-        echo "<input name=\"newprofile\" data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\">";
+        echo '<input name="newprofile" data-dojo-type="dijit.form.ValidationTextBox" required="1">';
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').addProfile()\">";
         echo __('Create profile');
         echo '</button>';
@@ -1001,7 +1001,7 @@ class Pref_Prefs extends ProtectedHandler
         echo '<tr class="placeholder" id="FCATR-0">'; #odd
         echo "<td width='5%' align='center'>";
         echo "<input id='FCATC-0' onclick='toggleSelectRow2(this);'";
-        echo " data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\">";
+        echo ' data-dojo-type="dijit.form.CheckBox" type="checkbox">';
         echo '</td>';
         if (!$_SESSION['profile']) {
             $is_active = __('(active)');

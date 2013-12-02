@@ -193,71 +193,53 @@ class PublicHandler extends Handler
             } else {
                 header('Content-Type: text/plain; charset=utf-8');
             }
-
             echo $tmp;
         } elseif ($format == 'json') {
-
             $feed = array();
-
+            $feed['article_count'] = 0;
             $feed['title'] = $feed_title;
             $feed['version'] = VERSION;
             $feed['feed_url'] = $feed_self_url;
-
             if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB') && $feed == -2) {
                 $feed['hub_url'] = \SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB');
             }
-
             $feed['self_url'] = get_self_url_prefix();
-
             $feed['articles'] = array();
-
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $article = array();
-
                 $article['id'] = $line['link'];
                 $article['link'] = $line['link'];
                 $article['title'] = $line['title'];
                 $article['excerpt'] = truncate_string(strip_tags($line['content_preview']), 100, '...');
                 $article['content'] = sanitize($line['content_preview'], false, $owner_uid);
                 $article['updated'] = date('c', strtotime($line['updated']));
-
                 if ($line['note']) {
                     $article['note'] = $line['note'];
                 }
                 if ($article['author']) {
                     $article['author'] = $line['author'];
                 }
-
                 $tags = get_article_tags($line['id'], $owner_uid);
-
                 if (count($tags) > 0) {
                     $article['tags'] = array();
-
                     foreach ($tags as $tag) {
                         array_push($article['tags'], $tag);
                     }
                 }
-
                 $enclosures = \SmallSmallRSS\Enclosures::get($line['id']);
-
                 if (count($enclosures) > 0) {
                     $article['enclosures'] = array();
-
                     foreach ($enclosures as $e) {
                         $type = $e['content_type'];
                         $url = $e['content_url'];
                         $length = $e['duration'];
-
                         array_push($article['enclosures'], array('url' => $url, 'type' => $type, 'length' => $length));
                     }
                 }
-
                 array_push($feed['articles'], $article);
             }
-
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode($feed);
-
         } else {
             header('Content-Type: application/json; charset=utf-8');
             echo json_encode(array('error' => array('message' => 'Unknown format')));

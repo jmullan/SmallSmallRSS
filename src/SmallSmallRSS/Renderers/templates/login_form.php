@@ -1,9 +1,9 @@
 <?php
 \SmallSmallRSS\Locale::startupGettext();
-$login_error_msg = isset($_SESSION["login_error_msg"]) ? $_SESSION["login_error_msg"] : '';
+$login_error_msg = isset($_SESSION['login_error_msg']) ? $_SESSION['login_error_msg'] : '';
 $fake_login = isset($fake_login) ? $fake_login : '';
-$fake_password = isset($_SESSION["fake_password"]) ? $_SESSION["fake_password"] : '';
-$return = urlencode($_SERVER["REQUEST_URI"]);
+$fake_password = isset($_SESSION['fake_password']) ? $_SESSION['fake_password'] : '';
+$return = urlencode($_SERVER['REQUEST_URI']);
 $software_name = \SmallSmallRSS\Config::get('SOFTWARE_NAME');
 ?>
 <!DOCTYPE html>
@@ -37,12 +37,12 @@ $software_name = \SmallSmallRSS\Config::get('SOFTWARE_NAME');
 if (!empty($login_error_msg)) {
 ?>
       <div class="row-error"><?php echo $login_error_msg ?></div>
-<?php $login_error_msg = ""; ?>
+<?php $login_error_msg = ''; ?>
 <?php
 }
 ?>
       <div class="row">
-        <label><?php echo __("Login:") ?></label>
+        <label><?php echo __('Login:') ?></label>
         <input name="login" class="input"
           onchange="fetchProfiles()" onfocus="fetchProfiles()" onblur="fetchProfiles()"
           style="width: 220px"
@@ -52,22 +52,22 @@ if (!empty($login_error_msg)) {
 
 
     <div class="row">
-      <label><?php echo __("Password:") ?></label>
+      <label><?php echo __('Password:') ?></label>
       <input type="password" name="password" required="1"
         style="width: 220px" class="input"
         value="<?php echo $fake_password ?>"/>
 <?php
-if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_internal") !== false) { ?>
-      <a class='forgotpass' href="public.php?op=forgotpass"><?php echo __("I forgot my password") ?></a>
+if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) { ?>
+      <a class='forgotpass' href="public.php?op=forgotpass"><?php echo __('I forgot my password') ?></a>
     <?php } ?>
     </div>
 
 
     <div class="row">
-      <label><?php echo __("Profile:") ?></label>
+      <label><?php echo __('Profile:') ?></label>
       <span id='profile_box'>
         <select disabled='disabled' data-dojo-type='dijit.form.Select' style='width: 220px; margin : 0px'>
-          <option><?php echo __("Default profile") ?></option>
+          <option><?php echo __('Default profile') ?></option>
         </select>
       </span>
     </div>
@@ -76,11 +76,11 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_internal") !== false) { 
       <label>&nbsp;</label>
       <input data-dojo-type="dijit.form.CheckBox" name="bw_limit" id="bw_limit" type="checkbox"
         onchange="bwLimitChange(this)">
-      <label id="bw_limit_label" for="bw_limit"><?php echo __("Use less traffic") ?></label>
+      <label id="bw_limit_label" for="bw_limit"><?php echo __('Use less traffic') ?></label>
     </div>
 
     <div data-dojo-type="dijit.Tooltip" connectId="bw_limit_label" position="below" style="display:none">
-<?php echo __("Does not display images in articles, reduces automatic refreshes."); ?>
+<?php echo __('Does not display images in articles, reduces automatic refreshes.'); ?>
     </div>
 
     <?php if (\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') > 0) { ?>
@@ -88,7 +88,7 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_internal") !== false) { 
     <div class="row">
       <label>&nbsp;</label>
       <input data-dojo-type="dijit.form.CheckBox" name="remember_me" id="remember_me" type="checkbox" checked="checked">
-      <label for="remember_me"><?php echo __("Remember me") ?></label>
+      <label for="remember_me"><?php echo __('Remember me') ?></label>
     </div>
 
     <?php } ?>
@@ -97,7 +97,7 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), "auth_internal") !== false) { 
         <button data-dojo-type="dijit.form.Button" type="submit"><?php echo __('Log in') ?></button>
         <?php if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) { ?>
         <button onclick="return gotoRegForm()" data-dojo-type="dijit.form.Button">
-          <?php echo __("Create new account") ?>
+          <?php echo __('Create new account') ?>
         </button>
         <?php } ?>
       </div>

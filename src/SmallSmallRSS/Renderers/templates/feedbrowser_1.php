@@ -1,9 +1,9 @@
 <?php
 foreach ($lines as $line) {
-    $feed_url = htmlspecialchars($line["feed_url"]);
-    $site_url = htmlspecialchars($line["site_url"]);
-    $title = htmlspecialchars($line["title"]);
-    $subscribers = htmlspecialchars($line["subscribers"]);
+    $feed_url = htmlspecialchars($line['feed_url']);
+    $site_url = htmlspecialchars($line['site_url']);
+    $title = htmlspecialchars($line['title']);
+    $subscribers = htmlspecialchars($line['subscribers']);
 
 ?>
 <li>

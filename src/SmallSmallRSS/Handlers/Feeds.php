@@ -71,7 +71,7 @@ class Feeds extends ProtectedHandler
 
         // right part
 
-        ob_get_start();
+        ob_start();
         echo "<span class='r'>";
         echo "<span id='selected_prompt'></span>";
         echo "<span id='feed_title'>";
@@ -202,7 +202,7 @@ class Feeds extends ProtectedHandler
         }
         $disable_cache = false;
         $reply = array();
-        ob_get_start();
+        ob_start();
         $rgba_cache = array();
         $timing_info = microtime(true);
         $topmost_article_ids = array();
@@ -826,7 +826,7 @@ class Feeds extends ProtectedHandler
                 echo '</span></p></div>';
             }
         }
-        $reply_content = ob_get_clean();
+        $reply['content'] = ob_get_clean();
         if (!empty($_REQUEST['debug'])) {
             $timing_info = print_checkpoint('H2', $timing_info);
         }
@@ -858,7 +858,6 @@ class Feeds extends ProtectedHandler
     public function view()
     {
         $timing_info = microtime(true);
-
         $reply = array('headlines' => array());
 
         if (!empty($_REQUEST['debug'])) {
@@ -1035,7 +1034,7 @@ class Feeds extends ProtectedHandler
         );
         $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_errors');
 
-        ob_get_start();
+        ob_start();
         echo '<div class="whiteBox">';
         echo __('No feed selected.');
         echo '<p><span class="insensitive">';

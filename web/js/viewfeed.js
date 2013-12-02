@@ -19,23 +19,17 @@ var has_storage = 'sessionStorage' in window && window['sessionStorage'] !== nul
 function headlines_callback2(transport, offset, background, infscroll_req) {
     try {
         handle_rpc_json(transport);
-
         var is_cat = false;
         var feed_id = false;
-
         var reply = false;
-
         try {
             reply = JSON.parse(transport.responseText);
         } catch (e) {
             console.error(e);
         }
-
         if (reply) {
-
             is_cat = reply['headlines']['is_cat'];
             feed_id = reply['headlines']['id'];
-
             if (background) {
                 var content = reply['headlines']['content'];
 

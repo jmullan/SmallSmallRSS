@@ -260,7 +260,7 @@ class PublicHandler extends Handler
 
             if ($fresh) {
                 echo ';';
-                echo getFeedArticles(-3, false, true, $uid);
+                echo countUnreadFeedArticles(-3, false, true, $uid);
             }
 
         } else {

@@ -189,7 +189,7 @@ class CountersCache
             $unread = (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'sv');
 
         } else {
-            $unread = (int) getFeedArticles($feed_id, $is_cat, true, $owner_uid);
+            $unread = (int) countUnreadFeedArticles($feed_id, $is_cat, true, $owner_uid);
         }
 
         \SmallSmallRSS\Database::query('BEGIN');

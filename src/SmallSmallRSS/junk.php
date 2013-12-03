@@ -209,6 +209,88 @@ function getAllCounters()
     return $data;
 }
 
+function getGlobalCounters()
+{
+    return array(
+        array(
+            'id' => 'global-unread',
+            'counter' => \SmallSmallRSS\CountersCache::getGlobalUnread($_SESSION['uid'])
+        ),
+        array(
+            'id' => 'subscribed-feeds',
+            'counter' => \SmallSmallRSS\Feeds::count($_SESSION['uid'])
+        )
+    );
+}
+
+function getVirtCounters()
+{
+    $ret_arr = array();
+    for ($i = 0; $i >= -4; $i--) {
+        $count = getFeedUnread($i);
+        if ($i == 0 || $i == -1 || $i == -2) {
+            $auxctr = countUnreadFeedArticles($i, false);
+        } else {
+            $auxctr = 0;
+        }
+        $cv = array(
+            'id' => $i,
+            'counter' => (int) $count,
+            'auxcounter' => $auxctr
+        );
+        array_push($ret_arr, $cv);
+    }
+    $feeds = \SmallSmallRSS\PluginHost::getInstance()->getFeeds(-1);
+    if (is_array($feeds)) {
+        foreach ($feeds as $feed) {
+            $cv = array(
+                'id' => \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']),
+                'counter' => $feed['sender']->get_unread($feed['id'])
+            );
+            array_push($ret_arr, $cv);
+        }
+    }
+    return $ret_arr;
+}
+
+function getLabelCounters($descriptions = false)
+{
+    $owner_uid = $_SESSION['uid'];
+    $result = \SmallSmallRSS\Database::query(
+        "SELECT
+             id,
+             caption,
+             COUNT(u1.unread) AS unread,
+             COUNT(u2.unread) AS total
+         FROM
+             ttrss_labels2
+             LEFT JOIN ttrss_user_labels2 ON
+                (ttrss_labels2.id = label_id)
+             LEFT JOIN ttrss_user_entries AS u1
+             ON (u1.ref_id = article_id AND u1.unread = true AND u1.owner_uid = $owner_uid)
+             LEFT JOIN ttrss_user_entries AS u2
+             ON (u2.ref_id = article_id AND u2.unread = false AND u2.owner_uid = $owner_uid)
+         WHERE ttrss_labels2.owner_uid = $owner_uid
+         GROUP BY
+             ttrss_labels2.id, ttrss_labels2.caption"
+    );
+    $ret_arr = array();
+    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        $id = label_to_feed_id($line['id']);
+        $cv = array(
+            'id' => $id,
+            'counter' => (int) $line['unread'],
+            'auxcounter' => (int) $line['total']
+        );
+        if ($descriptions) {
+            $cv['description'] = $line['caption'];
+        }
+        $ret_arr[] = $cv;
+    }
+    return $ret_arr;
+}
+
+
 function getCategoryCounters()
 {
     $ret_arr = array();
@@ -288,7 +370,7 @@ function getCategoryUnread($cat, $owner_uid = false)
     }
     if ($cat >= 0) {
         $feed_ids = \SmallSmallRSS\Feeds::getForCat($cat, $owner_uid);
-        $unread = \SmallSmallRSS\UserEntries::countUnread($cat, $owner_uid);
+        $unread = \SmallSmallRSS\UserEntries::countUnread($feed_ids, $owner_uid);
         return $unread;
     } elseif ($cat == \SmallSmallRSS\FeedCategories::SPECIAL) {
         return getFeedUnread(-1) + getFeedUnread(-2) + getFeedUnread(-3) + getFeedUnread(0);
@@ -310,7 +392,7 @@ function getCategoryUnread($cat, $owner_uid = false)
 
 function getFeedUnread($feed, $is_cat = false)
 {
-    return getFeedArticles($feed, $is_cat, true, $_SESSION['uid']);
+    return countUnreadFeedArticles($feed, $is_cat, true, $_SESSION['uid']);
 }
 
 function getLabelUnread($label_id, $owner_uid = false)
@@ -335,7 +417,7 @@ function getLabelUnread($label_id, $owner_uid = false)
     }
 }
 
-function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_uid = false)
+function countUnreadFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_uid = false)
 {
     $n_feed = (int) $feed;
     $need_entries = false;
@@ -425,90 +507,6 @@ function getFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_ui
     }
     $unread = \SmallSmallRSS\Database::fetch_result($result, 0, 'unread');
     return $unread;
-}
-
-function getGlobalCounters($global_unread = -1)
-{
-    if ($global_unread == -1) {
-        $global_unread = \SmallSmallRSS\CountersCache::getGlobalUnread($_SESSION['uid']);
-    }
-    return array(
-        array(
-            'id' => 'global-unread',
-            'counter' => $global_unread
-        ),
-        array(
-            'id' => 'subscribed-feeds',
-            'counter' => \SmallSmallRSS\Feeds::count($_SESSION['uid'])
-        )
-    );
-}
-
-function getVirtCounters()
-{
-    $ret_arr = array();
-    for ($i = 0; $i >= -4; $i--) {
-        $count = getFeedUnread($i);
-        if ($i == 0 || $i == -1 || $i == -2) {
-            $auxctr = getFeedArticles($i, false);
-        } else {
-            $auxctr = 0;
-        }
-        $cv = array(
-            'id' => $i,
-            'counter' => (int) $count,
-            'auxcounter' => $auxctr
-        );
-        array_push($ret_arr, $cv);
-    }
-    $feeds = \SmallSmallRSS\PluginHost::getInstance()->getFeeds(-1);
-    if (is_array($feeds)) {
-        foreach ($feeds as $feed) {
-            $cv = array(
-                'id' => \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']),
-                'counter' => $feed['sender']->get_unread($feed['id'])
-            );
-            array_push($ret_arr, $cv);
-        }
-    }
-    return $ret_arr;
-}
-
-function getLabelCounters($descriptions = false)
-{
-    $ret_arr = array();
-    $owner_uid = $_SESSION['uid'];
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT
-             id,
-             caption,
-             COUNT(u1.unread) AS unread,
-             COUNT(u2.unread) AS total
-         FROM
-             ttrss_labels2
-             LEFT JOIN ttrss_user_labels2 ON
-                (ttrss_labels2.id = label_id)
-             LEFT JOIN ttrss_user_entries AS u1
-             ON (u1.ref_id = article_id AND u1.unread = true AND u1.owner_uid = $owner_uid)
-             LEFT JOIN ttrss_user_entries AS u2
-             ON (u2.ref_id = article_id AND u2.unread = false AND u2.owner_uid = $owner_uid)
-         WHERE ttrss_labels2.owner_uid = $owner_uid
-         GROUP BY
-             ttrss_labels2.id, ttrss_labels2.caption"
-    );
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        $id = label_to_feed_id($line['id']);
-        $cv = array(
-            'id' => $id,
-            'counter' => (int) $line['unread'],
-            'auxcounter' => (int) $line['total']
-        );
-        if ($descriptions) {
-            $cv['description'] = $line['caption'];
-        }
-        array_push($ret_arr, $cv);
-    }
-    return $ret_arr;
 }
 
 function getFeedCounters($active_feed = false)

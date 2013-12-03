@@ -824,17 +824,6 @@ function getFeedIcon($id)
     return false;
 }
 
-function \SmallSmallRSS\HotKeys::info()
-{
-    return \SmallSmallRSS\HotKeys::info();
-}
-
-
-function \SmallSmallRSS\HotKeys::map()
-{
-    return \SmallSmallRSS\HotKeys::map();
-}
-
 function make_runtime_info()
 {
     $data = array();

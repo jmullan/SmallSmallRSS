@@ -12,10 +12,10 @@ class Swap_JK extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::HOTKEY_MAP,
+        \SmallSmallRSS\Hooks::FILTER_HOTKEY_MAP,
     );
 
-    public function hookHotkeyMap($hotkeys)
+    public function hookFilterHotkeyMap($hotkeys)
     {
         $hotkeys["j"] = "next_feed";
         $hotkeys["k"] = "prev_feed";

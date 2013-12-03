@@ -12,7 +12,7 @@ class Hooks
     const FEED_PARSED = 6;
     const UPDATE_TASK = 7;
     const AUTH_USER = 8;
-    const HOTKEY_MAP = 9;
+    const FILTER_HOTKEY_MAP = 9;
     const FILTER_ARTICLE = 10;
     const RENDER_ARTICLE_CDM = 11;
     const FEED_FETCHED = 12;

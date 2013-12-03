@@ -341,8 +341,9 @@ class API extends Handler
 
             if ($num_updated > 0 && $field == 'unread') {
                 $result = \SmallSmallRSS\Database::query(
-                    "SELECT DISTINCT feed_id FROM ttrss_user_entries
-                    WHERE ref_id IN ($article_ids)"
+                    "SELECT DISTINCT feed_id
+                     FROM ttrss_user_entries
+                     WHERE ref_id IN ($article_ids)"
                 );
 
                 while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
@@ -417,7 +418,7 @@ class API extends Handler
                         'comments' => $line['comments'],
                         'author' => $line['author'],
                         'updated' => (int) strtotime($line['updated']),
-                        'content' => $line['cached_content'] != '' ? $line['cached_content'] : $line['content'],
+                        'content' => trim($line['cached_content']) != '' ? $line['cached_content'] : $line['content'],
                         'feed_id' => $line['feed_id'],
                         'attachments' => $attachments,
                         'score' => (int) $line['score'],
@@ -429,13 +430,9 @@ class API extends Handler
                     foreach ($hooks as $p) {
                         $article = $p->hookFilterArticleApi(array('article' => $article));
                     }
-
-
-                    array_push($articles, $article);
-
+                    $articles[] = $article;
                 }
             }
-
             $this->wrap(self::STATUS_OK, $articles);
         } else {
             $this->wrap(self::STATUS_ERR, array('error' => 'INCORRECT_USAGE'));

@@ -95,11 +95,11 @@ function catchupAllFeeds() {
         var query_str = "backend.php?op=feeds&method=catchupAll";
         notify_progress("Marking all feeds as read...");
         new Ajax.Request("backend.php", {
-                parameters: query_str,
-                onComplete: function(transport) {
-                    request_counters(true);
-                    viewCurrentFeed();
-                }});
+            parameters: query_str,
+            onComplete: function(transport) {
+                request_counters(true);
+                viewCurrentFeed();
+            }});
         global_unread = 0;
         updateTitle("");
     }
@@ -902,32 +902,27 @@ function handle_rpc_json(transport, scheduled_call) {
                     console.log("Received UPDATE_COUNTERS, need to refresh counters.");
                     setInitParam("last_article_id", -1);
                     request_counters(true);
+                    reply['counters'] = false;
                 }
             }
             var counters = reply['counters'];
             if (counters) {
                 parse_counters(counters, scheduled_call);
             }
-
             var runtime_info = reply['runtime-info'];
-
             if (runtime_info) {
                 parse_runtime_info(runtime_info);
             }
-
             Element.hide(dijit.byId("net-alert").domNode);
-
         } else {
             Element.show(dijit.byId("net-alert").domNode);
         }
-
     } catch (e) {
         Element.show(dijit.byId("net-alert").domNode);
         console.log('Exception when handling rpc json');
         console.log(e);
         console.log(transport.responseText);
     }
-
     return true;
 }
 

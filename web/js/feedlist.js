@@ -135,16 +135,14 @@ function viewfeed(feed, method, is_cat, offset, background, infscroll_req, can_w
 
         timeout_ms = can_wait ? 250 : 0;
         _viewfeed_timeout = setTimeout(function() {
-
-                                           new Ajax.Request("backend.php", {
-                                                                parameters: query,
-                                                                onComplete: function(transport) {
-                                                                    setFeedExpandoIcon(feed, is_cat, 'images/blank_icon.gif');
-                                                                    headlines_callback2(transport, offset, background, infscroll_req);
-                                                                    PluginHost.run(PluginHost.HOOK_FEED_LOADED, [feed, is_cat]);
-                                                                } });
-                                       }, timeout_ms); // Wait 250ms
-
+            new Ajax.Request("backend.php", {
+                parameters: query,
+                onComplete: function(transport) {
+                    setFeedExpandoIcon(feed, is_cat, 'images/blank_icon.gif');
+                    headlines_callback2(transport, offset, background, infscroll_req);
+                    PluginHost.run(PluginHost.HOOK_FEED_LOADED, [feed, is_cat]);
+                }});
+            }, timeout_ms); // Wait 250ms
     } catch (e) {
         exception_error("viewfeed", e);
     }
@@ -153,21 +151,16 @@ function viewfeed(feed, method, is_cat, offset, background, infscroll_req, can_w
 function feedlist_init() {
     try {
         loading_set_progress(50);
-
         document.onkeydown = hotkey_handler;
         setTimeout("hotkey_prefix_timeout()", 5*1000);
-
         if (!getActiveFeedId()) {
             viewfeed(-3);
         } else {
             viewfeed(getActiveFeedId(), '', activeFeedIsCat());
         }
-
         hideOrShowFeeds(getInitParam("hide_read_feeds") == 1);
-
         request_counters(true);
         timeout();
-
     } catch (e) {
         exception_error("feedlist/init", e);
     }
@@ -178,7 +171,7 @@ function request_counters(force) {
     var date = new Date();
     var timestamp = Math.round(date.getTime() / 1000);
     var since = timestamp - counters_last_request;
-    if (!force && (since <= 5)) {
+    if (!force && (since <= 20)) {
         console.log("request_counters: interval too small: " + since + 's');
         return;
     }
@@ -189,14 +182,14 @@ function request_counters(force) {
             query = query + "&last_article_id=" + getInitParam("last_article_id");
         }
         new Ajax.Request("backend.php", {
-                parameters: query,
-                onComplete: function(transport) {
-                    try {
-                        handle_rpc_json(transport);
-                    } catch (e) {
-                        exception_error("request_counters", e);
-                    }
-                }});
+                             parameters: query,
+                             onComplete: function(transport) {
+                                 try {
+                                     handle_rpc_json(transport);
+                                 } catch (e) {
+                                     exception_error("request_counters", e);
+                                 }
+                             }});
     } catch (e) {
         exception_error("request_counters", e);
     }
@@ -297,7 +290,7 @@ function getFeedValue(feed, is_cat, key) {
             return tree.model.getFeedValue(feed, is_cat, key);
         }
     } catch (e) {
-         exception_error('getFeedValue', e);
+        exception_error('getFeedValue', e);
     }
     return '';
 }
@@ -427,22 +420,22 @@ function catchupFeed(feed, is_cat, mode) {
         notify_progress("Loading, please wait...", true);
 
         new Ajax.Request("backend.php", {
-                parameters: catchup_query,
-                onComplete: function(transport) {
-                    handle_rpc_json(transport);
-                    var show_next_feed = getInitParam("on_catchup_show_next_feed") == "1";
-                    if (show_next_feed) {
-                        var nuf = getNextUnreadFeed(feed, is_cat);
-                        if (nuf) {
-                            viewfeed(nuf, '', is_cat);
-                        }
-                    } else {
-                        if (feed == getActiveFeedId() && is_cat == activeFeedIsCat()) {
-                            viewCurrentFeed();
-                        }
-                    }
-                    notify("");
-                }});
+                             parameters: catchup_query,
+                             onComplete: function(transport) {
+                                 handle_rpc_json(transport);
+                                 var show_next_feed = getInitParam("on_catchup_show_next_feed") == "1";
+                                 if (show_next_feed) {
+                                     var nuf = getNextUnreadFeed(feed, is_cat);
+                                     if (nuf) {
+                                         viewfeed(nuf, '', is_cat);
+                                     }
+                                 } else {
+                                     if (feed == getActiveFeedId() && is_cat == activeFeedIsCat()) {
+                                         viewCurrentFeed();
+                                     }
+                                 }
+                                 notify("");
+                             }});
     } catch (e) {
         exception_error("catchupFeed", e);
     }

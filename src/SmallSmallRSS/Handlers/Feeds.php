@@ -1187,7 +1187,7 @@ class Feeds extends ProtectedHandler
         echo '</option>';
         $feed_title = self::getTitle($active_feed_id);
         if (!$is_cat) {
-            $feed_cat_title = getFeedCatTitle($active_feed_id);
+            $feed_cat_title = \SmallSmallRSS\Feeds::getCategoryTitle($active_feed_id);
         } else {
             $feed_cat_title = \SmallSmallRSS\FeedCategories::getTitle($active_feed_id);
         }

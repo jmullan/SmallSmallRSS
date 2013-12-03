@@ -461,4 +461,29 @@ class Feeds
         return $counts;
 
     }
+    public static function getCategoryTitle($feed_id)
+    {
+        if ($feed_id == -1) {
+            return __('Special');
+        } elseif ($feed_id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
+            return __('Labels');
+        } elseif ($feed_id > 0) {
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT ttrss_feed_categories.title
+                 FROM
+                     ttrss_feed_categories,
+                     ttrss_feeds
+                 WHERE
+                     ttrss_feeds.id = '$feed_id'
+                     AND cat_id = ttrss_feed_categories.id"
+            );
+            if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+                return \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
+            } else {
+                return __('Uncategorized');
+            }
+        } else {
+            return "getCategoryTitle($feed_id) failed";
+        }
+    }
 }

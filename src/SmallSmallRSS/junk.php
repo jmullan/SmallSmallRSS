@@ -753,33 +753,6 @@ function checkbox_to_bool($val)
     return 'on' == $val;
 }
 
-function getFeedCatTitle($id)
-{
-    if ($id == -1) {
-        return __('Special');
-    } elseif ($id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
-        return __('Labels');
-    } elseif ($id > 0) {
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT ttrss_feed_categories.title
-             FROM
-                 ttrss_feeds,
-                 ttrss_feed_categories
-             WHERE
-                 ttrss_feeds.id = '$id'
-                 AND cat_id = ttrss_feed_categories.id"
-        );
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
-        } else {
-            return __('Uncategorized');
-        }
-    } else {
-        return "getFeedCatTitle($id) failed";
-    }
-
-}
-
 function getFeedIcon($id)
 {
     switch ($id) {

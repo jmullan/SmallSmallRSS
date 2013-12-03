@@ -598,13 +598,7 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
     }
     $feed_id = \SmallSmallRSS\Feeds::getByUrl($url, $_SESSION['uid']);
     if (!$feed_id) {
-        \SmallSmallRSS\Feeds::add(
-            $url,
-            $cat_id,
-            $_SESSION['uid'],
-            $auth_login,
-            $auth_pass
-        );
+        \SmallSmallRSS\Feeds::add($url, $cat_id, $_SESSION['uid'], $auth_login, $auth_pass);
         $feed_id = \SmallSmallRSS\Feeds::getByUrl($url, $_SESSION['uid']);
         if ($feed_id) {
             \SmallSmallRSS\RSSUpdater::updateFeed($feed_id);
@@ -715,7 +709,7 @@ function print_feed_cat_select(
 {
     if (!$root_id) {
         print "<select id=\"$id\" name=\"$id\" default=\"$default_id\" $attributes";
-        print " onchange=\"catSelectOnChange(this)\">";
+        print ' onchange="catSelectOnChange(this)">';
     }
     $children = \SmallSmallRSS\FeedCategories::getChildrenForSelect($root_id, $_SESSION['uid']);
     foreach ($children as $line) {
@@ -735,8 +729,14 @@ function print_feed_cat_select(
             );
         }
         if ($line['num_children'] > 0) {
-            print_feed_cat_select($id, $default_id, $attributes,
-                                  $include_all_cats, $line['id'], $nest_level+1);
+            print_feed_cat_select(
+                $id,
+                $default_id,
+                $attributes,
+                $include_all_cats,
+                $line['id'],
+                $nest_level+1
+            );
         }
     }
 
@@ -758,9 +758,14 @@ function print_feed_cat_select(
     }
 }
 
+function checkbox_to_bool($val)
+{
+    return 'on' == $val;
+}
+
 function checkbox_to_sql_bool($val)
 {
-    return ($val == 'on') ? 'true' : 'false';
+    return \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($val));
 }
 
 function getFeedCatTitle($id)
@@ -2310,7 +2315,7 @@ function filter_to_sql($filter, $owner_uid)
                         $rule['reg_exp'] . "')";
                     break;
             }
-            if (isset($rule['inverse'])) {
+            if (!empty($rule['inverse'])) {
                 $qpart = "NOT ($qpart)";
             }
             if (isset($rule['feed_id']) && $rule['feed_id'] > 0) {

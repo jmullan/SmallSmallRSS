@@ -964,7 +964,6 @@ class Feeds extends ProtectedHandler
             'vgroup_last_feed' => $vgroup_last_feed,
             'disable_cache' => (bool) $disable_cache
         );
-        $reply['content'] = ob_get_clean();
         $reply['runtime-info'] = make_runtime_info();
         echo json_encode($reply);
     }

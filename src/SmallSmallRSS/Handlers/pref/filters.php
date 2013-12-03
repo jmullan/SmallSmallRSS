@@ -58,29 +58,20 @@ class Pref_Filters extends ProtectedHandler
 
     public function testFilter()
     {
-        $filter = array();
-
-        $filter['enabled'] = true;
-        $filter['match_any_rule'] = \SmallSmallRSS\Database::fromSQLBool(
-            checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST['match_any_rule']))
-        );
-        $filter['inverse'] = \SmallSmallRSS\Database::fromSQLBool(
-            checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST['inverse']))
-        );
-
-        $filter['rules'] = array();
-
-        $result = \SmallSmallRSS\Database::query('SELECT id,name FROM ttrss_filter_types');
-
+        $result = \SmallSmallRSS\Database::query('SELECT id, name FROM ttrss_filter_types');
         $filter_types = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
             $filter_types[$line['id']] = $line['name'];
         }
 
+        $filter = array();
+        $filter['enabled'] = true;
+        $filter['match_any_rule'] = checkbox_to_bool($_REQUEST['match_any_rule']);
+        $filter['inverse'] = checkbox_to_bool($_REQUEST['inverse']);
+        $filter['rules'] = array();
         $rctr = 0;
         foreach ($_REQUEST['rule'] as $r) {
             $rule = json_decode($r, true);
-
             if ($rule && $rctr < 5) {
                 $rule['type'] = $filter_types[$rule['filter_type']];
                 unset($rule['filter_type']);
@@ -89,10 +80,8 @@ class Pref_Filters extends ProtectedHandler
                     $rule['cat_id'] = (int) substr($rule['feed_id'], 4);
                     unset($rule['feed_id']);
                 }
-
-                array_push($filter['rules'], $rule);
-
-                ++$rctr;
+                $filter['rules'][] = $rule;
+                $rctr += 1;
             } else {
                 break;
             }
@@ -102,70 +91,53 @@ class Pref_Filters extends ProtectedHandler
             -4, 30, '', false, false, false,
             'date_entered DESC', 0, $_SESSION['uid'], $filter
         );
-
         $result = $qfh_ret[0];
-
         $articles = array();
         $found = 0;
-
         echo __('Articles matching this filter:');
-
         echo '<div class="filterTestHolder">';
         echo '<table width="100%" cellspacing="0" id="prefErrorFeedList">';
-
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
             $entry_timestamp = strtotime($line['updated']);
             $entry_tags = get_article_tags($line['id'], $_SESSION['uid']);
-
             $content_preview = truncate_string(
                 strip_tags($line['content_preview']), 100, '...'
             );
-
             if ($line['feed_title']) {
                 $feed_title = $line['feed_title'];
             }
-
             echo '<tr>';
-
-            echo "<td width='5%' align='center'><input
-                data-dojo-type=\"dijit.form.CheckBox\" checked=\"1\"
-                disabled=\"1\" type=\"checkbox\"></td>";
+            echo "<td width='5%' align='center'>";
+            echo "<input data-dojo-type=\"dijit.form.CheckBox\" checked=\"1\" disabled=\"1\" type=\"checkbox\">";
+            echo "</td>";
             echo '<td>';
-
             echo $line['title'];
             echo '&nbsp;(';
             echo '<b>' . $feed_title . '</b>';
             echo '):&nbsp;';
             echo '<span class="insensitive">' . $content_preview . '</span>';
             echo ' ' . mb_substr($line['date_entered'], 0, 16);
-
             echo '</td></tr>';
-
             $found++;
         }
 
         if ($found == 0) {
-            echo "<tr><td align='center'>" .
-                __('No recent articles matching this filter have been found.');
-
-            echo "</td></tr><tr><td class='insensitive' align='center'>";
-
+            echo "<tr><td align='center'>";
+            echo __('No recent articles matching this filter have been found.');
+            echo "</td></tr>";
+            echo "<tr><td class=\"insensitive\" align=\"center\">";
             echo __('Complex expressions might not give results while testing due to issues with database server regexp implementation.');
-
-            echo '</td></tr>';
-
+            echo '</td>';
+            echo '</tr>';
         }
-
-        echo '</table></div>';
-
-        echo "<div style='text-align : center'>";
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('filterTestDlg').hide()\">".
-            __('Close this window').'</button>';
+        echo '</table>';
         echo '</div>';
-
+        echo "<div style='text-align : center'>";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('filterTestDlg').hide()\">";
+        echo __('Close this window');
+        echo '</button>';
+        echo '</div>';
     }
-
 
     public function getfiltertree()
     {
@@ -173,24 +145,29 @@ class Pref_Filters extends ProtectedHandler
         $root['id'] = 'root';
         $root['name'] = __('Filters');
         $root['items'] = array();
-
         $filter_search = $_SESSION['prefs_filter_search'];
-
         $result = \SmallSmallRSS\Database::query(
-            'SELECT *,
-            (SELECT action_param FROM ttrss_filters2_actions
-                WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_param,
-            (SELECT action_id FROM ttrss_filters2_actions
-                WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_id,
-            (SELECT description FROM ttrss_filter_actions
-                WHERE id = (SELECT action_id FROM ttrss_filters2_actions
-                    WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1)) AS action_name,
-            (SELECT reg_exp FROM ttrss_filters2_rules
-                WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS reg_exp
-            FROM ttrss_filters2 WHERE
-            owner_uid = '.$_SESSION['uid'].' ORDER BY order_id, title'
+            'SELECT
+                 *,
+                 (SELECT action_param FROM ttrss_filters2_actions
+                  WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_param,
+                 (SELECT action_id FROM ttrss_filters2_actions
+                  WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS action_id,
+                 (SELECT description FROM ttrss_filter_actions
+                  WHERE id = (
+                      SELECT action_id
+                      FROM ttrss_filters2_actions
+                      WHERE filter_id = ttrss_filters2.id
+                      ORDER BY id
+                      LIMIT 1
+                  )
+                 ) AS action_name,
+                 (SELECT reg_exp FROM ttrss_filters2_rules
+                  WHERE filter_id = ttrss_filters2.id ORDER BY id LIMIT 1) AS reg_exp
+             FROM ttrss_filters2
+             WHERE owner_uid = '.$_SESSION['uid'].'
+             ORDER BY order_id, title'
         );
-
 
         $action_id = -1;
         $folder = array();
@@ -202,9 +179,10 @@ class Pref_Filters extends ProtectedHandler
             $match_ok = false;
             if ($filter_search) {
                 $rules_result = \SmallSmallRSS\Database::query(
-                    'SELECT reg_exp FROM ttrss_filters2_rules WHERE filter_id = '.$line['id']
+                    'SELECT reg_exp
+                     FROM ttrss_filters2_rules
+                     WHERE filter_id = '.$line['id']
                 );
-
                 while ($rule_line = \SmallSmallRSS\Database::fetch_assoc($rules_result)) {
                     if (mb_strpos($rule_line['reg_exp'], $filter_search) !== false) {
                         $match_ok = true;
@@ -226,7 +204,10 @@ class Pref_Filters extends ProtectedHandler
                     $fg_color = \SmallSmallRSS\Database::fetch_result($label_result, 0, 'fg_color');
                     $bg_color = \SmallSmallRSS\Database::fetch_result($label_result, 0, 'bg_color');
 
-                    $name[1] = "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\" style='color: $fg_color; background-color: $bg_color; margin-right: 4px'>&alpha;</span>" . $name[1];
+                    $name[1] = "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\""
+                        . " style=\"color: $fg_color; background-color: $bg_color; margin-right: 4px\">"
+                        . "&alpha;</span>"
+                        . $name[1];
                 }
             }
 
@@ -264,7 +245,10 @@ class Pref_Filters extends ProtectedHandler
         $filter_id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
 
         $result = \SmallSmallRSS\Database::query(
-            "SELECT * FROM ttrss_filters2 WHERE id = '$filter_id' AND owner_uid = " . $_SESSION['uid']
+            "SELECT * FROM ttrss_filters2
+             WHERE
+                 id = '$filter_id'
+                 AND owner_uid = " . $_SESSION['uid']
         );
 
         $enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'enabled'));
@@ -391,47 +375,47 @@ class Pref_Filters extends ProtectedHandler
                 <label for=\"enabled\">".__('Enabled').'</label>';
 
         if ($match_any_rule) {
-            $checked = 'checked="1"';
+            $checked = ' checked="1"';
         } else {
             $checked = '';
         }
 
-        echo "<br/><input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"match_any_rule\" id=\"match_any_rule\" $checked>
-                <label for=\"match_any_rule\">".__('Match any rule').'</label>';
-
+        echo "<br/>";
+        echo "<input type=\"checkbox\" name=\"match_any_rule\" id=\"match_any_rule\"";
+        echo " $checked data-dojo-type=\"dijit.form.CheckBox\">";
+        echo "<label for=\"match_any_rule\">".__('Match any rule').'</label>';
         if ($inverse) {
-            $checked = 'checked="1"';
+            $checked = ' checked="1"';
         } else {
             $checked = '';
         }
-
-        echo "<br/><input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"inverse\" id=\"inverse\" $checked>
-                <label for=\"inverse\">".__('Inverse matching').'</label>';
-
+        echo "<br/>";
+        echo "<input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"inverse\" id=\"inverse\" $checked>";
+        echo "<label for=\"inverse\">".__('Inverse matching').'</label>';
         echo '<p/>';
-
         echo '<div class="dlgButtons">';
-
         echo '<div style="float: left">';
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').removeFilter()\">".
-            __('Remove').'</button>';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').removeFilter()\">";
+        echo __('Remove');
+        echo '</button>';
         echo '</div>';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').test()\">";
+        echo __('Test');
+        echo '</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').execute()\">";
+        echo __('Save');
+        echo '</button> ';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').test()\">".
-            __('Test').'</button> ';
-
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').execute()\">".
-            __('Save').'</button> ';
-
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').hide()\">".
-            __('Cancel').'</button>';
-
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').hide()\">";
+        echo __('Cancel');
+        echo '</button>';
         echo '</div>';
     }
 
     private function getRuleName($rule)
     {
-        if (!$rule) {  $rule = json_decode($_REQUEST['rule'], true);
+        if (!$rule) {
+            $rule = json_decode($_REQUEST['rule'], true);
         }
 
         $feed_id = $rule['feed_id'];

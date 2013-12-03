@@ -227,9 +227,9 @@ function getVirtCounters()
 {
     $ret_arr = array();
     for ($i = 0; $i >= -4; $i--) {
-        $count = getFeedUnread($i);
+        $count = countUnreadFeedArticles($i, false, true, $_SESSION['uid']);
         if ($i == 0 || $i == -1 || $i == -2) {
-            $auxctr = countUnreadFeedArticles($i, false);
+            $auxctr = countUnreadFeedArticles($i, false, false, $_SESSION['uid']);
         } else {
             $auxctr = 0;
         }
@@ -276,7 +276,7 @@ function getLabelCounters($descriptions = false)
     );
     $ret_arr = array();
     while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        $id = label_to_feed_id($line['id']);
+        $id = \SmallSmallRSS\Labels::toFeedId($line['id']);
         $cv = array(
             'id' => $id,
             'counter' => (int) $line['unread'],
@@ -373,7 +373,12 @@ function getCategoryUnread($cat, $owner_uid = false)
         $unread = \SmallSmallRSS\UserEntries::countUnread($feed_ids, $owner_uid);
         return $unread;
     } elseif ($cat == \SmallSmallRSS\FeedCategories::SPECIAL) {
-        return getFeedUnread(-1) + getFeedUnread(-2) + getFeedUnread(-3) + getFeedUnread(0);
+        return (
+            countUnreadFeedArticles(-1, false, true, $_SESSION['uid'])
+            + countUnreadFeedArticles(-2, false, true, $_SESSION['uid'])
+            + countUnreadFeedArticles(-3, false, true, $_SESSION['uid'])
+            + countUnreadFeedArticles(0, false, true, $_SESSION['uid'])
+        );
     } elseif ($cat == \SmallSmallRSS\FeedCategories::LABELS) {
         $result = \SmallSmallRSS\Database::query(
             "SELECT COUNT(unread) AS unread
@@ -388,11 +393,6 @@ function getCategoryUnread($cat, $owner_uid = false)
         $unread = \SmallSmallRSS\Database::fetch_result($result, 0, 'unread');
         return $unread;
     }
-}
-
-function getFeedUnread($feed, $is_cat = false)
-{
-    return countUnreadFeedArticles($feed, $is_cat, true, $_SESSION['uid']);
 }
 
 function getLabelUnread($label_id, $owner_uid = false)
@@ -417,13 +417,10 @@ function getLabelUnread($label_id, $owner_uid = false)
     }
 }
 
-function countUnreadFeedArticles($feed, $is_cat = false, $unread_only = false, $owner_uid = false)
+function countUnreadFeedArticles($feed, $is_cat, $unread_only, $owner_uid)
 {
     $n_feed = (int) $feed;
     $need_entries = false;
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
-    }
     if ($unread_only) {
         $unread_qpart = 'unread = true';
     } else {
@@ -474,7 +471,7 @@ function countUnreadFeedArticles($feed, $is_cat = false, $unread_only = false, $
             $match_part = 'feed_id IS NULL';
         }
     } elseif ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
-        $label_id = feed_to_label_id($feed);
+        $label_id = \SmallSmallRSS\Labels::fromFeedId($feed);
         return getLabelUnread($label_id, $owner_uid);
     }
     if ($match_part) {
@@ -552,13 +549,6 @@ function getFeedCounters($active_feed = false)
         array_push($ret_arr, $cv);
     }
     return $ret_arr;
-}
-
-function get_pgsql_version()
-{
-    $result = \SmallSmallRSS\Database::query('SELECT version() AS version');
-    $version = explode(' ', \SmallSmallRSS\Database::fetch_result($result, 0, 'version'));
-    return $version[1];
 }
 
 /**
@@ -763,11 +753,6 @@ function checkbox_to_bool($val)
     return 'on' == $val;
 }
 
-function checkbox_to_sql_bool($val)
-{
-    return \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($val));
-}
-
 function getFeedCatTitle($id)
 {
     if ($id == -1) {
@@ -835,7 +820,7 @@ function make_runtime_info()
     $counts = \SmallSmallRSS\Feeds::getCounts($_SESSION['uid']);
     $data['max_feed_id'] = (int) $counts['max_feed_id'];
     $data['num_feeds'] = (int) $counts['num_feeds'];
-    $data['last_article_id'] = getLastArticleId();
+    $data['last_article_id'] = \SmallSmallRSS\UserEntries::getLastId($_SESSION['uid']);
     $data['cdm_expanded'] = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
     $data['dependency_timestamp'] = calculate_dep_timestamp();
     $data['reload_on_ts_change'] = \SmallSmallRSS\Config::get('RELOAD_ON_TS_CHANGE');
@@ -933,7 +918,6 @@ function search_to_sql($search)
                 }
                 break;
             case 'star':
-
                 if ($commandpair[1]) {
                     if ($commandpair[1] == 'true') {
                         array_push($query_keywords, "($not (marked = true))");
@@ -1062,7 +1046,7 @@ function queryFeedHeadlines(
         if ($search) {
             $view_query_part = ' ';
         } elseif ($feed != -1) {
-            $unread = getFeedUnread($feed, $cat_view);
+            $unread = countUnreadFeedArticles($feed, $cat_view, true, $_SESSION['uid']);
             if ($cat_view && $feed > 0 && $include_children) {
                 $unread += getCategoryChildrenUnread($feed);
             }
@@ -1177,7 +1161,7 @@ function queryFeedHeadlines(
         $query_strategy_part = 'true';
         $vfeed_query_part = 'ttrss_feeds.title AS feed_title,';
     } elseif ($feed <= \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // labels
-        $label_id = feed_to_label_id($feed);
+        $label_id = \SmallSmallRSS\Labels::fromFeedId($feed);
         $query_strategy_part = "label_id = '$label_id'
                     AND ttrss_labels2.id = ttrss_user_labels2.label_id
                     AND ttrss_user_labels2.article_id = ref_id";
@@ -1534,7 +1518,8 @@ function get_article_tags($id, $owner_uid = 0, $tag_cache = false)
         $tags = explode(',', $tag_cache);
     } else {
         /* do it the hard way */
-        $query = "SELECT DISTINCT tag_name,
+        $query = "SELECT DISTINCT
+                      tag_name,
                       owner_uid as owner
                   FROM
                       ttrss_tags
@@ -1559,28 +1544,6 @@ function get_article_tags($id, $owner_uid = 0, $tag_cache = false)
     return $tags;
 }
 
-function tag_is_valid($tag)
-{
-    if ($tag == '') {
-        return false;
-    }
-    if (preg_match("/^[0-9]*$/", $tag)) {
-        return false;
-    }
-    if (mb_strlen($tag) > 250) {
-        return false;
-    }
-
-    if (function_exists('iconv')) {
-        $tag = iconv('utf-8', 'utf-8', $tag);
-    }
-
-    if (!$tag) {
-        return false;
-    }
-    return true;
-}
-
 function T_sprintf()
 {
     $args = func_get_args();
@@ -1589,27 +1552,26 @@ function T_sprintf()
 
 function format_inline_player($url, $ctype)
 {
-    $entry = '';
+    ob_start();
     $url = htmlspecialchars($url);
     if (strpos($ctype, 'audio/') === 0) {
+        $player = false;
         if ($_SESSION['hasAudio']
             && (strpos($ctype, 'ogg') !== false || $_SESSION['hasMp3'])
         ) {
-            $entry .= "<audio preload=\"none\" controls>
-                         <source type=\"$ctype\" src=\"$url\"></source>
-                       </audio>";
+            echo "<audio preload=\"none\" controls><source type=\"$ctype\" src=\"$url\"></source></audio>";
         } else {
-            $entry .= "<object type=\"application/x-shockwave-flash\"
+            echo "<object type=\"application/x-shockwave-flash\"
                         data=\"lib/button/musicplayer.swf?song_url=$url\"
                         width=\"17\" height=\"17\" style='float: left; margin-right : 5px;'>
                          <param name=\"movie\" value=\"lib/button/musicplayer.swf?song_url=$url\" />
                        </object>";
         }
-        if ($entry) {
-            $entry .= "&nbsp; <a target=\"_blank\" href=\"$url\">" . basename($url) . '</a>';
+        if ($player) {
+            echo "&nbsp; <a target=\"_blank\" href=\"$url\">" . basename($url) . '</a>';
         }
     }
-    return $entry;
+    return ob_get_clean();
 }
 
 function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_uid = false)
@@ -1631,7 +1593,6 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
     );
 
     $feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'feed_id');
-
     $rv['feed_id'] = $feed_id;
 
     if ($mark_as_read) {
@@ -2113,65 +2074,54 @@ function format_article_enclosures(
     $hide_images = false
 )
 {
-
     $result = \SmallSmallRSS\Enclosures::get($id);
-    $rv = '';
-
     if (count($result) > 0) {
-
         $entries_html = array();
         $entries = array();
         $entries_inline = array();
-
         foreach ($result as $line) {
-
             $url = $line['content_url'];
             $ctype = $line['content_type'];
-
             if (!$ctype) {
                 $ctype = __('unknown type');
             }
-
-            $filename = substr($url, strrpos($url, '/')+1);
-
+            $filename = substr($url, strrpos($url, '/') + 1);
             $player = format_inline_player($url, $ctype);
-
             if ($player) {
-                array_push($entries_inline, $player);
+                $entries_inline[] = $player;
             }
-
-            $entry = "<div onclick=\"window.open('".htmlspecialchars($url)."')\"
-                    data-dojo-type=\"dijit.MenuItem\">$filename ($ctype)</div>";
-
-            array_push($entries_html, $entry);
+            $entry_html = "<div onclick=\"window.open('".htmlspecialchars($url)."')\"";
+            $entry_html .= " data-dojo-type=\"dijit.MenuItem\">$filename ($ctype)</div>";
+            $entries_html[] = $entry_html;
 
             $entry = array();
-
             $entry['type'] = $ctype;
             $entry['filename'] = $filename;
             $entry['url'] = $url;
-
-            array_push($entries, $entry);
+            $entries[] = $entry;
         }
 
+        ob_get_start();
         if ($_SESSION['uid'] && !\SmallSmallRSS\DBPrefs::read('STRIP_IMAGES') && !$_SESSION['bw_limit']) {
-            if ($always_display_enclosures ||
-                !preg_match('/<img/i', $article_content)) {
-
+            if ($always_display_enclosures
+                || !preg_match('/<img/i', $article_content)) {
                 foreach ($entries as $entry) {
-
                     if (preg_match('/image/', $entry['type']) ||
                         preg_match("/\.(jpg|png|gif|bmp)/i", $entry['filename'])) {
-
                         if (!$hide_images) {
-                            $rv .= '<p><img
-                                    alt="'.htmlspecialchars($entry['filename']).'"
-                                    src="' .htmlspecialchars($entry['url']) . '"/></p>';
+                            echo '<p>';
+                            echo '<img alt="' . htmlspecialchars($entry['filename']) . '" src="';
+                            echo htmlspecialchars($entry['url']);
+                            echo '"/>';
+                            echo '</p>';
                         } else {
-                            $rv .= '<p><a target="_blank"
-                                    href="'.htmlspecialchars($entry['url']).'"
-                                    >' .htmlspecialchars($entry['url']) . '</a></p>';
-
+                            echo '<p>';
+                            echo '<a target="_blank" href="';
+                            echo htmlspecialchars($entry['url']);
+                            echo '">';
+                            echo htmlspecialchars($entry['url']);
+                            echo '</a>';
+                            echo '</p>';
                         }
                     }
                 }
@@ -2179,30 +2129,29 @@ function format_article_enclosures(
         }
 
         if (count($entries_inline) > 0) {
-            $rv .= "<hr clear='both'/>";
+            echo "<hr clear='both'/>";
             foreach ($entries_inline as $entry) {
-                $rv .= $entry;
+                echo $entry;
             };
-            $rv .= "<hr clear='both'/>";
+            echo "<hr clear='both'/>";
         }
 
-        $rv .= '<select class="attachments" onchange="openSelectedAttachment(this)">'.
-            "<option value=''>" . __('Attachments').'</option>';
+        echo '<select class="attachments" onchange="openSelectedAttachment(this)">';
+        echo '<option value="">';
+        echo __('Attachments');
+        echo '</option>';
 
         foreach ($entries as $entry) {
-            $rv .= '<option value="'.htmlspecialchars($entry['url']).'">' . htmlspecialchars($entry['filename']) . '</option>';
+            echo '<option value="';
+            echo htmlspecialchars($entry['url']);
+            echo '">';
+            echo htmlspecialchars($entry['filename']);
+            echo '</option>';
 
         };
-
-        $rv .= '</select>';
+        echo '</select>';
     }
-
-    return $rv;
-}
-
-function getLastArticleId()
-{
-    return \SmallSmallRSS\UserEntries::getLastId($_SESSION['uid']);
+    return ob_get_clean();
 }
 
 function sphinx_search($query, $offset = 0, $limit = 30)
@@ -2405,16 +2354,6 @@ function calculate_dep_timestamp()
         }
     }
     return $max_ts;
-}
-
-function label_to_feed_id($label)
-{
-    return \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 - abs($label);
-}
-
-function feed_to_label_id($feed)
-{
-    return \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 + abs($feed);
 }
 
 function format_libxml_error($error)

@@ -120,4 +120,10 @@ class Database
             return false;
         }
     }
+    public static function getPostgreSQLVersion()
+    {
+        $result = self::query('SELECT version() AS version');
+        $version = explode(' ', self::fetch_result($result, 0, 'version'));
+        return $version[1];
+    }
 }

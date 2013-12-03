@@ -3,6 +3,17 @@ namespace SmallSmallRSS;
 
 class Labels
 {
+
+    public static function toFeedId($label_id)
+    {
+        return \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 - abs($label);
+    }
+
+    public static function fromFeedId($feed_id)
+    {
+        return \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 + abs($feed_id);
+    }
+
     public static function findId($label, $owner_uid)
     {
         $result = \SmallSmallRSS\Database::query(

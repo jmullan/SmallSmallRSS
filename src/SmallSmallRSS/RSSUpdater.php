@@ -822,7 +822,7 @@ class RSSUpdater
                 if ($f['type'] == 'tag') {
                     $manual_tags = array_map('trim', explode(',', $f['param']));
                     foreach ($manual_tags as $tag) {
-                        if (tag_is_valid($tag)) {
+                        if (\SmallSmallRSS\Tags::isValid($tag)) {
                             array_push($entry_tags, $tag);
                         }
                     }
@@ -849,7 +849,7 @@ class RSSUpdater
                 \SmallSmallRSS\Database::query('BEGIN');
                 foreach ($filtered_tags as $tag) {
                     $tag = sanitize_tag($tag);
-                    if (!tag_is_valid($tag)) {
+                    if (!\SmallSmallRSS\Tags::isValid($tag)) {
                         continue;
                     }
                     $tag = \SmallSmallRSS\Database::escape_string($tag);

@@ -204,7 +204,7 @@ class Pref_Feeds extends ProtectedHandler
                     $cat['items'] = array();
                 }
                 foreach ($labels as $line) {
-                    $label_id = label_to_feed_id($line['id']);
+                    $label_id = \SmallSmallRSS\Labels::toFeedId($line['id']);
                     $feed = $this->initFeedlistFeed($label_id, false, 0);
                     $feed['fg_color'] = $line['fg_color'];
                     $feed['bg_color'] = $line['bg_color'];
@@ -1037,23 +1037,14 @@ class Pref_Feeds extends ProtectedHandler
         $cat_id = (int) \SmallSmallRSS\Database::escape_string($_POST['cat_id']);
         $auth_login = \SmallSmallRSS\Database::escape_string(trim($_POST['auth_login']));
         $auth_pass = trim($_POST['auth_pass']);
-        $private = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_POST['private']));
-        $include_in_digest = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST['include_in_digest'])
-        );
-        $cache_images = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST['cache_images'])
-        );
-        $hide_images = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST['hide_images'])
-        );
-        $always_display_enclosures = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST['always_display_enclosures'])
-        );
 
-        $mark_unread_on_update = checkbox_to_sql_bool(
-            \SmallSmallRSS\Database::escape_string($_POST['mark_unread_on_update'])
-        );
+
+        $private = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['private']));
+        $include_in_digest = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['include_in_digest']));
+        $cache_images = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['cache_images']));
+        $hide_images = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['hide_images']));
+        $always_display_enclosures = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['always_display_enclosures']));
+        $mark_unread_on_update = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['mark_unread_on_update']));
 
         if (\SmallSmallRSS\Crypt::is_enabled()) {
             $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
@@ -1078,23 +1069,26 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         if (!$batch) {
-
             $result = \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_feeds SET
-                $category_qpart
-                title = '$feed_title', feed_url = '$feed_link',
-                update_interval = '$upd_intl',
-                purge_interval = '$purge_intl',
-                auth_login = '$auth_login',
-                auth_pass = '$auth_pass',
-                auth_pass_encrypted = $auth_pass_encrypted,
-                private = $private,
-                cache_images = $cache_images,
-                hide_images = $hide_images,
-                include_in_digest = $include_in_digest,
-                always_display_enclosures = $always_display_enclosures,
-                mark_unread_on_update = $mark_unread_on_update
-            WHERE id = '$feed_id' AND owner_uid = " . $_SESSION['uid']
+                "UPDATE ttrss_feeds
+                 SET
+                     $category_qpart
+                     title = '$feed_title',
+                     feed_url = '$feed_link',
+                     update_interval = '$upd_intl',
+                     purge_interval = '$purge_intl',
+                     auth_login = '$auth_login',
+                     auth_pass = '$auth_pass',
+                     auth_pass_encrypted = $auth_pass_encrypted,
+                     private = $private,
+                     cache_images = $cache_images,
+                     hide_images = $hide_images,
+                     include_in_digest = $include_in_digest,
+                     always_display_enclosures = $always_display_enclosures,
+                     mark_unread_on_update = $mark_unread_on_update
+                 WHERE
+                     id = '$feed_id'
+                     AND owner_uid = " . $_SESSION['uid']
             );
 
             \SmallSmallRSS\PluginHost::getInstance()->runHooks(
@@ -1104,19 +1098,14 @@ class Pref_Feeds extends ProtectedHandler
 
         } else {
             $feed_data = array();
-
             foreach (array_keys($_POST) as $k) {
                 if ($k != 'op' && $k != 'method' && $k != 'ids') {
                     $feed_data[$k] = $_POST[$k];
                 }
             }
-
             \SmallSmallRSS\Database::query('BEGIN');
-
             foreach (array_keys($feed_data) as $k) {
-
                 $qpart = '';
-
                 switch ($k) {
                     case 'title':
                         $qpart = "title = '$feed_title'";
@@ -1139,8 +1128,8 @@ class Pref_Feeds extends ProtectedHandler
                         break;
 
                     case 'auth_pass':
-                        $qpart = "auth_pass = '$auth_pass' AND
-                            auth_pass_encrypted = $auth_pass_encrypted";
+                        $qpart = "auth_pass = '$auth_pass',
+                                  auth_pass_encrypted = $auth_pass_encrypted";
                         break;
 
                     case 'private':
@@ -1175,13 +1164,14 @@ class Pref_Feeds extends ProtectedHandler
 
                 if ($qpart) {
                     \SmallSmallRSS\Database::query(
-                        "UPDATE ttrss_feeds SET $qpart WHERE id IN ($feed_ids)
-                        AND owner_uid = " . $_SESSION['uid']
+                        "UPDATE ttrss_feeds
+                         SET $qpart
+                         WHERE
+                             id IN ($feed_ids)
+                             AND owner_uid = " . $_SESSION['uid']
                     );
-                    echo '<br/>';
                 }
             }
-
             \SmallSmallRSS\Database::query('COMMIT');
         }
         return;
@@ -1193,8 +1183,9 @@ class Pref_Feeds extends ProtectedHandler
         $ids = $this->getSQLEscapedStringFromRequest('ids');
 
         \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_feeds SET pubsub_state = 0 WHERE id IN ($ids)
-            AND owner_uid = " . $_SESSION['uid']
+            "UPDATE ttrss_feeds
+             SET pubsub_state = 0 WHERE id IN ($ids)
+             AND owner_uid = " . $_SESSION['uid']
         );
 
         return;
@@ -1206,7 +1197,7 @@ class Pref_Feeds extends ProtectedHandler
         $ids = explode(',', $this->getSQLEscapedStringFromRequest('ids'));
 
         foreach ($ids as $id) {
-            Pref_Feeds::removeFeed($id, $_SESSION['uid']);
+            self::removeFeed($id, $_SESSION['uid']);
         }
 
         return;
@@ -1735,7 +1726,7 @@ class Pref_Feeds extends ProtectedHandler
         }
 
         if ($unread === false) {
-            $unread = getFeedUnread($feed_id, false);
+            $unread = countUnreadFeedArticles($feed_id, false, true, $_SESSION['uid']);
         }
 
         $obj['id'] = 'FEED:' . $feed_id;
@@ -2029,7 +2020,8 @@ class Pref_Feeds extends ProtectedHandler
             }
             \SmallSmallRSS\CountersCache::remove($id, $owner_uid);
         } else {
-            \SmallSmallRSS\Labels::remove(feed_to_label_id($id), $owner_uid);
+            $label_id = \SmallSmallRSS\Labels::fromFeedId($id);
+            \SmallSmallRSS\Labels::remove($label_id, $owner_uid);
         }
     }
 

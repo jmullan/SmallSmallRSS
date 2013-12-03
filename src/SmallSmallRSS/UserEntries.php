@@ -208,23 +208,23 @@ class UserEntries
                     );
                 }
 
-            } elseif ($feed_id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // label
-                $label_id = feed_to_label_id($feed_id);
+            } elseif ($feed_id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
+                $label_id = \SmallSmallRSS\Labels::fromFeedId($feed_id);
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_user_entries
-                 SET unread = false, last_read = NOW()
-                 WHERE ref_id IN (
-                     SELECT id
-                     FROM (
-                         SELECT ttrss_entries.id
-                         FROM ttrss_entries, ttrss_user_entries, ttrss_user_labels2
-                         WHERE
-                             ref_id = id
-                             AND label_id = '$label_id'
-                             AND ref_id = article_id
-                             AND owner_uid = $owner_uid AND unread = true AND $date_qpart
-                     ) as tmp
-                 )"
+                     SET unread = false, last_read = NOW()
+                     WHERE ref_id IN (
+                         SELECT id
+                         FROM (
+                             SELECT ttrss_entries.id
+                             FROM ttrss_entries, ttrss_user_entries, ttrss_user_labels2
+                             WHERE
+                                 ref_id = id
+                                 AND label_id = '$label_id'
+                                 AND ref_id = article_id
+                                 AND owner_uid = $owner_uid AND unread = true AND $date_qpart
+                         ) as tmp
+                     )"
                 );
 
             }

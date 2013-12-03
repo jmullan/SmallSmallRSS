@@ -124,7 +124,7 @@ class API extends Handler
         if ($feed_id) {
             $this->wrap(
                 self::STATUS_OK,
-                array('unread' => getFeedUnread($feed_id, $is_cat))
+                array('unread' => countUnreadFeedArticles($feed_id, $is_cat, true, $_SESSION['uid']))
             );
         } else {
             $this->wrap(
@@ -192,7 +192,7 @@ class API extends Handler
         $cats = array();
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             if ($include_empty || $line['num_feeds'] > 0 || $line['num_cats'] > 0) {
-                $unread = getFeedUnread($line['id'], true);
+                $unread = countUnreadFeedArticles($line['id'], true, true, $_SESSION['uid']);
                 if ($enable_nested) {
                     $unread += getCategoryChildrenUnread($line['id']);
                 }
@@ -208,7 +208,7 @@ class API extends Handler
         }
         foreach (array(-2, -1, 0) as $cat_id) {
             if ($include_empty || !$this->isCategoryEmpty($cat_id)) {
-                $unread = getFeedUnread($cat_id, true);
+                $unread = countUnreadFeedArticles($cat_id, true, true, $_SESSION['uid']);
                 if ($unread || !$unread_only) {
                     $cats[] = array(
                         'id' => $cat_id,
@@ -578,11 +578,9 @@ class API extends Handler
         /* Virtual feeds */
         if ($cat_id == -4 || $cat_id == -1) {
             foreach (array(-1, -2, -3, -4, -6, 0) as $i) {
-                $unread = getFeedUnread($i);
-
+                $unread = countUnreadFeedArticles($i, false, true, $_SESSION['uid']);
                 if ($unread || !$unread_only) {
                     $title = \SmallSmallRSS\Feeds::getTitle($i);
-
                     $row = array(
                         'id' => $i,
                         'title' => $title,
@@ -608,9 +606,10 @@ class API extends Handler
             );
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-                $unread = getFeedUnread($line['id'], true) +
-                    getCategoryChildrenUnread($line['id']);
-
+                $unread = (
+                    countUnreadFeedArticles($line['id'], true, true, $_SESSION['uid'])
+                    + getCategoryChildrenUnread($line['id'])
+                );
                 if ($unread || !$unread_only) {
                     $row = array(
                         'id' => $line['id'],
@@ -659,7 +658,7 @@ class API extends Handler
             );
         }
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            $unread = getFeedUnread($line['id']);
+            $unread = countUnreadFeedArticles($line['id'], false, true, $_SESSION['uid']);
             $has_icon = \SmallSmallRSS\Feeds::hasIcon($line['id']);
             if ($unread || !$unread_only) {
                 $row = array(

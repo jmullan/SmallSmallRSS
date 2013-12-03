@@ -326,7 +326,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                     $tags_to_cache = array();
                     foreach ($tags as $tag) {
                         $tag = \SmallSmallRSS\Database::escape_string(sanitize_tag($tag));
-                        if (!tag_is_valid($tag)) {
+                        if (!\SmallSmallRSS\Tags::isValid($tag)) {
                             continue;
                         }
                         $result = \SmallSmallRSS\Database::query(

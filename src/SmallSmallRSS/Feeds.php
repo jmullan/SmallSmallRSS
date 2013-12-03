@@ -161,19 +161,17 @@ class Feeds
         }
 
         if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
-            $pg_version = get_pgsql_version();
-
+            $pg_version = \SmallSmallRSS\Database::getPostgreSQLVersion();
             if (preg_match("/^7\./", $pg_version) || preg_match("/^8\.0/", $pg_version)) {
-
                 $result = \SmallSmallRSS\Database::query(
-                    "DELETE FROM ttrss_user_entries WHERE
+                    "DELETE FROM ttrss_user_entries
+                     WHERE
                          ttrss_entries.id = ref_id
                          AND marked = false
                          AND feed_id = '$feed_id'
                          AND ttrss_entries.date_updated < NOW() - INTERVAL '$purge_interval days'
                          $query_limit"
                 );
-
             } else {
                 $result = \SmallSmallRSS\Database::query(
                     "DELETE FROM ttrss_user_entries

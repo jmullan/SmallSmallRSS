@@ -362,7 +362,7 @@ class RPC extends ProtectedHandler
         if (!empty($_REQUEST['seq'])) {
             $reply['seq'] = (int) $_REQUEST['seq'];
         }
-        if ($last_article_id != getLastArticleId()) {
+        if ($last_article_id != \SmallSmallRSS\UserEntries::getLastId($_SESSION['uid'])) {
             $reply['counters'] = getAllCounters();
         }
         $reply['runtime-info'] = make_runtime_info();

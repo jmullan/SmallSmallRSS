@@ -3,7 +3,7 @@ namespace SmallSmallRSS;
 
 class Tags
 {
-    public function clearExpired($days = 14)
+    public static function clearExpired($days = 14)
     {
         $limit = 50000;
         if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
@@ -37,6 +37,33 @@ class Tags
             $limit -= $limit_part;
         }
         return $tags_deleted;
+    }
+    public static function isValidUTF8($string)
+    {
+        return (
+            preg_match('/^.{1}/usS', $string)
+            && !preg_match("/[\xC0\xC1\xF5-\xFF]/S", $string)
+        );
+    }
+
+    public static function isValid($tag)
+    {
+        if ($tag == '') {
+            return false;
+        }
+        if (preg_match("/^[0-9]*$/", $tag)) {
+            return false;
+        }
+        if (!self::isValidUTF8($string)) {
+            return false;
+        }
+        if (mb_strlen($tag) > 250) {
+            return false;
+        }
+        if (!$tag) {
+            return false;
+        }
+        return true;
     }
 
 }

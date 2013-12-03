@@ -288,7 +288,7 @@ class Article extends ProtectedHandler
             );
             foreach ($tags as $tag) {
                 $tag = sanitize_tag($tag);
-                if (!tag_is_valid($tag)) {
+                if (!\SmallSmallRSS\Tags::isValid($tag)) {
                     continue;
                 }
                 if (preg_match("/^[0-9]*$/", $tag)) {

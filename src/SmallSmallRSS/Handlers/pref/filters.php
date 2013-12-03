@@ -14,45 +14,25 @@ class Pref_Filters extends ProtectedHandler
 
     public function filtersortreset()
     {
-        \SmallSmallRSS\Database::query(
-            'UPDATE ttrss_filters2
-             SET order_id = 0
-             WHERE owner_uid = ' . $_SESSION['uid']
-        );
-        return;
+        \SmallSmallRSS\Filters::resetFilterOrders($_SESSION['uid']);
     }
 
     public function savefilterorder()
     {
         $data = json_decode($_POST['payload'], true);
-
-        #file_put_contents("/tmp/saveorder.json", $_POST['payload']);
-        #$data = json_decode(file_get_contents("/tmp/saveorder.json"), true);
-
         if (!is_array($data['items'])) {
             $data['items'] = json_decode($data['items'], true);
         }
-
         $index = 0;
-
         if (is_array($data) && is_array($data['items'])) {
             foreach ($data['items'][0]['items'] as $item) {
                 $filter_id = (int) str_replace('FILTER:', '', $item['_reference']);
-
                 if ($filter_id > 0) {
-
-                    \SmallSmallRSS\Database::query(
-                        "UPDATE ttrss_filters2 SET
-                        order_id = $index WHERE id = '$filter_id' AND
-                        owner_uid = " .$_SESSION['uid']
-                    );
-
-                    ++$index;
+                    \SmallSmallRSS\Filters::updateOrder($filter_id, $index, $_SESSION['uid']);
+                    $index += 1;
                 }
             }
         }
-
-        return;
     }
 
 
@@ -224,10 +204,6 @@ class Pref_Filters extends ProtectedHandler
             }
         }
 
-        /* if (count($folder['items']) > 0) {
-           array_push($root['items'], $folder);
-           } */
-
         $root['items'] = $folder['items'];
 
         $fl = array();
@@ -236,7 +212,6 @@ class Pref_Filters extends ProtectedHandler
         $fl['items'] = array($root);
 
         echo json_encode($fl);
-        return;
     }
 
     public function edit()
@@ -433,8 +408,9 @@ class Pref_Filters extends ProtectedHandler
         }
 
         $result = \SmallSmallRSS\Database::query(
-            'SELECT description FROM ttrss_filter_types
-            WHERE id = '. (int) $rule['filter_type']
+            'SELECT description
+             FROM ttrss_filter_types
+             WHERE id = '. (int) $rule['filter_type']
         );
         $filter_type = \SmallSmallRSS\Database::fetch_result($result, 0, 'description');
 
@@ -476,36 +452,22 @@ class Pref_Filters extends ProtectedHandler
         if ($_REQUEST['savemode'] && $_REQUEST['savemode'] == 'test') {
             return $this->testFilter();
         }
-
-        #        print_r($_REQUEST);
-
-        $filter_id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-        $enabled = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST['enabled']));
-        $match_any_rule = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST['match_any_rule']));
-        $inverse = checkbox_to_sql_bool(\SmallSmallRSS\Database::escape_string($_REQUEST['inverse']));
-        $title = \SmallSmallRSS\Database::escape_string($_REQUEST['title']);
-
-        $result = \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_filters2 SET enabled = $enabled,
-            match_any_rule = $match_any_rule,
-            inverse = $inverse,
-            title = '$title'
-            WHERE id = '$filter_id'
-            AND owner_uid = ". $_SESSION['uid']
+        \SmallSmallRSS\Filters::update(
+            $_REQUEST['id'],
+            checkbox_to_bool($_REQUEST['enabled']),
+            checkbox_to_bool($_REQUEST['match_any_rule']),
+            checkbox_to_bool($_REQUEST['inverse']),
+            $_REQUEST['title'],
+            $_SESSION['uid']
         );
-
         $this->saveRulesAndActions($filter_id);
 
     }
 
     public function remove()
     {
-
-        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['ids']));
-
-        foreach ($ids as $id) {
-            \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2 WHERE id = '$id' AND owner_uid = ". $_SESSION['uid']);
-        }
+        $ids = array_map('int', explode(',', $_REQUEST['ids']));
+        \SmallSmallRSS\Filters::deleteIds($ids, $_SESSION['uid']);
     }
 
     private function saveRulesAndActions($filter_id)
@@ -604,32 +566,16 @@ class Pref_Filters extends ProtectedHandler
         if ($_REQUEST['savemode'] && $_REQUEST['savemode'] == 'test') {
             return $this->testFilter();
         }
-
-        #        print_r($_REQUEST);
-
-        $enabled = checkbox_to_sql_bool($_REQUEST['enabled']);
-        $match_any_rule = checkbox_to_sql_bool($_REQUEST['match_any_rule']);
-        $title = \SmallSmallRSS\Database::escape_string($_REQUEST['title']);
-
         \SmallSmallRSS\Database::query('BEGIN');
-
         /* create base filter */
-
-        $result = \SmallSmallRSS\Database::query(
-            'INSERT INTO ttrss_filters2
-            (owner_uid, match_any_rule, enabled, title) VALUES
-            ('.$_SESSION['uid'].",$match_any_rule,$enabled, '$title')"
+        $filter_id = \SmallSmallRSS\Filters::add(
+            checkbox_to_bool($_REQUEST['enabled']),
+            checkbox_to_bool($_REQUEST['match_any_rule']),
+            false,
+            $_REQUEST['title'],
+            $owner_uid
         );
-
-        $result = \SmallSmallRSS\Database::query(
-            'SELECT MAX(id) AS id FROM ttrss_filters2
-            WHERE owner_uid = '.$_SESSION['uid']
-        );
-
-        $filter_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
-
         $this->saveRulesAndActions($filter_id);
-
         \SmallSmallRSS\Database::query('COMMIT');
     }
 
@@ -864,8 +810,10 @@ class Pref_Filters extends ProtectedHandler
         echo "<form name='filter_new_rule_form' id='filter_new_rule_form'>";
 
         $result = \SmallSmallRSS\Database::query(
-            'SELECT id,description
-            FROM ttrss_filter_types WHERE id != 5 ORDER BY description'
+            'SELECT id, description
+             FROM ttrss_filter_types
+             WHERE id != 5
+             ORDER BY description'
         );
 
         $filter_types = array();
@@ -875,9 +823,7 @@ class Pref_Filters extends ProtectedHandler
         }
 
         echo '<div class="dlgSec">'.__('Match').'</div>';
-
         echo '<div class="dlgSecCont">';
-
         echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\"
              required=\"true\" id=\"filterDlg_regExp\"
              style=\"font-size: 16px; width: 20em;\"
@@ -933,21 +879,17 @@ class Pref_Filters extends ProtectedHandler
             $action_param = '';
             $action_id = 0;
         }
-
         echo "<form name='filter_new_action_form' id='filter_new_action_form'>";
-
         echo '<div class="dlgSec">'.__('Perform Action').'</div>';
-
         echo '<div class="dlgSecCont">';
-
         echo '<select name="action_id" data-dojo-type="dijit.form.Select"
             onchange="filterDlgCheckAction(this)">';
 
         $result = \SmallSmallRSS\Database::query(
-            'SELECT id,description FROM ttrss_filter_actions
-            ORDER BY name'
+            'SELECT id, description
+             FROM ttrss_filter_actions
+             ORDER BY name'
         );
-
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $is_selected = ($line['id'] == $action_id) ? "selected='1'" : '';
             printf("<option $is_selected value='%d'>%s</option>", $line['id'], __($line['description']));
@@ -990,10 +932,13 @@ class Pref_Filters extends ProtectedHandler
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT title,COUNT(DISTINCT r.id) AS num_rules,COUNT(DISTINCT a.id) AS num_actions
-                FROM ttrss_filters2 AS f LEFT JOIN ttrss_filters2_rules AS r
-                    ON (r.filter_id = f.id)
-                        LEFT JOIN ttrss_filters2_actions AS a
-                            ON (a.filter_id = f.id) WHERE f.id = '$id' GROUP BY f.title"
+             FROM ttrss_filters2 AS f
+             LEFT JOIN ttrss_filters2_rules AS r
+                 ON (r.filter_id = f.id)
+             LEFT JOIN ttrss_filters2_actions AS a
+                 ON (a.filter_id = f.id)
+             WHERE f.id = '$id'
+             GROUP BY f.title"
         );
 
         $title = \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
@@ -1028,27 +973,24 @@ class Pref_Filters extends ProtectedHandler
 
     public function join()
     {
+        # TODO: check all ids against the currently logged in user
         $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['ids']));
-
         if (count($ids) > 1) {
             $base_id = array_shift($ids);
             $ids_str = join(',', $ids);
-
             \SmallSmallRSS\Database::query('BEGIN');
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_filters2_rules
-                SET filter_id = '$base_id' WHERE filter_id IN ($ids_str)"
+                 SET filter_id = '$base_id'
+                 WHERE filter_id IN ($ids_str)"
             );
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_filters2_actions
-                SET filter_id = '$base_id' WHERE filter_id IN ($ids_str)"
+                 SET filter_id = '$base_id'
+                 WHERE filter_id IN ($ids_str)"
             );
-
-            \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2 WHERE id IN ($ids_str)");
-            \SmallSmallRSS\Database::query("UPDATE ttrss_filters2 SET match_any_rule = true WHERE id = '$base_id'");
-
+            \SmallSmallRSS\Filters::deleteIds($ids, $_SESSION['uid']);
             \SmallSmallRSS\Database::query('COMMIT');
-
             $this->optimizeFilter($base_id);
 
         }
@@ -1059,47 +1001,41 @@ class Pref_Filters extends ProtectedHandler
         \SmallSmallRSS\Database::query('BEGIN');
         $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2_actions
-            WHERE filter_id = '$id'"
+             WHERE filter_id = '$id'"
         );
 
         $tmp = array();
         $dupe_ids = array();
-
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line['id'];
             unset($line['id']);
-
             if (array_search($line, $tmp) === false) {
-                array_push($tmp, $line);
+                $tmp[] = $line;
             } else {
-                array_push($dupe_ids, $id);
+                $dupe_ids[] = $id;
             }
         }
-
         if (count($dupe_ids) > 0) {
             $ids_str = join(',', $dupe_ids);
             \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_filters2_actions
-                WHERE id IN ($ids_str)"
+                 WHERE id IN ($ids_str)"
             );
         }
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2_rules
-            WHERE filter_id = '$id'"
+             WHERE filter_id = '$id'"
         );
-
         $tmp = array();
         $dupe_ids = array();
-
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line['id'];
             unset($line['id']);
-
             if (array_search($line, $tmp) === false) {
-                array_push($tmp, $line);
+                $tmp[] = $line;
             } else {
-                array_push($dupe_ids, $id);
+                $dupe_ids[] = $id;
             }
         }
 
@@ -1107,7 +1043,7 @@ class Pref_Filters extends ProtectedHandler
             $ids_str = join(',', $dupe_ids);
             \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_filters2_rules
-                WHERE id IN ($ids_str)"
+                 WHERE id IN ($ids_str)"
             );
         }
 

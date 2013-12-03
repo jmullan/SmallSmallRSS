@@ -68,10 +68,10 @@ class HotKeys
                 'help_dialog' => __('Show help dialog'))
         );
         $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-            \SmallSmallRSS\Hooks::HOTKEY_INFO
+            \SmallSmallRSS\Hooks::FILTER_HOTKEY_INFO
         );
         foreach ($hotkey_hooks as $plugin) {
-            $hotkeys = $plugin->hook_hotkey_info($hotkeys);
+            $hotkeys = $plugin->hookFilterHotKeyInfo($hotkeys);
         }
         return $hotkeys;
     }

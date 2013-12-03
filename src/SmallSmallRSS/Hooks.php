@@ -21,7 +21,7 @@ class Hooks
     const RENDER_TOOLBAR_BUTTON = 15;
     const RENDER_ACTION_ITEM = 16;
     const RENDER_HEADLINE_TOOLBAR_BUTTON = 17;
-    const HOTKEY_INFO = 18;
+    const FILTER_HOTKEY_INFO = 18;
     const ARTICLE_LEFT_BUTTON = 19;
     const PREFS_EDIT_FEED = 20;
     const PREFS_SAVE_FEED = 21;

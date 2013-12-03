@@ -20,8 +20,8 @@ class backend extends Handler
 
     private function display_main_help()
     {
-        $info = get_hotkeys_info();
-        $imap = get_hotkeys_map();
+        $info = \SmallSmallRSS\HotKeys::info();
+        $imap = \SmallSmallRSS\HotKeys::map();
         $omap = array();
         foreach ($imap[1] as $sequence => $action) {
             if (!isset($omap[$action])) {

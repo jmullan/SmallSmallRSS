@@ -458,7 +458,7 @@ class RPC extends ProtectedHandler
         $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, 'nf');
         $params['max_feed_id'] = (int) $max_feed_id;
         $params['num_feeds'] = (int) $num_feeds;
-        $params['hotkeys'] = get_hotkeys_map();
+        $params['hotkeys'] = \SmallSmallRSS\HotKeys::map();
         $params['csrf_token'] = $_SESSION['csrf_token'];
         if (!empty($_COOKIE['ttrss_widescreen'])) {
             $params['widescreen'] = (int) $_COOKIE['ttrss_widescreen'];

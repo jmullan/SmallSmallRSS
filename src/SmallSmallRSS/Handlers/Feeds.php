@@ -263,10 +263,6 @@ class Feeds extends ProtectedHandler
 
         $search_mode = $this->getSQLEscapedStringFromRequest('search_mode');
 
-        if (!empty($_REQUEST['debug'])) {
-            $timing_info = print_checkpoint('H0', $timing_info);
-        }
-
         if ($search_mode == '' && $method != '') {
             $search_mode = $method;
         }
@@ -318,10 +314,6 @@ class Feeds extends ProtectedHandler
             );
         }
 
-        if (!empty($_REQUEST['debug'])) {
-            $timing_info = print_checkpoint('H1', $timing_info);
-        }
-
         $result = $qfh_ret[0];
         $feed_title = $qfh_ret[1];
         $feed_site_url = $qfh_ret[2];
@@ -352,10 +344,6 @@ class Feeds extends ProtectedHandler
             $num_unread = 0;
             $cur_feed_title = '';
             $fresh_intl = \SmallSmallRSS\DBPrefs::read('FRESH_ARTICLE_MAX_AGE') * 60 * 60;
-            if (!empty($_REQUEST['debug'])) {
-                $timing_info = print_checkpoint('PS', $timing_info);
-            }
-
             $expand_cdm = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
@@ -770,10 +758,6 @@ class Feeds extends ProtectedHandler
                 ++$lnum;
             }
 
-            if (!empty($_REQUEST['debug'])) {
-                $timing_info = print_checkpoint('PE', $timing_info);
-            }
-
         } else {
             $message = '';
 
@@ -827,10 +811,6 @@ class Feeds extends ProtectedHandler
             }
         }
         $reply['content'] = ob_get_clean();
-        if (!empty($_REQUEST['debug'])) {
-            $timing_info = print_checkpoint('H2', $timing_info);
-        }
-
         return array(
             $topmost_article_ids,
             $headlines_count,
@@ -859,11 +839,6 @@ class Feeds extends ProtectedHandler
     {
         $timing_info = microtime(true);
         $reply = array('headlines' => array());
-
-        if (!empty($_REQUEST['debug'])) {
-            $timing_info = print_checkpoint('0', $timing_info);
-        }
-
         $omode = $this->getSQLEscapedStringFromRequest('omode');
         $feed = $this->getSQLEscapedStringFromRequest('feed');
         $method = $this->getSQLEscapedStringFromRequest('m');
@@ -970,28 +945,19 @@ class Feeds extends ProtectedHandler
                 $override_order = 'updated DESC';
                 break;
         }
-        if (!empty($_REQUEST['debug'])) {
-            $timing_info = print_checkpoint('04', $timing_info);
-        }
-
         $ret = $this->formatHeadlinesList(
             $feed, $method,
             $view_mode, $limit, $cat_view, $next_unread_feed, $offset,
             $vgroup_last_feed, $override_order, true
         );
 
-        //$topmost_article_ids = $ret[0];
         $headlines_count = $ret[1];
         $returned_feed = $ret[2];
         $disable_cache = $ret[3];
         $vgroup_last_feed = $ret[4];
 
-        $reply['headlines']['content'] =& $ret[5]['content'];
-        $reply['headlines']['toolbar'] =& $ret[5]['toolbar'];
-
-        if (!empty($_REQUEST['debug'])) {
-            $timing_info = print_checkpoint('05', $timing_info);
-        }
+        $reply['headlines']['content'] = $ret[5]['content'];
+        $reply['headlines']['toolbar'] = $ret[5]['toolbar'];
 
         $reply['headlines-info'] = array(
             'count' => (int) $headlines_count,
@@ -999,9 +965,6 @@ class Feeds extends ProtectedHandler
             'disable_cache' => (bool) $disable_cache
         );
         $reply['content'] = ob_get_clean();
-        if (!empty($_REQUEST['debug'])) {
-            $timing_info = print_checkpoint('30', $timing_info);
-        }
         $reply['runtime-info'] = make_runtime_info();
         echo json_encode($reply);
     }

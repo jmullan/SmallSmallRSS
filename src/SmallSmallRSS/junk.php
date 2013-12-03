@@ -1822,13 +1822,6 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
     return $rv;
 }
 
-function print_checkpoint($n, $s)
-{
-    $ts = microtime(true);
-    echo sprintf("<!-- CP[$n] %.4f seconds -->\n", $ts - $s);
-    return $ts;
-}
-
 function sanitize_tag($tag)
 {
     $tag = trim($tag);

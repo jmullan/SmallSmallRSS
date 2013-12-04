@@ -2268,17 +2268,6 @@ function filter_to_sql($filter, $owner_uid)
     return $fullquery;
 }
 
-if (!function_exists('gzdecode')) {
-    function gzdecode($string)
-    {
-        // no support for 2nd argument
-        return file_get_contents(
-            'compress.zlib://data:who/cares;base64,'.
-            base64_encode($string)
-        );
-    }
-}
-
 function get_random_bytes($length)
 {
     if (function_exists('openssl_random_pseudo_bytes')) {

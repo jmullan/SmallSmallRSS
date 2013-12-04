@@ -180,13 +180,26 @@ class Fetcher
                     $this->fetch_last_error = "HTTP Code: $this->fetch_last_error_code";
                 }
             }
-            $tmp = @gzdecode($data);
+            $tmp = self::gzdecode($data);
             if ($tmp) {
                 $data = $tmp;
             }
             return $data;
         }
     }
+
+    private static function gzdecode($data)
+    {
+        if (function_exists('gzdecode')) {
+            return gzdecode($data);
+        } else {
+            return file_get_contents(
+                'compress.zlib://data:who/cares;base64,'
+                . base64_encode($string)
+            );
+        }
+    }
+
 
     public function curlResolveUrl($url)
     {

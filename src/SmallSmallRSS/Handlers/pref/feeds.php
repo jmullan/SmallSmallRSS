@@ -100,7 +100,7 @@ class Pref_Feeds extends ProtectedHandler
             }
 
         }
-        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+        $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
         $feed_result = \SmallSmallRSS\Database::query(
             'SELECT id, title, last_error,
             ' . $substring_for_date . "(last_updated,1,19) AS last_updated
@@ -263,7 +263,7 @@ class Pref_Feeds extends ProtectedHandler
             $cat['checkbox'] = false;
             $cat['unread'] = 0;
             $cat['child_unread'] = 0;
-            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+            $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $feed_result = \SmallSmallRSS\Database::query(
                 'SELECT id, title,last_error,
                 ' . $substring_for_date . '(last_updated,1,19) AS last_updated
@@ -301,7 +301,7 @@ class Pref_Feeds extends ProtectedHandler
             $root['param'] = vsprintf(_ngettext('(%d feed)', '(%d feeds)', $num_children), $num_children);
 
         } else {
-            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+            $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $feed_result = \SmallSmallRSS\Database::query(
                 'SELECT id, title, last_error,
                 ' . $substring_for_date . '(last_updated,1,19) AS last_updated
@@ -1216,7 +1216,7 @@ class Pref_Feeds extends ProtectedHandler
         foreach ($ids as $id) {
 
             $filters = load_filters($id, $_SESSION['uid'], 6);
-            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+            $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $result = \SmallSmallRSS\Database::query(
                 'SELECT
                      title, content, link, ref_id, author,
@@ -1286,7 +1286,7 @@ class Pref_Feeds extends ProtectedHandler
         while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $feed_line['id'];
             $filters = load_filters($id, $_SESSION['uid'], 6);
-            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+            $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $tmp_result = \SmallSmallRSS\Database::query(
                 'SELECT
                      title, content, link, ref_id, author,

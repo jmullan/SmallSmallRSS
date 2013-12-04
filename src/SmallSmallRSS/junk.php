@@ -494,7 +494,7 @@ function countUnreadFeedArticles($feed, $is_cat, $unread_only, $owner_uid)
 function getFeedCounters($active_feed = false)
 {
     $ret_arr = array();
-    $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+    $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
     $query = '
         SELECT
             ttrss_feeds.id,
@@ -908,9 +908,7 @@ function search_to_sql($search)
                     $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $_SESSION['uid']);
                     $orig_ts = strtotime(substr($k, 1));
                     $k = date('Y-m-d', convert_timestamp($orig_ts, $user_tz_string, 'UTC'));
-
-                    //$k = date("Y-m-d", strtotime(substr($k, 1)));
-                    $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+                    $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
                     array_push($query_keywords, '('.$substring_for_date."(updated,1,LENGTH('$k')) $not = '$k')");
                 } else {
                     array_push(
@@ -1057,7 +1055,6 @@ function queryFeedHeadlines(
         if ($cat_view) {
             if ($feed > 0) {
                 if ($include_children) {
-                    // sub-cats
                     $subcats = \SmallSmallRSS\FeedCategories::getDescendents($feed, $owner_uid);
                     array_push($subcats, $feed);
                     $query_strategy_part = 'cat_id IN (' . implode(',', $subcats) . ')';
@@ -1561,7 +1558,7 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
         );
         \SmallSmallRSS\CountersCache::update($feed_id, $owner_uid);
     }
-    $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+    $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
     $result = \SmallSmallRSS\Database::query(
         'SELECT
              id,

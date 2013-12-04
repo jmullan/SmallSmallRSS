@@ -326,10 +326,12 @@ class UserEntries
     }
     public static function getMatchingFeeds($ref_ids, $owner_uid)
     {
+        $in_ref_ids = join(', ', array_map('intval', $ref_ids));
         $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT feed_id
              FROM ttrss_user_entries
              WHERE
+                 ref_id IN ($in_ref_ids)
                  AND owner_uid = $owner_uid"
         );
         $feed_ids = array();

@@ -104,6 +104,16 @@ class Database
         }
     }
 
+    public static function getSubstringForDateFunction()
+    {
+        if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
+            return 'SUBSTRING_FOR_DATE';
+        } else {
+            return 'SUBSTRING';
+        }
+
+    }
+
     public static function toSQLBool($boolean)
     {
         if ($s) {

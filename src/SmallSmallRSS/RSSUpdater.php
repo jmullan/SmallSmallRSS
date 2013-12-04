@@ -608,7 +608,7 @@ class RSSUpdater
             }
 
             // now it should exist, if not - bad luck then
-            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+            $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $result = \SmallSmallRSS\Database::query(
                 'SELECT
                      id,

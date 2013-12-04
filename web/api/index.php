@@ -28,8 +28,9 @@ if (!\SmallSmallRSS\PluginHost::init_all()) {
     Logger::log('Error initializing plugins');
     return;
 }
-
+ob_start();
 $method = strtolower(isset($_REQUEST['op']) ? $_REQUEST["op"] : '');
+\SmallSmallRSS\Logger::log($method);
 $handler = new \SmallSmallRSS\Handlers\API($_REQUEST);
 if ($handler->before($method)) {
     if ($method && method_exists($handler, $method)) {

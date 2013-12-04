@@ -26,7 +26,7 @@ class Pref_Users extends ProtectedHandler
     {
 
         $uid = sprintf('%d', $_REQUEST['id']);
-        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+        $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
         $result = \SmallSmallRSS\Database::query(
             'SELECT login,
                 '.$substring_for_date.'(last_login,1,16) AS last_login,
@@ -367,7 +367,7 @@ class Pref_Users extends ProtectedHandler
         } else {
             $user_search_query = '';
         }
-        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+        $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
         $result = \SmallSmallRSS\Database::query(
             'SELECT
                  id,login,access_level,email,

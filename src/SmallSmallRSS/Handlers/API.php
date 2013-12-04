@@ -68,17 +68,13 @@ class API extends Handler
 
     public function login()
     {
-        $login = $this->getSQLEscapedStringFromRequest('user');
+        $login = $_REQUEST['user'];
         $password = $_REQUEST['password'];
         $password_base64 = base64_decode($password);
         if (\SmallSmallRSS\Auth::is_single_user_mode()) {
             $login = 'admin';
         }
-
-        $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_users WHERE login = '$login'");
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            $uid = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
-        }
+        $uid = \SmallSmallRSS\Users::findUserByLogin($login);
         if (!$uid) {
             \SmallSmallRss\Logger::log("Could not find user: '$login'");
             $this->wrap(self::STATUS_ERR, array('error' => 'LOGIN_ERROR'));
@@ -147,9 +143,7 @@ class API extends Handler
         $limit = (int) $this->getSQLEscapedStringFromRequest('limit');
         $offset = (int) $this->getSQLEscapedStringFromRequest('offset');
         $include_nested = $this->getSQLBooleanFromRequest('include_nested');
-
         $feeds = $this->apiGetFeeds($cat_id, $unread_only, $limit, $offset, $include_nested);
-
         $this->wrap(self::STATUS_OK, $feeds);
     }
 
@@ -326,43 +320,34 @@ class API extends Handler
         }
 
         if ($field && $set_to && count($article_ids) > 0) {
-            $article_ids = join(', ', $article_ids);
+            $in_article_ids = join(', ', $article_ids);
             $result = \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries
                  SET
                      $field = $set_to
                      $additional_fields
                  WHERE
-                     ref_id IN ($article_ids)
+                     ref_id IN ($in_article_ids)
                      AND owner_uid = " . $_SESSION['uid']
             );
 
             $num_updated = \SmallSmallRSS\Database::affected_rows($result);
-
             if ($num_updated > 0 && $field == 'unread') {
-                $result = \SmallSmallRSS\Database::query(
-                    "SELECT DISTINCT feed_id
-                     FROM ttrss_user_entries
-                     WHERE ref_id IN ($article_ids)"
-                );
-
-                while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+                $feed_ids = \SmallSmallRSS\UserEntries::getMatchingFeeds($article_ids);
+                foreach ($feed_ids as $feed_id) {
                     \SmallSmallRSS\CountersCache::update($line['feed_id'], $_SESSION['uid']);
                 }
             }
-
             if ($num_updated > 0 && $field == 'published') {
                 $hub = \SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB');
                 if ($hub) {
                     $rss_link = get_self_url_prefix()
                         . '/public.php?op=rss&id=-2&key='
                         . get_feed_access_key(-2, false);
-
                     $p = new \Pubsubhubbub\Publisher($hub);
                     $pubsub_result = $p->publishUpdate($rss_link);
                 }
             }
-
             $this->wrap(self::STATUS_OK, array('status' => 'OK',
                                                'updated' => $num_updated));
 
@@ -375,19 +360,11 @@ class API extends Handler
     public function getArticle()
     {
 
-        $article_id = join(
-            ',',
-            array_filter(
-                explode(
-                    ',',
-                    $this->getSQLEscapedStringFromRequest('article_id')
-                ),
-                'is_numeric'
-            )
-        );
+        $article_ids = array_filter(explode(',', $_REQUEST['article_id']), 'is_numeric');
 
-        if ($article_id) {
-            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+        if ($article_ids) {
+            $in_article_ids = join(', ', array_map('intval', $article_ids));
+            $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $query = 'SELECT
                           id,title,link,content,cached_content,feed_id,comments,int_id,
                           marked,unread,published,score,
@@ -399,7 +376,7 @@ class API extends Handler
                           ) AS feed_title
                       FROM ttrss_entries,ttrss_user_entries
                       WHERE
-                          id IN ($article_id)
+                          id IN ($in_article_ids)
                           AND ref_id = id
                           AND owner_uid = " . $_SESSION['uid'];
             $result = \SmallSmallRSS\Database::query($query);
@@ -556,21 +533,16 @@ class API extends Handler
         /* Labels */
         if ($cat_id == -4 || $cat_id == -2) {
             $counters = getLabelCounters(true);
-
             foreach (array_values($counters) as $cv) {
-
                 $unread = $cv['counter'];
-
                 if ($unread || !$unread_only) {
-
                     $row = array(
                         'id' => $cv['id'],
                         'title' => $cv['description'],
                         'unread' => $cv['counter'],
                         'cat_id' => -2,
                     );
-
-                    array_push($feeds, $row);
+                    $feeds[] = $row;
                 }
             }
         }
@@ -587,7 +559,7 @@ class API extends Handler
                         'unread' => $unread,
                         'cat_id' => -1,
                     );
-                    array_push($feeds, $row);
+                    $feeds[] = $row;
                 }
 
             }
@@ -628,7 +600,7 @@ class API extends Handler
         } else {
             $limit_qpart = '';
         }
-        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+        $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
         if ($cat_id == -4 || $cat_id == -3) {
             $result = \SmallSmallRSS\Database::query(
                 'SELECT

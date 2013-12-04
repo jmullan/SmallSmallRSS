@@ -215,7 +215,7 @@ class Feeds extends ProtectedHandler
         $method_split = explode(':', $method);
         if ($method == 'ForceUpdate' && $feed > 0 && is_numeric($feed)) {
             // Update the feed if required with some basic flood control
-            $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+            $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $result = \SmallSmallRSS\Database::query(
                 'SELECT cache_images, '.$substring_for_date."(last_updated,1,19) AS last_updated
                  FROM ttrss_feeds WHERE id = '$feed'"
@@ -784,7 +784,7 @@ class Feeds extends ProtectedHandler
                 echo $message;
                 echo '<p>';
                 echo '<span class="insensitive">';
-                $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+                $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
                 $result = \SmallSmallRSS\Database::query(
                     'SELECT '.$substring_for_date.'(MAX(last_updated), 1, 19) AS last_updated
                      FROM ttrss_feeds
@@ -976,7 +976,7 @@ class Feeds extends ProtectedHandler
         $reply['headlines']['is_cat'] = false;
         $reply['headlines']['toolbar'] = '';
 
-        $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
+        $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
         $result = \SmallSmallRSS\Database::query(
             'SELECT ' . $substring_for_date . '(MAX(last_updated), 1, 19) AS last_updated
              FROM ttrss_feeds

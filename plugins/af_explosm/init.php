@@ -12,10 +12,10 @@ class Af_Explosm extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::ARTICLE_FILTER
+        \SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE
     );
 
-    public function hookArticleFilter($article)
+    public function hookFilterIncomingArticle($article)
     {
         $owner_uid = $article["owner_uid"];
         if (strpos($article["link"], "explosm.net/comics") !== false) {

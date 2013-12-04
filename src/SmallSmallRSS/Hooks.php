@@ -5,7 +5,7 @@ namespace SmallSmallRSS;
 class Hooks
 {
     const ARTICLE_BUTTON = 1;
-    const ARTICLE_FILTER = 2;
+    const FILTER_INCOMING_ARTICLE = 2;
     const RENDER_PREFS_TAB = 3;
     const RENDER_PREFS_TAB_SECTION = 4;
     const RENDER_PREFS_TABS = 5;
@@ -31,6 +31,8 @@ class Hooks
     public static function getHookMethod($hook)
     {
         $mappings = array(
+            self::FILTER_INCOMING_ARTICLE => 'hookFilterIncomingArticle',
+            self::FILTER_ARTICLE => 'hookFilterArticle',
             self::RENDER_PREFS_TAB => 'hookRenderPreferencesTab',
             self::UPDATE_TASK => 'hookUpdateTask',
             self::FEED_PARSED => 'hookFeedParsed',

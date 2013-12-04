@@ -354,7 +354,7 @@ function getCategoryUnread($cat, $owner_uid = false)
         $owner_uid = $_SESSION['uid'];
     }
     if ($cat >= 0) {
-        $feed_ids = \SmallSmallRSS\Feeds::getForCat($cat, $owner_uid);
+        $feed_ids = \SmallSmallRSS\Feeds::getForCategory($cat, $owner_uid);
         $unread = \SmallSmallRSS\UserEntries::countUnread($feed_ids, $owner_uid);
         return $unread;
     } elseif ($cat == \SmallSmallRSS\FeedCategories::SPECIAL) {
@@ -1600,8 +1600,8 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
             $owner_uid,
             $line['site_url']
         );
-        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::FILTER_ARTICLE) as $p) {
-            $line = $p->hookFilterArticle($line);
+        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE) as $p) {
+            $line = $p->hookFilterIncomingArticle($line);
         }
         $num_comments = $line['num_comments'];
         $entry_comments = '';

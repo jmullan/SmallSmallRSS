@@ -526,8 +526,8 @@ class RSSUpdater
                 'stored' => $stored_article
             );
 
-            foreach ($pluginhost->get_hooks(\SmallSmallRSS\Hooks::ARTICLE_FILTER) as $plugin) {
-                $article = $plugin->hookArticleFilter($article);
+            foreach ($pluginhost->get_hooks(\SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE) as $plugin) {
+                $article = $plugin->hookFilterIncomingArticle($article);
             }
 
             $entry_tags = $article['tags'];

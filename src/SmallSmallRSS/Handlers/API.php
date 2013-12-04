@@ -248,10 +248,8 @@ class API extends Handler
             }
 
             /* do not rely on params below */
-
             $search = $this->getSQLEscapedStringFromRequest('search');
             $search_mode = $this->getSQLEscapedStringFromRequest('search_mode');
-
             $headlines = $this->apiGetHeadlines(
                 $feed_id,
                 $limit,
@@ -269,7 +267,6 @@ class API extends Handler
                 $include_nested,
                 $sanitize_content
             );
-
             $this->wrap(self::STATUS_OK, $headlines);
         } else {
             $this->wrap(self::STATUS_ERR, array('error' => 'INCORRECT_USAGE'));
@@ -359,14 +356,19 @@ class API extends Handler
 
     public function getArticle()
     {
-
         $article_ids = array_filter(explode(',', $_REQUEST['article_id']), 'is_numeric');
-
         if ($article_ids) {
             $in_article_ids = join(', ', array_map('intval', $article_ids));
             $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $query = 'SELECT
-                          id,title,link,content,cached_content,feed_id,comments,int_id,
+                          id,
+                          title,
+                          link,
+                          content,
+                          cached_content,
+                          feed_id,
+                          comments,
+                          int_id,
                           marked,unread,published,score,
                           '.$substring_for_date."(updated,1,16) as updated,
                           author,
@@ -406,6 +408,9 @@ class API extends Handler
                     );
                     foreach ($hooks as $p) {
                         $article = $p->hookFilterArticleApi(array('article' => $article));
+                    }
+                    if (!$article['content']) {
+                        \SmallSmallRSS\Logger::log('No content for article');
                     }
                     $articles[] = $article;
                 }
@@ -496,21 +501,23 @@ class API extends Handler
             $reply = $plugin->$method();
             $this->wrap($reply[0], $reply[1]);
         } else {
-            $methods = array(
-                'getVersion' => '',
-                'getApiLevel' => '',
-                'getUnread' => '',
-                'getCounters' => '',
-                'getFeeds' => '',
-                'getCategories' => '',
-                'getHeadlines' => '',
-                'getArticle' => '',
-                'getConfig' => '',
-                'getPref' => '',
-                'getLabels' => '',
-                'getFeedTree' => ''
+            $reply = array(
+                'methods' => array(
+                    'getVersion' => '',
+                    'getApiLevel' => '',
+                    'getUnread' => '',
+                    'getCounters' => '',
+                    'getFeeds' => '',
+                    'getCategories' => '',
+                    'getHeadlines' => '',
+                    'getArticle' => '',
+                    'getConfig' => '',
+                    'getPref' => '',
+                    'getLabels' => '',
+                    'getFeedTree' => ''
+                )
             );
-            $this->wrap(self::STATUS_OK, array('methods' => $methods));
+            $this->wrap(self::STATUS_OK, $reply);
         }
     }
 
@@ -720,11 +727,9 @@ class API extends Handler
             }
 
             if ($show_content) {
-
                 if ($line['cached_content'] != '') {
-                    $line['content_preview'] =& $line['cached_content'];
+                    $line['content_preview'] = $line['cached_content'];
                 }
-
                 if ($sanitize_content) {
                     $headline_row['content'] = sanitize(
                         $line['content_preview'],

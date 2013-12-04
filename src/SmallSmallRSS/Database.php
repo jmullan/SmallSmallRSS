@@ -124,7 +124,7 @@ class Database
     }
     public static function fromSQLBool($boolean)
     {
-        if ($s == 't' || strtolower($s) == 'true' || $s == '1') {
+        if ($s == 't' || strtolower($s) == 'true' || $s == '1' || true === $s) {
             return true;
         } else {
             return false;

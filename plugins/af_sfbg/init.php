@@ -14,7 +14,7 @@ class Af_SFBG extends \SmallSmallRSS\Plugin
 
     public static $provides = array(
         \SmallSmallRSS\Hooks::GUID_FILTER,
-        \SmallSmallRSS\Hooks::ARTICLE_FILTER
+        \SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE
     );
 
     private static function shouldRunAgainst($link)
@@ -44,7 +44,7 @@ class Af_SFBG extends \SmallSmallRSS\Plugin
         return $guid;
     }
 
-    public function hookArticleFilter($article)
+    public function hookFilterIncomingArticle($article)
     {
         $link = $article['link'];
         if (self::shouldRunAgainst($link)) {

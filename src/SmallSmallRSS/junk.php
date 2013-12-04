@@ -65,26 +65,11 @@ function authenticate_user($login, $password, $check_only = false)
     }
 }
 
-function load_user_plugins($owner_uid)
-{
-    if ($owner_uid) {
-        $plugins = \SmallSmallRSS\DBPrefs::read('_ENABLED_PLUGINS', $owner_uid);
-        \SmallSmallRSS\PluginHost::getInstance()->load(
-            $plugins,
-            \SmallSmallRSS\PluginHost::KIND_USER,
-            $owner_uid
-        );
-        if (\SmallSmallRSS\Sanity::getSchemaVersion() > 100) {
-            \SmallSmallRSS\PluginHost::getInstance()->load_data();
-        }
-    }
-}
-
 function login_sequence()
 {
     if (\SmallSmallRSS\Auth::is_single_user_mode()) {
         authenticate_user('admin', null);
-        load_user_plugins($_SESSION['uid']);
+        \SmallSmallRSS\PluginHost::loadUserPlugins($_SESSION['uid']);
     } else {
         if (!\SmallSmallRSS\Sessions::validate()) {
             $_SESSION['uid'] = false;
@@ -109,7 +94,7 @@ function login_sequence()
 
         if ($_SESSION['uid']) {
             \SmallSmallRSS\Locale::startupGettext();
-            load_user_plugins($_SESSION['uid']);
+            \SmallSmallRSS\PluginHost::loadUserPlugins($_SESSION['uid']);
             /* cleanup ccache */
             \SmallSmallRSS\CountersCache::cleanup($_SESSION['uid']);
             \SmallSmallRSS\CatCountersCache::cleanup($_SESSION['uid']);

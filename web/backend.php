@@ -50,7 +50,7 @@ if ($_SESSION['uid']) {
         $renderer->render();
         return;
     }
-    load_user_plugins($_SESSION['uid']);
+    \SmallSmallRSS\PluginHost::loadUserPlugins($_SESSION['uid']);
 }
 $op = str_replace('-', '_', $op);
 $legacy_ops = array(

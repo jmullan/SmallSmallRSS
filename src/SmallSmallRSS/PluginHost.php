@@ -424,4 +424,20 @@ class PluginHost
         $this->load($user_plugins, self::KIND_USER, $owner_uid);
         return true;
     }
+    public static function loadUserPlugins($owner_uid)
+    {
+        if (!$owner_uid) {
+            return;
+        }
+        $plugins = \SmallSmallRSS\DBPrefs::read('_ENABLED_PLUGINS', $owner_uid);
+        \SmallSmallRSS\PluginHost::getInstance()->load(
+            $plugins,
+            \SmallSmallRSS\PluginHost::KIND_USER,
+            $owner_uid
+        );
+        if (\SmallSmallRSS\Sanity::getSchemaVersion() > 100) {
+            \SmallSmallRSS\PluginHost::getInstance()->load_data();
+        }
+    }
+
 }

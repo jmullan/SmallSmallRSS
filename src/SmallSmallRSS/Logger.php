@@ -85,7 +85,7 @@ class Logger
         $rawcalls = debug_backtrace();
         $message = '';
         if ('_debug' == $rawcalls[1]['function']) {
-            $file = str_replace(dirname(__DIR__) . '/', '', $rawcalls[1]['file']);
+            $file = str_replace(dirname(dirname(__DIR__)) . '/', '', $rawcalls[1]['file']);
             $message = '' . $file . ':' . $rawcalls[1]['line'] . ' ';
         }
         $message .= "[$ts] $msg";

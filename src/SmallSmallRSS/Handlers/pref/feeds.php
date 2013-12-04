@@ -9,15 +9,6 @@ class Pref_Feeds extends ProtectedHandler
         return isset($_REQUEST['mode']) ? $_REQUEST['mode'] : '';
     }
 
-    public function getSQLEscapedStringFromRequest($key)
-    {
-        $value = '';
-        if (isset($_REQUEST[$key])) {
-            $value = \SmallSmallRSS\Database::escape_string($_REQUEST[$key]);
-        }
-        return $value;
-    }
-
     public function ignoreCSRF($method)
     {
         $csrf_ignored = array(

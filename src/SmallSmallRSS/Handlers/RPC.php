@@ -394,12 +394,6 @@ class RPC extends ProtectedHandler
         echo json_encode(array('message' => 'UPDATE_COUNTERS'));
     }
 
-    public static function getBooleanFromRequest($key)
-    {
-        $value = isset($_REQUEST[$key]) ? $_REQUEST[$key] : '';
-        return ($value === 'true') || ($value === true);
-    }
-
     private static function checkDatabase()
     {
         $error_code = 0;

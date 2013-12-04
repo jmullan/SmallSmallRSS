@@ -10,24 +10,6 @@ class API extends Handler
 
     private $seq;
 
-    public function getSQLBooleanFromRequest($key)
-    {
-        $value = '';
-        if (isset($_REQUEST[$key])) {
-            $value = $_REQUEST[$key];
-        }
-        return \SmallSmallRSS\Database::fromSQLBool($value);
-    }
-
-    public function getSQLEscapedStringFromRequest($key)
-    {
-        $value = '';
-        if (isset($_REQUEST[$key])) {
-            $value = \SmallSmallRSS\Database::escape_string($_REQUEST[$key]);
-        }
-        return $value;
-    }
-
     public function before($method)
     {
         if (parent::before($method)) {
@@ -41,9 +23,7 @@ class API extends Handler
                 $this->wrap(self::STATUS_ERR, array('error' => 'API_DISABLED'));
                 return false;
             }
-
             $this->seq = (int) (isset($_REQUEST['seq']) ? $_REQUEST['seq'] : 0);
-
             return true;
         }
         return false;
@@ -139,19 +119,19 @@ class API extends Handler
     public function getFeeds()
     {
         $cat_id = $this->getSQLEscapedStringFromRequest('cat_id');
-        $unread_only = $this->getSQLBooleanFromRequest('unread_only');
+        $unread_only = $this->getBooleanFromRequest('unread_only');
         $limit = (int) $this->getSQLEscapedStringFromRequest('limit');
         $offset = (int) $this->getSQLEscapedStringFromRequest('offset');
-        $include_nested = $this->getSQLBooleanFromRequest('include_nested');
+        $include_nested = $this->getBooleanFromRequest('include_nested');
         $feeds = $this->apiGetFeeds($cat_id, $unread_only, $limit, $offset, $include_nested);
         $this->wrap(self::STATUS_OK, $feeds);
     }
 
     public function getCategories()
     {
-        $unread_only = $this->getSQLBooleanFromRequest('unread_only');
-        $enable_nested = $this->getSQLBooleanFromRequest('enable_nested');
-        $include_empty = $this->getSQLBooleanFromRequest('include_empty');
+        $unread_only = $this->getBooleanFromRequest('unread_only');
+        $enable_nested = $this->getBooleanFromRequest('enable_nested');
+        $include_empty = $this->getBooleanFromRequest('include_empty');
 
         // TODO do not return empty categories, return Uncategorized and standard virtual cats
 
@@ -226,16 +206,16 @@ class API extends Handler
 
             $offset = (int) $this->getSQLEscapedStringFromRequest('skip');
             $filter = $this->getSQLEscapedStringFromRequest('filter');
-            $is_cat = $this->getSQLBooleanFromRequest('is_cat');
-            $show_excerpt = $this->getSQLBooleanFromRequest('show_excerpt');
-            $show_content = $this->getSQLBooleanFromRequest('show_content');
+            $is_cat = $this->getBooleanFromRequest('is_cat');
+            $show_excerpt = $this->getBooleanFromRequest('show_excerpt');
+            $show_content = $this->getBooleanFromRequest('show_content');
             /* all_articles, unread, adaptive, marked, updated */
             $view_mode = $this->getSQLEscapedStringFromRequest('view_mode');
-            $include_attachments = $this->getSQLBooleanFromRequest('include_attachments');
+            $include_attachments = $this->getBooleanFromRequest('include_attachments');
             $since_id = (int) $this->getSQLEscapedStringFromRequest('since_id');
-            $include_nested = $this->getSQLBooleanFromRequest('include_nested');
+            $include_nested = $this->getBooleanFromRequest('include_nested');
             $sanitize_content = !isset($_REQUEST['sanitize']) ||
-                $this->getSQLBooleanFromRequest('sanitize');
+                $this->getBooleanFromRequest('sanitize');
 
             $override_order = false;
             switch ($_REQUEST['order_by']) {
@@ -740,6 +720,9 @@ class API extends Handler
                 } else {
                     $headline_row['content'] = $line['content_preview'];
                 }
+                if (!$headline_row['content']) {
+                    \SmallSmallRSS\Logger::log('No content');
+                }
             }
 
             // unify label output to ease parsing
@@ -755,7 +738,9 @@ class API extends Handler
             );
             $headline_row['comments_count'] = (int) $line['num_comments'];
             $headline_row['comments_link'] = $line['comments'];
-            $headline_row['always_display_attachments'] = \SmallSmallRSS\Database::fromSQLBool($line['always_display_enclosures']);
+            $headline_row['always_display_attachments'] = \SmallSmallRSS\Database::fromSQLBool(
+                $line['always_display_enclosures']
+            );
             $headline_row['author'] = $line['author'];
             $headline_row['score'] = (int) $line['score'];
             $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
@@ -764,7 +749,7 @@ class API extends Handler
             foreach ($hooks as $p) {
                 $headline_row = $p->hookFilterArticleApi(array('headline' => $headline_row));
             }
-            array_push($headlines, $headline_row);
+            $headlines[] = $headline_row;
         }
         return $headlines;
     }
@@ -803,7 +788,7 @@ class API extends Handler
 
     public function getFeedTree()
     {
-        $include_empty = $this->getSQLBooleanFromRequest('include_empty');
+        $include_empty = $this->getBooleanFromRequest('include_empty');
         $pf = new Pref_Feeds($_REQUEST);
         $_REQUEST['mode'] = 2;
         $_REQUEST['force_show_empty'] = $include_empty;

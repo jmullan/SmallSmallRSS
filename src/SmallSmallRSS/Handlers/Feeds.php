@@ -3,16 +3,6 @@ namespace SmallSmallRSS\Handlers;
 
 class Feeds extends ProtectedHandler
 {
-
-    public function getSQLEscapedStringFromRequest($key)
-    {
-        $value = '';
-        if (isset($_REQUEST[$key])) {
-            $value = \SmallSmallRSS\Database::escape_string($_REQUEST[$key]);
-        }
-        return $value;
-    }
-
     public function ignoreCSRF($method)
     {
         $csrf_ignored = array('index', 'feedbrowser', 'quickaddfeed', 'search');

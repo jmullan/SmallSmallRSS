@@ -372,15 +372,15 @@ class RPC extends ProtectedHandler
     /* GET["cmode"] = 0 - mark as read, 1 - as unread, 2 - toggle */
     public function catchupSelected()
     {
-        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['ids']));
+        $ids = explode(',', $_REQUEST['ids']);
         $cmode = sprintf('%d', $_REQUEST['cmode']);
-        catchupArticlesById($ids, $cmode);
+        catchupArticlesById($ids, $cmode, $_SESSION['uid']);
         echo json_encode(array('message' => 'UPDATE_COUNTERS', 'ids' => $ids));
     }
 
     public function markSelected()
     {
-        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['ids']));
+        $ids = explode(',', $_REQUEST['ids']);
         $cmode = sprintf('%d', $_REQUEST['cmode']);
         $this->markArticlesById($ids, $cmode);
         echo json_encode(array('message' => 'UPDATE_COUNTERS'));
@@ -388,7 +388,7 @@ class RPC extends ProtectedHandler
 
     public function publishSelected()
     {
-        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['ids']));
+        $ids = explode(',', $_REQUEST['ids']);
         $cmode = sprintf('%d', $_REQUEST['cmode']);
         $this->publishArticlesById($ids, $cmode);
         echo json_encode(array('message' => 'UPDATE_COUNTERS'));

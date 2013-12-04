@@ -1441,11 +1441,6 @@ function catchupArticlesById($ids, $cmode, $owner_uid = false)
     if (!$ids) {
         return;
     }
-    $tmp_ids = array();
-    foreach ($ids as $id) {
-        array_push($tmp_ids, "ref_id = '$id'");
-    }
-    $ids_qpart = join(' OR ', $tmp_ids);
     if ($cmode == 0) {
         \SmallSmallRSS\UserEntries::markIdsRead($ids, $owner_id);
     } elseif ($cmode == 1) {

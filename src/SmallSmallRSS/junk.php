@@ -2033,6 +2033,7 @@ function format_article_enclosures(
 )
 {
     $result = \SmallSmallRSS\Enclosures::get($id);
+    ob_start();
     if (count($result) > 0) {
         $entries_html = array();
         $entries = array();
@@ -2059,7 +2060,6 @@ function format_article_enclosures(
             $entries[] = $entry;
         }
 
-        ob_get_start();
         if ($_SESSION['uid'] && !\SmallSmallRSS\DBPrefs::read('STRIP_IMAGES') && !$_SESSION['bw_limit']) {
             if ($always_display_enclosures
                 || !preg_match('/<img/i', $article_content)) {

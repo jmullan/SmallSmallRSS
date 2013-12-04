@@ -533,7 +533,7 @@ class RPC extends ProtectedHandler
         ob_start();
         $feedbrowser = \SmallSmallRSS\Renderers\FeedBrower($search, $limit, $mode);
         $feedbrowser->render();
-        $buffer = ob_get_flush();
+        $buffer = ob_get_clean();
         echo json_encode(array('content' => $buffer, 'mode' => $mode));
     }
 

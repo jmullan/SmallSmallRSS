@@ -200,9 +200,9 @@ class Feeds extends ProtectedHandler
         if (isset($_REQUEST['DevForceUpdate'])) {
             header('Content-Type: text/plain');
         }
+        ob_start();
         $disable_cache = false;
         $reply = array();
-        ob_start();
         $rgba_cache = array();
         $timing_info = microtime(true);
         $topmost_article_ids = array();
@@ -755,7 +755,7 @@ class Feeds extends ProtectedHandler
 
                 }
 
-                ++$lnum;
+                $lnum += 1;
             }
 
         } else {
@@ -780,27 +780,24 @@ class Feeds extends ProtectedHandler
             }
 
             if (!$offset && $message) {
-                echo "<div class='whiteBox'>$message";
-
-                echo '<p><span class="insensitive">';
+                echo "<div class=\"whiteBox\">";
+                echo $message;
+                echo '<p>';
+                echo '<span class="insensitive">';
                 $substring_for_date = \SmallSmallRSS\Config::get('SUBSTRING_FOR_DATE');
                 $result = \SmallSmallRSS\Database::query(
-                    'SELECT '.$substring_for_date.'(MAX(last_updated), 1, 19) AS last_updated FROM ttrss_feeds
-                    WHERE owner_uid = ' . $_SESSION['uid']
+                    'SELECT '.$substring_for_date.'(MAX(last_updated), 1, 19) AS last_updated
+                     FROM ttrss_feeds
+                     WHERE owner_uid = ' . $_SESSION['uid']
                 );
-
                 $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
                 $last_updated = make_local_datetime($last_updated, false);
-
                 echo sprintf(__('Feeds last updated at %s'), $last_updated);
-
                 $result = \SmallSmallRSS\Database::query(
                     "SELECT COUNT(id) AS num_errors
                     FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION['uid']
                 );
-
                 $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_errors');
-
                 if ($num_errors > 0) {
                     echo '<br/>';
                     echo '<a class="insensitive" href="#" onclick="showFeedsWithErrors()">'.
@@ -811,6 +808,9 @@ class Feeds extends ProtectedHandler
             }
         }
         $reply['content'] = ob_get_clean();
+        if (false === $reply['content']) {
+            \SmallSmallRSS\Logger::log('No content!');
+        };
         return array(
             $topmost_article_ids,
             $headlines_count,

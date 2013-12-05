@@ -22,7 +22,9 @@ class Bookmarklets extends \SmallSmallRSS\Plugin
             \SmallSmallRSS\Renderers\Messages::renderNotice(
                 __("Drag the link below to your browser toolbar, open the feed you're interested in in your browser and click on the link to subscribe to it.")
             );
-            $bm_subscribe_url = str_replace('%s', '', add_feed_url());
+            $bm_subscribe_url = str_replace(
+                '%s', '', \SmallSmallRSS\Handlers\PublicHandler::getSubscribeUrl()
+            );
             $confirm_str = str_replace("'", "\'", __('Subscribe to %s in Tiny Tiny RSS?'));
             $bm_url = htmlspecialchars("javascript:{if(confirm('$confirm_str'.replace('%s',window.location.href)))window.location.href='$bm_subscribe_url'+window.location.href}");
             print "<p>";

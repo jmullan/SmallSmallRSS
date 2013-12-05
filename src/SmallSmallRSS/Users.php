@@ -78,11 +78,11 @@ class Users
         if (!$password) {
             $password = self::makePassword();
         }
-        $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
-        $pwd_hash = encrypt_password($password, $salt, true);
+        $salt = \SmallSmallRSS\Auth::getSalt();
+        $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($password, $salt, true);
         \SmallSmallRSS\Database::query(
             "INSERT INTO ttrss_users
-             (login,pwd_hash,access_level,last_login, email, created, salt)
+             (login, pwd_hash, access_level, last_login, email, created, salt)
              VALUES
              ('$login', '$pwd_hash', 0, null, '$email', NOW(), '$salt')"
         );

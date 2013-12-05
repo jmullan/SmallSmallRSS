@@ -584,18 +584,11 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
     }
 }
 
-function print_feed_select(
-    $id,
-    $default_id = '',
-    $attributes = '',
-    $include_all_feeds = true,
-    $root_id = false,
-    $nest_level = 0
-)
+function print_feed_select($id, $default_id = '', $attributes = '', $include_all = true, $root_id = false, $depth = 0)
 {
     if (!$root_id) {
         print "<select id=\"$id\" name=\"$id\" $attributes>";
-        if ($include_all_feeds) {
+        if ($include_all) {
             $is_selected = ('0' == $default_id) ? ' selected="1"' : '';
             print "<option $is_selected value=\"0\">";
             print __('All feeds');
@@ -604,31 +597,22 @@ function print_feed_select(
     }
     if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
         $children = \SmallSmallRSS\FeedCategories::getChildrenForSelect($root_id, $_SESSION['uid']);
-        foreach ($children as $lines) {
-            for ($i = 0; $i < $nest_level; $i++) {
-                $line['title'] = ' - ' . $line['title'];
-            }
-            $is_selected = ('CAT:' . $line['id'] == $default_id) ? ' selected="1"' : '';
-            printf(
-                "<option $is_selected value='CAT:%d'>%s</option>",
-                $line['id'],
-                htmlspecialchars($line['title'])
-            );
+        foreach ($children as $line) {
+            $cat_id = intval($line['id']);
+            $title = str_repeat(' - ', $next_level) . $line['title'];
+            $value = 'CAT:' . $cat_id;
+            $is_selected = ($value == $default_id) ? ' selected="1"' : '';
+            print "<option $is_selected value=\"$value\">";
+            print htmlspecialchars($title);
+            print '</option>';
             if ($line['num_children'] > 0) {
-                print_feed_select(
-                    $id,
-                    $default_id,
-                    $attributes,
-                    $include_all_feeds,
-                    $line['id'],
-                    $nest_level + 1
-                );
+                print_feed_select($id, $default_id, $attributes, $include_all, $line['id'], $depth + 1);
             }
             $feeds = \SmallSmallRSS\Feeds::getForSelectByCategory($line['id'], $_SESSION['uid']);
             foreach ($feeds as $fline) {
                 $is_selected = ($fline['id'] == $default_id) ? ' selected="1"' : '';
                 $fline['title'] = ' + ' . $fline['title'];
-                for ($i = 0; $i < $nest_level; $i++) {
+                for ($i = 0; $i < $depth; $i++) {
                     $fline['title'] = ' - ' . $fline['title'];
                 }
                 printf(
@@ -647,7 +631,7 @@ function print_feed_select(
             foreach ($feeds as $fline) {
                 $is_selected = ($fline['id'] == $default_id && !$default_is_cat) ? ' selected="1"' : '';
                 $fline['title'] = ' + ' . $fline['title'];
-                for ($i = 0; $i < $nest_level; $i++) {
+                for ($i = 0; $i < $depth; $i++) {
                     $fline['title'] = ' - ' . $fline['title'];
                 }
                 printf(
@@ -673,14 +657,7 @@ function print_feed_select(
     }
 }
 
-function print_feed_cat_select(
-    $id,
-    $default_id,
-    $attributes,
-    $include_all_cats = true,
-    $root_id = false,
-    $nest_level = 0
-)
+function print_feed_cat_select($id, $default_id, $attributes, $include_all = true, $root_id = false, $depth = 0)
 {
     if (!$root_id) {
         print "<select id=\"$id\" name=\"$id\" default=\"$default_id\" $attributes";
@@ -693,7 +670,7 @@ function print_feed_cat_select(
         } else {
             $is_selected = '';
         }
-        for ($i = 0; $i < $nest_level; $i++) {
+        for ($i = 0; $i < $depth; $i++) {
             $line['title'] = ' - ' . $line['title'];
         }
         if ($line['title']) {
@@ -704,19 +681,12 @@ function print_feed_cat_select(
             );
         }
         if ($line['num_children'] > 0) {
-            print_feed_cat_select(
-                $id,
-                $default_id,
-                $attributes,
-                $include_all_cats,
-                $line['id'],
-                $nest_level+1
-            );
+            print_feed_cat_select($id, $default_id, $attributes, $include_all, $line['id'], $depth + 1);
         }
     }
 
     if (!$root_id) {
-        if ($include_all_cats) {
+        if ($include_all) {
             if (\SmallSmallRSS\Database::num_rows($result) > 0) {
                 print '<option disabled="1">--------</option>';
             }
@@ -1228,7 +1198,6 @@ function queryFeedHeadlines(
                     $since_id_part
                     $query_strategy_part ORDER BY $order_by
                     $limit_query_part $offset_query_part";
-        \SmallSmallRSS\Logger::log($query);
         $result = \SmallSmallRSS\Database::query($query);
     } else {
         // browsing by tag
@@ -1756,28 +1725,6 @@ function get_self_url_prefix()
     }
 }
 
-/**
- * Compute the Mozilla Firefox feed adding URL from server HOST and REQUEST_URI.
- *
- * @return string The Mozilla Firefox feed adding URL.
- */
-function add_feed_url()
-{
-    $url_path = get_self_url_prefix() . '/public.php?op=subscribe&feed_url=%s';
-    return $url_path;
-}
-
-function encrypt_password($pass, $salt = '', $mode2 = false)
-{
-    if ($salt && $mode2) {
-        return 'MODE2:' . hash('sha256', $salt . $pass);
-    } elseif ($salt) {
-        return 'SHA1X:' . sha1("$salt:$pass");
-    } else {
-        return 'SHA1:' . sha1($pass);
-    }
-}
-
 function load_filters($feed_id, $owner_uid, $action_id = false)
 {
     $filters = array();
@@ -1953,14 +1900,6 @@ function save_email_address($email)
     }
 }
 
-function get_feed_access_key($feed_id, $is_cat, $owner_uid = false)
-{
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
-    }
-    return \SmallSmallRSS\AccessKeys::getForFeed($feed_id, $is_cat, $owner_uid);
-}
-
 function get_feeds_from_html($url, $content)
 {
     $url = fix_url($url);
@@ -1994,24 +1933,14 @@ function print_label_select($name, $value, $attributes = '')
         "SELECT caption FROM ttrss_labels2
          WHERE owner_uid = '".$_SESSION['uid']."' ORDER BY caption"
     );
-
     print "<select default=\"$value\" name=\"" . htmlspecialchars($name) .
         "\" $attributes onchange=\"labelSelectOnChange(this)\" >";
-
     while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-
         $issel = ($line['caption'] == $value) ? 'selected="1"' : '';
-
         print '<option value="'.htmlspecialchars($line['caption'])."\"
                 $issel>" . htmlspecialchars($line['caption']) . '</option>';
-
     }
-
-    #        print "<option value=\"ADD_LABEL\">" .__("Add label...") . "</option>";
-
     print '</select>';
-
-
 }
 
 function format_article_enclosures(
@@ -2240,19 +2169,6 @@ function filter_to_sql($filter, $owner_uid)
         $fullquery = "(NOT $fullquery)";
     }
     return $fullquery;
-}
-
-function get_random_bytes($length)
-{
-    if (function_exists('openssl_random_pseudo_bytes')) {
-        return openssl_random_pseudo_bytes($length);
-    } else {
-        $output = '';
-        for ($i = 0; $i < $length; $i++) {
-            $output .= chr(mt_rand(0, 255));
-        }
-        return $output;
-    }
 }
 
 function read_stdin()

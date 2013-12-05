@@ -31,14 +31,13 @@ class FeedCategories
     {
         if ($parent_cat_id) {
             $parent_qpart = "parent_cat = '$parent_cat_id'";
-            $parent_insert = "'$parent_cat_id'";
         } else {
             $parent_qpart = 'parent_cat IS NULL';
-            $parent_insert = 'NULL';
         }
 
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id FROM ttrss_feed_categories
+            "SELECT id
+             FROM ttrss_feed_categories
              WHERE
                  $parent_qpart
                  AND title = '$feed_cat'
@@ -90,6 +89,28 @@ class FeedCategories
         return false;
     }
 
+    public static function getChildrenForOPML($parent_cat_id, $owner_uid)
+    {
+
+        if ($parent_cat_id) {
+            $cat_qpart = "parent_cat = '$parent_cat_id'";
+        } else {
+            $cat_qpart = 'parent_cat IS NULL';
+        }
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id
+             FROM ttrss_feed_categories
+             WHERE
+                 $cat_qpart
+                 AND owner_uid = '$owner_uid'
+             ORDER BY order_id"
+        );
+        $cat_ids = array();
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            $cat_ids[] = $line['id'];
+        }
+    }
+
     public static function getChildren($cat, $owner_uid)
     {
         $result = \SmallSmallRSS\Database::query(
@@ -133,6 +154,7 @@ class FeedCategories
         }
         return $children;
     }
+
     public static function getParents($cat, $owner_uid)
     {
         if (!$cat) {

@@ -178,8 +178,8 @@ class Pref_Users extends ProtectedHandler
         $email = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['email']));
         $password = $_REQUEST['password'];
         if ($password) {
-            $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
-            $pwd_hash = encrypt_password($password, $salt, true);
+            $salt = \SmallSmallRSS\Auth::getSalt();
+            $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($password, $salt, true);
             $pass_query_part = "pwd_hash = '$pwd_hash', salt = '$salt',";
         } else {
             $pass_query_part = '';
@@ -212,8 +212,8 @@ class Pref_Users extends ProtectedHandler
 
         $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['login']));
         $tmp_user_pwd = make_password(8);
-        $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
-        $pwd_hash = encrypt_password($tmp_user_pwd, $salt, true);
+        $salt = \SmallSmallRSS\Auth::getSalt();
+        $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($tmp_user_pwd, $salt, true);
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_users WHERE
                 login = '$login'"
@@ -257,9 +257,9 @@ class Pref_Users extends ProtectedHandler
         $login = \SmallSmallRSS\Database::fetch_result($result, 0, 'login');
         $email = \SmallSmallRSS\Database::fetch_result($result, 0, 'email');
         $salt = \SmallSmallRSS\Database::fetch_result($result, 0, 'salt');
-        $new_salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
+        $new_salt = \SmallSmallRSS\Auth::getSalt();
         $tmp_user_pwd = make_password(8);
-        $pwd_hash = encrypt_password($tmp_user_pwd, $new_salt, true);
+        $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($tmp_user_pwd, $new_salt, true);
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users
              SET

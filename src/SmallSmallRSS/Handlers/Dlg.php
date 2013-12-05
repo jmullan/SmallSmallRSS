@@ -180,7 +180,7 @@ class Dlg extends ProtectedHandler
         $this->params = explode(':', $this->param, 3);
         $feed_id = \SmallSmallRSS\Database::escape_string($this->params[0]);
         $is_cat = (bool) $this->params[1];
-        $key = get_feed_access_key($feed_id, $is_cat);
+        $key = \SmallSmallRSS\AccessKeys::getForFeed($feed_id, $is_cat, $_SESSION['uid']);
         $url_path = htmlspecialchars($this->params[2]) . '&key=' . $key;
         echo '<h2>'.__('You can view this feed as RSS using the following URL:').'</h2>';
         echo '<div class="tagCloudContainer">';

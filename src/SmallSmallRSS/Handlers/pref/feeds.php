@@ -1624,7 +1624,7 @@ class Pref_Feeds extends ProtectedHandler
             echo '<p>';
             echo '<button onclick="window.navigator.registerContentHandler(\'' .
                 '"application/vnd.mozilla.maybe.feed", "'
-                . add_feed_url()
+                . \SmallSmallRSS\Handlers\PublicHandler::getSubscribeUrl()
                 . '", '
                 . ' "Tiny Tiny RSS")">'
                 . __('Click here to register this site as a feed reader.')
@@ -2125,11 +2125,7 @@ class Pref_Feeds extends ProtectedHandler
 
     public function regenOPMLKey()
     {
-        $this->updateFeedAccessKey(
-            'OPML:Publish',
-            false,
-            $_SESSION['uid']
-        );
+        $this->updateFeedAccessKey('OPML:Publish', false, $_SESSION['uid']);
         $new_link = Opml::opml_publish_url();
         echo json_encode(array('link' => $new_link));
     }
@@ -2138,16 +2134,13 @@ class Pref_Feeds extends ProtectedHandler
     {
         $feed_id = $this->getSQLEscapedStringFromRequest('id');
         $is_cat = $this->getSQLEscapedStringFromRequest('is_cat') == 'true';
-        $new_key = $this->updateFeedAccessKey($feed_id, $is_cat);
+        $new_key = $this->updateFeedAccessKey($feed_id, $is_cat, $_SESSION['uid']);
         echo json_encode(array('link' => $new_key));
     }
 
 
-    private function updateFeedAccessKey($feed_id, $is_cat, $owner_uid = false)
+    private function updateFeedAccessKey($feed_id, $is_cat, $owner_uid)
     {
-        if (!$owner_uid) {
-            $owner_uid = $_SESSION['uid'];
-        }
         $sql_is_cat = \SmallSmallRSS\Database::toSQLBool($is_cat);
         $result = \SmallSmallRSS\Database::query(
             "SELECT access_key FROM ttrss_access_keys
@@ -2168,7 +2161,7 @@ class Pref_Feeds extends ProtectedHandler
             );
             return $key;
         } else {
-            return get_feed_access_key($feed_id, $is_cat, $owner_uid);
+            return \SmallSmallRSS\AccessKeys::getForFeed($feed_id, $is_cat, $owner_uid);
         }
     }
 

@@ -340,7 +340,7 @@ class RPC extends ProtectedHandler
         if ($hub) {
             $rss_link = get_self_url_prefix() .
                 '/public.php?op=rss&id=-2&key=' .
-                get_feed_access_key(-2, false);
+                \SmallSmallRSS\AccessKeys::getForFeed(-2, false, $_SESSION['uid']);
             $p = new \Pubsubhubbub\Publisher($hub);
             $pubsub_result = $p->publishUpdate($rss_link);
         }
@@ -800,7 +800,7 @@ class RPC extends ProtectedHandler
         if ($hub) {
             $rss_link = get_self_url_prefix() .
                 '/public.php?op=rss&id=-2&key=' .
-                get_feed_access_key(-2, false);
+                \SmallSmallRSS\AccessKeys::getForFeed(-2, false, $_SESSION['uid']);
             $p = new \Pubsubhubbub\Publisher($hub);
             $pubsub_result = $p->publishUpdate($rss_link);
         }

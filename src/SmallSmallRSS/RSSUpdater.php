@@ -736,7 +736,7 @@ class RSSUpdater
                     if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB') && $published == 'true') {
                         $rss_link = get_self_url_prefix() .
                             '/public.php?op=rss&id=-2&key=' .
-                            get_feed_access_key(-2, false, $owner_uid);
+                            \SmallSmallRSS\AccessKeys::getForFeed(-2, false, $owner_uid);
 
                         $p = new Publisher(\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB'));
                         $pubsub_result = $p->publishUpdate($rss_link);

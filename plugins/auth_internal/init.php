@@ -44,8 +44,8 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
 
     public function authenticate($login, $password)
     {
-        $pwd_hash1 = encrypt_password($password);
-        $pwd_hash2 = encrypt_password($password, $login);
+        $pwd_hash1 = \SmallSmallRSS\Auth::encryptPassword($password);
+        $pwd_hash2 = \SmallSmallRSS\Auth::encryptPassword($password, $login);
         $login = \SmallSmallRSS\Database::escape_string($login);
         if (!empty($_REQUEST["otp"]) && \SmallSmallRSS\Sanity::getSchemaVersion() > 96) {
             $otp = \SmallSmallRSS\Database::escape_string($_REQUEST["otp"]);
@@ -97,8 +97,8 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
                 $result = \SmallSmallRSS\Database::query($query);
                 if (\SmallSmallRSS\Database::num_rows($result) == 1) {
                     // upgrade password to MODE2
-                    $salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
-                    $pwd_hash = encrypt_password($password, $salt, true);
+                    $salt = \SmallSmallRSS\Auth::getSalt();
+                    $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($password, $salt, true);
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_users
                          SET pwd_hash = '$pwd_hash', salt = '$salt'
@@ -112,7 +112,7 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
                 }
 
             } else {
-                $pwd_hash = encrypt_password($password, $salt, true);
+                $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($password, $salt, true);
                 $query = "SELECT id
                           FROM ttrss_users
                           WHERE login = '$login' AND pwd_hash = '$pwd_hash'";
@@ -148,15 +148,15 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
         $login = \SmallSmallRSS\Database::fetch_result($result, 0, "login");
 
         if (!$salt) {
-            $password_hash1 = encrypt_password($password);
-            $password_hash2 = encrypt_password($password, $login);
+            $password_hash1 = \SmallSmallRSS\Auth::encryptPassword($password);
+            $password_hash2 = \SmallSmallRSS\Auth::encryptPassword($password, $login);
 
             $query = "SELECT id FROM ttrss_users WHERE
                 id = '$owner_uid' AND (pwd_hash = '$password_hash1' OR
                 pwd_hash = '$password_hash2')";
 
         } else {
-            $password_hash = encrypt_password($password, $salt, true);
+            $password_hash = \SmallSmallRSS\Auth::encryptPassword($password, $salt, true);
 
             $query = "SELECT id FROM ttrss_users WHERE
                 id = '$owner_uid' AND pwd_hash = '$password_hash'";
@@ -173,8 +173,8 @@ class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth
 
         if ($this->checkPassword($owner_uid, $old_password)) {
 
-            $new_salt = substr(bin2hex(get_random_bytes(125)), 0, 250);
-            $new_password_hash = encrypt_password($new_password, $new_salt, true);
+            $new_salt = \SmallSmallRSS\Auth::getSalt();
+            $new_password_hash = \SmallSmallRSS\Auth::encryptPassword($new_password, $new_salt, true);
 
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_users

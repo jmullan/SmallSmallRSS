@@ -93,9 +93,11 @@ class PublicHandler extends Handler
         $feed_site_url = $qfh_ret[2];
         $last_error = $qfh_ret[3];
 
-        $feed_self_url = get_self_url_prefix() .
-            '/public.php?op=rss&id=-2&key=' .
-            get_feed_access_key(-2, false, $owner_uid);
+        $feed_self_url = (
+            get_self_url_prefix()
+            . '/public.php?op=rss&id=-2&key='
+            . \SmallSmallRSS\AccessKeys::getForFeed(-2, false, $owner_uid)
+        );
 
         if (!$feed_site_url) {
             $feed_site_url = get_self_url_prefix();
@@ -609,6 +611,11 @@ class PublicHandler extends Handler
                 header('Location: ' . \SmallSmallRSS\Config::get('SELF_URL_PATH'));
             }
         }
+    }
+
+    public static function getSubscribeUrl()
+    {
+        return get_self_url_prefix() . '/public.php?op=subscribe&feed_url=%s';
     }
 
     public function subscribe()

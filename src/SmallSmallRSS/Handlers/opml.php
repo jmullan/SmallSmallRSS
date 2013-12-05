@@ -53,10 +53,8 @@ class opml extends ProtectedHandler
     private function opml_export_category($owner_uid, $cat_id, $hide_private_feeds = false)
     {
         if ($cat_id) {
-            $cat_qpart = "parent_cat = '$cat_id'";
             $feed_cat_qpart = "cat_id = '$cat_id'";
         } else {
-            $cat_qpart = 'parent_cat IS NULL';
             $feed_cat_qpart = 'cat_id IS NULL';
         }
         if ($hide_private_feeds) {
@@ -65,32 +63,17 @@ class opml extends ProtectedHandler
             $hide_qpart = 'true';
         }
         $out = '';
+        $cat_title = '';
         if ($cat_id) {
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT title
-                 FROM ttrss_feed_categories
-                 WHERE
-                     id = '$cat_id'
-                     AND owner_uid = '$owner_uid'"
-            );
-            $cat_title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'title'));
+            $cat_title = htmlspecialchars(\SmallSmallRSS\FeedCategories::getTitle($cat_id));
         }
-
         if ($cat_title) {
             $out .= "<outline text=\"$cat_title\">\n";
         }
 
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT id,title
-             FROM ttrss_feed_categories
-             WHERE
-                 $cat_qpart
-                 AND owner_uid = '$owner_uid'
-             ORDER BY order_id, title"
-        );
+        $cat_ids = \SmallSmallRSS\FeedCategories::getChildrenForOPML($cat_id);
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            $title = htmlspecialchars($line['title']);
+        foreach ($cat_ids as $cat_id) {
             $out .= $this->opml_export_category($owner_uid, $line['id'], $hide_private_feeds);
         }
 
@@ -118,7 +101,8 @@ class opml extends ProtectedHandler
             $out .= "<outline text=\"$title\" xmlUrl=\"$url\" $html_url_qpart/>\n";
         }
 
-        if ($cat_title) {  $out .= "</outline>\n";
+        if ($cat_title) {
+            $out .= "</outline>\n";
         }
 
         return $out;
@@ -578,7 +562,7 @@ class opml extends ProtectedHandler
     public static function opml_publish_url()
     {
         $url_path = get_self_url_prefix();
-        $url_path .= '/opml.php?op=publish&key=' . get_feed_access_key('OPML:Publish', false, $_SESSION['uid']);
+        $url_path .= '/opml.php?op=publish&key=' . \SmallSmallRSS\AccessKeys::getForFeed('OPML:Publish', false, $_SESSION['uid']);
         return $url_path;
     }
 }

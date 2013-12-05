@@ -703,11 +703,6 @@ function print_feed_cat_select($id, $default_id, $attributes, $include_all = tru
     }
 }
 
-function checkbox_to_bool($val)
-{
-    return 'on' == $val;
-}
-
 function getFeedIcon($id)
 {
     switch ($id) {

@@ -46,8 +46,8 @@ class Pref_Filters extends ProtectedHandler
 
         $filter = array();
         $filter['enabled'] = true;
-        $filter['match_any_rule'] = checkbox_to_bool($_REQUEST['match_any_rule']);
-        $filter['inverse'] = checkbox_to_bool($_REQUEST['inverse']);
+        $filter['match_any_rule'] = self::checkBoxToBool($_REQUEST['match_any_rule']);
+        $filter['inverse'] = self::checkBoxToBool($_REQUEST['inverse']);
         $filter['rules'] = array();
         $rctr = 0;
         foreach ($_REQUEST['rule'] as $r) {
@@ -454,9 +454,9 @@ class Pref_Filters extends ProtectedHandler
         }
         \SmallSmallRSS\Filters::update(
             $_REQUEST['id'],
-            checkbox_to_bool($_REQUEST['enabled']),
-            checkbox_to_bool($_REQUEST['match_any_rule']),
-            checkbox_to_bool($_REQUEST['inverse']),
+            self::checkBoxToBool($_REQUEST['enabled']),
+            self::checkBoxToBool($_REQUEST['match_any_rule']),
+            self::checkBoxToBool($_REQUEST['inverse']),
             $_REQUEST['title'],
             $_SESSION['uid']
         );
@@ -569,8 +569,8 @@ class Pref_Filters extends ProtectedHandler
         \SmallSmallRSS\Database::query('BEGIN');
         /* create base filter */
         $filter_id = \SmallSmallRSS\Filters::add(
-            checkbox_to_bool($_REQUEST['enabled']),
-            checkbox_to_bool($_REQUEST['match_any_rule']),
+            self::checkBoxToBool($_REQUEST['enabled']),
+            self::checkBoxToBool($_REQUEST['match_any_rule']),
             false,
             $_REQUEST['title'],
             $owner_uid

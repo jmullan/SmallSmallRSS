@@ -1030,12 +1030,12 @@ class Pref_Feeds extends ProtectedHandler
         $auth_pass = trim($_POST['auth_pass']);
 
 
-        $private = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['private']));
-        $include_in_digest = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['include_in_digest']));
-        $cache_images = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['cache_images']));
-        $hide_images = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['hide_images']));
-        $always_display_enclosures = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['always_display_enclosures']));
-        $mark_unread_on_update = \SmallSmallRSS\Database::toSQLBool(checkbox_to_bool($_POST['mark_unread_on_update']));
+        $private = \SmallSmallRSS\Database::toSQLBool(self::checkBoxToBool($_POST['private']));
+        $include_in_digest = \SmallSmallRSS\Database::toSQLBool(self::checkBoxToBool($_POST['include_in_digest']));
+        $cache_images = \SmallSmallRSS\Database::toSQLBool(self::checkBoxToBool($_POST['cache_images']));
+        $hide_images = \SmallSmallRSS\Database::toSQLBool(self::checkBoxToBool($_POST['hide_images']));
+        $always_display_enclosures = \SmallSmallRSS\Database::toSQLBool(self::checkBoxToBool($_POST['always_display_enclosures']));
+        $mark_unread_on_update = \SmallSmallRSS\Database::toSQLBool(self::checkBoxToBool($_POST['mark_unread_on_update']));
 
         if (\SmallSmallRSS\Crypt::is_enabled()) {
             $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);

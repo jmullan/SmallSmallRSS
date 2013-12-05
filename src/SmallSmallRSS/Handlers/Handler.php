@@ -31,6 +31,11 @@ class Handler implements IHandler
         if (isset($_REQUEST[$key])) {
             $value = $_REQUEST[$key];
         }
+        return self::checkboxToBool($value);
+    }
+
+    public static function checkboxToBool($value)
+    {
         if ($value === true || $value === 1) {
             return true;
         } elseif ($value === false || $value === 0) {
@@ -51,9 +56,8 @@ class Handler implements IHandler
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
-            $value = \SmallSmallRSS\Database::escape_string($_REQUEST[$key]);
+            $value = $_REQUEST[$key];
         }
-        return $value;
+        return \SmallSmallRSS\Database::escape_string($value);
     }
-
 }

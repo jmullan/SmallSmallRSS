@@ -84,7 +84,7 @@ class Logger
         }
         $rawcalls = debug_backtrace();
         $message = '';
-        if ('_debug' == $rawcalls[1]['function']) {
+        if ('debug' == $rawcalls[1]['function']) {
             $file = str_replace(dirname(dirname(__DIR__)) . '/', '', $rawcalls[1]['file']);
             $message = '' . $file . ':' . $rawcalls[1]['line'] . ' ';
         }
@@ -106,5 +106,20 @@ class Logger
     public static function clearExpired()
     {
         self::get()->adapter->clearExpired();
+    }
+    public static function dump()
+    {
+        $value = func_get_args();
+        $rawcalls = debug_backtrace();
+        $message = '';
+        if ('debug' == $rawcalls[1]['function']) {
+            self::log($rawcalls[1]['file']);
+            self::log(dirname(dirname(__DIR__)));
+            $message = '' . $file . ':' . $rawcalls[1]['line'] . ' ';
+        }
+        $dumped = explode("\n", var_export($value, true));
+        foreach ($dumped as $line) {
+            self::log($message . $line);
+        }
     }
 }

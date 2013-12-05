@@ -218,14 +218,8 @@ class RPC extends ProtectedHandler
                 $title = \SmallSmallRSS\Database::escape_string(
                     \SmallSmallRSS\Database::fetch_result($result, 0, 'title')
                 );
-                $result = \SmallSmallRSS\Database::query(
-                    "SELECT id
-                     FROM ttrss_feeds
-                     WHERE
-                         feed_url = '$feed_url'
-                         AND owner_uid = " .$_SESSION['uid']
-                );
-                if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                $feed_id = \SmallSmallRSS\UserEntries::getByUrl($feed_url, $_SESSION['uid']);
+                if (!$feed_id) {
                     if (!$title) {
                         $title = '[Unknown]';
                     }
@@ -244,15 +238,7 @@ class RPC extends ProtectedHandler
                              0
                          )"
                     );
-                    $result = \SmallSmallRSS\Database::query(
-                        "SELECT id FROM ttrss_feeds WHERE feed_url = '$feed_url'
-                         AND owner_uid = ".$_SESSION['uid']
-                    );
-                    if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                        $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
-                    }
-                } else {
-                    $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+                    $feed_id = \SmallSmallRSS\UserEntries::getByUrl($feed_url, $_SESSION['uid']);
                 }
                 if ($feed_id) {
                     $result = \SmallSmallRSS\Database::query(
@@ -318,23 +304,13 @@ class RPC extends ProtectedHandler
 
     public function publ()
     {
-        $pub = $_REQUEST['pub'];
+        $pub = $this->getBooleanFromRequest('pub');
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-        $note = trim(strip_tags(\SmallSmallRSS\Database::escape_string($_REQUEST['note'])));
-
-        if ($pub == '1') {
-            $pub = 'true';
+        if ($pub) {
+            \SmallSmallRSS\UserEntries::publishIds(array($id), $_SESSION['uid']);
         } else {
-            $pub = 'false';
+            \SmallSmallRSS\UserEntries::unpublishIds(array($id), $_SESSION['uid']);
         }
-
-        $result = \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_user_entries
-             SET published = $pub, last_published = NOW()
-             WHERE
-                 ref_id = '$id'
-                 AND owner_uid = " . $_SESSION['uid']
-        );
         $pubsub_result = false;
         $hub = \SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB');
         if ($hub) {
@@ -369,28 +345,28 @@ class RPC extends ProtectedHandler
         echo json_encode($reply);
     }
 
-    /* GET["cmode"] = 0 - mark as read, 1 - as unread, 2 - toggle */
+    /* GET["mark_mode"] = 0 - mark as read, 1 - unmark as read, 2 - toggle */
     public function catchupSelected()
     {
         $ids = explode(',', $_REQUEST['ids']);
-        $cmode = sprintf('%d', $_REQUEST['cmode']);
-        catchupArticlesById($ids, $cmode, $_SESSION['uid']);
+        $mark_mode = sprintf('%d', $_REQUEST['mark_mode']);
+        catchupArticlesById($ids, $mark_mode, $_SESSION['uid']);
         echo json_encode(array('message' => 'UPDATE_COUNTERS', 'ids' => $ids));
     }
 
     public function markSelected()
     {
         $ids = explode(',', $_REQUEST['ids']);
-        $cmode = sprintf('%d', $_REQUEST['cmode']);
-        $this->markArticlesById($ids, $cmode);
+        $mark_mode = sprintf('%d', $_REQUEST['mark_mode']);
+        $this->markArticlesById($ids, $mark_mode);
         echo json_encode(array('message' => 'UPDATE_COUNTERS'));
     }
 
     public function publishSelected()
     {
         $ids = explode(',', $_REQUEST['ids']);
-        $cmode = sprintf('%d', $_REQUEST['cmode']);
-        $this->publishArticlesById($ids, $cmode);
+        $mark_mode = sprintf('%d', $_REQUEST['mark_mode']);
+        $this->publishArticlesById($ids, $mark_mode);
         echo json_encode(array('message' => 'UPDATE_COUNTERS'));
     }
 
@@ -734,39 +710,18 @@ class RPC extends ProtectedHandler
 
     }
 
-    private function markArticlesById($ids, $cmode)
+    private function markArticlesById($ids, $mark_mode)
     {
-
-        $tmp_ids = array();
-
-        foreach ($ids as $id) {
-            array_push($tmp_ids, "ref_id = '$id'");
-        }
-
-        $ids_qpart = join(' OR ', $tmp_ids);
-
-        if ($cmode == 0) {
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            marked = false, last_marked = NOW()
-            WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
-            );
-        } elseif ($cmode == 1) {
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            marked = true, last_marked = NOW()
-            WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
-            );
+        if ($mark_mode == \SmallSmallRSS\MarkModes::MARK) {
+            \SmallSmallRSS\UserEntries::markIds($ids, $_SESSION['uid']);
+        } elseif ($mark_mode == \SmallSmallRSS\MarkModes::UNMARK) {
+            \SmallSmallRSS\UserEntries::unmarkIds($ids, $_SESSION['uid']);
         } else {
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            marked = NOT marked,last_marked = NOW()
-            WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
-            );
+            \SmallSmallRSS\UserEntries::toggleMarkIds($ids, $_SESSION['uid']);
         }
     }
 
-    private function publishArticlesById($ids, $cmode)
+    private function publishArticlesById($ids, $mark_mode)
     {
 
         $tmp_ids = array();
@@ -777,23 +732,23 @@ class RPC extends ProtectedHandler
 
         $ids_qpart = join(' OR ', $tmp_ids);
 
-        if ($cmode == 0) {
+        if ($mark_mode == 0) {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            published = false,last_published = NOW()
-            WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
+                "UPDATE ttrss_user_entries
+                 SET published = false,last_published = NOW()
+                 WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
             );
-        } elseif ($cmode == 1) {
+        } elseif ($mark_mode == 1) {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            published = true,last_published = NOW()
-            WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
+                "UPDATE ttrss_user_entries
+                 SET published = true,last_published = NOW()
+                 WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
             );
         } else {
             \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries SET
-            published = NOT published,last_published = NOW()
-            WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
+                "UPDATE ttrss_user_entries
+                 SET published = NOT published,last_published = NOW()
+                 WHERE ($ids_qpart) AND owner_uid = " . $_SESSION['uid']
             );
         }
         $hub = \SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB');

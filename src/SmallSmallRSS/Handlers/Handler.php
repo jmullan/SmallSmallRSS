@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class Handler implements IHandler
 {
     protected $dbh;

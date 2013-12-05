@@ -16,6 +16,12 @@ var _last_headlines_update = 0;
 
 var has_storage = 'sessionStorage' in window && window['sessionStorage'] !== null;
 
+var mark_modes = {
+    "MARK": 0,
+    "UNMARK": 1,
+    "TOGGLE": 2
+};
+
 function headlines_callback2(transport, offset, background, infscroll_req) {
     try {
         handle_rpc_json(transport);
@@ -37,9 +43,9 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
                 return;
             }
 
-            if (feed_id != getActiveFeedId() || is_cat != activeFeedIsCat())
+            if (feed_id != getActiveFeedId() || is_cat != activeFeedIsCat()) {
                 return;
-
+            }
             /* dijit.getEnclosingWidget(
              document.forms["main_toolbar_form"].update).attr('disabled',
              is_cat || feed_id <= 0); */
@@ -56,13 +62,9 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
 
             $("headlines-frame").removeClassName("cdm");
             $("headlines-frame").removeClassName("normal");
-
             $("headlines-frame").addClassName(isCdmMode() ? "cdm" : "normal");
-
             var headlines_count = reply['headlines-info']['count'];
-
             vgroup_last_feed = reply['headlines-info']['vgroup_last_feed'];
-
             if (parseInt(headlines_count) < 30) {
                 _infscroll_disable = 1;
             } else {
@@ -71,51 +73,41 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
 
             var counters = reply['counters'];
             var articles = reply['articles'];
-            //var runtime_info = reply['runtime-info'];
-
             if (infscroll_req == false) {
                 loaded_article_ids = [];
-
                 dijit.byId("headlines-frame").attr('content',
                                                    reply['headlines']['content']);
-
                 dijit.byId("headlines-toolbar").attr('content',
                                                      reply['headlines']['toolbar']);
-
                 $$("#headlines-frame > div[id*=RROW]").each(function(row) {
-                                                                if (loaded_article_ids.indexOf(row.id) != -1) {
-                                                                    row.parentNode.removeChild(row);
-                                                                } else {
-                                                                    loaded_article_ids.push(row.id);
-                                                                }
-                                                            });
+                    if (loaded_article_ids.indexOf(row.id) != -1) {
+                        row.parentNode.removeChild(row);
+                    } else {
+                        loaded_article_ids.push(row.id);
+                    }
+                });
 
                 var hsp = $("headlines-spacer");
-                if (!hsp) hsp = new Element("DIV", {"id": "headlines-spacer"});
+                if (!hsp) {
+                    hsp = new Element("DIV", {"id": "headlines-spacer"});
+                }
                 dijit.byId('headlines-frame').domNode.appendChild(hsp);
-
                 initHeadlinesMenu();
-
                 if (_search_query) {
                     $("feed_title").innerHTML += "<span id='cancel_search'>" +
                         " (<a href='#' onclick='cancelSearch()'>" + __("Cancel search") + "</a>)" +
                         "</span>";
                 }
-
             } else {
-
                 if (headlines_count > 0 && feed_id == getActiveFeedId() && is_cat == activeFeedIsCat()) {
                     var c = dijit.byId("headlines-frame");
                     var ids = getSelectedArticleIds2();
                     var new_elems = [];
-
                     $("headlines-tmp").innerHTML = reply['headlines']['content'];
-
                     var hsp = $("headlines-spacer");
-
-                    if (hsp)
+                    if (hsp) {
                         c.domNode.removeChild(hsp);
-
+                    }
                     $$("#headlines-tmp > div").each(function(row) {
                                                         if (row.className == 'cdmFeedTitle') {
                                                             row.style.display = 'none';
@@ -131,35 +123,32 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
                                                         }
                                                     });
 
-                    if (!hsp) hsp = new Element("DIV", {"id": "headlines-spacer"});
-
+                    if (!hsp) {
+                        hsp = new Element("DIV", {"id": "headlines-spacer"});
+                    }
                     if (getInitParam("cdm_auto_catchup") == 1) {
                         c.domNode.appendChild(hsp);
                     }
-
-                    if (new_elems.size() == 0)
+                    if (new_elems.size() == 0) {
                         _infscroll_disable = true;
-
+                    }
                     for (var i = 0; i < ids.length; i++) {
                         markHeadline(ids[i]);
                     }
-
                     initHeadlinesMenu();
-
                     new_elems.each(function(child) {
-                                       dojo.parser.parse(child);
-
-                                       if (!Element.visible(child))
-                                           new Effect.Appear(child, { duration : 0.5 });
-                                   });
-
+                        dojo.parser.parse(child);
+                        if (!Element.visible(child)) {
+                            new Effect.Appear(child, { duration : 0.5 });
+                        }
+                    });
                 } else {
                     var hsp = $("headlines-spacer");
-
-                    if (hsp) hsp.innerHTML = "";
+                    if (hsp) {
+                        hsp.innerHTML = "";
+                    }
                 }
             }
-
             if (articles) {
                 for (var i = 0; i < articles.length; i++) {
                     var a_id = articles[i]['id'];
@@ -168,39 +157,31 @@ function headlines_callback2(transport, offset, background, infscroll_req) {
             } else {
                 console.log("no cached articles received");
             }
-
-            if (counters)
+            if (counters) {
                 parse_counters(counters);
-            else
+            } else {
                 request_counters(true);
-
+            }
         } else if (transport.responseText) {
             console.error("Invalid object received: " + transport.responseText);
-            dijit.byId("headlines-frame").attr('content', "<div class='whiteBox'>" +
-                                               __('Could not update headlines (invalid object received - see error console for details)') +
-                                               "</div>");
+            dijit.byId("headlines-frame").attr(
+                'content',
+                "<div class='whiteBox'>" +
+                __('Could not update headlines (invalid object received - see error console for details)') +
+                "</div>");
         } else {
             //notify_error("Error communicating with server.");
             Element.show(dijit.byId("net-alert").domNode);
         }
-
         _infscroll_request_sent = 0;
         _last_headlines_update = new Date().getTime();
-
         unpackVisibleHeadlines();
-
         // if we have some more space in the buffer, why not try to fill it
-
         if (!_infscroll_disable && $("headlines-spacer") &&
             $("headlines-spacer").offsetTop < $("headlines-frame").offsetHeight) {
-
-            window.setTimeout(function() {
-                                  loadMoreHeadlines();
-                              }, 250);
+            window.setTimeout(loadMoreHeadlines, 250);
         }
-
         notify("");
-
     } catch (e) {
         exception_error("headlines_callback2", e, transport);
     }
@@ -210,59 +191,41 @@ function render_article(article) {
     try {
         dijit.byId("headlines-wrap-inner").addChild(
             dijit.byId("content-insert"));
-
         var c = dijit.byId("content-insert");
-
         try {
             c.domNode.scrollTop = 0;
         } catch (e) { };
-
         PluginHost.run(PluginHost.HOOK_ARTICLE_RENDERED, article);
-
         c.attr('content', article);
-
         correctHeadlinesOffset(getActiveArticleId());
-
         try {
             c.focus();
         } catch (e) { };
-
     } catch (e) {
         exception_error("render_article", e);
     }
 }
 
 function showArticleInHeadlines(id, noexpand) {
-
     try {
         selectArticles("none");
-
         var crow = $("RROW-" + id);
-
         if (!crow) return;
-
         var article_is_unread = crow.hasClassName("Unread");
-
         if (!noexpand)
             crow.removeClassName("Unread");
         crow.addClassName("active");
-
         selectArticles('none');
-
         var view_mode = false;
-
         try {
             view_mode = document.forms['main_toolbar_form'].view_mode;
             view_mode = view_mode[view_mode.selectedIndex].value;
         } catch (e) {
             //
         }
-
         markHeadline(id);
-
         if (article_is_unread && !noexpand)
             _force_scheduled_update = true;
-
     } catch (e) {
         exception_error("showArticleInHeadlines", e);
     }
@@ -271,38 +234,29 @@ function showArticleInHeadlines(id, noexpand) {
 function article_callback2(transport, id) {
     try {
         handle_rpc_json(transport);
-
         var reply = false;
-
         try {
             reply = JSON.parse(transport.responseText);
         } catch (e) {
             console.error(e);
         }
-
         if (reply) {
-
             reply.each(function(article) {
-                           if (getActiveArticleId() == article['id']) {
-                               render_article(article['content']);
-                           }
-                           cids_requested.remove(article['id']);
-
-                           cache_set("article:" + article['id'], article['content']);
-                       });
-
+                if (getActiveArticleId() == article['id']) {
+                    render_article(article['content']);
+                }
+                cids_requested.remove(article['id']);
+                cache_set("article:" + article['id'], article['content']);
+            });
         } else if (transport.responseText) {
             console.error("Invalid object received: " + transport.responseText);
-
             render_article("<div class='whiteBox'>" +
                            __('Could not display article (invalid object received - see error console for details)') + "</div>");
         } else {
             Element.show(dijit.byId("net-alert").domNode);
         }
-
         var unread_in_buffer = $$("#headlines-frame > div[id*=RROW][class*=Unread]").length;
         request_counters(unread_in_buffer == 0);
-
         notify("");
     } catch (e) {
         exception_error("article_callback2", e, transport);
@@ -315,9 +269,7 @@ function view(id, activefeed, noexpand) {
         if (oldrow) {
             oldrow.removeClassName("active");
         }
-
         var crow = $("RROW-" + id);
-
         if (!crow) return;
         if (noexpand) {
             setActiveArticleId(id);
@@ -664,31 +616,26 @@ function toggleUnread_afh(effect) {
     }
 }
 
-function toggleUnread(id, cmode, effect) {
+function toggleUnread(id, mark_mode, effect) {
+    if (mark_mode == undefined) {
+        mark_mode = mark_modes.TOGGLE;
+    }
     try {
-
         var row = $("RROW-" + id);
         if (row) {
-            if (cmode == undefined || cmode == 2) {
+            if (mark_mode == mark_modes.TOGGLE) {
                 if (row.hasClassName("Unread")) {
                     row.removeClassName("Unread");
-
                 } else {
                     row.addClassName("Unread");
                 }
-
-            } else if (cmode == 0) {
-
+            } else if (mark_mode == mark_modes.MARK) {
                 row.removeClassName("Unread");
-
-            } else if (cmode == 1) {
+            } else if (mark_mode == mark_modes.UNMARK) {
                 row.addClassName("Unread");
             }
-
-            if (cmode == undefined) cmode = 2;
-
             var query = "?op=rpc&method=catchupSelected" +
-                "&cmode=" + param_escape(cmode) + "&ids=" + param_escape(id);
+                "&mark_mode=" + param_escape(mark_mode) + "&ids=" + param_escape(id);
             new Ajax.Request("backend.php", {
                     parameters: query,
                     onComplete: function(transport) {
@@ -783,31 +730,26 @@ function selectionToggleUnread(set_state, callback, no_error, ids) {
         }
 
         if (rows.length > 0) {
-
-            var cmode = "";
-
+            var mark_mode = "";
             if (set_state == undefined) {
-                cmode = "2";
+                mark_mode = mark_modes.TOGGLE;
             } else if (set_state == true) {
-                cmode = "1";
+                mark_mode = mark_modes.UNMARK;
             } else if (set_state == false) {
-                cmode = "0";
+                mark_mode = mark_modes.MARK;
             }
-
             var query = "?op=rpc&method=catchupSelected" +
-                "&cmode=" + cmode + "&ids=" + param_escape(rows.toString());
-
+                "&mark_mode=" + mark_mode + "&ids=" + param_escape(rows.toString());
             notify_progress("Loading, please wait...");
-
             new Ajax.Request("backend.php", {
-                                 parameters: query,
-                                 onComplete: function(transport) {
-                                     handle_rpc_json(transport);
-                                     if (callback) callback(transport);
-                                 } });
-
+                 parameters: query,
+                 onComplete: function(transport) {
+                     handle_rpc_json(transport);
+                     if (callback) {
+                         callback(transport);
+                     }
+                 }});
         }
-
     } catch (e) {
         exception_error("selectionToggleUnread", e);
     }
@@ -816,23 +758,17 @@ function selectionToggleUnread(set_state, callback, no_error, ids) {
 // sel_state ignored
 function selectionToggleMarked(sel_state, callback, no_error, ids) {
     try {
-
         var rows = ids ? ids : getSelectedArticleIds2();
-
         if (rows.length == 0 && !no_error) {
             alert(__("No articles are selected."));
             return;
         }
-
         for (var i = 0; i < rows.length; i++) {
             toggleMark(rows[i], true, true);
         }
-
         if (rows.length > 0) {
-
             var query = "?op=rpc&method=markSelected&ids=" +
-                param_escape(rows.toString()) + "&cmode=2";
-
+                param_escape(rows.toString()) + "&mark_mode=" + mark_modes.TOGGLE;
             new Ajax.Request("backend.php", {
                                  parameters: query,
                                  onComplete: function(transport) {
@@ -865,7 +801,7 @@ function selectionTogglePublished(sel_state, callback, no_error, ids) {
         if (rows.length > 0) {
 
             var query = "?op=rpc&method=publishSelected&ids=" +
-                param_escape(rows.toString()) + "&cmode=2";
+                param_escape(rows.toString()) + "&mark_mode=" + mark_modes.TOGGLE;
 
             new Ajax.Request("backend.php", {
                                  parameters: query,
@@ -1300,7 +1236,8 @@ function catchupBatchedArticles() {
             // make a copy of the array
             var batch = catchup_id_batch.slice();
             var query = "?op=rpc&method=catchupSelected" +
-                "&cmode=0&ids=" + param_escape(batch.toString());
+                "&mark_mode=" + mark_modes.MARK +
+                "&ids=" + param_escape(batch.toString());
 
             new Ajax.Request("backend.php", {
                                  parameters: query,
@@ -1378,7 +1315,8 @@ function catchupRelativeToArticle(below, id) {
                 }
 
                 var query = "?op=rpc&method=catchupSelected" +
-                    "&cmode=0" + "&ids=" + param_escape(ids_to_mark.toString());
+                    "&mark_mode=" + mark_modes.MARK +
+                    "&ids=" + param_escape(ids_to_mark.toString());
 
                 new Ajax.Request("backend.php", {
                                      parameters: query,
@@ -1655,7 +1593,8 @@ function cdmClicked(event, id) {
                 }
 
                 var query = "?op=rpc&method=catchupSelected" +
-                    "&cmode=0&ids=" + param_escape(id);
+                    "&mark_mode=" + mark_modes.MARK +
+                    "&ids=" + param_escape(id);
 
                 new Ajax.Request("backend.php", {
                         parameters: query,
@@ -1822,69 +1761,48 @@ function initHeadlinesMenu() {
     try {
         if (dijit.byId("headlinesMenu"))
             dijit.byId("headlinesMenu").destroyRecursive();
-
         var ids = [];
-
         if (!isCdmMode()) {
             nodes = $$("#headlines-frame > div[id*=RROW]");
         } else {
             nodes = $$("#headlines-frame span[id*=RTITLE]");
         }
-
         nodes.each(function(node) {
-                       ids.push(node.id);
-                   });
-
+            ids.push(node.id);
+        });
         var menu = new dijit.Menu({
-                                      id: "headlinesMenu",
-                                      targetNodeIds: ids,
-                                  });
-
+            id: "headlinesMenu",
+            targetNodeIds: ids,
+        });
         var tmph = dojo.connect(menu, '_openMyself', function (event) {
-                                    var callerNode = event.target, match = null, tries = 0;
-
-                                    while (match == null && callerNode && tries <= 3) {
-                                        match = callerNode.id.match("^[A-Z]+[-]([0-9]+)$");
-                                        callerNode = callerNode.parentNode;
-                                        ++tries;
-                                    }
-
-                                    if (match) this.callerRowId = parseInt(match[1]);
-
-                                });
-
-        /*              if (!isCdmMode())
-         menu.addChild(new dijit.MenuItem({
-         label: __("View article"),
-         onClick: function(event) {
-         view(this.getParent().callerRowId);
-         }})); */
-
+            var callerNode = event.target, match = null, tries = 0;
+            while (match == null && callerNode && tries <= 3) {
+                match = callerNode.id.match("^[A-Z]+[-]([0-9]+)$");
+                callerNode = callerNode.parentNode;
+                ++tries;
+            }
+            if (match) this.callerRowId = parseInt(match[1]);
+        });
         menu.addChild(new dijit.MenuItem({
-                                             label: __("Open original article"),
-                                             onClick: function(event) {
-                                                 openArticleInNewWindow(this.getParent().callerRowId);
-                                             }}));
-
+            label: __("Open original article"),
+            onClick: function(event) {
+                openArticleInNewWindow(this.getParent().callerRowId);
+        }}));
         menu.addChild(new dijit.MenuItem({
-                                             label: __("Display article URL"),
-                                             onClick: function(event) {
-                                                 displayArticleUrl(this.getParent().callerRowId);
-                                             }}));
-
+            label: __("Display article URL"),
+            onClick: function(event) {
+                displayArticleUrl(this.getParent().callerRowId);
+        }}));
         menu.addChild(new dijit.MenuSeparator());
-
         menu.addChild(new dijit.MenuItem({
-                                             label: __("Toggle unread"),
-                                             onClick: function(event) {
-                                                 var ids = getSelectedArticleIds2();
-                                                 // cast to string
-                                                 var id = this.getParent().callerRowId + "";
-                                                 ids = ids.size() != 0 && ids.indexOf(id) != -1 ? ids : [id];
-
-                                                 selectionToggleUnread(undefined, false, true, ids);
-                                             }}));
-
+            label: __("Toggle unread"),
+            onClick: function(event) {
+                var ids = getSelectedArticleIds2();
+                // cast to string
+                var id = this.getParent().callerRowId + "";
+                ids = ids.size() != 0 && ids.indexOf(id) != -1 ? ids : [id];
+                selectionToggleUnread(undefined, false, true, ids);
+        }}));
         menu.addChild(new dijit.MenuItem({
                                              label: __("Toggle starred"),
                                              onClick: function(event) {
@@ -1986,27 +1904,31 @@ function initHeadlinesMenu() {
 }
 
 function cache_set(id, obj) {
-    if (has_storage)
+    if (has_storage) {
         try {
             sessionStorage[id] = obj;
         } catch (e) {
             sessionStorage.clear();
         }
+    }
 }
 
 function cache_get(id) {
-    if (has_storage)
+    if (has_storage) {
         return sessionStorage[id];
+    }
 }
 
 function cache_clear() {
-    if (has_storage)
+    if (has_storage) {
         sessionStorage.clear();
+    }
 }
 
 function cache_delete(id) {
-    if (has_storage)
+    if (has_storage) {
         sessionStorage.removeItem(id);
+    }
 }
 
 function cancelSearch() {

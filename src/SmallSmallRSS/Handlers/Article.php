@@ -61,7 +61,7 @@ class Article extends ProtectedHandler
             return;
         }
 
-        $this->catchupArticleById($id, 0);
+        $this->catchupArticlesById($id, \SmallSmallRSS\MarkModes::MARK, $_SESSION['uid']);
 
         if (!$_SESSION['bw_limit']) {
             foreach ($cids as $cid) {
@@ -72,41 +72,6 @@ class Article extends ProtectedHandler
         }
 
         echo json_encode($articles);
-    }
-
-    private function catchupArticleById($id, $cmode)
-    {
-
-        if ($cmode == 0) {
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries
-                 SET unread = false,
-                     last_read = NOW()
-                 WHERE
-                     ref_id = '$id'
-                     AND owner_uid = " . $_SESSION['uid']
-            );
-        } elseif ($cmode == 1) {
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries
-                 SET unread = true
-                 WHERE
-                     ref_id = '$id'
-                     AND owner_uid = " . $_SESSION['uid']
-            );
-        } else {
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries
-                 SET unread = NOT unread,
-                     last_read = NOW()
-                 WHERE
-                     ref_id = '$id'
-                     AND owner_uid = " . $_SESSION['uid']
-            );
-        }
-
-        $feed_id = \SmallSmallRSS\UserEntries::getArticleFeed($id, $_SESSION['uid']);
-        \SmallSmallRSS\CountersCache::update($feed_id, $_SESSION['uid']);
     }
 
     public static function createPublishedArticle(
@@ -138,7 +103,7 @@ class Article extends ProtectedHandler
         \SmallSmallRSS\Database::query('BEGIN');
         // only check for our user data here, others might have shared this with different content etc
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id
+            "SELECT ref_id
              FROM ttrss_entries, ttrss_user_entries
              WHERE
                  link = '$url'
@@ -147,18 +112,9 @@ class Article extends ProtectedHandler
              LIMIT 1"
         );
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT int_id
-                 FROM ttrss_user_entries
-                 WHERE
-                     ref_id = '$ref_id'
-                     AND owner_uid = '$owner_uid'
-                 LIMIT 1"
-            );
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                $int_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'int_id');
-
+            $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'ref_id');
+            $int_id = \SmallSmallRSS\UserEntries::getIntId($ref_id, $owner_uid);
+            if (!is_null($int_id)) {
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_entries
                      SET
@@ -166,14 +122,7 @@ class Article extends ProtectedHandler
                          content_hash = '$content_hash'
                      WHERE id = '$ref_id'"
                 );
-                \SmallSmallRSS\Database::query(
-                    "UPDATE ttrss_user_entries
-                     SET published = true,
-                         last_published = NOW()
-                     WHERE
-                         int_id = '$int_id'
-                         AND owner_uid = '$owner_uid'"
-                );
+                \SmallSmallRSS\UserEntries::publishIds(array($ref_id), $owner_uid);
             } else {
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_user_entries
@@ -266,20 +215,9 @@ class Article extends ProtectedHandler
         $tags_str = \SmallSmallRSS\Database::escape_string($_REQUEST['tags_str']);
         $tags = array_unique(array_map('trim', (explode(',', $tags_str))));
         \SmallSmallRSS\Database::query('BEGIN');
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT int_id FROM ttrss_user_entries
-             WHERE
-                 ref_id = '$id'
-                 AND owner_uid = '" . $_SESSION['uid'] . "'
-             LIMIT 1"
-        );
-
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-
+        $int_id = \SmallSmallRSS\UserEntries::getIntId($id, $_SESSION['uid']);
+        if (!is_null($int_id)) {
             $tags_to_cache = array();
-
-            $int_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'int_id');
-
             \SmallSmallRSS\Database::query(
                 "DELETE FROM ttrss_tags
                  WHERE
@@ -307,12 +245,7 @@ class Article extends ProtectedHandler
             /* update tag cache */
             sort($tags_to_cache);
             $tags_str = join(',', $tags_to_cache);
-            \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries
-                 SET tag_cache = '$tags_str'
-                 WHERE ref_id = '$id'
-                 AND owner_uid = " . $_SESSION['uid']
-            );
+            \SmallSmallRSS\setCachedTags($id, $_SESSION['uid'], $tags_str);
         }
         \SmallSmallRSS\Database::query('COMMIT');
         $tags = get_article_tags($id);

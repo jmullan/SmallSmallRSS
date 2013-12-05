@@ -1394,22 +1394,20 @@ function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes)
     return $doc;
 }
 
-function catchupArticlesById($ids, $cmode, $owner_uid = false)
+function catchupArticlesById($ids, $mark_mode, $owner_uid)
 {
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
-    }
     if (!$ids) {
+        \SmallSmallRSS\Logger::log('No ref ids');
         return;
     }
-    if ($cmode == 0) {
-        \SmallSmallRSS\UserEntries::markIdsRead($ids, $owner_id);
-    } elseif ($cmode == 1) {
-        \SmallSmallRSS\UserEntries::markIdsUnread($ids, $owner_id);
-    } else {
-        \SmallSmallRSS\UserEntries::toggleIdsUnread($ids, $owner_id);
+    if ($mark_mode == \SmallSmallRSS\MarkModes::MARK) {
+        \SmallSmallRSS\UserEntries::markIdsRead($ids, $owner_uid);
+    } elseif ($mark_mode == \SmallSmallRSS\MarkModes::UNMARK) {
+        \SmallSmallRSS\UserEntries::markIdsUnread($ids, $owner_uid);
+    } elseif ($mark_mode == \SmallSmallRSS\MarkModes::TOGGLE) {
+        \SmallSmallRSS\UserEntries::toggleIdsUnread($ids, $owner_uid);
     }
-    $feed_ids = \SmallSmallRSS\UserEntries::getMatchingFeeds($ids, $owner_id);
+    $feed_ids = \SmallSmallRSS\UserEntries::getMatchingFeeds($ids, $owner_uid);
     foreach ($feed_ids as $feed_id) {
         \SmallSmallRSS\CountersCache::update($feed_id, $owner_uid);
     }

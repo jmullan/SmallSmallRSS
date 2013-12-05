@@ -276,10 +276,12 @@ class UserEntries
     public static function markIdsRead($ref_ids, $owner_uid)
     {
         if (!$ref_ids) {
+            \SmallSmallRSS\Logger::log('No ref ids');
             return;
         }
         $in_ref_ids = join(', ', $ref_ids);
         \SmallSmallRSS\Database::query(
+        $query =
             "UPDATE ttrss_user_entries
              SET
                  unread = false,
@@ -362,5 +364,110 @@ class UserEntries
                  AND owner_uid = $owner_uid"
         );
 
+    }
+    public static function markIds($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET marked = true, last_marked = NOW()
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
+
+    public static function unmarkIds($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET marked = false, last_marked = NOW()
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
+    public static function toggleMarkIds($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET marked = NOT marked,
+                 last_marked = NOW()
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
+
+    public static function publishIds($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET published = true, last_published = NOW()
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
+
+    public static function unpublishIds($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET published = false, last_published = NOW()
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
+    public static function togglePublishIds($ref_ids, $owner_uid)
+    {
+        if (!$ref_ids) {
+            return;
+        }
+        $in_ref_ids = join(', ', $ref_ids);
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET published = NOT published,
+                 last_published = NOW()
+             WHERE
+                 ref_id IN ($in_ref_ids)
+                 AND owner_uid = $owner_uid"
+        );
+    }
+    public static function getIntId($ref_id, $owner_uid)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT int_id
+             FROM ttrss_user_entries
+             WHERE
+                 ref_id = '$ref_id'
+                 AND owner_uid = '$owner_uid'
+             LIMIT 1"
+        );
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'int_id');
+        } else {
+            return null;
+        }
     }
 }

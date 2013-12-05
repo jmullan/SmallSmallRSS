@@ -34,7 +34,8 @@ class Logger_Syslog
         }
         $backtrace = debug_backtrace();
         foreach (array_slice($backtrace, 1, 1) as $step) {
-            $string = $step['file'] . ':' . $step['line'] . ' ' . $string;
+            $file = str_replace(dirname(dirname(dirname(__DIR__))) . '/', '', $step['file']);
+            $string = $file . ':' . $step['line'] . ' ' . $string;
         }
         error_log($string);
     }

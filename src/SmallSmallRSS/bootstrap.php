@@ -12,15 +12,6 @@ date_default_timezone_set('UTC');
 if (defined('E_DEPRECATED')) {
     error_reporting(-1);
 }
-
 \SmallSmallRSS\Sessions::init();
-
-
-\SmallSmallRSS\Config::set(
-    'SELF_USER_AGENT',
-    'Tiny Tiny RSS/' . \SmallSmallRSS\Constants::VERSION . ' (http://tt-rss.org/)'
-);
-ini_set('user_agent', \SmallSmallRSS\Config::get('SELF_USER_AGENT'));
-
-
+ini_set('user_agent', \SmallSmallRSS\Fetcher::getUserAgent());
 require __DIR__ . '/junk.php';

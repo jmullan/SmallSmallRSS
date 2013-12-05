@@ -25,20 +25,8 @@ class Af_Unburn extends \SmallSmallRSS\Plugin
              || strpos($article["link"], "/~r/") !== false
              || strpos($article["link"], "feedsportal.com") !== false)) {
             if (strpos($article["plugin_data"], "unburn,$owner_uid:") === false) {
-                if (ini_get("safe_mode") || ini_get("open_basedir")) {
-                    $fetcher = new \SmallSmallRSS\Fetcher();
-                    $url = $fetcher->curlResolveUrl($article["link"]);
-                } else {
-                    $ch = curl_init($article["link"]);
-                }
-                curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_HEADER, true);
-                curl_setopt($ch, CURLOPT_FOLLOWLOCATION, !ini_get("safe_mode") && !ini_get("open_basedir"));
-                curl_setopt($ch, CURLOPT_USERAGENT, SELF_USER_AGENT);
-                $contents = @curl_exec($ch);
-                $real_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-                curl_close($ch);
+                $fetcher = new \SmallSmallRSS\Fetcher();
+                $real_url = $fetcher->getRealUrl($article['link']);
                 if ($real_url) {
                     /* remove the rest of it */
                     $query = parse_url($real_url, PHP_URL_QUERY);

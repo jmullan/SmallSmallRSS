@@ -1,6 +1,8 @@
 <?php
 namespace SmallSmallRSS;
 
+# TODO: use https://github.com/webignition/robots-txt-parser
+
 class Fetcher
 {
     public $site_url;
@@ -78,7 +80,7 @@ class Fetcher
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-            curl_setopt($ch, CURLOPT_USERAGENT, SELF_USER_AGENT);
+            curl_setopt($ch, CURLOPT_USERAGENT, self::getUserAgent());
             curl_setopt($ch, CURLOPT_ENCODING, '');
             if (false !== $this->site_url) {
                 curl_setopt($ch, CURLOPT_REFERER, $this->site_url);
@@ -268,5 +270,33 @@ class Fetcher
         }
         curl_close($curl);
         return $url;
+    }
+
+    public static function getRealUrl()
+    {
+        if (ini_get("safe_mode") || ini_get("open_basedir")) {
+            $real_url = $fetcher->curlResolveUrl($article["link"]);
+        } else {
+            $ch = curl_init($article["link"]);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HEADER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, !ini_get("safe_mode") && !ini_get("open_basedir"));
+            curl_setopt($ch, CURLOPT_USERAGENT, self::getUserAgent());
+            $contents = @curl_exec($ch);
+            $real_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+            curl_close($ch);
+        }
+        return $real_url;
+    }
+
+    public static function getUserAgent()
+    {
+        return (
+            \SmallSmallRSS\Config::get('SELF_USER_AGENT_BOT')
+            . '/'
+            . \SmallSmallRSS\Constants::VERSION
+            . ' (https://github.com/jmullan/SmallSmallRSS)'
+        );
     }
 }

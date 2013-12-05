@@ -256,6 +256,8 @@ class DefaultConfigs
      */
     const FORCED_LOCALE = '';
 
+    const SELF_USER_AGENT_BOT = 'SmallSmallRSSbot';
+
     // TODO: Swap these out as well
     const _API_DEBUG_HTTP_ENABLED = false;
     const _ENABLE_FEED_DEBUGGING = false;

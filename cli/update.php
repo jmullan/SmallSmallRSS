@@ -62,10 +62,6 @@ if (count($options) == 0 || isset($options["help"])) {
     return;
 }
 
-if (!isset($options['daemon'])) {
-    \SmallSmallRss\ErrorHandler::register();
-}
-
 if (!isset($options['update-schema'])) {
     \SmallSmallRSS\Sanity::schemaOrDie();
 }

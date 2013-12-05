@@ -1,11 +1,6 @@
 <?php
 namespace SmallSmallRSS;
 
-// Not sure what the following line refers to:
-// Original from http://www.daniweb.com/code/snippet43.html
-
-\SmallSmallRSS\ErrorHandler::register();
-
 class Sessions
 {
     public static $session_expire = 86400;

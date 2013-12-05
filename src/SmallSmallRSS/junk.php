@@ -1151,7 +1151,9 @@ function queryFeedHeadlines(
                 $result = \SmallSmallRSS\Database::query(
                     "SELECT title,site_url,last_error,last_updated
                      FROM ttrss_feeds
-                     WHERE id = '$feed' AND owner_uid = $owner_uid"
+                     WHERE
+                         id = '$feed'
+                         AND owner_uid = $owner_uid"
                 );
                 $feed_title = \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
                 $feed_site_url = \SmallSmallRSS\Database::fetch_result($result, 0, 'site_url');
@@ -1226,13 +1228,8 @@ function queryFeedHeadlines(
                     $since_id_part
                     $query_strategy_part ORDER BY $order_by
                     $limit_query_part $offset_query_part";
-
-        if (!empty($_REQUEST['debug'])) {
-            print $query;
-        }
-
+        \SmallSmallRSS\Logger::log($query);
         $result = \SmallSmallRSS\Database::query($query);
-
     } else {
         // browsing by tag
 

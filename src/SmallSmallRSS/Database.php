@@ -116,15 +116,20 @@ class Database
 
     public static function toSQLBool($boolean)
     {
-        if ($s) {
-            return 'true';
-        } else {
-            return 'false';
-        }
+        return ((bool) $boolean ? 'true' : 'false');
     }
     public static function fromSQLBool($boolean)
     {
-        if ($s == 't' || strtolower($s) == 'true' || $s == '1' || true === $s) {
+        if (is_string($boolean)) {
+            $boolean = strtolower($boolean);
+        }
+        if ($boolean == 't'
+            || $boolean == 'true'
+            || $boolean == 'y'
+            || $boolean == 'yes'
+            || $boolean == '1'
+            || $boolean == 1
+            || true === $boolean) {
             return true;
         } else {
             return false;

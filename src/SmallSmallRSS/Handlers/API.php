@@ -203,19 +203,19 @@ class API extends Handler
             if (!$limit || $limit >= 200) {
                 $limit = 200;
             }
-
             $offset = (int) $this->getSQLEscapedStringFromRequest('skip');
             $filter = $this->getSQLEscapedStringFromRequest('filter');
+
             $is_cat = $this->getBooleanFromRequest('is_cat');
             $show_excerpt = $this->getBooleanFromRequest('show_excerpt');
             $show_content = $this->getBooleanFromRequest('show_content');
+
             /* all_articles, unread, adaptive, marked, updated */
             $view_mode = $this->getSQLEscapedStringFromRequest('view_mode');
             $include_attachments = $this->getBooleanFromRequest('include_attachments');
             $since_id = (int) $this->getSQLEscapedStringFromRequest('since_id');
             $include_nested = $this->getBooleanFromRequest('include_nested');
-            $sanitize_content = !isset($_REQUEST['sanitize']) ||
-                $this->getBooleanFromRequest('sanitize');
+            $sanitize_content = !isset($_REQUEST['sanitize']) || $this->getBooleanFromRequest('sanitize');
 
             $override_order = false;
             switch ($_REQUEST['order_by']) {
@@ -674,17 +674,15 @@ class API extends Handler
         $headlines = array();
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            $is_updated = (
-                $line['last_read'] == ''
-                && ($line['unread'] != 't' && $line['unread'] != '1')
-            );
+            $unread = \SmallSmallRSS\Database::fromSQLBool($line['unread']);
+            $is_updated = ($line['last_read'] == '' && !$unread);
 
             $tags = explode(',', $line['tag_cache']);
             $labels = json_decode($line['label_cache'], true);
 
             $headline_row = array(
                 'id' => (int) $line['id'],
-                'unread' => \SmallSmallRSS\Database::fromSQLBool($line['unread']),
+                'unread' => $unread,
                 'marked' => \SmallSmallRSS\Database::fromSQLBool($line['marked']),
                 'published' => \SmallSmallRSS\Database::fromSQLBool($line['published']),
                 'updated' => (int) strtotime($line['updated']),
@@ -696,9 +694,7 @@ class API extends Handler
             );
 
             if ($include_attachments) {
-                $headline_row['attachments'] = \SmallSmallRSS\Enclosures::get(
-                    $line['id']
-                );
+                $headline_row['attachments'] = \SmallSmallRSS\Enclosures::get($line['id']);
             }
 
             if ($show_excerpt) {

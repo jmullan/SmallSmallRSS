@@ -599,7 +599,7 @@ function print_feed_select($id, $default_id = '', $attributes = '', $include_all
         $children = \SmallSmallRSS\FeedCategories::getChildrenForSelect($root_id, $_SESSION['uid']);
         foreach ($children as $line) {
             $cat_id = intval($line['id']);
-            $title = str_repeat(' - ', $next_level) . $line['title'];
+            $title = str_repeat(' - ', $depth) . $line['title'];
             $value = 'CAT:' . $cat_id;
             $is_selected = ($value == $default_id) ? ' selected="1"' : '';
             print "<option $is_selected value=\"$value\">";
@@ -687,11 +687,11 @@ function print_feed_cat_select($id, $default_id, $attributes, $include_all = tru
 
     if (!$root_id) {
         if ($include_all) {
-            if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+            if ($children) {
                 print '<option disabled="1">--------</option>';
             }
             if ($default_id == 0) {
-                $is_selected = 'selected="1"';
+                $is_selected = ' selected="selected"';
             } else {
                 $is_selected = '';
             }

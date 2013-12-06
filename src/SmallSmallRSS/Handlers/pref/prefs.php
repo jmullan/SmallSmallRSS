@@ -207,7 +207,7 @@ class Pref_Prefs extends ProtectedHandler
             "DELETE FROM ttrss_user_prefs
             WHERE $profile_qpart AND owner_uid = ".$_SESSION['uid']
         );
-        initialize_user_prefs($_SESSION['uid'], $_SESSION['profile']);
+        \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], $_SESSION['profile']);
         echo __('Your preferences are now set to default values.');
     }
 
@@ -491,10 +491,10 @@ class Pref_Prefs extends ProtectedHandler
         }
 
         if (!empty($_SESSION['profile'])) {
-            initialize_user_prefs($_SESSION['uid'], $_SESSION['profile']);
+            \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], $_SESSION['profile']);
             $profile_qpart = "profile = '" . $_SESSION['profile'] . "'";
         } else {
-            initialize_user_prefs($_SESSION['uid']);
+            \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], false);
             $profile_qpart = 'profile IS NULL';
         }
         $result = \SmallSmallRSS\Database::query(

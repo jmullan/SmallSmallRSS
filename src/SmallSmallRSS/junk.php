@@ -1,18 +1,4 @@
 <?php
-
-function initialize_user_prefs($uid, $profile = false)
-{
-    \SmallSmallRSS\Database::query('BEGIN');
-    $active_prefs = \SmallSmallRSS\UserPrefs::getActive($uid, $profile);
-    $default_prefs = \SmallSmallRSS\Prefs::getAll();
-    foreach ($default_prefs as $pref_name => $value) {
-        if (!isset($active_prefs[$pref_name])) {
-            \SmallSmallRSS\UserPrefs::insert($pref_name, $value, $uid, $profile);
-        }
-    }
-    \SmallSmallRSS\Database::query('COMMIT');
-}
-
 function authenticate_user($login, $password, $check_only = false)
 {
     if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
@@ -45,7 +31,7 @@ function authenticate_user($login, $password, $check_only = false)
             $_SESSION['user_agent'] = sha1($_SERVER['HTTP_USER_AGENT']);
             $_SESSION['pwd_hash'] = $user_record['pwd_hash'];
             $_SESSION['last_version_check'] = time();
-            initialize_user_prefs($_SESSION['uid']);
+            \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], false);
             return true;
         }
         return false;
@@ -60,7 +46,7 @@ function authenticate_user($login, $password, $check_only = false)
             $_SESSION['csrf_token'] = sha1(uniqid(rand(), true));
         }
         $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
-        initialize_user_prefs($_SESSION['uid']);
+        \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], false);
         return true;
     }
 }
@@ -99,15 +85,6 @@ function login_sequence()
             \SmallSmallRSS\CountersCache::cleanup($_SESSION['uid']);
             \SmallSmallRSS\CatCountersCache::cleanup($_SESSION['uid']);
         }
-    }
-}
-
-function truncate_string($str, $max_len, $suffix = '&hellip;')
-{
-    if (mb_strlen($str, 'utf-8') > $max_len - 3) {
-        return mb_substr($str, 0, $max_len, 'utf-8') . $suffix;
-    } else {
-        return $str;
     }
 }
 
@@ -529,7 +506,7 @@ function getFeedCounters($active_feed = false)
             $cv['error'] = $last_error;
         }
         if ($active_feed && $id == $active_feed) {
-            $cv['title'] = truncate_string($line['title'], 30);
+            $cv['title'] = \SmallSmallRSS\Utils::truncateString($line['title'], 30);
         }
         array_push($ret_arr, $cv);
     }
@@ -1140,7 +1117,10 @@ function queryFeedHeadlines(
             $offset_query_part = "OFFSET $offset";
         }
         // proper override_order applied above
-        if ($vfeed_query_part && !$ignore_vfeed_group && \SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED', $owner_uid)) {
+        if ($vfeed_query_part
+            && !$ignore_vfeed_group
+            && \SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED', $owner_uid)
+        ) {
             if (!$override_order) {
                 $order_by = "ttrss_feeds.title, $order_by";
             } else {
@@ -1257,8 +1237,8 @@ function queryFeedHeadlines(
                     $y++;
                 } while ($y < $i);
             }
-            array_push($sub_ands, "A1.post_int_id = ttrss_user_entries.int_id and ttrss_user_entries.owner_uid = $owner_uid");
-            array_push($sub_ands, 'ttrss_user_entries.ref_id = ttrss_entries.id');
+            $sub_ands[] = "A1.post_int_id = ttrss_user_entries.int_id and ttrss_user_entries.owner_uid = $owner_uid";
+            $sub_ands[] = 'ttrss_user_entries.ref_id = ttrss_entries.id';
             $from_qpart = ' FROM ' . implode(', ', $sub_selects) . ', ttrss_user_entries, ttrss_entries';
             $where_qpart = ' WHERE ' . implode(' AND ', $sub_ands);
         }
@@ -1301,9 +1281,7 @@ function sanitize($str, $force_remove_images = false, $owner = false, $site_url 
             if ($entry->hasAttribute('href')) {
                 $entry->setAttribute(
                     'href',
-                    \SmallSmallRSS\Utils::rewriteRelativeUrl(
-                        $site_url, $entry->getAttribute('href')
-                    )
+                    \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $entry->getAttribute('href'))
                 );
                 $entry->setAttribute('rel', 'noreferrer');
             }
@@ -1824,25 +1802,31 @@ function format_article_labels($labels, $id)
     if (!is_array($labels)) {
         return '';
     }
-    $labels_str = '';
+    ob_start();
     foreach ($labels as $l) {
-        $labels_str .= sprintf(
-            "<span class='hlLabelRef' style='color : %s; background-color : %s'>%s</span>",
-            $l[2], $l[3], $l[1]
+        printf(
+            '<span class="hlLabelRef" style="color: %s; background-color: %s">%s</span>',
+            $l[2],
+            $l[3],
+            $l[1]
         );
     }
-
-    return $labels_str;
+    return ob_get_clean();
 
 }
 
 function format_article_note($id, $note, $allow_edit = true)
 {
-    return (
-        "<div class='articleNote'    onclick=\"editArticleNote($id)\">"
-        . "<div class='noteEdit' onclick=\"editArticleNote($id)\">"
-        . ($allow_edit ? __('(edit note)') : '')."</div>$note</div>"
-    );
+    ob_start();
+    echo "<div class=\"articleNote\" onclick=\"editArticleNote($id)\">";
+    if ($allow_edit) {
+        echo "<div class=\"noteEdit\" onclick=\"editArticleNote($id)\">";
+        echo __('(edit note)');
+        echo "</div>";
+    }
+    echo $note;
+    echo "</div>";
+    return ob_get_clean();
 }
 
 /**
@@ -1941,8 +1925,7 @@ function format_article_enclosures(
     $always_display_enclosures,
     $article_content,
     $hide_images = false
-)
-{
+) {
     $result = \SmallSmallRSS\Enclosures::get($id);
     ob_start();
     if (count($result) > 0) {

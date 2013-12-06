@@ -89,4 +89,12 @@ class Utils
             || (stripos($content, 'DOCTYPE html') !== false)
         );
     }
+    public static function truncateString($str, $max_len, $suffix = '&hellip;')
+    {
+        if (mb_strlen($str, 'utf-8') > $max_len - 3) {
+            return mb_substr($str, 0, $max_len, 'utf-8') . $suffix;
+        } else {
+            return $str;
+        }
+    }
 }

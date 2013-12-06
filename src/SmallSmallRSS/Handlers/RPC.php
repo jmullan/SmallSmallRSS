@@ -64,7 +64,7 @@ class RPC extends ProtectedHandler
                 if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                     $profile_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
                     if ($profile_id) {
-                        initialize_user_prefs($_SESSION['uid'], $profile_id);
+                        \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], $profile_id);
                     }
                 }
             }

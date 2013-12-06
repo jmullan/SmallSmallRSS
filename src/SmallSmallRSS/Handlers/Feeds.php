@@ -71,7 +71,7 @@ class Feeds extends ProtectedHandler
 
             $target = 'target="_blank"';
             echo "<a title=\"$last_updated\" $target href=\"$feed_site_url\">".
-                truncate_string($feed_title, 30) . '</a>';
+                \SmallSmallRSS\Utils::truncateString($feed_title, 30) . '</a>';
 
             if ($error) {
                 echo " (<span class=\"error\" title=\"$error\">Error</span>)";
@@ -403,7 +403,7 @@ class Feeds extends ProtectedHandler
                 );
 
                 if (\SmallSmallRSS\DBPrefs::read('SHOW_CONTENT_PREVIEW')) {
-                    $content_preview = truncate_string(
+                    $content_preview = \SmallSmallRSS\Utils::truncateString(
                         strip_tags($line['content_preview']),
                         250
                     );
@@ -488,7 +488,7 @@ class Feeds extends ProtectedHandler
                     echo "<a id=\"RTITLE-$id\" class=\"title\" href=\"";
                     echo htmlspecialchars($line['link']);
                     echo '" onclick="">';
-                    echo truncate_string($line['title'], 200);
+                    echo \SmallSmallRSS\Utils::truncateString($line['title'], 200);
                     if (\SmallSmallRSS\DBPrefs::read('SHOW_CONTENT_PREVIEW')) {
                         if ($content_preview) {
                             echo "<span class=\"contentPreview\"> - $content_preview</span>";
@@ -503,7 +503,7 @@ class Feeds extends ProtectedHandler
                             $rgba = $rgba_cache[$feed_id];
                             echo "<a class=\"hlFeed\" style=\"background: rgba($rgba, 0.3)\"";
                             echo " href=\"#\" onclick=\"viewfeed($feed_id)\">";
-                            echo truncate_string($line['feed_title'], 30);
+                            echo \SmallSmallRSS\Utils::truncateString($line['feed_title'], 30);
                             echo '</a>';
                         }
                     }
@@ -615,7 +615,7 @@ class Feeds extends ProtectedHandler
                             echo "<div class=\"hlFeed\">
                                 <a href=\"#\" style=\"background-color: rgba($rgba,0.3)\"
                                 onclick=\"viewfeed($feed_id)\">".
-                                truncate_string($line['feed_title'], 30);
+                                \SmallSmallRSS\Utils::truncateString($line['feed_title'], 30);
                             echo '</a>
                             </div>';
                         }

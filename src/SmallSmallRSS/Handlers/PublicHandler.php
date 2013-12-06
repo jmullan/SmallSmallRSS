@@ -126,7 +126,7 @@ class PublicHandler extends Handler
                 $tpl->setVariable('ARTICLE_TITLE', htmlspecialchars($line['title']), true);
                 $tpl->setVariable(
                     'ARTICLE_EXCERPT',
-                    truncate_string(strip_tags($line['content_preview']), 100, '...'),
+                    \SmallSmallRSS\Utils::truncateString(strip_tags($line['content_preview']), 100, '...'),
                     true
                 );
 
@@ -212,7 +212,7 @@ class PublicHandler extends Handler
                 $article['id'] = $line['link'];
                 $article['link'] = $line['link'];
                 $article['title'] = $line['title'];
-                $article['excerpt'] = truncate_string(strip_tags($line['content_preview']), 100, '...');
+                $article['excerpt'] = \SmallSmallRSS\Utils::truncateString(strip_tags($line['content_preview']), 100, '...');
                 $article['content'] = sanitize($line['content_preview'], false, $owner_uid);
                 $article['updated'] = date('c', strtotime($line['updated']));
                 if ($line['note']) {

@@ -50,4 +50,17 @@ class UserPrefs
             );
         }
     }
+    public static function initialize($uid, $profile)
+    {
+        \SmallSmallRSS\Database::query('BEGIN');
+        $active_prefs = \SmallSmallRSS\UserPrefs::getActive($uid, $profile);
+        $default_prefs = \SmallSmallRSS\Prefs::getAll();
+        foreach ($default_prefs as $pref_name => $value) {
+            if (!isset($active_prefs[$pref_name])) {
+                \SmallSmallRSS\UserPrefs::insert($pref_name, $value, $uid, $profile);
+            }
+        }
+        \SmallSmallRSS\Database::query('COMMIT');
+
+    }
 }

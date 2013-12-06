@@ -150,7 +150,7 @@ class Digest
             $tpl->setVariable('ARTICLE_UPDATED', $updated);
             $tpl->setVariable(
                 'ARTICLE_EXCERPT',
-                truncate_string(strip_tags($line['content']), 300)
+                \SmallSmallRSS\Utils::truncateString(strip_tags($line['content']), 300)
             );
             //            $tpl->setVariable('ARTICLE_CONTENT',
             //                strip_tags($article_content));
@@ -162,7 +162,7 @@ class Digest
             $tpl_t->setVariable('ARTICLE_LINK', $line['link']);
             $tpl_t->setVariable('ARTICLE_UPDATED', $updated);
             //            $tpl_t->setVariable('ARTICLE_EXCERPT',
-            //                truncate_string(strip_tags($line["excerpt"]), 100));
+            //                \SmallSmallRSS\Utils::truncateString(strip_tags($line["excerpt"]), 100));
 
             $tpl_t->addBlock('article');
 

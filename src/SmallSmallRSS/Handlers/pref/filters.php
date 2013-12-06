@@ -80,7 +80,7 @@ class Pref_Filters extends ProtectedHandler
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $entry_timestamp = strtotime($line['updated']);
             $entry_tags = get_article_tags($line['id'], $_SESSION['uid']);
-            $content_preview = truncate_string(
+            $content_preview = \SmallSmallRSS\Utils::truncateString(
                 strip_tags($line['content_preview']), 100, '...'
             );
             if ($line['feed_title']) {

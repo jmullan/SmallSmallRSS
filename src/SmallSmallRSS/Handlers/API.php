@@ -700,7 +700,7 @@ class API extends Handler
             }
 
             if ($show_excerpt) {
-                $excerpt = truncate_string(strip_tags($line['content_preview']), 100);
+                $excerpt = \SmallSmallRSS\Utils::truncateString(strip_tags($line['content_preview']), 100);
                 $headline_row['excerpt'] = $excerpt;
             }
 

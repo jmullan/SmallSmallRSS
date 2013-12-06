@@ -21,7 +21,7 @@ class Messages extends \SmallSmallRSS\Renderers\Base
         if (strlen($id)) {
             echo ' id="' . $id . '"';
         }
-        echo '>"';
+        echo '>';
         echo '<span>';
         echo '<img src="' . $image . '" alt="">';
         echo '</span>';

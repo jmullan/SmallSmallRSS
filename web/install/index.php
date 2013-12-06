@@ -213,7 +213,7 @@ header('Content-Type: text/html; charset=utf-8');
 <body>
   <div class="floatingLogo"><img src="../images/logo_small.png" /></div>
   <h1><?php echo $software_name; ?> Installer</h1>
-  <div class='content'>
+  <div class="content">
   <form action="" method="post">
     <input type="hidden" name="op" value="testconfig" />
     <h2>Database settings</h2>
@@ -263,7 +263,9 @@ if ($op == 'testconfig') {
         print "<p>Some configuration tests failed. Please correct them before continuing.</p>";
         print "<ul>";
         foreach ($errors as $error) {
-            print "<li style='color : red'>$error</li>";
+            print '<li style="color: red">';
+            print $error;
+            print '</li>';
         }
         print "</ul>";
         exit;

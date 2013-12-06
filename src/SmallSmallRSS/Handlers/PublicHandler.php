@@ -283,12 +283,12 @@ class PublicHandler extends Handler
                  AND login = '$login'
              ORDER BY title"
         );
-        echo "<select data-dojo-type='dijit.form.Select' style='width: 220px; margin : 0px' name='profile'>";
-        echo "<option value='0'>" . __('Default profile') . '</option>';
+        echo "<select data-dojo-type=\"dijit.form.Select\" style=\"width: 220px; margin: 0px\" name=\"profile\">";
+        echo "<option value=\"0\">" . __('Default profile') . '</option>';
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $id = $line['id'];
             $title = $line['title'];
-            echo "<option value='$id'>$title</option>";
+            echo "<option value=\"$id\">$title</option>";
         }
         echo '</select>';
     }
@@ -454,7 +454,7 @@ class PublicHandler extends Handler
         $js_renderer->render_script_tag('lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls');
         echo "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
         echo "\n</head>";
-        echo "\n<body id='sharepopup'>";
+        echo "\n<body id=\"sharepopup\">";
 
         $action = $_REQUEST['action'];
 
@@ -475,7 +475,7 @@ class PublicHandler extends Handler
                     $_SESSION['uid']
                 );
 
-                echo "<script type='text/javascript'>";
+                echo "<script type=\"text/javascript\">";
                 echo 'window.close();';
                 echo '</script>';
 
@@ -483,9 +483,9 @@ class PublicHandler extends Handler
                 $title = htmlspecialchars($_REQUEST['title']);
                 $url = htmlspecialchars($_REQUEST['url']);
 ?>
-                <table height='100%' width='100%'>
+                <table height="100%" width="100%">
                      <tr>
-                     <td colspan='2'>
+                     <td colspan="2">
                      <h1><?php echo __('Share with Tiny Tiny RSS') ?></h1>
                      </td>
                      </tr>

@@ -305,8 +305,7 @@ function getCategoryCounters()
 // only accepts real cats (>= 0)
 function getCategoryChildrenUnread($cat, $owner_uid = false)
 {
-    if (
-        $cat == \SmallSmallRSS\FeedCategories::SPECIAL
+    if ($cat == \SmallSmallRSS\FeedCategories::SPECIAL
         || $cat == \SmallSmallRSS\FeedCategories::LABELS
         || $cat == \SmallSmallRSS\FeedCategories::NONE
     ) {
@@ -840,13 +839,14 @@ function search_to_sql($search)
                         array_push($query_keywords, "($not (published = false))");
                     }
                 } else {
-                    array_push($query_keywords, "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
-                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))");
+                    $query_keywords[] = (
+                        "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
+                          OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))"
+                    );
                 }
                 break;
             default:
                 if (strpos($k, '@') === 0) {
-
                     $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $_SESSION['uid']);
                     $orig_ts = strtotime(substr($k, 1));
                     $k = date('Y-m-d', convert_timestamp($orig_ts, $user_tz_string, 'UTC'));
@@ -879,8 +879,7 @@ function queryFeedHeadlines(
     $since_id = 0,
     $include_children = false,
     $ignore_vfeed_group = false
-)
-{
+) {
     $last_updated = 0;
     $last_error = 0;
     $feed_site_url = '';
@@ -1532,7 +1531,10 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
             $owner_uid,
             $line['site_url']
         );
-        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE) as $p) {
+        $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+            \SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE
+        );
+        foreach ($hooks as $p) {
             $line = $p->hookFilterIncomingArticle($line);
         }
         $num_comments = $line['num_comments'];

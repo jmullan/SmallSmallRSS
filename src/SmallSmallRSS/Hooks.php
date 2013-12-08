@@ -4,7 +4,7 @@ namespace SmallSmallRSS;
 
 class Hooks
 {
-    const ARTICLE_BUTTON = 1;
+    const RENDER_ARTICLE_BUTTON = 1;
     const FILTER_INCOMING_ARTICLE = 2;
     const RENDER_PREFS_TAB = 3;
     const RENDER_PREFS_TAB_SECTION = 4;
@@ -22,7 +22,7 @@ class Hooks
     const RENDER_ACTION_ITEM = 16;
     const RENDER_HEADLINE_TOOLBAR_BUTTON = 17;
     const FILTER_HOTKEY_INFO = 18;
-    const ARTICLE_LEFT_BUTTON = 19;
+    const RENDER_ARTICLE_LEFT_BUTTON = 19;
     const PREFS_EDIT_FEED = 20;
     const PREFS_SAVE_FEED = 21;
     const FETCH_FEED = 22;
@@ -42,8 +42,8 @@ class Hooks
             self::RENDER_PREFS_TAB => 'hookRenderPreferencesTab',
             self::FILTER_ARTICLE_API => 'hookFilterArticleApi',
             self::RENDER_ARTICLE_CDM => 'hookRenderArticleCDM',
-            self::ARTICLE_LEFT_BUTTON => 'hookArticleLeftButton',
-            self::ARTICLE_BUTTON => 'hookArticleButton',
+            self::RENDER_ARTICLE_LEFT_BUTTON => 'hookRenderArticleLeftButton',
+            self::RENDER_ARTICLE_BUTTON => 'hookRenderArticleButton',
             self::RENDER_TOOLBAR_BUTTON => 'hookRenderToolbarButton',
             self::RENDER_ACTION_ITEM => 'hookRenderActionItem',
             self::RENDER_HEADLINE_TOOLBAR_BUTTON => 'hookRenderHeadlineToolbarButton',

@@ -213,8 +213,9 @@ class Feeds extends ProtectedHandler
 
             if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                 $last_updated = strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated'));
-                $cache_images = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images'));
-
+                $cache_images = \SmallSmallRSS\Database::fromSQLBool(
+                    \SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images')
+                );
                 if (!$cache_images && time() - $last_updated > 120 || isset($_REQUEST['DevForceUpdate'])) {
                     \SmallSmallRSS\RSSUpdater::updateFeed($feed, true);
                 } else {
@@ -310,7 +311,7 @@ class Feeds extends ProtectedHandler
         $last_error = $qfh_ret[3];
         $last_updated = (
             (strpos($qfh_ret[4], '1970-') === false)
-            ? make_local_datetime($qfh_ret[4], false)
+            ? make_local_datetime($qfh_ret[4], false, $_SESSION['uid'])
             : __('Never')
         );
 
@@ -396,10 +397,10 @@ class Feeds extends ProtectedHandler
                         class=\"pubPic\"
                         alt=\"Publish article\" onclick='togglePub($id)'>";
                 }
-                $updated_fmt = make_local_datetime($line['updated'], false);
+                $updated_fmt = make_local_datetime($line['updated'], false, $_SESSION['uid']);
                 $date_entered_fmt = T_sprintf(
                     'Imported at %s',
-                    make_local_datetime($line['date_entered'], false)
+                    make_local_datetime($line['date_entered'], false, $_SESSION['uid'])
                 );
 
                 if (\SmallSmallRSS\DBPrefs::read('SHOW_CONTENT_PREVIEW')) {
@@ -694,12 +695,10 @@ class Feeds extends ProtectedHandler
                     );
                     echo '</div>';
                     echo '<div class="cdmFooter">';
-                    $left_button_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-                        \SmallSmallRSS\Hooks::ARTICLE_LEFT_BUTTON
+                    \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+                        \SmallSmallRSS\Hooks::RENDER_ARTICLE_LEFT_BUTTON,
+                        $line
                     );
-                    foreach ($left_button_hooks as $p) {
-                        echo $p->hookArticleLeftButton($line);
-                    }
                     $tags_str = format_tags_string($tags, $id);
                     echo "<img src='images/tag.png' alt='Tags' title='Tags'>";
                     echo "<span id=\"ATSTR-$id\">$tags_str</span>";
@@ -729,18 +728,14 @@ class Feeds extends ProtectedHandler
                     }
 
                     echo '<div style="float: right">';
-                    $article_button_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-                        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+                    \SmallSmallRSS\PluginHost::getInstance()->runHooks(
+                        \SmallSmallRSS\Hooks::RENDER_ARTICLE_BUTTON,
+                        $line
                     );
-                    foreach ($article_button_hooks as $p) {
-                        echo $p->hookArticleButton($line);
-                    }
-
                     echo '</div>';
                     echo '</div>';
-
-                    echo '</div><hr/>';
-
+                    echo '</div>';
+                    echo '<hr/>';
                     echo '</div>';
 
                 }
@@ -762,10 +757,10 @@ class Feeds extends ProtectedHandler
                     $message = __('No starred articles found to display.');
                     break;
                 default:
+                    $message = __('No articles found to display.');
                     if ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
-                        $message = __('No articles found to display. You can assign articles to labels manually from article header context menu (applies to all selected articles) or use a filter.');
-                    } else {
-                        $message = __('No articles found to display.');
+                        $message .= __('You can assign all selected articles to labels from article header context menu.');
+                        $message .= __('You can assign articles to labels using a filter.');
                     }
             }
 
@@ -781,7 +776,7 @@ class Feeds extends ProtectedHandler
                      WHERE owner_uid = ' . $_SESSION['uid']
                 );
                 $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
-                $last_updated = make_local_datetime($last_updated, false);
+                $last_updated = make_local_datetime($last_updated, false, $_SESSION['uid']);
                 echo sprintf(__('Feeds last updated at %s'), $last_updated);
                 $result = \SmallSmallRSS\Database::query(
                     "SELECT COUNT(id) AS num_errors
@@ -936,9 +931,16 @@ class Feeds extends ProtectedHandler
                 break;
         }
         $ret = $this->formatHeadlinesList(
-            $feed, $method,
-            $view_mode, $limit, $cat_view, $next_unread_feed, $offset,
-            $vgroup_last_feed, $override_order, true
+            $feed,
+            $method,
+            $view_mode,
+            $limit,
+            $cat_view,
+            $next_unread_feed,
+            $offset,
+            $vgroup_last_feed,
+            $override_order,
+            true
         );
 
         $headlines_count = $ret[1];
@@ -974,7 +976,7 @@ class Feeds extends ProtectedHandler
         );
 
         $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
-        $last_updated = make_local_datetime($last_updated, false);
+        $last_updated = make_local_datetime($last_updated, false, $_SESSION['uid']);
 
 
         $result = \SmallSmallRSS\Database::query(
@@ -1101,39 +1103,37 @@ class Feeds extends ProtectedHandler
         }
         $browser_search = $this->getSQLEscapedStringFromRequest('search');
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="rpc">';
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="updateFeedBrowser">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"';
+        echo ' name="method" value="updateFeedBrowser">';
 
-        echo "<div data-dojo-type=\"dijit.Toolbar\">
-            <div style='float: right'>
-            <img style='display: none'
-                id='feed_browser_spinner' src='images/indicator_white.gif'>
-            <input name=\"search\" data-dojo-type=\"dijit.form.TextBox\" size=\"20\" type=\"search\"
-                onchange=\"dijit.byId('feedBrowserDlg').update()\" value=\"$browser_search\">
-            <button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').update()\">";
+        echo "<div data-dojo-type=\"dijit.Toolbar\">";
+        echo "<div style=\"float: right\">";
+        echo "<img style=\"display: none\" id=\"feed_browser_spinner\" src=\"images/indicator_white.gif\" />";
+        echo "<input name=\"search\" data-dojo-type=\"dijit.form.TextBox\" size=\"20\" type=\"search\"";
+        echo " onchange=\"dijit.byId('feedBrowserDlg').update()\" value=\"$browser_search\">";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('feedBrowserDlg').update()\">";
         echo __('Search');
-        echo '</button>
-        </div>';
+        echo '</button>';
+        echo '</div>';
 
-        echo " <select name=\"mode\" data-dojo-type=\"dijit.form.Select\" onchange=\"dijit.byId('feedBrowserDlg').update()\">
-            <option value='1'>" . __('Popular feeds') . "</option>
-            <option value='2'>" . __('Feed archive') . '</option>
-            </select> ';
+        echo "<select name=\"mode\" data-dojo-type=\"dijit.form.Select\"";
+        echo " onchange=\"dijit.byId('feedBrowserDlg').update()\">";
+        echo "<option value='1'>" . __('Popular feeds') . "</option>";
+        echo "<option value='2'>" . __('Feed archive') . '</option>';
+        echo '</select>';
 
         echo __('limit:');
 
-        echo " <select data-dojo-type=\"dijit.form.Select\" name=\"limit\" onchange=\"dijit.byId('feedBrowserDlg').update()\">";
+        echo "<select data-dojo-type=\"dijit.form.Select\" name=\"limit\"";
+        echo " onchange=\"dijit.byId('feedBrowserDlg').update()\">";
 
         foreach (array(25, 50, 100, 200) as $l) {
             $issel = ($l == $limit) ? 'selected="1"' : '';
             echo "<option $issel value=\"$l\">$l</option>";
         }
-
         echo '</select> ';
-
         echo '</div>';
-
         $owner_uid = $_SESSION['uid'];
-
         echo "<ul class='browseFeedList' id='browseFeedList'>";
         $feedbrowser = \SmallSmallRSS\Renderers\FeedBrower(
             $search,
@@ -1210,5 +1210,4 @@ class Feeds extends ProtectedHandler
         echo '</button>';
         echo '</div>';
     }
-
 }

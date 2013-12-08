@@ -104,14 +104,11 @@ function convert_timestamp($timestamp, $source_tz, $dest_tz)
     return $dt->format('U') + $dest_tz->getOffset($dt);
 }
 
-function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt = false)
+function make_local_datetime($timestamp, $long, $owner_uid, $no_smart_dt = false)
 {
     static $utc_tz = null;
     if (is_null($utc_tz)) {
         $utc_tz = new DateTimeZone('UTC');
-    }
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
     }
     if (!$timestamp) {
         $timestamp = '1970-01-01 0:00';
@@ -134,7 +131,7 @@ function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt
     $user_timestamp = $dt->format('U') + $tz_offset;
 
     if (!$no_smart_dt) {
-        return smart_date_time($user_timestamp, $tz_offset, $owner_uid);
+        return smart_date_time($user_timestamp, $owner_uid, $tz_offset);
     } else {
         if ($long) {
             $format = \SmallSmallRSS\DBPrefs::read('LONG_DATE_FORMAT', $owner_uid);
@@ -145,11 +142,8 @@ function make_local_datetime($timestamp, $long, $owner_uid = false, $no_smart_dt
     }
 }
 
-function smart_date_time($timestamp, $tz_offset = 0, $owner_uid = false)
+function smart_date_time($timestamp, $owner_uid, $tz_offset)
 {
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
-    }
     if (date('Y.m.d', $timestamp) == date('Y.m.d', time() + $tz_offset)) {
         return date('G:i', $timestamp);
     } elseif (date('Y', $timestamp) == date('Y', time() + $tz_offset)) {
@@ -269,7 +263,7 @@ function getCategoryCounters()
     $ret_arr[] = array(
         'id' => \SmallSmallRSS\FeedCategories::LABELS,
         'kind' => 'cat',
-        'counter' => getCategoryUnread(\SmallSmallRSS\FeedCategories::LABELS)
+        'counter' => getCategoryUnread(\SmallSmallRSS\FeedCategories::LABELS, $_SESSION['uid'])
     );
     $result = \SmallSmallRSS\Database::query(
         'SELECT
@@ -303,16 +297,13 @@ function getCategoryCounters()
 }
 
 // only accepts real cats (>= 0)
-function getCategoryChildrenUnread($cat, $owner_uid = false)
+function getCategoryChildrenUnread($cat, $owner_uid)
 {
     if ($cat == \SmallSmallRSS\FeedCategories::SPECIAL
         || $cat == \SmallSmallRSS\FeedCategories::LABELS
         || $cat == \SmallSmallRSS\FeedCategories::NONE
     ) {
         return 0;
-    }
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
     }
     $cat_ids = \SmallSmallRSS\FeedCategories::getChildren($cat, $owner_uid);
     $unread = 0;
@@ -324,21 +315,18 @@ function getCategoryChildrenUnread($cat, $owner_uid = false)
     return $unread;
 }
 
-function getCategoryUnread($cat, $owner_uid = false)
+function getCategoryUnread($cat, $owner_uid)
 {
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
-    }
     if ($cat >= 0) {
         $feed_ids = \SmallSmallRSS\Feeds::getForCategory($cat, $owner_uid);
         $unread = \SmallSmallRSS\UserEntries::countUnread($feed_ids, $owner_uid);
         return $unread;
     } elseif ($cat == \SmallSmallRSS\FeedCategories::SPECIAL) {
         return (
-            countUnreadFeedArticles(-1, false, true, $_SESSION['uid'])
-            + countUnreadFeedArticles(-2, false, true, $_SESSION['uid'])
-            + countUnreadFeedArticles(-3, false, true, $_SESSION['uid'])
-            + countUnreadFeedArticles(0, false, true, $_SESSION['uid'])
+            countUnreadFeedArticles(-1, false, true, $owner_uid)
+            + countUnreadFeedArticles(-2, false, true, $owner_uid)
+            + countUnreadFeedArticles(-3, false, true, $owner_uid)
+            + countUnreadFeedArticles(0, false, true, $owner_uid)
         );
     } elseif ($cat == \SmallSmallRSS\FeedCategories::LABELS) {
         $result = \SmallSmallRSS\Database::query(
@@ -356,12 +344,8 @@ function getCategoryUnread($cat, $owner_uid = false)
     }
 }
 
-function getLabelUnread($label_id, $owner_uid = false)
+function getLabelUnread($label_id, $owner_uid)
 {
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
-    }
-
     $result = \SmallSmallRSS\Database::query(
         "SELECT COUNT(ref_id) AS unread
          FROM ttrss_user_entries, ttrss_user_labels2
@@ -490,7 +474,7 @@ function getFeedCounters($active_feed = false)
         $id = $line['id'];
         $count = $line['count'];
         $last_error = htmlspecialchars($line['last_error']);
-        $last_updated = make_local_datetime($line['last_updated'], false);
+        $last_updated = make_local_datetime($line['last_updated'], false, $_SESSION['uid']);
         $has_img = \SmallSmallRSS\Feeds::hasIcon($id);
         if (date('Y') - date('Y', strtotime($line['last_updated'])) > 2) {
             $last_updated = '';
@@ -945,7 +929,7 @@ function queryFeedHeadlines(
         } elseif ($feed != -1) {
             $unread = countUnreadFeedArticles($feed, $cat_view, true, $_SESSION['uid']);
             if ($cat_view && $feed > 0 && $include_children) {
-                $unread += getCategoryChildrenUnread($feed);
+                $unread += getCategoryChildrenUnread($feed, $_SESSION['uid']);
             }
             if ($unread > 0) {
                 $view_query_part = ' unread = true AND ';
@@ -1437,223 +1421,6 @@ function format_inline_player($url, $ctype)
         }
     }
     return ob_get_clean();
-}
-
-function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_uid = false)
-{
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
-    }
-
-    $rv = array();
-
-    $rv['id'] = $id;
-
-    /* we can figure out feed_id from article id anyway, why do we
-     * pass feed_id here? let's ignore the argument :(*/
-
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT feed_id FROM ttrss_user_entries
-         WHERE ref_id = '$id'"
-    );
-
-    $feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'feed_id');
-    $rv['feed_id'] = $feed_id;
-
-    if ($mark_as_read) {
-        $result = \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_user_entries
-             SET unread = false,last_read = NOW()
-             WHERE ref_id = '$id' AND owner_uid = $owner_uid"
-        );
-        \SmallSmallRSS\CountersCache::update($feed_id, $owner_uid);
-    }
-    $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
-    $result = \SmallSmallRSS\Database::query(
-        'SELECT
-             id,
-             title,
-             link,
-             content,
-             feed_id,
-             comments,
-             int_id,
-             '.$substring_for_date."(updated,1,16) as updated,
-             (SELECT site_url FROM ttrss_feeds WHERE id = feed_id) as site_url,
-             (SELECT hide_images FROM ttrss_feeds WHERE id = feed_id) as hide_images,
-             (
-                  SELECT always_display_enclosures
-                  FROM ttrss_feeds
-                  WHERE id = feed_id
-             ) as always_display_enclosures,
-             num_comments,
-             tag_cache,
-             author,
-             orig_feed_id,
-             note,
-             cached_content
-         FROM ttrss_entries,ttrss_user_entries
-         WHERE
-             id = '$id'
-             AND ref_id = id
-             AND owner_uid = $owner_uid"
-    );
-
-    if ($result) {
-        $line = \SmallSmallRSS\Database::fetch_assoc($result);
-        $tag_cache = $line['tag_cache'];
-        $line['tags'] = get_article_tags($id, $owner_uid, $line['tag_cache']);
-        unset($line['tag_cache']);
-        $line['content'] = sanitize(
-            $line['content'],
-            \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
-            $owner_uid,
-            $line['site_url']
-        );
-        $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
-            \SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE
-        );
-        foreach ($hooks as $p) {
-            $line = $p->hookFilterIncomingArticle($line);
-        }
-        $num_comments = $line['num_comments'];
-        $entry_comments = '';
-        if ($num_comments > 0) {
-            if ($line['comments']) {
-                $comments_url = htmlspecialchars($line['comments']);
-            } else {
-                $comments_url = htmlspecialchars($line['link']);
-            }
-            $entry_comments = "<a target='_blank' href=\"$comments_url\">$num_comments comments</a>";
-        } else {
-            if ($line['comments'] && $line['link'] != $line['comments']) {
-                $entry_comments = "<a target='_blank' href=\"".htmlspecialchars($line['comments']).'">comments</a>';
-            }
-        }
-        if ($zoom_mode) {
-            header('Content-Type: text/html');
-            $rv['content'] .= '<html><head>';
-            $rv['content'] .= '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>';
-            $rv['content'] .= '<title>';
-            $rv['content'] .= \SmallSmallRSS\Config::get('SOFTWARE_NAME');
-            $rv['content'] .= ' : ' . $line['title'] . '</title>';
-            $rv['content'] .= '<link rel="stylesheet" type="text/css" href="css/tt-rss.css" />';
-            $rv['content'] .= '</head><body id="ttrssZoom">';
-        }
-        $rv['content'] .= "<div class=\"postReply\" id=\"POST-$id\">";
-        $rv['content'] .= "<div class=\"postHeader\" id=\"POSTHDR-$id\">";
-        $entry_author = $line['author'];
-        if ($entry_author) {
-            $entry_author = __(' - ') . $entry_author;
-        }
-        $parsed_updated = make_local_datetime(
-            $line['updated'],
-            true,
-            $owner_uid,
-            true
-        );
-        $rv['content'] .= "<div class=\"postDate\">$parsed_updated</div>";
-        if ($line['link']) {
-            $rv['content'] .= "<div class='postTitle'>";
-            $rv['content'] .= "<a target='_blank' title=\"";
-            $rv['content'] .= htmlspecialchars($line['title']) . '"';
-            $rv['content'] .= ' href="' . htmlspecialchars($line['link']) . '">';
-            $rv['content'] .= $line['title'] . '</a>';
-            $rv['content'] .= "<span class='author'>$entry_author</span></div>";
-        } else {
-            $rv['content'] .= "<div class='postTitle'>" . $line['title'] . "$entry_author</div>";
-        }
-
-        $tags_str = format_tags_string($line['tags'], $id);
-        $tags_str_full = join(', ', $line['tags']);
-        if (!$tags_str_full) {
-            $tags_str_full = __('no tags');
-        }
-        if (!$entry_comments) {
-            $entry_comments = '&nbsp;'; # placeholder
-        }
-
-        $rv['content'] .= "<div class='postTags' style='float: right'>";
-        $rv['content'] .= "<img src='images/tag.png' class='tagsPic' alt='Tags' title='Tags' />&nbsp;";
-        if (!$zoom_mode) {
-            $rv['content'] .= "<span id=\"ATSTR-$id\">$tags_str</span>
-                    <a title=\"".__('Edit tags for this article')."\"
-                    href=\"#\" onclick=\"editArticleTags($id, $feed_id)\">(+)</a>";
-
-            $rv['content'] .= "<div data-dojo-type=\"dijit.Tooltip\"
-                    id=\"ATSTRTIP-$id\" connectId=\"ATSTR-$id\"
-                    position=\"below\">$tags_str_full</div>";
-            foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::ARTICLE_BUTTON) as $p) {
-                $rv['content'] .= $p->hookArticleButton($line);
-            }
-
-        } else {
-            $tags_str = strip_tags($tags_str);
-            $rv['content'] .= "<span id=\"ATSTR-$id\">$tags_str</span>";
-        }
-        $rv['content'] .= '</div>';
-        $rv['content'] .= "<div clear='both'>";
-
-        foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::ARTICLE_LEFT_BUTTON) as $p) {
-            $rv['content'] .= $p->hookArticleLeftButton($line);
-        }
-
-        $rv['content'] .= "$entry_comments</div>";
-
-        if ($line['orig_feed_id']) {
-
-            $tmp_result = \SmallSmallRSS\Database::query(
-                'SELECT * FROM ttrss_archived_feeds
-                 WHERE id = '.$line['orig_feed_id']
-            );
-
-            if (\SmallSmallRSS\Database::num_rows($tmp_result) != 0) {
-
-                $rv['content'] .= "<div clear='both'>";
-                $rv['content'] .= __('Originally from:');
-
-                $rv['content'] .= '&nbsp;';
-
-                $tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result);
-
-                $rv['content'] .= "<a target='_blank'
-                        href=' " . htmlspecialchars($tmp_line['site_url']) . "'>" .
-                    $tmp_line['title'] . '</a>';
-
-                $rv['content'] .= '&nbsp;';
-
-                $rv['content'] .= "<a target='_blank' href='" . htmlspecialchars($tmp_line['feed_url']) . "'>";
-                $rv['content'] .= "<img title='".__('Feed URL')."'class='tinyFeedIcon' src='images/pub_set.svg'></a>";
-
-                $rv['content'] .= '</div>';
-            }
-        }
-        $rv['content'] .= '</div>';
-        $rv['content'] .= "<div id=\"POSTNOTE-$id\">";
-        if ($line['note']) {
-            $rv['content'] .= format_article_note($id, $line['note'], !$zoom_mode);
-        }
-        $rv['content'] .= '</div>';
-        $rv['content'] .= '<div class="postContent">';
-        $rv['content'] .= $line['content'];
-        $rv['content'] .= format_article_enclosures(
-            $id,
-            \SmallSmallRSS\Database::fromSQLBool($line['always_display_enclosures']),
-            $line['content'],
-            \SmallSmallRSS\Database::fromSQLBool($line['hide_images'])
-        );
-        $rv['content'] .= '</div>';
-        $rv['content'] .= '</div>';
-    }
-
-    if ($zoom_mode) {
-        $rv['content'] .= "
-                <div class='footer'>
-                <button onclick=\"return window.close()\">".
-            __('Close this window').'</button></div>';
-        $rv['content'] .= '</body></html>';
-    }
-    return $rv;
 }
 
 function get_self_url_prefix()

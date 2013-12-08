@@ -3,13 +3,13 @@ namespace SmallSmallRSS;
 
 class UserEntries
 {
-    public static function getArticleFeed($id, $owner_uid)
+    public static function getArticleFeed($ref_id, $owner_uid)
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT feed_id
              FROM ttrss_user_entries
              WHERE
-                 ref_id = '$id'
+                 ref_id = '$ref_id'
                  AND owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
@@ -94,16 +94,16 @@ class UserEntries
                 } elseif ($feed_id == -2) {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries
-                     SET unread = false,last_read = NOW()
-                     WHERE
-                         unread = true
-                         AND $date_qpart
-                         AND owner_uid = $owner_uid
-                         AND (
-                             SELECT COUNT(*)
-                             FROM ttrss_user_labels2
-                             WHERE article_id = ref_id
-                         ) > 0"
+                         SET unread = false,last_read = NOW()
+                         WHERE
+                             unread = true
+                             AND $date_qpart
+                             AND owner_uid = $owner_uid
+                             AND (
+                                 SELECT COUNT(*)
+                                 FROM ttrss_user_labels2
+                                 WHERE article_id = ref_id
+                             ) > 0"
                     );
                 }
             } elseif ($feed_id > 0) {
@@ -232,19 +232,19 @@ class UserEntries
         } else {
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries
-             SET unread = false, last_read = NOW()
-             WHERE ref_id IN (
-                 SELECT id FROM (
-                     SELECT ttrss_entries.id
-                     FROM ttrss_entries, ttrss_user_entries, ttrss_tags
-                     WHERE ref_id = ttrss_entries.id
-                         AND post_int_id = int_id
-                         AND tag_name = '$feed_id'
-                         AND ttrss_user_entries.owner_uid = $owner_uid
-                         AND unread = true
-                         AND $date_qpart
-                 ) as tmp
-             )"
+                 SET unread = false, last_read = NOW()
+                 WHERE ref_id IN (
+                     SELECT id FROM (
+                         SELECT ttrss_entries.id
+                         FROM ttrss_entries, ttrss_user_entries, ttrss_tags
+                         WHERE ref_id = ttrss_entries.id
+                             AND post_int_id = int_id
+                             AND tag_name = '$feed_id'
+                             AND ttrss_user_entries.owner_uid = $owner_uid
+                             AND unread = true
+                             AND $date_qpart
+                     ) as tmp
+                 )"
             );
         }
     }
@@ -469,6 +469,38 @@ class UserEntries
             return \SmallSmallRSS\Database::fetch_result($result, 0, 'int_id');
         } else {
             return null;
+        }
+    }
+    public static function setNote($ref_id, $owner_uid, $note)
+    {
+        $ref_id = \SmallSmallRSS\Database::escape_string($ref_id);
+        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $note = \SmallSmallRSS\Database::escape_string(trim(strip_tags($note)));
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+             SET note = '$note'
+             WHERE
+                 ref_id = '$ref_id'
+                 AND owner_uid = $owner_uid"
+        );
+
+    }
+
+    public static function getNote($ref_id, $owner_uid)
+    {
+        $ref_id = \SmallSmallRSS\Database::escape_string($ref_id);
+        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT note
+             FROM ttrss_user_entries
+             WHERE
+                 ref_id = '$ref_id'
+                 AND owner_uid = $owner_uid"
+        );
+        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, "note");
+        } else {
+            return '';
         }
     }
 }

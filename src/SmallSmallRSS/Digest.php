@@ -130,16 +130,9 @@ class Digest
         }
 
         for ($i = 0; $i < sizeof($headlines); $i++) {
-
             $line = $headlines[$i];
-
             array_push($affected_ids, $line['ref_id']);
-
-            $updated = make_local_datetime(
-                $line['last_updated'], false,
-                $user_id
-            );
-
+            $updated = make_local_datetime($line['last_updated'], false, $user_id, $_SESSION['uid']);
             if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS', $user_id)) {
                 $line['feed_title'] = $line['cat_title'] . ' / ' . $line['feed_title'];
             }
@@ -152,8 +145,6 @@ class Digest
                 'ARTICLE_EXCERPT',
                 \SmallSmallRSS\Utils::truncateString(strip_tags($line['content']), 300)
             );
-            //            $tpl->setVariable('ARTICLE_CONTENT',
-            //                strip_tags($article_content));
 
             $tpl->addBlock('article');
 
@@ -161,8 +152,6 @@ class Digest
             $tpl_t->setVariable('ARTICLE_TITLE', $line['title']);
             $tpl_t->setVariable('ARTICLE_LINK', $line['link']);
             $tpl_t->setVariable('ARTICLE_UPDATED', $updated);
-            //            $tpl_t->setVariable('ARTICLE_EXCERPT',
-            //                \SmallSmallRSS\Utils::truncateString(strip_tags($line["excerpt"]), 100));
 
             $tpl_t->addBlock('article');
 

@@ -12,7 +12,7 @@ class Share extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+        \SmallSmallRSS\Hooks::RENDER_ARTICLE_BUTTON
     );
 
     public function getJavascript()
@@ -20,12 +20,15 @@ class Share extends \SmallSmallRSS\Plugin
         return file_get_contents(dirname(__FILE__) . "/share.js");
     }
 
-    public function hookArticleButton($line)
+    public function hookRenderArticleButton($line)
     {
-        return "<img src=\"plugins/share/share.png\"
-            class='tagsPic' style=\"cursor : pointer\"
-            onclick=\"shareArticle(".$line['int_id'].")\"
-            title='".__('Share by URL')."'>";
+        echo "<img src=\"plugins/share/share.png\" class=\"tagsPic\" style=\"cursor: pointer\"";
+        echo " onclick=\"shareArticle(";
+        echo $line['int_id'];
+        echo ")\"";
+        echo " title=\"";
+        echo __('Share by URL');
+        echo "\">";
     }
 
     public function shareArticle()
@@ -37,7 +40,7 @@ class Share extends \SmallSmallRSS\Plugin
              WHERE int_id = '$param' AND owner_uid = " . $_SESSION['uid']
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-            print "Article not found.";
+            echo "Article not found.";
         } else {
             $uuid = \SmallSmallRSS\Database::fetch_result($result, 0, "uuid");
             $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "ref_id");
@@ -52,17 +55,21 @@ class Share extends \SmallSmallRSS\Plugin
                          AND owner_uid = " . $_SESSION['uid']
                 );
             }
-            print "<h2>". __("You can share this article by the following unique URL:") . "</h2>";
+            echo "<h2>";
+            echo __("You can share this article by the following unique URL:");
+            echo "</h2>";
             $url_path = get_self_url_prefix();
             $url_path .= "/public.php?op=share&key=$uuid";
-            print "<div class=\"tagCloudContainer\">";
-            print "<a id='pub_opml_url' href='$url_path' target='_blank'>$url_path</a>";
-            print "</div>";
+            echo "<div class=\"tagCloudContainer\">";
+            echo "<a id=\"pub_opml_url\" href=\"$url_path\" target=\"_blank\">";
+            echo $url_path;
+            echo "</a>";
+            echo "</div>";
         }
-        print "<div align='center'>";
-        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('shareArticleDlg').hide()\">";
-        print __('Close this window');
-        print "</button>";
-        print "</div>";
+        echo "<div align='center'>";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('shareArticleDlg').hide()\">";
+        echo __('Close this window');
+        echo "</button>";
+        echo "</div>";
     }
 }

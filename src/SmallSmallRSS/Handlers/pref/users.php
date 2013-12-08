@@ -47,11 +47,13 @@ class Pref_Users extends ProtectedHandler
         echo "<table width='100%'>";
         $last_login = make_local_datetime(
             \SmallSmallRSS\Database::fetch_result($result, 0, 'last_login'),
-            true
+            true,
+            $_SESSION['uid']
         );
         $created = make_local_datetime(
             \SmallSmallRSS\Database::fetch_result($result, 0, 'created'),
-            true
+            true,
+            $_SESSION['uid']
         );
         $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, 'access_level');
         $stored_articles = \SmallSmallRSS\Database::fetch_result($result, 0, 'stored_articles');
@@ -117,7 +119,8 @@ class Pref_Users extends ProtectedHandler
         echo '<div class="dlgSecCont">';
 
         if ($sel_disabled) {
-            echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"login\" value=\"$login\">";
+            echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
+            echo " name=\"login\" value=\"$login\">";
         }
 
         echo "<input size=\"30\" style=\"font-size: 16px\"
@@ -402,8 +405,8 @@ class Pref_Users extends ProtectedHandler
                 $uid = $line['id'];
                 echo "<tr id=\"UMRR-$uid\">";
                 $line['login'] = htmlspecialchars($line['login']);
-                $line['created'] = make_local_datetime($line['created'], false);
-                $line['last_login'] = make_local_datetime($line['last_login'], false);
+                $line['created'] = make_local_datetime($line['created'], false, $_SESSION['uid']);
+                $line['last_login'] = make_local_datetime($line['last_login'], false, $_SESSION['uid']);
                 echo "<td align='center'><input onclick='toggleSelectRow2(this);'";
                 echo " data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\"";
                 echo " id=\"UMCHK-$uid\"></td>";

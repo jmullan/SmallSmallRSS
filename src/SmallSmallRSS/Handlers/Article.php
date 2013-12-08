@@ -47,16 +47,16 @@ class Article extends ProtectedHandler
         $articles = array();
 
         if ($mode == '') {
-            array_push($articles, format_article($id, false));
+            array_push($articles, self::formatArticle($id, false, false, $_SESSION['uid']));
         } elseif ($mode == 'zoom') {
-            array_push($articles, format_article($id, true, true));
+            array_push($articles, self::formatArticle($id, true, true, $_SESSION['uid']));
         } elseif ($mode == 'raw') {
             if ($_REQUEST['html']) {
                 header('Content-Type: text/html');
                 echo '<link rel="stylesheet" type="text/css" href="css/tt-rss.css" />';
             }
 
-            $article = format_article($id, false);
+            $article = self::formatArticle($id, false, false, $_SESSION['uid']);
             echo $article['content'];
             return;
         }
@@ -66,7 +66,7 @@ class Article extends ProtectedHandler
         if (!$_SESSION['bw_limit']) {
             foreach ($cids as $cid) {
                 if ($cid) {
-                    array_push($articles, format_article($cid, false, false));
+                    array_push($articles, self::formatArticle($cid, false, false, $_SESSION['uid']));
                 }
             }
         }

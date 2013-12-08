@@ -11,7 +11,7 @@ class Embed_Original extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+        \SmallSmallRSS\Hooks::RENDER_ARTICLE_BUTTON
     );
 
     public function getJavascript()
@@ -24,22 +24,20 @@ class Embed_Original extends \SmallSmallRSS\Plugin
         return file_get_contents(__DIR__ . "/init.css");
     }
 
-    public function hookArticleButton($line)
+    public function hookRenderArticleButton($line)
     {
         $id = $line["id"];
-
-        $rv = "<img src=\"plugins/embed_original/button.png\"
-                class='tagsPic' style=\"cursor : pointer\"
-                onclick=\"embedOriginalArticle($id)\"
-                title='".__('Toggle embed original')."'>";
-
-        return $rv;
+        echo "<img src=\"plugins/embed_original/button.png\"";
+        echo " class=\"tagsPic\" style=\"cursor : pointer\"";
+        echo " onclick=\"embedOriginalArticle($id)\"";
+        echo "title='";
+        echo __('Toggle embed original');
+        echo "'>";
     }
 
     public function getUrl()
     {
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-
         $result = \SmallSmallRSS\Database::query(
             "SELECT link
              FROM ttrss_entries, ttrss_user_entries

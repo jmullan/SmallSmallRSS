@@ -113,7 +113,7 @@ class PrefFeeds extends ProtectedHandler
             $feed['unread'] = 0;
             $feed['error'] = $feed_line['last_error'];
             $feed['icon'] = getFeedIcon($feed_line['id']);
-            $feed['param'] = make_local_datetime($feed_line['last_updated'], true);
+            $feed['param'] = make_local_datetime($feed_line['last_updated'], true, $_SESSION['uid']);
 
             array_push($items, $feed);
         }
@@ -275,7 +275,7 @@ class PrefFeeds extends ProtectedHandler
                 $feed['checkbox'] = false;
                 $feed['error'] = $feed_line['last_error'];
                 $feed['icon'] = getFeedIcon($feed_line['id']);
-                $feed['param'] = make_local_datetime($feed_line['last_updated'], true);
+                $feed['param'] = make_local_datetime($feed_line['last_updated'], true, $_SESSION['uid']);
                 $feed['unread'] = 0;
                 $feed['type'] = 'feed';
 
@@ -312,7 +312,7 @@ class PrefFeeds extends ProtectedHandler
                 $feed['checkbox'] = false;
                 $feed['error'] = $feed_line['last_error'];
                 $feed['icon'] = getFeedIcon($feed_line['id']);
-                $feed['param'] = make_local_datetime($feed_line['last_updated'], true);
+                $feed['param'] = make_local_datetime($feed_line['last_updated'], true, $_SESSION['uid']);
                 $feed['unread'] = 0;
                 $feed['type'] = 'feed';
 
@@ -1678,7 +1678,7 @@ class PrefFeeds extends ProtectedHandler
         if ($cat_id > 0) {
             $cat_unread = \SmallSmallRSS\CountersCache::find($cat_id, $_SESSION['uid'], true);
         } elseif ($cat_id == 0 || $cat_id == -2) {
-            $cat_unread = getCategoryUnread($cat_id);
+            $cat_unread = getCategoryUnread($cat_id, $_SESSION['uid']);
         } else {
             $cat_unread = 0;
         }
@@ -1791,7 +1791,7 @@ class PrefFeeds extends ProtectedHandler
             echo '</a>';
 
             echo "</td><td class=\"insensitive\" align='right'>";
-            echo make_local_datetime($line['last_article'], false);
+            echo make_local_datetime($line['last_article'], false, $_SESSION['uid']);
             echo '</td>';
             echo '</tr>';
 

@@ -12,7 +12,7 @@ class MailTo extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+        \SmallSmallRSS\Hooks::RENDER_ARTICLE_BUTTON
     );
 
     public function getJavascript()
@@ -20,12 +20,14 @@ class MailTo extends \SmallSmallRSS\Plugin
         return file_get_contents(dirname(__FILE__) . "/init.js");
     }
 
-    public function hookArticleButton($line)
+    public function hookRenderArticleButton($line)
     {
-        return "<img src=\"plugins/mailto/mail.png\"
-                    class='tagsPic' style=\"cursor : pointer\"
-                    onclick=\"mailtoArticle(".$line["id"].")\"
-                    alt='Zoom' title='".__('Forward by email')."'>";
+        echo "<img src=\"plugins/mailto/mail.png\" class=\"tagsPic\" style=\"cursor: pointer\"";
+        echo " onclick=\"mailtoArticle(";
+        echo $line["id"];
+        echo ")\" alt=\"Zoom\" title='";
+        echo __('Forward by email');
+        echo "'>";
     }
 
     public function emailArticle()
@@ -63,18 +65,18 @@ class MailTo extends \SmallSmallRSS\Plugin
             "mailto:?subject=" . rawurlencode($subject)
             . "&body=" . rawurlencode($content)
         );
-        print __("Clicking the following link to invoke your mail client:");
-        print "<div class=\"tagCloudContainer\">";
-        print "<a target=\"_blank\" href=\"$mailto_link\">";
-        print __("Forward selected article(s) by email.");
-        print "</a>";
-        print "</div>";
-        print __("You should be able to edit the message before sending in your mail client.");
-        print "<p>";
-        print "<div style='text-align : center'>";
-        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">";
-        print __('Close this dialog');
-        print "</button>";
-        print "</div>";
+        echo __("Clicking the following link to invoke your mail client:");
+        echo "<div class=\"tagCloudContainer\">";
+        echo "<a target=\"_blank\" href=\"$mailto_link\">";
+        echo __("Forward selected article(s) by email.");
+        echo "</a>";
+        echo "</div>";
+        echo __("You should be able to edit the message before sending in your mail client.");
+        echo "<p>";
+        echo "<div style='text-align : center'>";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">";
+        echo __('Close this dialog');
+        echo "</button>";
+        echo "</div>";
     }
 }

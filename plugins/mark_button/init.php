@@ -11,14 +11,12 @@ class Mark_Button extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+        \SmallSmallRSS\Hooks::RENDER_ARTICLE_BUTTON
     );
 
-    public function hookArticleButton($line)
+    public function hookRenderArticleButton($line)
     {
-        $marked_pic = "";
         $id = $line["id"];
-
         if (\SmallSmallRSS\DBPrefs::read("COMBINED_DISPLAY_MODE")) {
             if (\SmallSmallRSS\Database::fromSQLBool($line["marked"])) {
                 $image = 'images/mark_set.svg';
@@ -27,8 +25,7 @@ class Mark_Button extends \SmallSmallRSS\Plugin
                 $image = 'images/mark_unset.svg';
                 $action = __('Unstar article');
             }
-            $marked_pic = "<img src=\"$image\" class=\"markedPic\" alt=\"$action\" onclick='toggleMark($id)'>";
+            echo "<img src=\"$image\" class=\"markedPic\" alt=\"$action\" onclick=\"toggleMark($id)\">";
         }
-        return $marked_pic;
     }
 }

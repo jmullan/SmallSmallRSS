@@ -10,7 +10,7 @@ class Mail extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+        \SmallSmallRSS\Hooks::RENDER_ARTICLE_BUTTON
     );
 
     public function getJavascript()
@@ -18,20 +18,26 @@ class Mail extends \SmallSmallRSS\Plugin
         return file_get_contents(dirname(__FILE__) . "/mail.js");
     }
 
-    public function hookArticleButton($line)
+    public function hookRenderArticleButton($line)
     {
-        return "<img src=\"plugins/mail/mail.png\"
-                    class='tagsPic' style=\"cursor : pointer\"
-                    onclick=\"emailArticle(".$line["id"].")\"
-                    alt='Zoom' title='".__('Forward by email')."'>";
+        echo "<img src=\"plugins/mail/mail.png\" class=\"tagsPic\" style=\"cursor: pointer\"";
+        echo " onclick=\"emailArticle(";
+        echo $line["id"];
+        echo ")\"";
+        echo " alt=\"Zoom\" title='";
+        echo __('Forward by email');
+        echo "'>";
     }
 
     public function emailArticle()
     {
         $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"mail\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"sendEmail\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
+        echo " name=\"op\" value=\"pluginhandler\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
+        echo " name=\"plugin\" value=\"mail\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
+        echo " name=\"method\" value=\"sendEmail\">";
         $result = \SmallSmallRSS\Database::query(
             "SELECT email, full_name FROM ttrss_users WHERE id = " . $_SESSION["uid"]
         );
@@ -40,8 +46,10 @@ class Mail extends \SmallSmallRSS\Plugin
         if (!$user_name) {
             $user_name = $_SESSION['name'];
         }
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_email\" value=\"$user_email\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"from_name\" value=\"$user_name\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
+        echo " name=\"from_email\" value=\"$user_email\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
+        echo " name=\"from_name\" value=\"$user_name\">";
         $tpl = new \MiniTemplator\Engine();
         $tpl_t = new \MiniTemplator\Engine();
         $tpl->readTemplateFromFile("templates/email_article_template.txt");
@@ -75,41 +83,50 @@ class Mail extends \SmallSmallRSS\Plugin
         $tpl->addBlock('email');
         $content = "";
         $tpl->generateOutputToString($content);
-        print "<table width='100%'><tr><td>";
-        print __('From:');
-        print "</td><td>";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" disabled=\"1\" style=\"width: 30em;\"
-                value=\"$user_name <$user_email>\">";
-        print "</td></tr><tr><td>";
-        print __('To:');
-        print "</td><td>";
-        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"true\"
-                style=\"width: 30em;\"
-                name=\"destination\" id=\"emailArticleDlg_destination\">";
-        print "<div class=\"autocomplete\" id=\"emailArticleDlg_dst_choices\"
-                style=\"z-index: 30; display: none\"></div>";
-        print "</td></tr><tr><td>";
-        print __('Subject:');
-        print "</td><td>";
-        print "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"true\"
+        echo "<table width=\"100%\">";
+        echo "<tr>";
+        echo "<td>";
+        echo __('From:');
+        echo "</td><td>";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" disabled=\"1\" style=\"width: 30em;\"";
+        echo " value=\"$user_name &lt;$user_email&gt;\">";
+        echo "</td></tr><tr><td>";
+        echo __('To:');
+        echo "</td><td>";
+        echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"true\"";
+        echo " style=\"width: 30em;\" name=\"destination\" id=\"emailArticleDlg_destination\">";
+        echo "<div class=\"autocomplete\" id=\"emailArticleDlg_dst_choices\" style=\"z-index: 30; display: none\">";
+        echo "</div>";
+        echo "</td></tr><tr><td>";
+        echo __('Subject:');
+        echo "</td><td>";
+        echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"true\"
                 style=\"width: 30em;\"
                 name=\"subject\" value=\"$subject\" id=\"subject\">";
-        print "</td></tr>";
-        print "<tr><td colspan='2'><textarea data-dojo-type=\"dijit.form.SimpleTextarea\" style='font-size: 12px; width: 100%' rows=\"20\"
-            name='content'>$content</textarea>";
-        print "</td></tr></table>";
-        print "<div class='dlgButtons'>";
-        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').execute()\">".__('Send e-mail')."</button> ";
-        print "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">".__('Cancel')."</button>";
-        print "</div>";
+        echo "</td></tr>";
+        echo "<tr>";
+        echo "<td colspan='2'>";
+        echo "<textarea data-dojo-type=\"dijit.form.SimpleTextarea\"";
+        echo " style=\"font-size: 12px; width: 100%\" rows=\"20\" name='content'>";
+        echo $content;
+        echo "</textarea>";
+        echo "</td>";
+        echo "</tr>";
+        echo "</table>";
+        echo "<div class='dlgButtons'>";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').execute()\">";
+        echo __('Send e-mail');
+        echo "</button> ";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">";
+        echo __('Cancel');
+        echo "</button>";
+        echo "</div>";
     }
 
     public function sendEmail()
     {
         $reply = array();
-
         $mail = new \SmallSmallRSS\Mailer();
-
         $mail->From = strip_tags($_REQUEST['from_email']);
         $mail->FromName = strip_tags($_REQUEST['from_name']);
         //$mail->AddAddress($_REQUEST['destination']);
@@ -131,19 +148,18 @@ class Mail extends \SmallSmallRSS\Plugin
             }
             $reply['message'] = "UPDATE_COUNTERS";
         }
-
-        print json_encode($reply);
+        echo json_encode($reply);
     }
 
     public function completeEmails()
     {
         $search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
-        print "<ul>";
+        echo "<ul>";
         foreach ($_SESSION['stored_emails'] as $email) {
             if (strpos($email, $search) !== false) {
-                print "<li>$email</li>";
+                echo "<li>$email</li>";
             }
         }
-        print "</ul>";
+        echo "</ul>";
     }
 }

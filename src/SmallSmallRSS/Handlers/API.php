@@ -168,7 +168,7 @@ class API extends Handler
             if ($include_empty || $line['num_feeds'] > 0 || $line['num_cats'] > 0) {
                 $unread = countUnreadFeedArticles($line['id'], true, true, $_SESSION['uid']);
                 if ($enable_nested) {
-                    $unread += getCategoryChildrenUnread($line['id']);
+                    $unread += getCategoryChildrenUnread($line['id'], $_SESSION['uid']);
                 }
                 if ($unread || !$unread_only) {
                     $cats[] = array(
@@ -569,7 +569,7 @@ class API extends Handler
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
                 $unread = (
                     countUnreadFeedArticles($line['id'], true, true, $_SESSION['uid'])
-                    + getCategoryChildrenUnread($line['id'])
+                    + getCategoryChildrenUnread($line['id'], $_SESSION['uid'])
                 );
                 if ($unread || !$unread_only) {
                     $row = array(
@@ -593,8 +593,8 @@ class API extends Handler
         if ($cat_id == -4 || $cat_id == -3) {
             $result = \SmallSmallRSS\Database::query(
                 'SELECT
-                    id, feed_url, cat_id, title, order_id, ' .
-                    $substring_for_date . '(last_updated,1,19) AS last_updated
+                    id, feed_url, cat_id, title, order_id, '
+                . $substring_for_date . '(last_updated,1,19) AS last_updated
                  FROM ttrss_feeds
                  WHERE owner_uid = ' . $_SESSION['uid'] . "
                  ORDER BY cat_id, title
@@ -763,7 +763,7 @@ class API extends Handler
                  AND owner_uid = ".$_SESSION['uid']
         );
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            Pref_Feeds::removeFeed($feed_id, $_SESSION['uid']);
+            PrefFeeds::removeFeed($feed_id, $_SESSION['uid']);
             $this->wrap(self::STATUS_OK, array('status' => 'OK'));
         } else {
             $this->wrap(self::STATUS_ERR, array('error' => 'FEED_NOT_FOUND'));
@@ -787,7 +787,7 @@ class API extends Handler
     public function getFeedTree()
     {
         $include_empty = $this->getBooleanFromRequest('include_empty');
-        $pf = new Pref_Feeds($_REQUEST);
+        $pf = new PrefFeeds($_REQUEST);
         $_REQUEST['mode'] = 2;
         $_REQUEST['force_show_empty'] = $include_empty;
         if ($pf) {

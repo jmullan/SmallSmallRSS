@@ -362,7 +362,7 @@ class PublicHandler extends Handler
             $id = \SmallSmallRSS\Database::fetch_result($result, 0, 'ref_id');
             $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, 'owner_uid');
 
-            $article = format_article($id, false, true, $owner_uid);
+            $article = self::formatArticle($id, false, true, $owner_uid);
             print_r($article['content']);
         } else {
             echo 'Article not found.';

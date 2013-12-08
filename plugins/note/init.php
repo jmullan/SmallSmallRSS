@@ -12,7 +12,7 @@ class Note extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+        \SmallSmallRSS\Hooks::RENDER_ARTICLE_BUTTON
     );
 
     public function getJavascript()
@@ -21,62 +21,55 @@ class Note extends \SmallSmallRSS\Plugin
     }
 
 
-    public function hookArticleButton($line)
+    public function hookRenderArticleButton($line)
     {
-        return "<img src=\"plugins/note/note.png\"
-            style=\"cursor : pointer\" style=\"cursor : pointer\"
-            onclick=\"editArticleNote(".$line["id"].")\"
-            class='tagsPic' title='".__('Edit article note')."'>";
+        echo "<img src=\"plugins/note/note.png\"";
+        echo " style=\"cursor : pointer\" style=\"cursor: pointer\"";
+        echo " onclick=\"editArticleNote(";
+        echo $line["id"];
+        echo ")\"";
+        echo " class='tagsPic' title='";
+        echo __('Edit article note');
+        echo "'>";
     }
 
     public function edit()
     {
         $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
+        $note = \SmallSmallRSS\UserEntries::getNote($param, $_SESSION['uid']);
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" ";
+        echo " style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setNote\">";
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"note\">";
 
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT note
-             FROM ttrss_user_entries
-             WHERE
-                 ref_id = '$param'
-                 AND owner_uid = " . $_SESSION['uid']
-        );
+        echo "<table width='100%'><tr><td>";
+        echo "<textarea data-dojo-type=\"dijit.form.SimpleTextarea\"";
+        echo " style=\"font-size: 12px; width: 100%; height: 100px;\"";
+        echo " placeHolder=\"body#ttrssMain { font-size: 14px; };\"";
+        echo " name=\"note\">";
+        echo $note;
+        echo "</textarea>";
+        echo "</td>";
+        echo "</tr>";
+        echo "</table>";
 
-        $note = \SmallSmallRSS\Database::fetch_result($result, 0, "note");
-
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setNote\">";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"note\">";
-
-        print "<table width='100%'><tr><td>";
-        print "<textarea data-dojo-type=\"dijit.form.SimpleTextarea\"
-            style='font-size: 12px; width: 100%; height: 100px;'
-            placeHolder='body#ttrssMain { font-size: 14px; };'
-            name='note'>$note</textarea>";
-        print "</td></tr></table>";
-
-        print "<div class='dlgButtons'>";
-        print "<button data-dojo-type=\"dijit.form.Button\"
-            onclick=\"dijit.byId('editNoteDlg').execute()\">".__('Save')."</button> ";
-        print "<button data-dojo-type=\"dijit.form.Button\"
-            onclick=\"dijit.byId('editNoteDlg').hide()\">".__('Cancel')."</button>";
-        print "</div>";
+        echo "<div class='dlgButtons'>";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('editNoteDlg').execute()\">";
+        echo __('Save');
+        echo "</button> ";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('editNoteDlg').hide()\">";
+        echo __('Cancel');
+        echo "</button>";
+        echo "</div>";
 
     }
 
     public function setNote()
     {
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
-        $note = trim(strip_tags(\SmallSmallRSS\Database::escape_string($_REQUEST["note"])));
-
-        \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_user_entries
-             SET note = '$note'
-             WHERE
-                 ref_id = '$id'
-                 AND owner_uid = " . $_SESSION["uid"]
-        );
-        $formatted_note = format_article_note($id, $note);
-        print json_encode(array("note" => $formatted_note, "raw_length" => mb_strlen($note)));
+        \SmallSmallRSS\UserEntries::setNote($_REQUEST['id'], $_SESSION['uid'], $_REQUEST['note']);
+        $note = \SmallSmallRSS\UserEntries::getNote($_REQUEST['id'], $_SESSION['uid']);
+        $formatted_note = format_article_note($_REQUEST['id'], $note);
+        echo json_encode(array("note" => $formatted_note, "raw_length" => mb_strlen($note)));
     }
 }

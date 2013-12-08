@@ -11,17 +11,18 @@ class Close_Button extends \SmallSmallRSS\Plugin
     const IS_SYSTEM = false;
 
     public static $provides = array(
-        \SmallSmallRSS\Hooks::ARTICLE_BUTTON
+        \SmallSmallRSS\Hooks::RENDER_ARTICLE_BUTTON
     );
 
-    public function hookArticleButton($line)
+    public function hookRenderArticleButton($line)
     {
         if (!\SmallSmallRSS\DBPrefs::read("COMBINED_DISPLAY_MODE")) {
-            $rv = "<img src=\"plugins/close_button/button.png\"
-                    class='tagsPic' style=\"cursor: pointer\"
-                    onclick=\"closeArticlePanel()\"
-                    title='".__('Close article')."'>";
+            echo "<img src=\"plugins/close_button/button.png\"";
+            echo " class=\"tagsPic\" style=\"cursor: pointer\"";
+            echo " onclick=\"closeArticlePanel()\"";
+            echo " title='";
+            echo __('Close article');
+            echo "' />";
         }
-        return $rv;
     }
 }

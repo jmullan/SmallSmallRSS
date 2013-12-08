@@ -668,11 +668,11 @@ class RSSUpdater
                 $score = \SmallSmallRSS\ArticleFilters::calculateScore($article_filters);
 
                 $query = "SELECT ref_id, int_id
-                      FROM ttrss_user_entries
-                      WHERE
-                          ref_id = '$ref_id'
-                          AND owner_uid = '$owner_uid'
-                          $dupcheck_qpart";
+                          FROM ttrss_user_entries
+                          WHERE
+                              ref_id = '$ref_id'
+                              AND owner_uid = '$owner_uid'
+                              $dupcheck_qpart";
 
                 $result = \SmallSmallRSS\Database::query($query);
 
@@ -701,16 +701,16 @@ class RSSUpdater
 
                     // N-grams
 
-                    if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql' and defined('_NGRAM_TITLE_DUPLICATE_THRESHOLD')) {
-
+                    if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql'
+                        && defined('_NGRAM_TITLE_DUPLICATE_THRESHOLD')) {
                         $result = \SmallSmallRSS\Database::query(
                             "SELECT COUNT(*) AS similar
-                         FROM ttrss_entries, ttrss_user_entries
-                         WHERE
-                             ref_id = id
-                             AND updated >= NOW() - INTERVAL '7 day'
-                             AND similarity(title, '$entry_title') >= "._NGRAM_TITLE_DUPLICATE_THRESHOLD."
-                             AND owner_uid = $owner_uid"
+                             FROM ttrss_entries, ttrss_user_entries
+                             WHERE
+                                 ref_id = id
+                                 AND updated >= NOW() - INTERVAL '7 day'
+                                 AND similarity(title, '$entry_title') >= "._NGRAM_TITLE_DUPLICATE_THRESHOLD."
+                                 AND owner_uid = $owner_uid"
                         );
 
                         $ngram_similar = \SmallSmallRSS\Database::fetch_result($result, 0, 'similar');
@@ -725,12 +725,12 @@ class RSSUpdater
 
                     $result = \SmallSmallRSS\Database::query(
                         "INSERT INTO ttrss_user_entries
-                                (ref_id, owner_uid, feed_id, unread, last_read, marked,
-                                published, score, tag_cache, label_cache, uuid,
-                                last_marked, last_published)
-                            VALUES ('$ref_id', '$owner_uid', '$feed', $unread,
-                                $last_read_qpart, $marked, $published, '$score', '', '',
-                                '', $last_marked, $last_published)"
+                         (ref_id, owner_uid, feed_id, unread, last_read, marked,
+                              published, score, tag_cache, label_cache, uuid,
+                              last_marked, last_published)
+                         VALUES ('$ref_id', '$owner_uid', '$feed', $unread,
+                             $last_read_qpart, $marked, $published, '$score', '', '',
+                             '', $last_marked, $last_published)"
                     );
 
                     if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_HUB') && $published == 'true') {
@@ -744,12 +744,12 @@ class RSSUpdater
 
                     $result = \SmallSmallRSS\Database::query(
                         "SELECT int_id
-                     FROM ttrss_user_entries
-                     WHERE
-                         ref_id = '$ref_id'
-                         AND owner_uid = '$owner_uid'
-                         AND feed_id = '$feed'
-                     LIMIT 1"
+                         FROM ttrss_user_entries
+                         WHERE
+                             ref_id = '$ref_id'
+                             AND owner_uid = '$owner_uid'
+                             AND feed_id = '$feed'
+                         LIMIT 1"
                     );
 
                     if (\SmallSmallRSS\Database::num_rows($result) == 1) {
@@ -848,7 +848,7 @@ class RSSUpdater
             if (count($filtered_tags) > 0) {
                 \SmallSmallRSS\Database::query('BEGIN');
                 foreach ($filtered_tags as $tag) {
-                    $tag = sanitize_tag($tag);
+                    $tag = \SmallSmallRSS\Tags::sanitize($tag);
                     if (!\SmallSmallRSS\Tags::isValid($tag)) {
                         continue;
                     }
@@ -972,7 +972,7 @@ class RSSUpdater
      * @access public
      * @return mixed The favicon URL, or false if none was found.
      */
-    function getFaviconUrl($url)
+    public static function getFaviconUrl($url)
     {
         $favicon_url = false;
         if ($html = \SmallSmallRSS\Fetcher::fetch($url)) {

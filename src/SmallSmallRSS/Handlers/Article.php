@@ -80,8 +80,7 @@ class Article extends ProtectedHandler
         $content,
         $labels_str,
         $owner_uid
-    )
-    {
+    ) {
         # TODO: Move this into a model class
         $guid = 'SHA1:' . sha1('ttshared:' . $url . $owner_uid);
         $content_hash = sha1($content);
@@ -169,9 +168,10 @@ class Article extends ProtectedHandler
 
     public function editArticleTags()
     {
-        echo __('Tags for this article (separated by commas):').'<br>';
-        $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
-        $tags = get_article_tags(\SmallSmallRSS\Database::escape_string($param));
+        echo __('Tags for this article (separated by commas):');
+        echo '<br />';
+        $param = $_REQUEST['param'];
+        $tags = get_article_tags($param, $_SESSION['uid']);
         $tags_str = join(', ', $tags);
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="article">';
@@ -211,44 +211,21 @@ class Article extends ProtectedHandler
 
     public function setArticleTags()
     {
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-        $tags_str = \SmallSmallRSS\Database::escape_string($_REQUEST['tags_str']);
+        $id = $_REQUEST['id'];
+        $tags_str = $_REQUEST['tags_str'];
         $tags = array_unique(array_map('trim', (explode(',', $tags_str))));
         \SmallSmallRSS\Database::query('BEGIN');
         $int_id = \SmallSmallRSS\UserEntries::getIntId($id, $_SESSION['uid']);
         if (!is_null($int_id)) {
-            $tags_to_cache = array();
-            \SmallSmallRSS\Database::query(
-                "DELETE FROM ttrss_tags
-                 WHERE
-                     post_int_id = $int_id
-                     AND owner_uid = '".$_SESSION['uid']."'"
-            );
-            foreach ($tags as $tag) {
-                $tag = sanitize_tag($tag);
-                if (!\SmallSmallRSS\Tags::isValid($tag)) {
-                    continue;
-                }
-                if (preg_match("/^[0-9]*$/", $tag)) {
-                    continue;
-                }
-                if ($tag != '') {
-                    \SmallSmallRSS\Database::query(
-                        "INSERT INTO ttrss_tags
-                         (post_int_id, owner_uid, tag_name)
-                         VALUES ('$int_id', '".$_SESSION['uid']."', '$tag')"
-                    );
-                }
-                array_push($tags_to_cache, $tag);
-            }
-
+            \SmallSmallRSS\Tags::deleteForPost($int_id, $_SESSION['uid']);
+            $tags = \SmallSmallRSS\Tags::setForPost($int_id, $_SESSION['uid'], $tags);
             /* update tag cache */
-            sort($tags_to_cache);
-            $tags_str = join(',', $tags_to_cache);
-            \SmallSmallRSS\setCachedTags($id, $_SESSION['uid'], $tags_str);
+            sort($tags);
+            $tags_str = join(',', $tags);
+            \SmallSmallRSS\UserEntries::setCachedTags($id, $_SESSION['uid'], $tags_str);
         }
         \SmallSmallRSS\Database::query('COMMIT');
-        $tags = get_article_tags($id);
+        $tags = get_article_tags($id, $_SESSION['uid']);
         $tags_str = format_tags_string($tags, $id);
         $tags_str_full = join(', ', $tags);
         if (!$tags_str_full) {

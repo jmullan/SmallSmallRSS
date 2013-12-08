@@ -281,7 +281,6 @@ class UserEntries
         }
         $in_ref_ids = join(', ', $ref_ids);
         \SmallSmallRSS\Database::query(
-        $query =
             "UPDATE ttrss_user_entries
              SET
                  unread = false,
@@ -456,6 +455,8 @@ class UserEntries
     }
     public static function getIntId($ref_id, $owner_uid)
     {
+        $ref_id = \SmallSmallRSS\Database::escape_string($ref_id);
+        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
         $result = \SmallSmallRSS\Database::query(
             "SELECT int_id
              FROM ttrss_user_entries

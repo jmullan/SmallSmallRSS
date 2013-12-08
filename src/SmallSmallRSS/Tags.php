@@ -65,5 +65,80 @@ class Tags
         }
         return true;
     }
+    public static function getForRefId($ref_id, $owner_uid)
+    {
+        $tags = array();
+        /* do it the hard way */
+        $query = "SELECT DISTINCT tag_name
+                  FROM
+                      ttrss_tags
+                  WHERE post_int_id = (
+                      SELECT int_id
+                      FROM ttrss_user_entries
+                      WHERE
+                          ref_id = '$ref_id'
+                          AND owner_uid = '$owner_uid'
+                      LIMIT 1
+                  )
+                  ORDER BY tag_name";
+        $result = \SmallSmallRSS\Database::query($query);
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $tags[] = $line['tag_name'];
+        }
+        return $tags;
+    }
+    public static function deleteForPost($post_int_id, $owner_uid)
+    {
+        $post_int_id = \SmallSmallRSS\Database::escape_string($post_int_id);
+        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        \SmallSmallRSS\Database::query(
+            "DELETE FROM ttrss_tags
+             WHERE
+                 post_int_id = $post_int_id
+                 AND owner_uid = '$owner_uid'"
+        );
 
+    }
+    public static function postHas($post_int_id, $owner_uid, $tag)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id FROM ttrss_tags
+             WHERE
+                 tag_name = '$tag'
+                 AND post_int_id = '$entry_int_id'
+                 AND owner_uid = '$owner_uid'
+             LIMIT 1"
+        );
+        return $result && \SmallSmallRSS\Database::num_rows($result);
+
+    }
+    public static function setForPost($post_int_id, $owner_uid, $tags)
+    {
+        $filtered_tags = array();
+        $escaped_tags = array();
+        foreach ($tags as $tag) {
+            $tag = self::sanitize($tag);
+            if (!self::isValid($tag)) {
+                continue;
+            }
+            $filtered_tags[] = $tag;
+            $escaped_tags[] = \SmallSmallRSS\Database::escape_string($tag);
+        }
+        ob_start();
+        echo "INSERT INTO ttrss_tags (post_int_id, owner_uid, tag_name)";
+        foreach ($escaped_tags as $tag) {
+            echo "VALUES ('$post_int_id', '$owner_uid', '$tag')";
+        }
+        $query = ob_get_clean();
+        \SmallSmallRSS\Database::query($query);
+        return $filtered_tags;
+    }
+    public static function sanitize($tag)
+    {
+        $tag = trim($tag);
+        $tag = mb_strtolower($tag, 'utf-8');
+        $tag = preg_replace('/[\'\"\+\>\<]/', '', $tag);
+        $tag = str_replace('technorati tag: ', '', $tag);
+        return $tag;
+    }
 }

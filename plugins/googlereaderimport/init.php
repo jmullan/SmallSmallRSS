@@ -133,7 +133,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                     if (is_array($item['categories'])) {
                         foreach ($item['categories'] as $cat) {
                             if (strstr($cat, "com.google/") === false) {
-                                array_push($tags, sanitize_tag($cat));
+                                $tags = \SmallSmallRSS\Tags::sanitize($cat);
                             }
                         }
                     }
@@ -305,7 +305,11 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                  ('$title', '$guid', '$link', '$updated', '$content', '$content_hash', NOW(), NOW(), '$author')"
             );
 
-            $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_entries WHERE guid = '$guid'");
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT id
+                 FROM ttrss_entries
+                 WHERE guid = '$guid'"
+            );
 
             if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                 $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
@@ -318,50 +322,33 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                 );
 
                 $result = \SmallSmallRSS\Database::query(
-                    "SELECT int_id FROM ttrss_user_entries, ttrss_entries
-                     WHERE owner_uid = $owner_uid AND ref_id = id AND ref_id = $ref_id"
+                    "SELECT int_id
+                     FROM ttrss_user_entries, ttrss_entries
+                     WHERE
+                         owner_uid = $owner_uid
+                         AND ref_id = id
+                         AND ref_id = $ref_id"
                 );
                 if (\SmallSmallRSS\Database::num_rows($result) != 0 && is_array($tags)) {
                     $entry_int_id = \SmallSmallRSS\Database::fetch_result($result, 0, "int_id");
                     $tags_to_cache = array();
                     foreach ($tags as $tag) {
-                        $tag = \SmallSmallRSS\Database::escape_string(sanitize_tag($tag));
+                        $tag = \SmallSmallRSS\Tags::sanitize($tag);
                         if (!\SmallSmallRSS\Tags::isValid($tag)) {
                             continue;
                         }
-                        $result = \SmallSmallRSS\Database::query(
-                            "SELECT id FROM ttrss_tags
-                             WHERE
-                                 tag_name = '$tag'
-                                 AND post_int_id = '$entry_int_id'
-                                 AND owner_uid = '$owner_uid'
-                             LIMIT 1"
-                        );
-
-                        if ($result && \SmallSmallRSS\Database::num_rows($result) == 0) {
-                            \SmallSmallRSS\Database::query(
-                                "INSERT INTO ttrss_tags
-                                 (owner_uid,tag_name,post_int_id)
-                                 VALUES ('$owner_uid','$tag', '$entry_int_id')"
-                            );
+                        if (!\SmallSmallRSS\Tags::postHas($entry_int_id, $owner_uid, $tag)) {
+                            \SmallSmallRSS\Tags::setForPost($entry_int_id, $owner_uid, array($tag));
                         }
 
-                        array_push($tags_to_cache, $tag);
+                        $tags_to_cache[] = $tag;
                     }
 
                     /* update the cache */
 
                     $tags_to_cache = array_unique($tags_to_cache);
-                    $tags_str = \SmallSmallRSS\Database::escape_string(join(",", $tags_to_cache));
-
-                    \SmallSmallRSS\Database::query(
-                        "UPDATE ttrss_user_entries
-                         SET
-                             tag_cache = '$tags_str'
-                         WHERE
-                             ref_id = '$ref_id'
-                             AND owner_uid = $owner_uid"
-                    );
+                    $tags_str = join(",", $tags_to_cache);
+                    \SmallSmallRSS\UserEntries::setCachedTags($ref_id, $owner_uid, $tags_str);
                 }
                 $rc = true;
             }

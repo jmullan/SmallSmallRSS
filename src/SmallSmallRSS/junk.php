@@ -1390,12 +1390,9 @@ function catchupArticlesById($ids, $mark_mode, $owner_uid)
     }
 }
 
-function get_article_tags($id, $owner_uid = 0, $tag_cache = false)
+function get_article_tags($id, $owner_uid, $tag_cache = false)
 {
     $a_id = \SmallSmallRSS\Database::escape_string($id);
-    if (!$owner_uid) {
-        $owner_uid = $_SESSION['uid'];
-    }
     $tags = array();
     if ($tag_cache === false) {
         $tag_cache = \SmallSmallRSS\UserEntries::getCachedTags($id, $owner_uid);
@@ -1404,25 +1401,7 @@ function get_article_tags($id, $owner_uid = 0, $tag_cache = false)
         $tags = explode(',', $tag_cache);
     } else {
         /* do it the hard way */
-        $query = "SELECT DISTINCT
-                      tag_name,
-                      owner_uid as owner
-                  FROM
-                      ttrss_tags
-                  WHERE post_int_id = (
-                      SELECT int_id
-                      FROM ttrss_user_entries
-                      WHERE
-                          ref_id = '$a_id'
-                          AND owner_uid = '$owner_uid'
-                      LIMIT 1
-                  )
-                  ORDER BY tag_name";
-        $tmp_result = \SmallSmallRSS\Database::query($query);
-        while ($tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
-            array_push($tags, $tmp_line['tag_name']);
-        }
-
+        $tags = \SmallSmallRSS\Tags::getForRefId($a_id, $owner_uid);
         /* update the cache */
         $tags_str = join(',', $tags);
         \SmallSmallRSS\UserEntries::setCachedTags($id, $owner_uid, $tags_str);
@@ -1677,17 +1656,6 @@ function format_article($id, $mark_as_read = true, $zoom_mode = false, $owner_ui
     return $rv;
 }
 
-function sanitize_tag($tag)
-{
-    $tag = trim($tag);
-    $tag = mb_strtolower($tag, 'utf-8');
-    $tag = preg_replace('/[\'\"\+\>\<]/', '', $tag);
-    //        $tag = str_replace('"', "", $tag);
-    //        $tag = str_replace("+", " ", $tag);
-    $tag = str_replace('technorati tag: ', '', $tag);
-    return $tag;
-}
-
 function get_self_url_prefix()
 {
     $self_url_path = \SmallSmallRSS\Config::get('SELF_URL_PATH');
@@ -1725,13 +1693,12 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
         $rules = array();
         $actions = array();
 
-        while ($rule_line = \SmallSmallRSS\Database::fetch_assoc($result2)) {
+        while (($rule_line = \SmallSmallRSS\Database::fetch_assoc($result2))) {
             $rule = array();
             $rule['reg_exp'] = $rule_line['reg_exp'];
             $rule['type'] = $rule_line['type_name'];
             $rule['inverse'] = \SmallSmallRSS\Database::fromSQLBool($rule_line['inverse']);
-
-            array_push($rules, $rule);
+            $rules[] = $rule;
         }
 
         $result2 = \SmallSmallRSS\Database::query(
@@ -1743,14 +1710,11 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
                  action_id = t.id AND filter_id = '$filter_id'"
         );
 
-        while ($action_line = \SmallSmallRSS\Database::fetch_assoc($result2)) {
-            #                print_r($action_line);
-
+        while (($action_line = \SmallSmallRSS\Database::fetch_assoc($result2))) {
             $action = array();
             $action['type'] = $action_line['type_name'];
             $action['param'] = $action_line['action_param'];
-
-            array_push($actions, $action);
+            $actions[] = $action;
         }
         $filter = array();
         $filter['match_any_rule'] = \SmallSmallRSS\Database::fromSQLBool($filter_line['match_any_rule']);

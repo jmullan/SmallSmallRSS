@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../src/SmallSmallRSS/bootstrap.php';
 function make_password($length = 8)
 {
     $password = "";
@@ -174,7 +175,7 @@ function makeSelfURLPath()
 }
 
 
-if (file_exists("../config.ini")) {
+if (file_exists(__DIR__ . "/../../config.ini")) {
     if (!defined('_INSTALLER_IGNORE_CONFIG_CHECK')) {
         \SmallSmallRSS\Renderers\Messages::renderError(
             "Error: config.ini already exists in tt-rss directory; aborting."

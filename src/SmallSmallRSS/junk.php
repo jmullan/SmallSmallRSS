@@ -330,17 +330,16 @@ function getCategoryCounters($owner_uid)
 // only accepts real cats (>= 0)
 function getCategoryChildrenUnread($cat, $owner_uid)
 {
+    $unread = getCategoryUnread($cat, $owner_uid);;
     if ($cat == \SmallSmallRSS\FeedCategories::SPECIAL
         || $cat == \SmallSmallRSS\FeedCategories::LABELS
         || $cat == \SmallSmallRSS\FeedCategories::NONE
     ) {
-        return 0;
+        return $unread;
     }
     $cat_ids = \SmallSmallRSS\FeedCategories::getChildren($cat, $owner_uid);
-    $unread = 0;
     foreach ($cat_ids as $cat_id) {
         # TODO: This is pretty inefficient.
-        $unread += getCategoryUnread($cat_id, $owner_uid);
         $unread += getCategoryChildrenUnread($cat_id, $owner_uid);
     }
     return $unread;
@@ -482,8 +481,9 @@ function countUnreadFeedArticles($feed, $is_cat, $unread_only, $owner_uid)
     return $unread;
 }
 
-function getFeedCounters($active_feed = false)
+function getFeedCounters($owner_uid)
 {
+    $active_feed = false;
     $start = microtime(true);
     $ret_arr = array();
     $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
@@ -496,7 +496,7 @@ function getFeedCounters($active_feed = false)
             value AS count
         FROM ttrss_feeds, ttrss_counters_cache
         WHERE
-            ttrss_feeds.owner_uid = '.$_SESSION['uid'].'
+            ttrss_feeds.owner_uid = '.$owner_uid.'
             AND ttrss_counters_cache.owner_uid = ttrss_feeds.owner_uid
             AND ttrss_counters_cache.feed_id = id';
 
@@ -506,7 +506,7 @@ function getFeedCounters($active_feed = false)
         $id = $line['id'];
         $count = $line['count'];
         $last_error = htmlspecialchars($line['last_error']);
-        $last_updated = make_local_datetime($line['last_updated'], false, $_SESSION['uid']);
+        $last_updated = make_local_datetime($line['last_updated'], false, $owner_uid);
         $has_img = \SmallSmallRSS\Feeds::hasIcon($id);
         if (date('Y') - date('Y', strtotime($line['last_updated'])) > 2) {
             $last_updated = '';
@@ -520,9 +520,6 @@ function getFeedCounters($active_feed = false)
         );
         if ($last_error) {
             $cv['error'] = $last_error;
-        }
-        if ($active_feed && $id == $active_feed) {
-            $cv['title'] = \SmallSmallRSS\Utils::truncateString($line['title'], 30);
         }
         $ret_arr[] = $cv;
     }

@@ -1,11 +1,11 @@
-var global_unread = -1;
-var hotkey_prefix = false;
-var hotkey_prefix_pressed = false;
-var hotkey_actions = {};
-var _widescreen_mode = false;
-var _rpc_seq = 0;
-var _active_feed_id = 0;
-var _active_feed_is_cat = false;
+var global_unread = -1,
+    hotkey_prefix = false,
+    hotkey_prefix_pressed = false,
+    hotkey_actions = {},
+    _widescreen_mode = false,
+    _rpc_seq = 0,
+    _active_feed_id = 0,
+    _active_feed_is_cat = false;
 
 function next_seq() {
     _rpc_seq += 1;
@@ -23,7 +23,9 @@ function getActiveFeedId() {
     } catch (e) {
         exception_error("getActiveFeedId", e);
     }
+    return null;
 }
+
 function setActiveFeedId(id, is_cat) {
     try {
         hash_set('f', id);
@@ -127,28 +129,26 @@ function search() {
         dijit.byId("searchDlg").destroyRecursive();
 
     dialog = new dijit.Dialog({
-                                  id: "searchDlg",
-                                  title: __("Search"),
-                                  style: "width: 600px",
-                                  execute: function() {
-                                      if (this.validate()) {
-                                          _search_query = dojo.objectToQuery(this.attr('value'));
-                                          this.hide();
-                                          viewCurrentFeed();
-                                      }
-                                  },
-                                  href: query});
-
+        id: "searchDlg",
+        title: __("Search"),
+        style: "width: 600px",
+        execute: function() {
+            if (this.validate()) {
+                _search_query = dojo.objectToQuery(this.attr('value'));
+                this.hide();
+                viewCurrentFeed();
+            }
+        },
+        href: query
+    });
     dialog.show();
 }
 
 function updateTitle() {
     var tmp = "Tiny Tiny RSS";
-
     if (global_unread > 0) {
         tmp = "(" + global_unread + ") " + tmp;
     }
-
     if (window.fluid) {
         if (global_unread > 0) {
             window.fluid.dockBadge = global_unread;
@@ -156,27 +156,21 @@ function updateTitle() {
             window.fluid.dockBadge = "";
         }
     }
-
     document.title = tmp;
 }
 
 function genericSanityCheck() {
     setCookie("ttrss_test", "TEST");
-
     if (getCookie("ttrss_test") != "TEST") {
         return fatalError(2);
     }
-
     return true;
 }
-
 
 function init() {
     try {
         //dojo.registerModulePath("fox", "../../js/");
-
         dojo.require("fox.FeedTree");
-
         dojo.require("dijit.ColorPalette");
         dojo.require("dijit.Dialog");
         dojo.require("dijit.form.Button");
@@ -417,14 +411,13 @@ function init() {
             gotoPreferences();
         };
         hotkey_actions["select_article_cursor"] = function() {
-            var id = getArticleUnderPointer();
+            var id = getArticleUnderPointer(),
+                row,
+                cb;
             if (id) {
-                var row = $("RROW-" + id);
-
+                row = $("RROW-" + id);
                 if (row) {
-                    var cb = dijit.getEnclosingWidget(
-                        row.getElementsByClassName("rchk")[0]);
-
+                    cb = dijit.getEnclosingWidget(row.getElementsByClassName("rchk")[0]);
                     if (cb) {
                         cb.attr("checked", !cb.attr("checked"));
                         toggleSelectRowById(cb, "RROW-" + id);
@@ -432,6 +425,7 @@ function init() {
                     }
                 }
             }
+            return true;
         };
         hotkey_actions["create_label"] = function() {
             addLabel();
@@ -462,36 +456,32 @@ function init() {
         };
         hotkey_actions["toggle_combined_mode"] = function() {
             notify_progress("Loading, please wait...");
-
-            var value = isCdmMode() ? "false" : "true";
-            var query = "?op=rpc&method=setpref&key=COMBINED_DISPLAY_MODE&value=" + value;
-
-            new Ajax.Request("backend.php", {
-                                 parameters: query,
-                                 onComplete: function(transport) {
-                                     setInitParam("combined_display_mode",
-                                                  !getInitParam("combined_display_mode"));
-
-                                     closeArticlePanel();
-                                     viewCurrentFeed();
-
-                                 } });
+            var value = isCdmMode() ? "false" : "true",
+                query = "?op=rpc&method=setpref&key=COMBINED_DISPLAY_MODE&value=" + value;
+            new Ajax.Request(
+                "backend.php",
+                {
+                    parameters: query,
+                    onComplete: function(transport) {
+                        setInitParam("combined_display_mode",
+                        !getInitParam("combined_display_mode"));
+                        closeArticlePanel();
+                        viewCurrentFeed();
+                    }});
         };
         hotkey_actions["toggle_cdm_expanded"] = function() {
             notify_progress("Loading, please wait...");
-
             var value = getInitParam("cdm_expanded") ? "false" : "true";
             var query = "?op=rpc&method=setpref&key=CDM_EXPANDED&value=" + value;
-
-            new Ajax.Request("backend.php", {
-                                 parameters: query,
-                                 onComplete: function(transport) {
-                                     setInitParam("cdm_expanded", !getInitParam("cdm_expanded"));
-                                     viewCurrentFeed();
-                                 } });
+            new Ajax.Request(
+                "backend.php",
+                {
+                    parameters: query,
+                    onComplete: function(transport) {
+                        setInitParam("cdm_expanded", !getInitParam("cdm_expanded"));
+                        viewCurrentFeed();
+                    }});
         };
-
-
     } catch (e) {
         exception_error("init", e);
     }

@@ -155,63 +155,78 @@ function smart_date_time($timestamp, $owner_uid, $tz_offset)
     }
 }
 
-function getAllCounters()
+function getAllCounters($owner_uid)
 {
-    $data = getGlobalCounters();
-    $data = array_merge($data, getVirtCounters());
-    $data = array_merge($data, getLabelCounters());
-    $data = array_merge($data, getFeedCounters());
-    $data = array_merge($data, getCategoryCounters());
+    $data = getGlobalCounters($owner_uid);
+    $data = array_merge($data, getVirtCounters($owner_uid));
+    $data = array_merge($data, getLabelCounters($owner_uid));
+    $data = array_merge($data, getFeedCounters($owner_uid));
+    $data = array_merge($data, getCategoryCounters($owner_uid));
     return $data;
 }
 
-function getGlobalCounters()
+function getGlobalCounters($owner_uid)
 {
+    $start = microtime(true);
+    $global_unread = \SmallSmallRSS\CountersCache::getGlobalUnread($owner_uid);
+    $global_unread_time = (microtime(true) - $start) * 1000;
+    $start = microtime(true);
+    $subscribed_feeds = \SmallSmallRSS\Feeds::count($owner_uid);
+    $subscribed_feeds_time = (microtime(true) - $start) * 1000;
     return array(
         array(
             'id' => 'global-unread',
-            'counter' => \SmallSmallRSS\CountersCache::getGlobalUnread($_SESSION['uid'])
+            'counter' => $global_unread,
+            'time' => $global_unread_time
         ),
         array(
             'id' => 'subscribed-feeds',
-            'counter' => \SmallSmallRSS\Feeds::count($_SESSION['uid'])
+            'counter' => $subscribed_feeds,
+            'time' => $subscribed_feeds_time
         )
     );
 }
 
-function getVirtCounters()
+function getVirtCounters($owner_uid)
 {
     $ret_arr = array();
     for ($i = 0; $i >= -4; $i--) {
-        $count = countUnreadFeedArticles($i, false, true, $_SESSION['uid']);
+        $start = microtime(true);
+        $count = countUnreadFeedArticles($i, false, true, $owner_uid);
         if ($i == 0 || $i == -1 || $i == -2) {
-            $auxctr = countUnreadFeedArticles($i, false, false, $_SESSION['uid']);
+            $auxctr = countUnreadFeedArticles($i, false, false, $owner_uid);
         } else {
             $auxctr = 0;
         }
+        $time = (microtime(true) - $start) * 1000;
         $cv = array(
             'id' => $i,
             'counter' => (int) $count,
-            'auxcounter' => $auxctr
+            'auxcounter' => $auxctr,
+            'time' => $time
         );
-        array_push($ret_arr, $cv);
+        $ret_arr[] = $cv;
     }
     $feeds = \SmallSmallRSS\PluginHost::getInstance()->getFeeds(-1);
     if (is_array($feeds)) {
         foreach ($feeds as $feed) {
+            $start = microtime(true);
+            $count = $feed['sender']->get_unread($feed['id']);
+            $time = (microtime(true) - $start) * 1000;
             $cv = array(
                 'id' => \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']),
-                'counter' => $feed['sender']->get_unread($feed['id'])
+                'counter' => (int) $count,
+                'time' => $time
             );
-            array_push($ret_arr, $cv);
+            $ret_arr[] = $cv;
         }
     }
     return $ret_arr;
 }
 
-function getLabelCounters($descriptions = false)
+function getLabelCounters($owner_uid, $descriptions = false)
 {
-    $owner_uid = $_SESSION['uid'];
+    $start = microtime(true);
     $result = \SmallSmallRSS\Database::query(
         "SELECT
              id,
@@ -236,35 +251,45 @@ function getLabelCounters($descriptions = false)
         $cv = array(
             'id' => $id,
             'counter' => (int) $line['unread'],
-            'auxcounter' => (int) $line['total']
+            'auxcounter' => (int) $line['total'],
+            'time' => 0
         );
         if ($descriptions) {
             $cv['description'] = $line['caption'];
         }
         $ret_arr[] = $cv;
     }
+    $time = (microtime(true) - $start) * 1000 / count($ret_arr);
+    foreach ($ret_arr as $k => $v) {
+        $ret_arr[$k]['time'] = $time;
+    }
     return $ret_arr;
 }
 
 
-function getCategoryCounters()
+function getCategoryCounters($owner_uid)
 {
     $ret_arr = array();
     /* Special case: NULL category doesn't actually exist in the DB */
+    $start = microtime(true);
     $ret_arr[] = array(
         'id' => \SmallSmallRSS\FeedCategories::NONE,
         'kind' => 'cat',
         'counter' => (int) \SmallSmallRSS\CountersCache::find(
             \SmallSmallRSS\FeedCategories::NONE,
-            $_SESSION['uid'],
+            $owner_uid,
             true
-        )
+        ),
+        'time' => (microtime(true) - $start) * 1000
     );
+    $start = microtime(true);
     $ret_arr[] = array(
         'id' => \SmallSmallRSS\FeedCategories::LABELS,
         'kind' => 'cat',
-        'counter' => getCategoryUnread(\SmallSmallRSS\FeedCategories::LABELS, $_SESSION['uid'])
+        'counter' => getCategoryUnread(\SmallSmallRSS\FeedCategories::LABELS, $owner_uid),
+        'time' => (microtime(true) - $start) * 1000
     );
+    $start = microtime(true);
     $result = \SmallSmallRSS\Database::query(
         'SELECT
             id AS cat_id,
@@ -280,19 +305,25 @@ function getCategoryCounters()
             WHERE
                 ttrss_cat_counters_cache.feed_id = id
                 AND ttrss_cat_counters_cache.owner_uid = ttrss_feed_categories.owner_uid
-                AND ttrss_feed_categories.owner_uid = ' . $_SESSION['uid']
+                AND ttrss_feed_categories.owner_uid = ' . $owner_uid
     );
+    $query_time = (microtime(true) - $start) * 1000;
     while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        $start = microtime(true);
         $line['cat_id'] = (int) $line['cat_id'];
         if ($line['num_children'] > 0) {
-            $child_counter = getCategoryChildrenUnread($line['cat_id'], $_SESSION['uid']);
+            $child_counter = getCategoryChildrenUnread($line['cat_id'], $owner_uid);
         } else {
             $child_counter = 0;
         }
-        $cv = array('id' => $line['cat_id'], 'kind' => 'cat', 'counter' => $line['unread'] + $child_counter);
+        $cv = array(
+            'id' => $line['cat_id'],
+            'kind' => 'cat',
+            'counter' => $line['unread'] + $child_counter,
+            'time' => (microtime(true) - $start) * 1000
+        );
         $ret_arr[] = $cv;
     }
-
     return $ret_arr;
 }
 
@@ -453,6 +484,7 @@ function countUnreadFeedArticles($feed, $is_cat, $unread_only, $owner_uid)
 
 function getFeedCounters($active_feed = false)
 {
+    $start = microtime(true);
     $ret_arr = array();
     $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
     $query = '
@@ -480,10 +512,11 @@ function getFeedCounters($active_feed = false)
             $last_updated = '';
         }
         $cv = array(
-            'id' => $id,
+            'id' => (int) $id,
             'updated' => $last_updated,
             'counter' => (int) $count,
-            'has_img' => (int) $has_img
+            'has_img' => (int) $has_img,
+            'time' => 0
         );
         if ($last_error) {
             $cv['error'] = $last_error;
@@ -491,7 +524,11 @@ function getFeedCounters($active_feed = false)
         if ($active_feed && $id == $active_feed) {
             $cv['title'] = \SmallSmallRSS\Utils::truncateString($line['title'], 30);
         }
-        array_push($ret_arr, $cv);
+        $ret_arr[] = $cv;
+    }
+    $time = (microtime(true) - $start) * 1000 / count($ret_arr);
+    foreach ($ret_arr as $k => $v) {
+        $ret_arr[$k]['time'] = $time;
     }
     return $ret_arr;
 }
@@ -751,17 +788,11 @@ function search_to_sql($search)
         switch ($commandpair[0]) {
             case 'title':
                 if ($commandpair[1]) {
-                    array_push(
-                        $query_keywords,
-                        "($not (LOWER(ttrss_entries.title) LIKE '%".
-                        \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))"
-                    );
+                    $query_keywords[] = "($not (LOWER(ttrss_entries.title) LIKE '%"
+                        . \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))";
                 } else {
-                    array_push(
-                        $query_keywords,
-                        "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')
-                            OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))"
-                    );
+                    $query_keywords[] = "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')"
+                        . " OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))";
                 }
                 break;
             case 'author':
@@ -967,7 +998,7 @@ function queryFeedHeadlines(
         if ($feed > 0) {
             if ($include_children) {
                 $subcats = \SmallSmallRSS\FeedCategories::getDescendents($feed, $owner_uid);
-                array_push($subcats, $feed);
+                $subcats[] = $feed;
                 $cats_qpart = join(',', $subcats);
             } else {
                 $cats_qpart = $feed;
@@ -981,7 +1012,7 @@ function queryFeedHeadlines(
             if ($feed > 0) {
                 if ($include_children) {
                     $subcats = \SmallSmallRSS\FeedCategories::getDescendents($feed, $owner_uid);
-                    array_push($subcats, $feed);
+                    $subcats[] = $feed;
                     $query_strategy_part = 'cat_id IN (' . implode(',', $subcats) . ')';
                 } else {
                     $query_strategy_part = "cat_id = '$feed'";
@@ -1203,12 +1234,9 @@ function queryFeedHeadlines(
             $sub_selects = array();
             $sub_ands = array();
             foreach ($all_tags as $term) {
-                array_push(
-                    $sub_selects,
-                    '(SELECT post_int_id from ttrss_tags WHERE tag_name = '
+                $sub_selects [] =  '(SELECT post_int_id from ttrss_tags WHERE tag_name = '
                     . \SmallSmallRSS\Database::quote($term)
-                    . " AND owner_uid = $owner_uid) as A$i"
-                );
+                    . " AND owner_uid = $owner_uid) as A$i";
                 $i++;
             }
             if ($i > 2) {
@@ -1341,10 +1369,10 @@ function strip_harmful_tags($doc, $allowed_elements, $disallowed_attributes)
             $attrs_to_remove = array();
             foreach ($entry->attributes as $attr) {
                 if (strpos($attr->nodeName, 'on') === 0) {
-                    array_push($attrs_to_remove, $attr);
+                    $attrs_to_remove[] = $attr;
                 }
                 if (in_array($attr->nodeName, $disallowed_attributes)) {
-                    array_push($attrs_to_remove, $attr);
+                    $attrs_to_remove[] = $attr;
                 }
             }
             foreach ($attrs_to_remove as $attr) {
@@ -1606,7 +1634,7 @@ function save_email_address($email)
         $_SESSION['stored_emails'] = array();
     }
     if (!in_array($email, $_SESSION['stored_emails'])) {
-        array_push($_SESSION['stored_emails'], $email);
+        $_SESSION['stored_emails'][] = $email;
     }
 }
 
@@ -1858,7 +1886,7 @@ function filter_to_sql($filter, $owner_uid)
             if (isset($rule['cat_id'])) {
                 if ($rule['cat_id'] > 0) {
                     $children = \SmallSmallRSS\FeedCategories::getDescendents($rule['cat_id'], $owner_uid);
-                    array_push($children, $rule['cat_id']);
+                    $children[] = $rule['cat_id'];
                     $children = join(',', $children);
                     $cat_qpart = "cat_id IN ($children)";
                 } else {
@@ -1866,7 +1894,7 @@ function filter_to_sql($filter, $owner_uid)
                 }
                 $qpart .= " AND $cat_qpart";
             }
-            array_push($query, "($qpart)");
+            $query[] = "($qpart)";
         }
     }
     if (count($query) > 0) {

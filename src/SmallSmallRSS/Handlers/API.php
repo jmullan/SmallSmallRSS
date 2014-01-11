@@ -113,7 +113,7 @@ class API extends Handler
     /* Method added for ttrss-reader for Android */
     public function getCounters()
     {
-        $this->wrap(self::STATUS_OK, getAllCounters());
+        $this->wrap(self::STATUS_OK, getAllCounters($_SESSION['uid']));
     }
 
     public function getFeeds()

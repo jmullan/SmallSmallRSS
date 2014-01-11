@@ -330,18 +330,24 @@ class RPC extends ProtectedHandler
 
     public function getAllCounters()
     {
+        $all_start = microtime(true);
         $last_article_id = 0;
         if (!empty($_REQUEST['last_article_id'])) {
             $last_article_id = (int) $_REQUEST['last_article_id'];
         }
-        $reply = array();
+        $reply = array('times' => array());
         if (!empty($_REQUEST['seq'])) {
             $reply['seq'] = (int) $_REQUEST['seq'];
         }
+        $start = microtime(true);
         if ($last_article_id != \SmallSmallRSS\UserEntries::getLastId($_SESSION['uid'])) {
-            $reply['counters'] = getAllCounters();
+            $reply['counters'] = getAllCounters($_SESSION['uid']);
+            $reply['times']['counters'] = (microtime(true) - $start) * 1000;
         }
+        $start = microtime(true);
         $reply['runtime-info'] = make_runtime_info();
+        $reply['times']['runtime-info'] = (microtime(true) - $start) * 1000;
+        $reply['times']['all'] = (microtime(true) - $all_start) * 1000;
         echo json_encode($reply);
     }
 

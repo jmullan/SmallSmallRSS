@@ -28,13 +28,9 @@ if (array_search($op, $public_calls) !== false) {
 }
 
 $csrf_token = (isset($_REQUEST['csrf_token']) ? $_REQUEST['csrf_token'] : '');
-
 \SmallSmallRSS\Sessions::init();
-
 \SmallSmallRSS\Locale::startupGettext();
-
 $script_started = microtime(true);
-
 if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;
 }
@@ -76,7 +72,7 @@ if (class_exists($handler) || $override) {
     if ($handler) {
         if (!$handler instanceof \SmallSmallRSS\Handlers\IHandler) {
             $error_code = 6;
-        } elseif (\SmallSmallRSS\Sessions::validateCSRF($csrf_token) || $handler->ignoreCSRF($method)) {
+        } elseif ($handler->ignoreCSRF($method) || \SmallSmallRSS\Sessions::validateCSRF($csrf_token)) {
             if ($handler->before($method)) {
                 if ($method && method_exists($handler, $method)) {
                     $handler->$method();

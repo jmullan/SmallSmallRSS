@@ -158,9 +158,9 @@ function smart_date_time($timestamp, $owner_uid, $tz_offset)
 function getAllCounters($owner_uid)
 {
     $data = getGlobalCounters($owner_uid);
+    $data = array_merge($data, getFeedCounters($owner_uid));
     $data = array_merge($data, getVirtCounters($owner_uid));
     $data = array_merge($data, getLabelCounters($owner_uid));
-    $data = array_merge($data, getFeedCounters($owner_uid));
     $data = array_merge($data, getCategoryCounters($owner_uid));
     return $data;
 }
@@ -513,6 +513,7 @@ function getFeedCounters($owner_uid)
         }
         $cv = array(
             'id' => (int) $id,
+            'kind' => 'feed',
             'updated' => $last_updated,
             'counter' => (int) $count,
             'has_img' => (int) $has_img,

@@ -5,8 +5,7 @@ class RPC extends ProtectedHandler
 {
     public function ignoreCSRF($method)
     {
-        $csrf_ignored = array('sanitycheck', 'completelabels');
-
+        $csrf_ignored = array('sanitycheck', 'completelabels', 'getallcounters');
         return array_search($method, $csrf_ignored) !== false;
     }
 

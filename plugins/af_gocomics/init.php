@@ -20,7 +20,7 @@ class Af_GoComics extends \SmallSmallRSS\Plugin
         if (strpos($article["guid"], "gocomics.com") !== false) {
             if (strpos($article["plugin_data"], "gocomics,$owner_uid:") === false) {
                 $doc = new DOMDocument();
-                @$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                @$doc->loadHTML(\SmallSmallRSS\Fetcher::simpleFetch($article["link"]));
 
                 $basenode = false;
 

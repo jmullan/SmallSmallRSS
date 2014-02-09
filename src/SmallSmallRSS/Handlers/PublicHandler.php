@@ -760,7 +760,7 @@ class PublicHandler extends Handler
                 break;
             case 4:
                 \SmallSmallRSS\Renderers\Messages::renderNotice(__('Multiple feed URLs found.'));
-                $contents = @\SmallSmallRSS\Fetcher::fetch($url, false, $auth_login, $auth_pass);
+                $contents = @\SmallSmallRSS\Fetcher::simpleFetch($url, false, $auth_login, $auth_pass);
                 if (\SmallSmallRSS\Utils::isHtml($contents)) {
                     $feed_urls = get_feeds_from_html($url, $contents);
                 }

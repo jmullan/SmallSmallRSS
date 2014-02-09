@@ -123,7 +123,7 @@ class Feeds
      * @access public
      * @return void
      */
-    public static function purge($feed_id, $purge_interval)
+    public static function purge($feed_id, $purge_interval=0)
     {
         if (!$purge_interval) {
             $purge_interval = self::purgeInterval($feed_id);

@@ -41,6 +41,9 @@ class MySQLi implements DatabaseInterface
 
     public function fetch_assoc($result)
     {
+        if (!$result) {
+            return null;
+        }
         return mysqli_fetch_assoc($result);
     }
 
@@ -52,7 +55,7 @@ class MySQLi implements DatabaseInterface
 
     public function fetch_result($result, $row, $param)
     {
-        if (mysqli_data_seek($result, $row)) {
+        if ($result && mysqli_data_seek($result, $row)) {
             $line = mysqli_fetch_assoc($result);
             return $line[$param];
         } else {
@@ -72,7 +75,7 @@ class MySQLi implements DatabaseInterface
 
     public function last_error()
     {
-        return mysqli_error();
+        return mysqli_error($this->link);
     }
 
     public function init()

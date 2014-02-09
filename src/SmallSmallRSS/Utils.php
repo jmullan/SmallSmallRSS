@@ -28,6 +28,15 @@ class Utils
 
     public static function buildUrl($parts)
     {
+        if (!isset($parts['scheme'])) {
+            $parts['scheme'] = null;
+        }
+        if (!isset($parts['host'])) {
+            $parts['host'] = null;
+        }
+        if (!isset($parts['path'])) {
+            $parts['path'] = null;
+        }
         return $parts['scheme'] . '://' . $parts['host'] . $parts['path'];
     }
 

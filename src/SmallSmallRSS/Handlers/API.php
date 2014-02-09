@@ -310,9 +310,9 @@ class API extends Handler
 
             $num_updated = \SmallSmallRSS\Database::affected_rows($result);
             if ($num_updated > 0 && $field == 'unread') {
-                $feed_ids = \SmallSmallRSS\UserEntries::getMatchingFeeds($article_ids);
+                $feed_ids = \SmallSmallRSS\UserEntries::getMatchingFeeds($article_ids, $_SESSION['uid']);
                 foreach ($feed_ids as $feed_id) {
-                    \SmallSmallRSS\CountersCache::update($line['feed_id'], $_SESSION['uid']);
+                    \SmallSmallRSS\CountersCache::update($feed_id, $_SESSION['uid']);
                 }
             }
             if ($num_updated > 0 && $field == 'published') {

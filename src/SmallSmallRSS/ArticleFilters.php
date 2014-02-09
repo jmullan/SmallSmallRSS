@@ -3,7 +3,7 @@ namespace SmallSmallRSS;
 
 class ArticleFilters
 {
-    public function get($filters, $title, $content, $link, $timestamp, $author, $tags)
+    static public function get($filters, $title, $content, $link, $timestamp, $author, $tags)
     {
         $matches = array();
         foreach ($filters as $filter) {
@@ -79,7 +79,7 @@ class ArticleFilters
         return $matches;
     }
 
-    public function matchArticle($filters, $filter_name)
+    static public function matchArticle($filters, $filter_name)
     {
         foreach ($filters as $f) {
             if ($f['type'] == $filter_name) {
@@ -89,7 +89,7 @@ class ArticleFilters
         return false;
     }
 
-    public function calculateScore($filters)
+    static public function calculateScore($filters)
     {
         $score = 0;
         foreach ($filters as $f) {
@@ -100,7 +100,7 @@ class ArticleFilters
         return $score;
     }
 
-    public function assignArticleToLabel($id, $filters, $owner_uid, $article_labels)
+    static public function assignArticleToLabel($id, $filters, $owner_uid, $article_labels)
     {
         foreach ($filters as $f) {
             if ($f['type'] == 'label') {

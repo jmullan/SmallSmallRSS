@@ -21,7 +21,7 @@ class Af_PennyArcade extends \SmallSmallRSS\Plugin
         if (strpos($article["link"], "penny-arcade.com") !== false && strpos($article["title"], "Comic:") !== false) {
             if (strpos($article["plugin_data"], "pennyarcade,$owner_uid:") === false) {
                 $doc = new DOMDocument();
-                $doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                $doc->loadHTML(\SmallSmallRSS\Fetcher::simpleFetch($article["link"]));
 
                 $basenode = false;
 
@@ -48,7 +48,7 @@ class Af_PennyArcade extends \SmallSmallRSS\Plugin
 
             if (strpos($article["plugin_data"], "pennyarcade,$owner_uid:") === false) {
                 $doc = new DOMDocument();
-                $doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                $doc->loadHTML(\SmallSmallRSS\Fetcher::simpleFetch($article["link"]));
 
                 if ($doc) {
                     $xpath = new DOMXPath($doc);

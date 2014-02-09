@@ -54,7 +54,7 @@ class Tags
         if (preg_match("/^[0-9]*$/", $tag)) {
             return false;
         }
-        if (!self::isValidUTF8($string)) {
+        if (!self::isValidUTF8($tag)) {
             return false;
         }
         if (mb_strlen($tag) > 250) {

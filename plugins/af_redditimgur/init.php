@@ -47,7 +47,7 @@ class Af_RedditImgur extends \SmallSmallRSS\Plugin
 
                                 $token = $matches[1];
 
-                                $album_content = \SmallSmallRSS\Fetcher::fetch(
+                                $album_content = \SmallSmallRSS\Fetcher::simpleFetch(
                                     $entry->getAttribute("href"),
                                     false,
                                     false,
@@ -87,7 +87,7 @@ class Af_RedditImgur extends \SmallSmallRSS\Plugin
                             $regex = "/^http:\/\/imgur.com\/(a|album)\/[^\.]+$/";
                             if (preg_match($regex, $entry->getAttribute("href"), $matches)) {
 
-                                $album_content = \SmallSmallRSS\Fetcher::fetch(
+                                $album_content = \SmallSmallRSS\Fetcher::simpleFetch(
                                     $entry->getAttribute("href"),
                                     false,
                                     false,

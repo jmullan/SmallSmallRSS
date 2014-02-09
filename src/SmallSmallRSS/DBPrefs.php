@@ -47,11 +47,10 @@ class DBPrefs
         $profile = false;
 
         if (!$user_id) {
-            $user_id = $_SESSION['uid'];
-            @$profile = $_SESSION['profile'];
-        } else {
-            $user_id = sprintf('%d', $user_id);
+            $user_id = (!empty($_SESSION['uid']) ? $_SESSION['uid'] : null);
+            $profile = (!empty($_SESSION['profile']) ? $_SESSION['profile'] : null);
         }
+        $user_id = sprintf('%d', $user_id);
 
         if (isset(self::$cache[$pref_name])) {
             $tuple = self::$cache[$pref_name];

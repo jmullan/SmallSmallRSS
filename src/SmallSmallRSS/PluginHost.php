@@ -53,7 +53,7 @@ class PluginHost
 
     public function runHooks($type, $args = null)
     {
-        $method = \SmallSmallRSS\Hooks::getHookMethod($hook);
+        $method = \SmallSmallRSS\Hooks::getHookMethod($type);
         if ($method !== false) {
             foreach ($this->get_hooks($type) as $hook) {
                 $hook->$method($args);

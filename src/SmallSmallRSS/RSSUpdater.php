@@ -25,13 +25,12 @@ class RSSUpdater
         // We update the feed last update started date before anything else.
         // There is no lag due to feed contents downloads
         // It prevents another process from updating the same feed.
-        \SmallSmallRSS\Feeds::markUpdateStarted($feeds_to_update);
-        $nf = 0;
+        \SmallSmallRSS\Feeds::markUpdateStarted($feed_ids);
         foreach ($feed_ids as $feed_id) {
             self::updateFeed($feed_id, true);
         }
         \SmallSmallRSS\Digest::send_headlines();
-        return $nf;
+        return count($feed_ids);
     }
     public static function getUpdateableFeeds($limit = null)
     {
@@ -232,7 +231,7 @@ class RSSUpdater
             }
             $fetch_last_error = false;
             if (!$feed_data) {
-                $fetcher = new \SmallSmallRSS\Fetcher();
+                $fetcher = new \SmallSmallRSS\Fetcher($fetch_url);
                 $feed_data = $fetcher->getFileContents(
                     $fetch_url,
                     false,
@@ -339,9 +338,14 @@ class RSSUpdater
              * the icon avgcolor again (unless the icon got updated) */
 
             $favicon_file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed.ico";
-            $favicon_modified = @filemtime($favicon_file);
+            $favicon_modified = 0;
+            if (file_exists($favicon_file)) {
+                $favicon_modified = filemtime($favicon_file);
+            }
             self::checkFeedFavicon($site_url, $feed);
-            $favicon_modified_new = @filemtime($favicon_file);
+            if (file_exists($favicon_file)) {
+                $favicon_modified_new = filemtime($favicon_file);
+            }
             if ($favicon_modified_new > $favicon_modified) {
                 $favicon_avg_color = '';
             }
@@ -479,11 +483,11 @@ class RSSUpdater
                 }
             }
 
-            $entry_tags = array_unique($additional_tags);
-
-            for ($i = 0; $i < count($entry_tags); $i++) {
-                $entry_tags[$i] = mb_strtolower($entry_tags[$i], 'utf-8');
+            $entry_tags = array();
+            foreach ($additional_tags as $additional_tag) {
+                $entry_tags[] = mb_strtolower($additional_tag, 'utf-8');
             }
+            $entry_tags = array_unique($entry_tags);
 
             // TODO: less memory-hungry implementation
             // FIXME not sure if owner_uid is a good idea here, we may have a base
@@ -816,7 +820,7 @@ class RSSUpdater
                     array_push($enclosures, $e_item);
                 }
             }
-            \SmallSmallRSS\Enclosures::add($enclosures);
+            \SmallSmallRSS\Enclosures::add($entry_ref_id, $enclosures);
             // check for manual tags (we have to do it here since they're loaded from filters)
             foreach ($article_filters as $f) {
                 if ($f['type'] == 'tag') {
@@ -911,7 +915,6 @@ class RSSUpdater
 
         \SmallSmallRSS\Feeds::purge($feed);
         \SmallSmallRSS\Feeds::markUpdated($feed);
-        unset($rss);
     }
 
     public static function makeGUIDFromTitle($title)
@@ -930,7 +933,7 @@ class RSSUpdater
             $favicon_url = self::getFaviconUrl($site_url);
             if ($favicon_url) {
                 // Limiting to "image" type misses those served with text/plain
-                $contents = \SmallSmallRSS\Fetcher::fetch($favicon_url);
+                $contents = \SmallSmallRSS\Fetcher::simpleFetch($favicon_url);
                 if ($contents) {
                     // Crude image type matching.
                     // Patterns gleaned from the file(1) source code.
@@ -975,7 +978,8 @@ class RSSUpdater
     public static function getFaviconUrl($url)
     {
         $favicon_url = false;
-        if ($html = \SmallSmallRSS\Fetcher::fetch($url)) {
+        $fetcher = new \SmallSmallRSS\Fetcher($url);
+        if ($html = $fetcher->fetch($url)) {
             libxml_use_internal_errors(true);
             $doc = new \DOMDocument();
             $doc->loadHTML($html);

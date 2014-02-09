@@ -7,16 +7,16 @@ class Fetcher
 {
     public $site_url;
     public $fetch_curl_used;
-    public $fetch_last_error;
-    public $fetch_last_error_code;
+    public $last_error;
+    public $last_error_code;
     public $fetch_last_content_code;
 
     public function __construct($site_url)
     {
         $this->site_url = $site_url;
         $this->fetch_curl_used = false;
-        $this->fetch_last_error = false;
-        $this->fetch_last_error_code = false;
+        $this->last_error = false;
+        $this->last_error_code = false;
         $this->fetch_last_content_code = false;
     }
 
@@ -30,8 +30,21 @@ class Fetcher
         $timestamp = 0
     )
     {
-        $fetcher = new self();
-        return $fetcher->getFileContents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
+        return $this->getFileContents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
+    }
+
+    static public function simpleFetch(
+        $url,
+        $type = false,
+        $login = false,
+        $pass = false,
+        $post_query = false,
+        $timeout = false,
+        $timestamp = 0
+    )
+    {
+        $fetcher = new self($url);
+        return $fetcher->fetch($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
     }
 
     public function getFileContents(
@@ -50,7 +63,7 @@ class Fetcher
             if (ini_get('safe_mode') || ini_get('open_basedir')) {
                 $new_url = $this->curlResolveUrl($url);
                 if (!$new_url) {
-                    // geturl has already populated $this->fetch_last_error
+                    // geturl has already populated $this->last_error
                     return false;
                 }
                 $ch = curl_init($new_url);
@@ -103,7 +116,7 @@ class Fetcher
                 $contents = @curl_exec($ch);
             }
             if ($contents === false) {
-                $this->fetch_last_error = curl_errno($ch) . ' ' . curl_error($ch);
+                $this->last_error = curl_errno($ch) . ' ' . curl_error($ch);
                 curl_close($ch);
                 return false;
             }
@@ -111,13 +124,13 @@ class Fetcher
             $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $this->fetch_last_content_type = curl_getinfo($ch, CURLINFO_CONTENT_TYPE);
 
-            $this->fetch_last_error_code = $http_code;
+            $this->last_error_code = $http_code;
 
             if ($http_code != 200 || $type && strpos($this->fetch_last_content_type, "$type") === false) {
                 if (curl_errno($ch) != 0) {
-                    $this->fetch_last_error = curl_errno($ch) . ' ' . curl_error($ch);
+                    $this->last_error = curl_errno($ch) . ' ' . curl_error($ch);
                 } else {
-                    $this->fetch_last_error = "HTTP Code: $http_code";
+                    $this->last_error = "HTTP Code: $http_code";
                 }
                 curl_close($ch);
                 return false;
@@ -168,7 +181,7 @@ class Fetcher
                     }
 
                     if (substr(strtolower($h), 0, 7) == 'http/1.') {
-                        $this->fetch_last_error_code = (int) substr($h, 9, 3);
+                        $this->last_error_code = (int) substr($h, 9, 3);
                     }
                 }
             }
@@ -177,9 +190,9 @@ class Fetcher
                 $error = error_get_last();
 
                 if ($error['message'] != $old_error['message']) {
-                    $this->fetch_last_error = $error['message'];
+                    $this->last_error = $error['message'];
                 } else {
-                    $this->fetch_last_error = "HTTP Code: $this->fetch_last_error_code";
+                    $this->last_error = "HTTP Code: $this->last_error_code";
                 }
             }
             $tmp = self::gzdecode($data);
@@ -258,7 +271,7 @@ class Fetcher
                 return (isset($url_parsed))? geturl($url):'';
             }
 
-            $this->fetch_last_error = curl_errno($curl) . ' ' . curl_error($curl);
+            $this->last_error = curl_errno($curl) . ' ' . curl_error($curl);
             curl_close($curl);
 
             $oline = '';

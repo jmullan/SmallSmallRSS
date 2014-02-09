@@ -21,7 +21,7 @@ class Af_Whomp extends \SmallSmallRSS\Plugin
         if (strpos($article["guid"], "whompcomic.com") !== false) {
             if (strpos($article["plugin_data"], "whomp,$owner_uid:") === false) {
                 $doc = new DOMDocument();
-                @$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                @$doc->loadHTML(\SmallSmallRSS\Fetcher::simpleFetch($article["link"]));
                 $basenode = false;
                 if ($doc) {
                     $xpath = new DOMXPath($doc);

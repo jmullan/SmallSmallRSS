@@ -10,7 +10,7 @@ class Digest
      * @param integer $limit The maximum number of articles by digest.
      * @return boolean Return false if digests are not enabled.
      */
-    public function send_headlines($debug = false)
+    static public function send_headlines($debug = false)
     {
 
         $user_limit = 15; // amount of users to process (e.g. emails to send out)
@@ -68,7 +68,7 @@ class Digest
         }
     }
 
-    public function prepare_headlines($user_id, $days = 1, $limit = 1000)
+    static public function prepare_headlines($user_id, $days = 1, $limit = 1000)
     {
 
         $tpl = new \MiniTemplator\Engine();

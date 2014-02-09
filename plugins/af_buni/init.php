@@ -21,7 +21,7 @@ class Af_Buni extends \SmallSmallRSS\Plugin
         if (strpos($article["guid"], "bunicomic.com") !== false) {
             if (strpos($article["plugin_data"], "buni,$owner_uid:") === false) {
                 $doc = new DOMDocument();
-                @$doc->loadHTML(\SmallSmallRSS\Fetcher::fetch($article["link"]));
+                @$doc->loadHTML(\SmallSmallRSS\Fetcher::simpleFetch($article["link"]));
                 $basenode = false;
                 if ($doc) {
                     $xpath = new DOMXPath($doc);

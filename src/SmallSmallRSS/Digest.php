@@ -78,7 +78,7 @@ class Digest
         $tpl_t->readTemplateFromFile('templates/digest_template.txt');
 
         $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $user_id);
-        $local_ts = convert_timestamp(time(), 'UTC', $user_tz_string);
+        $local_ts = \SmallSmallRSS\Utils::convertTimestamp(time(), 'UTC', $user_tz_string);
 
         $tpl->setVariable('CUR_DATE', date('Y/m/d', $local_ts));
         $tpl->setVariable('CUR_TIME', date('G:i', $local_ts));

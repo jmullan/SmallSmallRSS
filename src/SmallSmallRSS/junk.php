@@ -88,22 +88,6 @@ function login_sequence()
     }
 }
 
-function convert_timestamp($timestamp, $source_tz, $dest_tz)
-{
-    try {
-        $source_tz = new DateTimeZone($source_tz);
-    } catch (Exception $e) {
-        $source_tz = new DateTimeZone('UTC');
-    }
-    try {
-        $dest_tz = new DateTimeZone($dest_tz);
-    } catch (Exception $e) {
-        $dest_tz = new DateTimeZone('UTC');
-    }
-    $dt = new DateTime(date('Y-m-d H:i:s', $timestamp), $source_tz);
-    return $dt->format('U') + $dest_tz->getOffset($dt);
-}
-
 function make_local_datetime($timestamp, $long, $owner_uid, $no_smart_dt = false)
 {
     static $utc_tz = null;
@@ -131,7 +115,7 @@ function make_local_datetime($timestamp, $long, $owner_uid, $no_smart_dt = false
     $user_timestamp = $dt->format('U') + $tz_offset;
 
     if (!$no_smart_dt) {
-        return smart_date_time($user_timestamp, $owner_uid, $tz_offset);
+        return \SmallSmallRSS\Utils::smartDateTime($user_timestamp, $owner_uid, $tz_offset);
     } else {
         if ($long) {
             $format = \SmallSmallRSS\DBPrefs::read('LONG_DATE_FORMAT', $owner_uid);
@@ -139,19 +123,6 @@ function make_local_datetime($timestamp, $long, $owner_uid, $no_smart_dt = false
             $format = \SmallSmallRSS\DBPrefs::read('SHORT_DATE_FORMAT', $owner_uid);
         }
         return date($format, $user_timestamp);
-    }
-}
-
-function smart_date_time($timestamp, $owner_uid, $tz_offset)
-{
-    if (date('Y.m.d', $timestamp) == date('Y.m.d', time() + $tz_offset)) {
-        return date('G:i', $timestamp);
-    } elseif (date('Y', $timestamp) == date('Y', time() + $tz_offset)) {
-        $format = \SmallSmallRSS\DBPrefs::read('SHORT_DATE_FORMAT', $owner_uid);
-        return date($format, $timestamp);
-    } else {
-        $format = \SmallSmallRSS\DBPrefs::read('LONG_DATE_FORMAT', $owner_uid);
-        return date($format, $timestamp);
     }
 }
 
@@ -259,7 +230,10 @@ function getLabelCounters($owner_uid, $descriptions = false)
         }
         $ret_arr[] = $cv;
     }
-    $time = (microtime(true) - $start) * 1000 / count($ret_arr);
+    $time = (microtime(true) - $start) * 1000;
+    if ($ret_arr) {
+        $time /= count($ret_arr);
+    }
     foreach ($ret_arr as $k => $v) {
         $ret_arr[$k]['time'] = $time;
     }
@@ -729,7 +703,6 @@ function getFeedIcon($id)
             }
             break;
     }
-    return false;
 }
 
 function make_runtime_info()
@@ -862,7 +835,7 @@ function search_to_sql($search)
                 if (strpos($k, '@') === 0) {
                     $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $_SESSION['uid']);
                     $orig_ts = strtotime(substr($k, 1));
-                    $k = date('Y-m-d', convert_timestamp($orig_ts, $user_tz_string, 'UTC'));
+                    $k = date('Y-m-d', \SmallSmallRSS\Utils::convertTimestamp($orig_ts, $user_tz_string, 'UTC'));
                     $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
                     array_push($query_keywords, '('.$substring_for_date."(updated,1,LENGTH('$k')) $not = '$k')");
                 } else {
@@ -1545,7 +1518,7 @@ function format_tags_string($tags, $id)
         $maxtags = min(5, count($tags));
 
         for ($i = 0; $i < $maxtags; $i++) {
-            $tags_str .= "<a class=\"tag\" href=\"#\" onclick=\"viewfeed('".$tags[$i]."')\">" . $tags[$i] . '</a>, ';
+            $tags_str .= '<a class="tag" href="#" onclick="viewfeed(\'' . $tags[$i] . '\')">' . $tags[$i] . '</a>, ';
         }
         $tags_str = mb_substr($tags_str, 0, mb_strlen($tags_str)-2);
         if (count($tags) > $maxtags) {
@@ -1557,7 +1530,6 @@ function format_tags_string($tags, $id)
 
 function format_article_labels($labels, $id)
 {
-
     if (!is_array($labels)) {
         return '';
     }
@@ -1664,17 +1636,15 @@ function get_feeds_from_html($url, $content)
 
 function print_label_select($name, $value, $attributes = '')
 {
-
-    $result = \SmallSmallRSS\Database::query(
-        "SELECT caption FROM ttrss_labels2
-         WHERE owner_uid = '".$_SESSION['uid']."' ORDER BY caption"
-    );
+    $labels = \SmallSmallRSS\Labels::getAll($_SESSION['uid']);
     print "<select default=\"$value\" name=\"" . htmlspecialchars($name) .
         "\" $attributes onchange=\"labelSelectOnChange(this)\" >";
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-        $issel = ($line['caption'] == $value) ? 'selected="1"' : '';
-        print '<option value="'.htmlspecialchars($line['caption'])."\"
-                $issel>" . htmlspecialchars($line['caption']) . '</option>';
+    foreach ($labels as $line) {
+        $issel = ($line['caption'] == $value) ? ' selected="selected"' : '';
+        echo '<option value="' . htmlspecialchars($line['caption']) . '"';
+        echo $issel;
+        echo htmlspecialchars($line['caption']);
+        echo '</option>';
     }
     print '</select>';
 }
@@ -1795,8 +1765,6 @@ function sphinx_search($query, $offset = 0, $limit = 30)
     return $ids;
 }
 
-
-
 function rewrite_urls($html)
 {
     libxml_use_internal_errors(true);
@@ -1906,34 +1874,10 @@ function filter_to_sql($filter, $owner_uid)
     return $fullquery;
 }
 
-function read_stdin()
-{
-    $fp = fopen('php://stdin', 'r');
-    if ($fp) {
-        $line = trim(fgets($fp));
-        fclose($fp);
-        return $line;
-    }
-    return null;
-}
-
-function tmpdirname($path, $prefix)
-{
-    // Use PHP's tmpfile function to create a temporary
-    // directory name. Delete the file and keep the name.
-    $tempname = tempnam($path, $prefix);
-    if (!$tempname) {
-        return false;
-    }
-    if (!unlink($tempname)) {
-        return false;
-    }
-    return $tempname;
-}
-
 function calculate_dep_timestamp()
 {
-    $files = array_merge(glob('js/*.js'), glob('css/*.css'));
+    $base = __DIR__ . '/../../web';
+    $files = array_merge(glob($base . '/js/*.js'), glob($base . '/css/*.css'));
     $max_ts = -1;
     foreach ($files as $file) {
         if (filemtime($file) > $max_ts) {
@@ -1941,15 +1885,4 @@ function calculate_dep_timestamp()
         }
     }
     return $max_ts;
-}
-
-function format_libxml_error($error)
-{
-    return T_sprintf(
-        'LibXML error %s at line %d (column %d): %s',
-        $error->code,
-        $error->line,
-        $error->column,
-        $error->message
-    );
 }

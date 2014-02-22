@@ -106,4 +106,42 @@ class Utils
             return $str;
         }
     }
+    public static function convertTimestamp($timestamp, $source_tz, $dest_tz)
+    {
+        try {
+            $source_tz = new DateTimeZone($source_tz);
+        } catch (Exception $e) {
+            $source_tz = new DateTimeZone('UTC');
+        }
+        try {
+            $dest_tz = new DateTimeZone($dest_tz);
+        } catch (Exception $e) {
+            $dest_tz = new DateTimeZone('UTC');
+        }
+        $dt = new DateTime(date('Y-m-d H:i:s', $timestamp), $source_tz);
+        return $dt->format('U') + $dest_tz->getOffset($dt);
+    }
+
+    public static function smartDateTime($timestamp, $owner_uid, $tz_offset)
+    {
+        if (date('Y.m.d', $timestamp) == date('Y.m.d', time() + $tz_offset)) {
+            return date('G:i', $timestamp);
+        } elseif (date('Y', $timestamp) == date('Y', time() + $tz_offset)) {
+            $format = \SmallSmallRSS\DBPrefs::read('SHORT_DATE_FORMAT', $owner_uid);
+            return date($format, $timestamp);
+        } else {
+            $format = \SmallSmallRSS\DBPrefs::read('LONG_DATE_FORMAT', $owner_uid);
+            return date($format, $timestamp);
+        }
+    }
+    public static function readStdin()
+    {
+        $line = null;
+        $fp = fopen('php://stdin', 'r');
+        if ($fp) {
+            $line = trim(fgets($fp));
+            fclose($fp);
+        }
+        return $line;
+    }
 }

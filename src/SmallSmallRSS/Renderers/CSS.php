@@ -14,7 +14,13 @@ class CSS
     }
     public function renderStylesheetTag($filename)
     {
-        $timestamp = filemtime(__DIR__ . "../../$filename");
-        echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"$filename?$timestamp\"/>\n";
+        $real_filename = __DIR__ . "/../../../web/$filename";
+        $timestamp = '';
+        if (file_exists($real_filename)) {
+            $timestamp = filemtime($real_filename);
+        } else {
+
+        }
+        echo '<link rel="stylesheet" type="text/css" href="' . $filename . '?' . $timestamp . '"/>';
     }
 }

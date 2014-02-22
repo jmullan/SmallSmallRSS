@@ -155,7 +155,7 @@ if (isset($options["cleanup-tags"])) {
 if (isset($options["indexes"])) {
     print "PLEASE BACKUP YOUR DATABASE BEFORE PROCEEDING!";
     print "Type 'yes' to continue.";
-    if (read_stdin() != 'yes') {
+    if (\SmallSmallRSS\Utils::readStdin() != 'yes') {
         exit;
     }
     \SmallSmallRSS\Database\Updater::dropIndexes();
@@ -165,7 +165,7 @@ if (isset($options["indexes"])) {
 if (isset($options["convert-filters"])) {
     print "WARNING: this will remove all existing type2 filters.";
     print "Type 'yes' to continue.";
-    if (read_stdin() != 'yes') {
+    if (\SmallSmallRSS\Utils::readStdin() != 'yes') {
         exit;
     }
     \SmallSmallRSS\Database::query("DELETE FROM ttrss_filters2");
@@ -220,7 +220,7 @@ if (isset($options["update-schema"])) {
         print "WARNING: please backup your database before continuing.";
         print "Type 'yes' to continue.";
 
-        if (read_stdin() != 'yes') {
+        if (\SmallSmallRSS\Utils::readStdin() != 'yes') {
             exit;
         }
         for ($i = $updater->getSchemaVersion() + 1; $i <= \SmallSmallRSS\Constants::SCHEMA_VERSION; $i++) {

@@ -115,10 +115,13 @@ class DBPrefs
     {
         $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
         $value = \SmallSmallRSS\Database::escape_string($value, $strip_tags);
+        $profile = null;
 
         if (!$user_id) {
             $user_id = $_SESSION['uid'];
-            @$profile = $_SESSION['profile'];
+            if (isset($_SESSION['profile'])) {
+                $profile = $_SESSION['profile'];
+            }
         } else {
             $user_id = sprintf('%d', $user_id);
             $prefs_cache = false;

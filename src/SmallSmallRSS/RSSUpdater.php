@@ -339,6 +339,7 @@ class RSSUpdater
 
             $favicon_file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed.ico";
             $favicon_modified = 0;
+            $favicon_modified_new = 0;
             if (file_exists($favicon_file)) {
                 $favicon_modified = filemtime($favicon_file);
             }
@@ -629,7 +630,7 @@ class RSSUpdater
 
             $entry_ref_id = 0;
             $entry_int_id = 0;
-
+            $article_filters = array();
             if (\SmallSmallRSS\Database::num_rows($result) == 1) {
                 // this will be used below in update handler
                 $orig_content_hash = \SmallSmallRSS\Database::fetch_result($result, 0, 'content_hash');

@@ -34,10 +34,11 @@ class JS extends \SmallSmallRSS\Renderers\Base
     public function render_script_tag($filename)
     {
         $parts = parse_url($filename);
-        $query = $parts['query'];
         $query = '';
-        if (!(strpos($filename, '?') === false)) {
-            $query = substr($filename, strpos($filename, '?') + 1);
+        if (isset($parts['query'])) {
+            $query = $parts['query'];
+        }
+        if (strpos($filename, '?') !== false) {
             $filename = substr($filename, 0, strpos($filename, '?'));
         }
         $timestamp = filemtime($filename);

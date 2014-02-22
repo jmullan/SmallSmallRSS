@@ -22,12 +22,12 @@ class MailTo extends \SmallSmallRSS\Plugin
 
     public function hookRenderArticleButton($line)
     {
-        echo "<img src=\"plugins/mailto/mail.png\" class=\"tagsPic\" style=\"cursor: pointer\"";
-        echo " onclick=\"mailtoArticle(";
+        echo '<img src="plugins/mailto/mail.png" class="tagsPic" style="cursor: pointer"';
+        echo ' onclick="mailtoArticle(';
         echo $line["id"];
-        echo ")\" alt=\"Zoom\" title='";
+        echo ')" alt="Zoom" title="';
         echo __('Forward by email');
-        echo "'>";
+        echo '" />';
     }
 
     public function emailArticle()
@@ -65,18 +65,17 @@ class MailTo extends \SmallSmallRSS\Plugin
             "mailto:?subject=" . rawurlencode($subject)
             . "&body=" . rawurlencode($content)
         );
-        echo __("Clicking the following link to invoke your mail client:");
-        echo "<div class=\"tagCloudContainer\">";
-        echo "<a target=\"_blank\" href=\"$mailto_link\">";
-        echo __("Forward selected article(s) by email.");
-        echo "</a>";
-        echo "</div>";
-        echo __("You should be able to edit the message before sending in your mail client.");
-        echo "<p>";
-        echo "<div style='text-align : center'>";
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('emailArticleDlg').hide()\">";
+        echo __('Clicking the following link to invoke your mail client:');
+        echo '<div class="tagCloudContainer">';
+        echo '<a target="_blank" href="' . $mailto_link . '">';
+        echo __('Forward selected article(s) by email.');
+        echo '</a>';
+        echo '</div>';
+        echo __('You should be able to edit the message before sending in your mail client.');
+        echo '<p style="text-align: center">';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="dijit.byId(\'emailArticleDlg\').hide()">';
         echo __('Close this dialog');
-        echo "</button>";
-        echo "</div>";
+        echo '</button>';
+        echo '</div>';
     }
 }

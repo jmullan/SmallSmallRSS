@@ -7,7 +7,7 @@ class Enclosures
     {
         $query = "SELECT * FROM ttrss_enclosures
                   WHERE
-                      post_id = '$id'
+                      post_id = '$post_id'
                       AND content_url != ''";
         $rv = array();
         $result = \SmallSmallRSS\Database::query($query);

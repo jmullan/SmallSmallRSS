@@ -254,7 +254,7 @@ class DefaultConfigs
      * Override the default translation with this
      * example: en_US
      */
-    const FORCED_LOCALE = '';
+    const FORCE_LOCALE = '';
 
     const SELF_USER_AGENT_BOT = 'SmallSmallRSSbot';
 

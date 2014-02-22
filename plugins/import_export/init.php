@@ -28,7 +28,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
             return;
         }
         print "please enter your username: ";
-        $username = \SmallSmallRSS\Database::escape_string(trim(read_stdin()));
+        $username = \SmallSmallRSS\Database::escape_string(trim(\SmallSmallRSS\Utils::readStdin()));
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_users WHERE login = '$username'"
         );

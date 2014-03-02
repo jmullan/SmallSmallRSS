@@ -20,25 +20,20 @@ class FeedParser
         libxml_use_internal_errors(true);
         libxml_clear_errors();
         $this->doc = new \DOMDocument();
-        $this->doc->loadXML($data);
-
-        $error = libxml_get_last_error();
-
-        if ($error && $error->code == 9) {
-            libxml_clear_errors();
-
-            // we might want to try guessing input encoding here too
-            $data = iconv('UTF-8', 'UTF-8//IGNORE', $data);
-
-            $this->doc = new \DOMDocument();
+        if ('' !== $data) {
             $this->doc->loadXML($data);
-
             $error = libxml_get_last_error();
+            if ($error && $error->code == 9) {
+                libxml_clear_errors();
+                // we might want to try guessing input encoding here too
+                $data = iconv('UTF-8', 'UTF-8//IGNORE', $data);
+                $this->doc = new \DOMDocument();
+                $this->doc->loadXML($data);
+                $error = libxml_get_last_error();
+            }
+            $this->error = $this->format_error($error);
+            libxml_clear_errors();
         }
-
-        $this->error = $this->format_error($error);
-        libxml_clear_errors();
-
         $this->items = array();
     }
 

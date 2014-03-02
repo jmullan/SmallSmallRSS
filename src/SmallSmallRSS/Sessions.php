@@ -3,12 +3,17 @@ namespace SmallSmallRSS;
 
 class Sessions
 {
-    public static $session_expire = 86400;
+    public static $session_expire = null;
     public static $session_name = 'ttrss_sid';
+    private static $initialized = false;
 
     public static function init($session_name = null)
     {
-        self::$session_expire = max(\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'), 86400);
+        if (self::$initialized) {
+            return;
+        }
+        self::$initialized = true;
+        self::$session_expire = \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME');
         if (!is_null($session_name)) {
             self::$session_name = $session_name;
         }
@@ -23,10 +28,7 @@ class Sessions
         ini_set('session.name', self::$session_name);
         ini_set('session.use_only_cookies', true);
         ini_set('session.gc_maxlifetime', self::$session_expire);
-        ini_set(
-            'session.cookie_lifetime',
-            min(0, \SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'))
-        );
+        ini_set('session.cookie_lifetime', self::$session_expire);
         if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
             session_set_save_handler(
                 '\SmallSmallRSS\Sessions::open',

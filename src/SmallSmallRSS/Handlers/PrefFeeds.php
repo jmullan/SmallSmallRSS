@@ -1371,8 +1371,7 @@ class PrefFeeds extends ProtectedHandler
     public function addCat()
     {
         $feed_cat = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['cat']));
-
-        \SmallSmallRSS\FeedCategories::add($feed_cat);
+        \SmallSmallRSS\FeedCategories::add($_SESSION['uid'], $feed_cat);
     }
 
     public function index()

@@ -29,7 +29,7 @@ if (array_search($op, $public_calls) !== false) {
 
 $csrf_token = (isset($_REQUEST['csrf_token']) ? $_REQUEST['csrf_token'] : '');
 \SmallSmallRSS\Sessions::init();
-\SmallSmallRSS\Locale::startupGettext();
+\SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
 $script_started = microtime(true);
 if (!\SmallSmallRSS\PluginHost::init_all()) {
     return;

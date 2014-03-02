@@ -36,7 +36,7 @@ class opml extends ProtectedHandler
         echo '<div class="floatingLogo"><img src="images/logo_small.png"></div>';
         echo '<h1>'.__('OPML Utility').'</h1>';
         echo "<div class='content'>";
-        \SmallSmallRSS\FeedCategories::add('Imported feeds');
+        \SmallSmallRSS\FeedCategories::add($owner_uid, 'Imported feeds');
         $this->opml_notice(__('Importing OPML...'));
         $this->opml_import($owner_uid);
         echo '<br />';
@@ -431,7 +431,7 @@ class opml extends ProtectedHandler
     {
         $body = $doc->getElementsByTagName('body');
 
-        $default_cat_id = (int) \SmallSmallRSS\FeedCategories::get('Imported feeds', false);
+        $default_cat_id = (int) \SmallSmallRSS\FeedCategories::get($owner_uid, 'Imported feeds', false);
 
         if ($root_node) {
             $cat_title = \SmallSmallRSS\Database::escape_string(
@@ -444,11 +444,11 @@ class opml extends ProtectedHandler
             }
 
             if (!in_array($cat_title, array('tt-rss-filters', 'tt-rss-labels', 'tt-rss-prefs'))) {
-                $cat_id = \SmallSmallRSS\FeedCategories::get($cat_title, $parent_id);
+                $cat_id = \SmallSmallRSS\FeedCategories::get($owner_uid, $cat_title, $parent_id);
                 \SmallSmallRSS\Database::query('BEGIN');
                 if ($cat_id === false) {
-                    \SmallSmallRSS\FeedCategories::add($cat_title, $parent_id);
-                    $cat_id = \SmallSmallRSS\FeedCategories::get($cat_title, $parent_id);
+                    \SmallSmallRSS\FeedCategories::add($_SESSION['uid'], $cat_title, $parent_id);
+                    $cat_id = \SmallSmallRSS\FeedCategories::get($owner_uid, $cat_title, $parent_id);
                 }
                 \SmallSmallRSS\Database::query('COMMIT');
             } else {

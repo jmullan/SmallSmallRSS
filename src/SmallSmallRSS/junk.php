@@ -79,7 +79,7 @@ function login_sequence()
         }
 
         if ($_SESSION['uid']) {
-            \SmallSmallRSS\Locale::startupGettext();
+            \SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
             \SmallSmallRSS\PluginHost::loadUserPlugins($_SESSION['uid']);
             /* cleanup ccache */
             \SmallSmallRSS\CountersCache::cleanup($_SESSION['uid']);

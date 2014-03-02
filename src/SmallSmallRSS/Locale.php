@@ -26,7 +26,7 @@ class Locale
         'fi_FI' => 'Suomi'
     );
 
-    public static function startupGettext()
+    public static function startupGettext($owner_uid)
     {
         # Get locale from Accept-Language header
         $locale = \AcceptToGettext\Scorer::al2gt(
@@ -37,9 +37,9 @@ class Locale
         if ($forced_locale and $forced_locale != 'auto') {
             $locale = $forced_locale;
         }
-        if (!empty($_SESSION['uid'])
+        if (!empty($owner_uid)
             && \SmallSmallRSS\Sanity::getSchemaVersion() >= 120) {
-            $pref_locale = \SmallSmallRSS\DBPrefs::read('USER_LANGUAGE', $_SESSION['uid']);
+            $pref_locale = \SmallSmallRSS\DBPrefs::read('USER_LANGUAGE', $owner_uid);
             if ($pref_locale && $pref_locale != 'auto') {
                 $locale = $pref_locale;
             }

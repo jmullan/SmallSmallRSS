@@ -27,7 +27,7 @@ class FeedCategories
         }
     }
 
-    public static function get($feed_cat, $parent_cat_id = false)
+    public static function get($owner_uid, $feed_cat, $parent_cat_id = false)
     {
         if ($parent_cat_id) {
             $parent_qpart = "parent_cat = '$parent_cat_id'";
@@ -41,7 +41,7 @@ class FeedCategories
              WHERE
                  $parent_qpart
                  AND title = '$feed_cat'
-                 AND owner_uid = ".$_SESSION['uid']
+                 AND owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
             return false;
@@ -50,7 +50,7 @@ class FeedCategories
         }
     }
 
-    public static function add($feed_cat, $parent_cat_id = false)
+    public static function add($owner_uid, $feed_cat, $parent_cat_id = false)
     {
         if (!$feed_cat) {
             return false;
@@ -74,14 +74,14 @@ class FeedCategories
              WHERE
                  $parent_qpart
                  AND title = '$feed_cat'
-                 AND owner_uid = " . $_SESSION['uid']
+                 AND owner_uid = $owner_uid"
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
 
             $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_feed_categories (owner_uid,title,parent_cat)
-                VALUES ('".$_SESSION['uid']."', '$feed_cat', $parent_insert)"
+                VALUES ('$owner_uid', '$feed_cat', $parent_insert)"
             );
             \SmallSmallRSS\Database::query('COMMIT');
             return true;

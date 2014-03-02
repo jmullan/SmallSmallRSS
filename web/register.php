@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Sessions::init();
 
-\SmallSmallRSS\Locale::startupGettext();
+\SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
 
 $action = $_REQUEST['action'];
 

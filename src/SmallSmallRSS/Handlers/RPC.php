@@ -377,24 +377,21 @@ class RPC extends ProtectedHandler
 
     private static function checkDatabase()
     {
-        $error_code = 0;
+        $error_code = \SmallSmallRSS\Errors::UNSPECIFIED();
         $schema_version = \SmallSmallRSS\Sanity::getSchemaVersion(true);
         if (!\SmallSmallRSS\Sanity::isSchemaCorrect()) {
-            $error_code = 5;
+            $error_code = \SmallSmallRSS\Errors::INCORRECT_DB_SCHEMA();
         }
         if (\SmallSmallRSS\Config::get('DB_TYPE') == 'mysql') {
             $result = \SmallSmallRSS\Database::query('SELECT true', false);
             if (\SmallSmallRSS\Database::num_rows($result) != 1) {
-                $error_code = 10;
+                $error_code = \SmallSmallRSS\Errors::OLD_MYSQL();
             }
         }
         if (\SmallSmallRSS\Database::escape_string('testTEST') != 'testTEST') {
-            $error_code = 12;
+            $error_code = \SmallSmallRSS\Errors::SQL_ESCAPE_FAILED();
         }
-        return array(
-            'code' => $error_code,
-            'message' => \SmallSmallRSS\Constants::error_description($error_code)
-        );
+        return array('code' => $error_code->getOrdinal(), 'message' => $error_code->description());
     }
 
     private function makeInitParams()

@@ -825,7 +825,7 @@ class PublicHandler extends Handler
 
     public function index()
     {
-        $renderer = new \SmallSmallRSS\Renderers\JSONError(7);
+        $renderer = new \SmallSmallRSS\Renderers\JSONError(\SmallSmallRSS\Errors::NOTHING_TO_DO());
         $renderer->render();
     }
 

@@ -42,7 +42,7 @@ if (\SmallSmallRSS\Auth::is_single_user_mode()) {
 
 if ($_SESSION['uid']) {
     if (!\SmallSmallRSS\Sessions::validate()) {
-        $renderer = new \SmallSmallRSS\Renderers\JSONError(6);
+        $renderer = new \SmallSmallRSS\Renderers\JSONError(\SmallSmallRSS\Errors::REQUEST_UNAUTHORIZED());
         $renderer->render();
         return;
     }
@@ -62,7 +62,7 @@ if (isset($legacy_ops[$op])) {
 }
 $handler = '\\SmallSmallRSS\\Handlers\\' . $op;
 $override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler($op, $method);
-$error_code = 7;
+$error_code = \SmallSmallRSS\Errors::NOTHING_TO_DO();
 if (class_exists($handler) || $override) {
     if ($override) {
         $handler = $override;
@@ -71,7 +71,7 @@ if (class_exists($handler) || $override) {
     }
     if ($handler) {
         if (!$handler instanceof \SmallSmallRSS\Handlers\IHandler) {
-            $error_code = 6;
+            $error_code = \SmallSmallRSS\Errors::REQUEST_UNAUTHORIZED();
         } elseif ($handler->ignoreCSRF($method) || \SmallSmallRSS\Sessions::validateCSRF($csrf_token)) {
             if ($handler->before($method)) {
                 if ($method && method_exists($handler, $method)) {
@@ -84,10 +84,10 @@ if (class_exists($handler) || $override) {
                 $handler->after();
                 return;
             } else {
-                $error_code = 6;
+                $error_code = \SmallSmallRSS\Errors::REQUEST_UNAUTHORIZED();
             }
         } else {
-            $error_code = 6;
+            $error_code = \SmallSmallRSS\Errors::REQUEST_UNAUTHORIZED();
         }
     }
 }

@@ -391,7 +391,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
             echo json_encode(array("feeds" => $feeds));
         } else {
-            $renderer = new \SmallSmallRSS\Renderers\JSONError(6);
+            $renderer = new \SmallSmallRSS\Renderers\JSONError(\SmallSmallRSS\Errors::REQUEST_UNAUTHORIZED());
             $renderer->render();
         }
     }

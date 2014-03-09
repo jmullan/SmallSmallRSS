@@ -28,5 +28,5 @@ if ($handler instanceof \SmallSmallRSS\Handlers\IHandler && $handler->before($me
     $handler->after();
     return;
 }
-$renderer = new \SmallSmallRSS\Renderers\JSONError(7);
+$renderer = new \SmallSmallRSS\Renderers\JSONError(\SmallSmallRSS\Errors::NOTHING_TO_DO());
 $renderer->render();

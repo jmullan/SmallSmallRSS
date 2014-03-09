@@ -157,7 +157,7 @@ class Sessions
         $expire = time();
         \SmallSmallRSS\Database::query(
             'DELETE FROM ttrss_sessions
-             WHERE expire < $expire'
+             WHERE expire < ' . $expire
         );
     }
 

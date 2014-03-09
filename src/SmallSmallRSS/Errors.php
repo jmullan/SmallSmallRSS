@@ -22,7 +22,7 @@ class Errors extends \MabeEnum\Enum
     public function dump()
     {
         $ERRORS = array(
-            self::UNSPECIFIED => '',
+            self::UNSPECIFIED => __('No error'),
             self::REQUIRES_XHR => __(
                 'This program requires XmlHttpRequest'
                 . " to function properly. Your browser doesn't seem to support it."
@@ -55,7 +55,7 @@ class Errors extends \MabeEnum\Enum
 
     public function description()
     {
-        $errors = self::errors();
+        $errors = self::dump();
         return $errors[$this->getOrdinal()];
     }
 }

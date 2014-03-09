@@ -56,6 +56,7 @@ class Database
         $error = self::last_error();
         if ($error) {
             \SmallSmallRSS\Logger::log('SQL error');
+            \SmallSmallRSS\Logger::log($query);
         }
         return $result;
     }

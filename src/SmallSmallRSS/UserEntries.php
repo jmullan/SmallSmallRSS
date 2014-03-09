@@ -503,4 +503,22 @@ class UserEntries
             return '';
         }
     }
+    public static function unescapedUpdateFields($owner_uid, $fields, $article_ids)
+    {
+        $in_article_ids = join(', ', $article_ids);
+        $field_pairs = array();
+        foreach ($fields as $field => $set_to) {
+            $field_pairs[] = "$field = $set_to";
+        }
+        $field_settings = join(', ', $field_pairs);
+        $result = \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_user_entries
+                 SET
+                     $field_settings
+                 WHERE
+                     ref_id IN ($in_article_ids)
+                     AND owner_uid = $owner_uid"
+        );
+        return \SmallSmallRSS\Database::affected_rows($result);
+    }
 }

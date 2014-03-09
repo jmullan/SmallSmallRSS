@@ -110,8 +110,8 @@ class Handler implements IHandler
             unset($line['tag_cache']);
             $line['content'] = sanitize(
                 $line['content'],
-                \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
                 $owner_uid,
+                \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
                 $line['site_url']
             );
             $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(

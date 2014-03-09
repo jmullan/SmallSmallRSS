@@ -261,21 +261,19 @@ class API extends Handler
         $data = $this->getSQLEscapedStringFromRequest('data');
         $field_raw = (int) $this->getSQLEscapedStringFromRequest('field');
 
-        $field = '';
-        $set_to = '';
-
+        $fields = array();
         switch ($field_raw) {
             case 0:
                 $field = 'marked';
-                $additional_fields = ',last_marked = NOW()';
+                $fields['last_marked'] = 'NOW()';
                 break;
             case 1:
                 $field = 'published';
-                $additional_fields = ',last_published = NOW()';
+                $fields['last_published'] = 'NOW()';
                 break;
             case 2:
                 $field = 'unread';
-                $additional_fields = ',last_read = NOW()';
+                $fields['last_read'] = 'NOW()';
                 break;
             case 3:
                 $field = 'note';
@@ -298,18 +296,15 @@ class API extends Handler
         }
 
         if ($field && $set_to && count($article_ids) > 0) {
-            $in_article_ids = join(', ', $article_ids);
-            $result = \SmallSmallRSS\Database::query(
-                "UPDATE ttrss_user_entries
-                 SET
-                     $field = $set_to
-                     $additional_fields
-                 WHERE
-                     ref_id IN ($in_article_ids)
-                     AND owner_uid = " . $_SESSION['uid']
+            $fields[$field] = $set_to;
+
+            $num_updated = \SmallSmallRSS\UserEntries::unescapedUpdateFields(
+                $_SESSION['uid'],
+                $fields,
+                $article_ids
             );
 
-            $num_updated = \SmallSmallRSS\Database::affected_rows($result);
+
             if ($num_updated > 0 && $field == 'unread') {
                 $feed_ids = \SmallSmallRSS\UserEntries::getMatchingFeeds($article_ids, $_SESSION['uid']);
                 foreach ($feed_ids as $feed_id) {
@@ -413,7 +408,7 @@ class API extends Handler
         $config['daemon_is_running'] = \SmallSmallRSS\Lockfiles::is_locked('update_daemon.lock');
         $result = \SmallSmallRSS\Database::query(
             'SELECT COUNT(*) AS cf FROM
-            ttrss_feeds WHERE owner_uid = ' . $_SESSION['uid']
+             ttrss_feeds WHERE owner_uid = ' . $_SESSION['uid']
         );
         $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, 'cf');
         $config['num_feeds'] = (int) $num_feeds;
@@ -712,8 +707,8 @@ class API extends Handler
                 if ($sanitize_content) {
                     $headline_row['content'] = sanitize(
                         $line['content_preview'],
+                        $_SESSION['uid'],
                         \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
-                        false,
                         $line['site_url']
                     );
                 } else {
@@ -761,7 +756,7 @@ class API extends Handler
              FROM ttrss_feeds
              WHERE
                  id = '$feed_id'
-                 AND owner_uid = ".$_SESSION['uid']
+                 AND owner_uid = " . $_SESSION['uid']
         );
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
             PrefFeeds::removeFeed($feed_id, $_SESSION['uid']);

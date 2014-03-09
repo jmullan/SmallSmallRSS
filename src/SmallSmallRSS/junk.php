@@ -1,7 +1,20 @@
 <?php
 function authenticate_user($login, $password, $check_only = false)
 {
-    if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
+    if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+        $_SESSION['uid'] = 1;
+        $_SESSION['name'] = 'admin';
+        $_SESSION['access_level'] = 10;
+        $_SESSION['hide_hello'] = true;
+        $_SESSION['hide_logout'] = true;
+        $_SESSION['auth_module'] = false;
+        if (!$_SESSION['csrf_token']) {
+            $_SESSION['csrf_token'] = sha1(uniqid(rand(), true));
+        }
+        $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
+        \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], false);
+        return true;
+    } else {
         $user_id = false;
         $plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::AUTH_USER);
         if (!$plugins) {
@@ -35,19 +48,6 @@ function authenticate_user($login, $password, $check_only = false)
             return true;
         }
         return false;
-    } else {
-        $_SESSION['uid'] = 1;
-        $_SESSION['name'] = 'admin';
-        $_SESSION['access_level'] = 10;
-        $_SESSION['hide_hello'] = true;
-        $_SESSION['hide_logout'] = true;
-        $_SESSION['auth_module'] = false;
-        if (!$_SESSION['csrf_token']) {
-            $_SESSION['csrf_token'] = sha1(uniqid(rand(), true));
-        }
-        $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
-        \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], false);
-        return true;
     }
 }
 
@@ -1230,11 +1230,8 @@ function queryFeedHeadlines(
     return array($result, $feed_title, $feed_site_url, $last_error, $last_updated);
 }
 
-function sanitize($str, $force_remove_images = false, $owner = false, $site_url = false)
+function sanitize($str, $owner, $force_remove_images = false, $site_url = false)
 {
-    if (!$owner) {
-        $owner = $_SESSION['uid'];
-    }
     $res = trim($str);
     if (!$res) {
         return '';

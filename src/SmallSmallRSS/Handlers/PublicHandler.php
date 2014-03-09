@@ -130,7 +130,7 @@ class PublicHandler extends Handler
                     true
                 );
 
-                $content = sanitize($line['content_preview'], false, $owner_uid);
+                $content = sanitize($line['content_preview'], $owner_uid);
                 $note_style = (
                     'background-color: #fff7d5;
                      border-width: 1px;
@@ -213,7 +213,7 @@ class PublicHandler extends Handler
                 $article['link'] = $line['link'];
                 $article['title'] = $line['title'];
                 $article['excerpt'] = \SmallSmallRSS\Utils::truncateString(strip_tags($line['content_preview']), 100, '...');
-                $article['content'] = sanitize($line['content_preview'], false, $owner_uid);
+                $article['content'] = sanitize($line['content_preview'], $owner_uid);
                 $article['updated'] = date('c', strtotime($line['updated']));
                 if ($line['note']) {
                     $article['note'] = $line['note'];

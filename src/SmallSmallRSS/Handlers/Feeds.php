@@ -530,7 +530,7 @@ class Feeds extends ProtectedHandler
                     $line['content'] = sanitize(
                         $line['content_preview'],
                         \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
-                        false,
+                        $_SESSION['uid'],
                         $entry_site_url
                     );
                     \SmallSmallRSS\PluginHost::getInstance()->runHooks(

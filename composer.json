@@ -61,7 +61,8 @@
         "jmullan/otphp": "*@dev",
         "jmullan/minitemplator": "*@dev",
         "mobiledetect/mobiledetectlib": "*",
-        "gigablah/sphinxphp": "2.0.*"
+        "gigablah/sphinxphp": "2.0.*",
+        "marc-mabe/php-enum": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*"

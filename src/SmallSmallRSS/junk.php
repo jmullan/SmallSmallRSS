@@ -727,7 +727,8 @@ function make_runtime_info()
     $data['daemon_stamp'] = $daemon_stamp;
     $data['last_run'] = $last_run;
     if ($data['daemon_is_running']) {
-        if (time() - $_SESSION['daemon_stamp_check'] > 30) {
+        if (!isset($_SESSION['daemon_stamp_check'])
+            || time() - $_SESSION['daemon_stamp_check'] > 30) {
             $stamp_delta = time() - $last_run;
             if ($stamp_delta > 1800) {
                 $stamp_check = false;

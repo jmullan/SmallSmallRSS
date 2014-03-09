@@ -23,18 +23,20 @@ class Digest
         }
 
         $result = \SmallSmallRSS\Database::query(
-            "SELECT id,email FROM ttrss_users
-                WHERE email != '' AND (last_digest_sent IS NULL OR $interval_query)"
+            "SELECT id,email
+             FROM ttrss_users
+             WHERE email != '' AND (last_digest_sent IS NULL OR $interval_query)"
         );
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-            if (@\SmallSmallRSS\DBPrefs::read('DIGEST_ENABLE', $line['id'], false)) {
-                $preferred_ts = strtotime(\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME', $line['id'], '00:00'));
+            $uid = $line['id'];
+            if (@\SmallSmallRSS\DBPrefs::read('DIGEST_ENABLE', $uid, false)) {
+                $preferred_ts = strtotime(\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME', $uid, '00:00'));
                 $since = time() - $preferred_ts;
                 // try to send digests within 2 hours of preferred time
                 if ($preferred_ts && $since >= 0 && $since < 7200) {
-                    $do_catchup = \SmallSmallRSS\DBPrefs::read('DIGEST_CATCHUP', $line['id'], false);
-                    $tuple = prepare_headlines_digest($line['id'], 1, $limit);
+                    $do_catchup = \SmallSmallRSS\DBPrefs::read('DIGEST_CATCHUP', $uid, false);
+                    $tuple = prepare_headlines_digest($uid, 1, $limit);
                     $digest = $tuple[0];
                     $headlines_count = $tuple[1];
                     $affected_ids = $tuple[2];
@@ -55,12 +57,12 @@ class Digest
                             \SmallSmallRSS\Logger::debug('ERROR: ' . $mail->ErrorInfo, true, $debug);
                         }
                         if ($rc && $do_catchup) {
-                            catchupArticlesById($affected_ids, 0, $line['id']);
+                            catchupArticlesById($affected_ids, 0, $uid);
                         }
                     }
                     \SmallSmallRSS\Database::query(
                         'UPDATE ttrss_users SET last_digest_sent = NOW()
-                        WHERE id = ' . $line['id']
+                        WHERE id = ' . $uid
                     );
 
                 }

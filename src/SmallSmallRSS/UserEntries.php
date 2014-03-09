@@ -166,7 +166,7 @@ class UserEntries
                     );
                 }
                 if ($feed_id == -3) {
-                    $intl = \SmallSmallRSS\DBPrefs::read('FRESH_ARTICLE_MAX_AGE');
+                    $intl = \SmallSmallRSS\DBPrefs::read('FRESH_ARTICLE_MAX_AGE', $owner_uid);
                     if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
                         $match_part = "date_entered > NOW() - INTERVAL '$intl hour' ";
                     } else {

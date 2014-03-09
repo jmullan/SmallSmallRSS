@@ -19,7 +19,8 @@ class API extends Handler
                 return false;
             }
 
-            if (!empty($_SESSION['uid']) && $method != 'logout' && !\SmallSmallRSS\DBPrefs::read('ENABLE_API_ACCESS')) {
+            if (!empty($_SESSION['uid']) && $method != 'logout'
+                && !\SmallSmallRSS\DBPrefs::read('ENABLE_API_ACCESS', $_SESSION['uid'])) {
                 $this->wrap(self::STATUS_ERR, array('error' => 'API_DISABLED'));
                 return false;
             }
@@ -437,7 +438,7 @@ class API extends Handler
     public function getPref()
     {
         $pref_name = $this->getSQLEscapedStringFromRequest('pref_name');
-        $this->wrap(self::STATUS_OK, array('value' => \SmallSmallRSS\DBPrefs::read($pref_name)));
+        $this->wrap(self::STATUS_OK, array('value' => \SmallSmallRSS\DBPrefs::read($pref_name, $_SESSION['uid'])));
     }
 
     public function getLabels()

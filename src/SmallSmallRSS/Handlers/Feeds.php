@@ -585,15 +585,18 @@ class Feeds extends ProtectedHandler
                         <a class=\"title\"
                         target=\"_blank\" href=\"".
                         htmlspecialchars($line['link']);
-                    echo '">'.
-                        $line['title'] .
-                        "</a> <span class=\"author\">$entry_author</span>";
+                    echo '">';
+                    echo $line['title'];
+                    echo '</a>';
+                    echo ' ';
+                    echo '<span class="author">';
+                    echo $entry_author;
+                    echo '</span>';
 
                     echo $labels_str;
 
-                    echo "<span class='collapseBtn' style='display: none'>
-                        <img src=\"images/collapse.png\" onclick=\"cdmCollapseArticle(event, $id)\"
-                        title=\"";
+                    echo '<span class="collapseBtn" style="display: none">';
+                    echo "<img src=\"images/collapse.png\" onclick=\"cdmCollapseArticle(event, $id)\" title=\"";
                     echo __('Collapse article');
                     echo '"/></span>';
 
@@ -605,18 +608,19 @@ class Feeds extends ProtectedHandler
                         $excerpt_hidden = 'style="display: none"';
                     }
 
-                    echo "<span $excerpt_hidden
-                        id=\"CEXC-$id\" class=\"cdmExcerpt\"> - $content_preview</span>";
+                    echo "<span $excerpt_hidden id=\"CEXC-$id\" class=\"cdmExcerpt\">";
+                    echo "-";
+                    echo $content_preview;
+                    echo "</span>";
                     echo '</span>';
 
                     if (!\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED')) {
-                        if (@$line['feed_title']) {
-                            $rgba = @$rgba_cache[$feed_id];
-
-                            echo "<div class=\"hlFeed\">
-                                <a href=\"#\" style=\"background-color: rgba($rgba,0.3)\"
-                                onclick=\"viewfeed($feed_id)\">".
-                                \SmallSmallRSS\Utils::truncateString($line['feed_title'], 30);
+                        if (!empty($line['feed_title'])) {
+                            $rgba = isset($rgba_cache[$feed_id]) ? $rgba_cache[$feed_id] : '255, 255, 255';
+                            echo '<div class="hlFeed">';
+                            echo "<a href=\"#\" style=\"background-color: rgba($rgba,0.3)\"";
+                            echo " onclick=\"viewfeed($feed_id)\">";
+                            echo \SmallSmallRSS\Utils::truncateString($line['feed_title'], 30);
                             echo '</a>
                             </div>';
                         }

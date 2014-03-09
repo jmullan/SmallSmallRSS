@@ -1,8 +1,11 @@
 <?php
 require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Sessions::init();
-
-\SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
+$user_id = null;
+if (isset($_SESSION['uid'])) {
+    $user_id = $_SESSION['uid'];
+}
+\SmallSmallRSS\Locale::startupGettext($user_id);
 
 $script_started = microtime(true);
 

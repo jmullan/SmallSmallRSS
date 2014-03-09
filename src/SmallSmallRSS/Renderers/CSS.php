@@ -5,7 +5,7 @@ class CSS
 {
     public function renderUserStylesheet()
     {
-        $value = \SmallSmallRSS\DBPrefs::read('USER_STYLESHEET');
+        $value = \SmallSmallRSS\DBPrefs::read('USER_STYLESHEET', $_SESSION['uid']);
         if ($value) {
             echo '<style type="text/css">';
             echo str_replace('<br/>', "\n", $value);

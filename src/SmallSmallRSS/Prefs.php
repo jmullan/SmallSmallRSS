@@ -17,4 +17,19 @@ class Prefs
         }
         return $prefs;
     }
+
+    public static function getHelp($pref_name)
+    {
+        $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT help_text
+             FROM ttrss_prefs
+             WHERE pref_name = '$pref_name'"
+        );
+        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+            return \SmallSmallRSS\Database::fetch_result($result, 0, 'help_text');
+        } else {
+            return false;
+        }
+    }
 }

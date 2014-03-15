@@ -147,11 +147,7 @@ class Pref_Prefs extends ProtectedHandler
             $value = \SmallSmallRSS\Database::escape_string($_POST[$pref_name]);
             if ($pref_name == 'DIGEST_PREFERRED_TIME') {
                 if (\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME') != $value) {
-                    \SmallSmallRSS\Database::query(
-                        'UPDATE ttrss_users
-                         SET last_digest_sent = NULL
-                         WHERE id = ' . $_SESSION['uid']
-                    );
+                    \SmallSmallRSS\Users::clearLastDigestSent($_SESSION['uid']);
                 }
             }
             if ($pref_name == 'USER_LANGUAGE') {
@@ -170,13 +166,9 @@ class Pref_Prefs extends ProtectedHandler
 
     public function getHelp()
     {
-        $pref_name = \SmallSmallRSS\Database::escape_string($_REQUEST['pn']);
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT help_text FROM ttrss_prefs
-            WHERE pref_name = '$pref_name'"
-        );
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            $help_text = \SmallSmallRSS\Database::fetch_result($result, 0, 'help_text');
+        $pref_name = $_REQUEST['pn'];
+        $help_text = \SmallSmallRSS\Prefs::getHelp($pref_name);
+        if ($help_text !== false) {
             echo $help_text;
         } else {
             printf(__('Unknown option: %s'), $pref_name);
@@ -185,13 +177,7 @@ class Pref_Prefs extends ProtectedHandler
 
     public function changeemail()
     {
-        $email = \SmallSmallRSS\Database::escape_string($_POST['email']);
-        $full_name = \SmallSmallRSS\Database::escape_string($_POST['full_name']);
-        $active_uid = $_SESSION['uid'];
-        \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_users SET email = '$email',
-            full_name = '$full_name' WHERE id = '$active_uid'"
-        );
+        \SmallSmallRSS\Users::update($_SESSION['uid'], $_POST['email'], $_POST['full_name']);
         echo __('Your personal data has been saved.');
     }
 
@@ -205,7 +191,7 @@ class Pref_Prefs extends ProtectedHandler
         }
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_user_prefs
-            WHERE $profile_qpart AND owner_uid = ".$_SESSION['uid']
+             WHERE $profile_qpart AND owner_uid = ".$_SESSION['uid']
         );
         \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], $_SESSION['profile']);
         echo __('Your preferences are now set to default values.');

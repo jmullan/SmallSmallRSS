@@ -119,4 +119,24 @@ class Users
         );
         return \SmallSmallRSS\Database::fetch_assoc($result);
     }
+    public static function clearLastDigestSent($owner_uid)
+    {
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_users
+             SET last_digest_sent = NULL
+             WHERE id = $owner_uid"
+        );
+
+    }
+    public static function update($owner_uid, $email, $full_name)
+    {
+        $full_name = \SmallSmallRSS\Database::escape_string(trim($full_name));
+        $email = \SmallSmallRSS\Database::escape_string(trim($email));
+        \SmallSmallRSS\Database::query(
+            "UPDATE ttrss_users
+             SET email = '$email',
+                 full_name = '$full_name'
+             WHERE id = '$owner_uid'"
+        );
+    }
 }

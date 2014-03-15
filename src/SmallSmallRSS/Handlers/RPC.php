@@ -12,59 +12,24 @@ class RPC extends ProtectedHandler
     public function setprofile()
     {
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-
         $_SESSION['profile'] = $id;
     }
 
     public function remprofiles()
     {
-        $ids = explode(',', \SmallSmallRSS\Database::escape_string(trim($_REQUEST['ids'])));
-
-        foreach ($ids as $id) {
-            if ($_SESSION['profile'] != $id) {
-                \SmallSmallRSS\Database::query(
-                    "DELETE FROM ttrss_settings_profiles
-                     WHERE
-                         id = '$id'
-                         AND owner_uid = " . $_SESSION['uid']
-                );
-            }
-        }
+        \SmallSmallRSS\SettingsProfiles::deleteIds(explode(',', $_REQUEST['ids']));
     }
 
     public function addprofile()
     {
-        $title = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['title']));
+        $title = trim($_REQUEST['title']);
         if ($title) {
             \SmallSmallRSS\Database::query('BEGIN');
-
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT id
-                 FROM ttrss_settings_profiles
-                 WHERE
-                     title = '$title'
-                     AND owner_uid = " . $_SESSION['uid']
-            );
-
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-
-                \SmallSmallRSS\Database::query(
-                    "INSERT INTO ttrss_settings_profiles
-                     (title, owner_uid)
-                     VALUES ('$title', ".$_SESSION['uid'] .')'
-                );
-
-                $result = \SmallSmallRSS\Database::query(
-                    "SELECT id
-                     FROM ttrss_settings_profiles
-                     WHERE title = '$title'"
-                );
-
-                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                    $profile_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
-                    if ($profile_id) {
-                        \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], $profile_id);
-                    }
+            $id = \SmallSmallRSS\SettingsProfiles::findByTitle($title, $_SESSION['uid']);
+            if ($id !== false) {
+                $id = \SmallSmallRSS\SettingsProfiles::create($title, $_SESSION['uid']);
+                if ($id !== false) {
+                    \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], $id);
                 }
             }
             \SmallSmallRSS\Database::query('COMMIT');
@@ -81,14 +46,8 @@ class RPC extends ProtectedHandler
         }
         if ($title) {
             \SmallSmallRSS\Database::query('BEGIN');
-            $result = \SmallSmallRSS\Database::query(
-                "SELECT id
-                 FROM ttrss_settings_profiles
-                 WHERE
-                     title = '$title'
-                     AND owner_uid =" . $_SESSION['uid']
-            );
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            $existing_title_id = \SmallSmallRSS\SettingsProfiles::findByTitle($title, $_SESSION['uid']);
+            if ($existing_title_id === false) {
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_settings_profiles
                      SET title = '$title'
@@ -96,18 +55,8 @@ class RPC extends ProtectedHandler
                          id = '$id' AND
                          owner_uid = " . $_SESSION['uid']
                 );
-                echo $title;
-            } else {
-                $result = \SmallSmallRSS\Database::query(
-                    "SELECT title
-                     FROM ttrss_settings_profiles
-                     WHERE
-                         id = '$id'
-                         AND owner_uid =" . $_SESSION['uid']
-                );
-                echo \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
             }
-
+            echo $title;
             \SmallSmallRSS\Database::query('COMMIT');
         }
     }

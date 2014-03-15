@@ -22,11 +22,15 @@ class PublicHandler extends Handler
         }
 
         $date_sort_field = 'date_entered DESC, updated DESC';
+        $date_check_field = 'date_entered';
 
-        if ($feed == -2) {
+        if ($feed == -2 && !$is_cat) {
             $date_sort_field = 'last_published DESC';
-        } elseif ($feed == -1)
-                $date_sort_field = 'last_marked DESC';
+            $date_check_field = 'last_published';
+        } elseif ($feed == -1 && !$is_cat) {
+            $date_sort_field = 'last_marked DESC';
+            $date_check_field = 'last_marked';
+        }
 
         switch ($order) {
             case 'title':
@@ -59,8 +63,7 @@ class PublicHandler extends Handler
         $result = $qfh_ret[0];
 
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            $ts = strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, 'date_entered'));
-
+            $ts = strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, $date_check_field));
             if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE'])
                 && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $ts) {
                 header('HTTP/1.0 304 Not Modified');

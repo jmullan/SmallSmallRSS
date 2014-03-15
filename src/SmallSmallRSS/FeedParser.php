@@ -31,7 +31,16 @@ class FeedParser
                 $this->doc->loadXML($data);
                 $error = libxml_get_last_error();
             }
-            $this->error = $this->format_error($error);
+            $this->error = "";
+            if ($error) {
+                foreach(libxml_get_errors() as $error) {
+                    if($error->level == LIBXML_ERR_FATAL) {
+                        $this->error = $this->format_error($error);
+                        // break here because currently we only show one error
+                        break;
+                    }
+                }
+            }
             libxml_clear_errors();
         }
         $this->items = array();
@@ -53,7 +62,7 @@ class FeedParser
 
         $root = $xpath->query('(//atom03:feed|//atom:feed|//channel|//rdf:rdf|//rdf:RDF)');
 
-        if ($root) {
+        if ($root && $root->length) {
             $root = $root->item(0);
 
             if ($root) {

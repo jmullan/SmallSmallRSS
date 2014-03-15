@@ -200,9 +200,9 @@ class CountersCache
 
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             \SmallSmallRSS\Database::query(
-                "UPDATE $table SET
-                 value = '$unread', updated = NOW() WHERE
-                 feed_id = '$feed_id' AND owner_uid = '$owner_uid'"
+                "UPDATE $table
+                 SET value = '$unread', updated = NOW()
+                 WHERE feed_id = '$feed_id' AND owner_uid = '$owner_uid'"
             );
         } else {
             \SmallSmallRSS\Database::query(

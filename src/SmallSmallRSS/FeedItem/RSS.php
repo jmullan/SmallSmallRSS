@@ -107,6 +107,22 @@ class FeedItem_RSS extends FeedItem_Abstract
             $enc->length = $enclosure->getAttribute('length');
             $encs[] = $enc;
         }
+        $enclosures = $this->xpath->query("media:group", $this->elem);
+        foreach ($enclosures as $enclosure) {
+            $enc = new FeedEnclosure();
+            $content = $this->xpath->query("media:content", $enclosure)->item(0);
+            $enc->type = $content->getAttribute("type");
+            $enc->link = $content->getAttribute("url");
+            $enc->length = $content->getAttribute("length");
+            $desc = $this->xpath->query("media:description", $content)->item(0);
+            if ($desc) {
+                $enc->title = strip_tags($desc->nodeValue);
+            } else {
+                $desc = $this->xpath->query("media:description", $enclosure)->item(0);
+                if ($desc) $enc->title = strip_tags($desc->nodeValue);
+            }
+            $encs[] = $enc;
+        }
         return $encs;
     }
 }

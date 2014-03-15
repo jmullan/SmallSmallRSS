@@ -94,7 +94,7 @@ class UserEntries
                 } elseif ($feed_id == -2) {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries
-                         SET unread = false,last_read = NOW()
+                         SET unread = false, last_read = NOW()
                          WHERE
                              unread = true
                              AND $date_qpart
@@ -102,7 +102,10 @@ class UserEntries
                              AND (
                                  SELECT COUNT(*)
                                  FROM ttrss_user_labels2
-                                 WHERE article_id = ref_id
+                                 WHERE
+                                     article_id = ref_id
+                                     AND id = ref_id
+                                     AND $date_qpart
                              ) > 0"
                     );
                 }

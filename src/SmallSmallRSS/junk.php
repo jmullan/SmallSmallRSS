@@ -311,12 +311,46 @@ function getCategoryChildrenUnread($cat, $owner_uid)
     ) {
         return $unread;
     }
-    $cat_ids = \SmallSmallRSS\FeedCategories::getChildren($cat, $owner_uid);
+    $cat_ids = \SmallSmallRSS\FeedCategories::getDescendents($cat, $owner_uid);
+    $unreads = getCategoriesUnread($cat_ids, $owner_uid);
+    $unread += sum($unreads);
+    return $unread + $children_unread;
+}
+
+function getCategoriesUnread($cat_ids, $owner_uid) {
+    $unreads = array();
+    $regular_cat_ids = array();
     foreach ($cat_ids as $cat_id) {
-        # TODO: This is pretty inefficient.
-        $unread += getCategoryChildrenUnread($cat_id, $owner_uid);
+        if ($cat_id >= 0) {
+            $regular_cat_ids[] = $cat_id;
+        } else {
+            $unreads[$cat_id] = getCategoryUnread($cat_id, $owner_uid);
+        }
     }
-    return $unread;
+    if ($regular_cat_ids) {
+        $escaped_regular_cat_ids = join(',', $regular_cat_ids);
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT
+                 ttrss_feeds.cat_id,
+                 COUNT(ttrss_user_entries.int_id) AS unread
+             FROM
+                 ttrss_feeds
+             INNER JOIN
+                 ttrss_user_entries
+             WHERE
+                 ttrss_feeds.owner_uid = $owner_uid
+                 AND ttrss_feeds.cat_id IN ($escaped_regular_cat_ids)
+
+                 AND ttrss_user_entries.feed_id = ttrss_feeds.id
+
+                 AND ttrss_user_entries.unread = true
+                 AND ttrss_user_entries.owner_uid = $owner_uid"
+        );
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $unreads[$line['cat_id']] == $line['unread'];
+        }
+    }
+    return $unreads;
 }
 
 function getCategoryUnread($cat, $owner_uid)

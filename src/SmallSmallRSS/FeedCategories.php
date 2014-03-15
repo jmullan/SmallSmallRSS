@@ -111,21 +111,6 @@ class FeedCategories
         }
     }
 
-    public static function getChildren($cat, $owner_uid)
-    {
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT id
-             FROM ttrss_feed_categories
-             WHERE
-                 parent_cat = '$cat'
-                 AND owner_uid = $owner_uid"
-        );
-        $ids = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
-            $ids[] = $line['id'];
-        }
-        return $ids;
-    }
     public static function getChildrenForSelect($root_id, $owner_uid)
     {
         if ($root_id) {
@@ -174,16 +159,39 @@ class FeedCategories
         }
         return $parents;
     }
-    public static function getDescendents($cat, $owner_uid)
+
+    public static function getChildren($cat_ids, $owner_uid)
+    {
+        $ids = array();
+        if (is_array($cat_ids)) {
+            if (!$cat_ids) {
+                return $ids;
+            }
+            $qpart = "parent_cat IN($escaped_cat_ids)";
+        } else {
+            $qpart = "parent_cat = '$cat'";
+        }
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id
+             FROM ttrss_feed_categories
+             WHERE
+                 $qpart
+                 AND owner_uid = $owner_uid"
+        );
+        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            $ids[] = $line['id'];
+        }
+        return $ids;
+    }
+
+    public static function getDescendents($cat_ids, $owner_uid)
     {
         # TODO: make this more efficient
-        $children = self::getChildren($cat, $owner_uid);
-        $descendents = $children;
-        foreach ($children as $child_id) {
-            $descendents = array_merge($descendents, self::getDescendents($child_id, $owner_uid));
-        }
+        $descendents = self::getChildren($cat_ids, $owner_uid);
+        $descendents = array_merge($descendents, self::getDescendents($descendents, $owner_uid));
         return array_unique($descendents);
     }
+
     public static function getAncestors($cat, $owner_uid)
     {
         # TODO: make this more efficient

@@ -82,7 +82,11 @@ class FeedBrowser extends \SmallSmallRSS\Renderers\Base
         }
         $params = array('lines' => $lines);
         if (!$lines) {
-            echo '<li style="text-align : center"><p>'.__('No feeds found.').'</p></li>';
+            echo '<li style="text-align: center">';
+            echo '<p>';
+            echo __('No feeds found.');
+            echo '</p>';
+            echo '</li>';
         } elseif ($this->mode == self::MODE_1) {
             $this->renderPHP(__DIR__ . '/templates/feedbrowser_1.php', $params);
         } else {

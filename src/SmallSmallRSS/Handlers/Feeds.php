@@ -765,10 +765,11 @@ class Feeds extends ProtectedHandler
             }
 
             if (!$offset && $message) {
-                echo "<div class=\"whiteBox\">";
-                echo $message;
+                echo '<div class="whiteBox">';
                 echo '<p>';
-                echo '<span class="insensitive">';
+                echo $message;
+                echo '</p>';
+
                 $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
                 $result = \SmallSmallRSS\Database::query(
                     'SELECT '.$substring_for_date.'(MAX(last_updated), 1, 19) AS last_updated
@@ -777,20 +778,26 @@ class Feeds extends ProtectedHandler
                 );
                 $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
                 $last_updated = make_local_datetime($last_updated, false, $_SESSION['uid']);
-                echo sprintf(__('Feeds last updated at %s'), $last_updated);
                 $result = \SmallSmallRSS\Database::query(
                     "SELECT COUNT(id) AS num_errors
                     FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION['uid']
                 );
                 $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_errors');
+
+                echo '<p class="insensitive">';
+                echo sprintf(__('Feeds last updated at %s'), $last_updated);
+                echo '</p>';
                 if ($num_errors > 0) {
-                    echo '<a class="insensitive" href="#" onclick="showFeedsWithErrors()">'.
-                        __('Some feeds have update errors (click for details)');
+                    echo '<p>';
+                    echo '<a class="insensitive" href="#" onclick="showFeedsWithErrors()">';
+                    echo __('Some feeds have update errors (click for details)');
                     echo '</a>';
+                    echo '</p>';
                 }
-                echo '</span></p></div>';
+                echo '</div>';
             }
         }
+
         $reply['content'] = ob_get_clean();
         if (false === $reply['content']) {
             \SmallSmallRSS\Logger::log('No content!');

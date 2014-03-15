@@ -90,10 +90,10 @@ foreach ($js_files as $jsfile) {
 
 <body id="ttrssMain" class="claro">
 
-<div id="overlay" style="display: block">
+<div id="overlay">
   <div id="overlay_inner">
     <div class="insensitive"><?php echo __('Loading, please wait...'); ?></div>
-    <div data-dojo-type="dijit.ProgressBar" places="0" style="width: 300px" id="loading_bar" progress="0" maximum="100"></div>
+    <div id="loading_bar" data-dojo-type="dijit.ProgressBar" places="0" progress="0" maximum="100"></div>
     <noscript><br/><?php \SmallSmallRSS\Renderers\Messages::renderError('Javascript is disabled. Please enable it.') ?></noscript>
   </div>
 </div>
@@ -102,7 +102,7 @@ foreach ($js_files as $jsfile) {
 <div id="headlines-tmp" style="display: none"></div>
 <div id="main" data-dojo-type="dijit.layout.BorderContainer">
   <div id="feeds-holder" data-dojo-type="dijit.layout.ContentPane"
-    data-dojo-props="region: 'leading', splitter: true" style="width: 20%">
+    data-dojo-props="region: 'leading', splitter: true">
     <div id="feedlistLoading">
       <img src="images/indicator_tiny.gif" />
       <?php echo  __('Loading, please wait...'); ?>
@@ -114,9 +114,9 @@ foreach ($js_files as $jsfile) {
       <div id="toolbar" data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: 'top'">
         <div id="main-toolbar" data-dojo-type="dijit.Toolbar">
           <form id="main_toolbar_form" action="" onsubmit="return false;">
-          <button data-dojo-type="dijit.form.Button" id="collapse_feeds_btn"
+          <button id="collapse_feeds_btn" data-dojo-type="dijit.form.Button"
             onclick="collapse_feedlist()"
-            title="<?php echo __('Collapse feedlist') ?>" style="display : inline">
+            title="<?php echo __('Collapse feedlist') ?>">
             &lt;&lt;
           </button>
           <select name="view_mode" title="<?php echo __('Show articles') ?>"
@@ -205,7 +205,7 @@ if (empty($_SESSION['hide_logout'])) {
           </div>
         </div>
         <div id="content-insert" data-dojo-type="dijit.layout.ContentPane"
-          data-dojo-props="region: 'bottom', splitter: true" style="height : 50%">
+          data-dojo-props="region: 'bottom', splitter: true">
         </div>
       </div>
     </div>

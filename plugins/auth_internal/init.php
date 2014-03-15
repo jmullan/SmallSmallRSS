@@ -1,8 +1,6 @@
 <?php
 class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_Interface
 {
-    private $host;
-
     const API_VERSION = 2;
     const VERSION = 1.0;
     const NAME = 'Internal Authentication';

@@ -2,8 +2,6 @@
 
 class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers\IHandler
 {
-    private $host;
-
     const API_VERSION = 2;
     const VERSION = 1.0;
     const NAME = 'Linked tt-rss Instances';

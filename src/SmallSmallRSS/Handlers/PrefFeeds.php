@@ -556,17 +556,11 @@ class PrefFeeds extends ProtectedHandler
             )
         );
 
-        $title = htmlspecialchars(
-            \SmallSmallRSS\Database::fetch_result(
-                $result,
-                0,
-                'title'
-            )
-        );
+        $title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'title'));
 
-        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\">";
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-feeds">';
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="editSave">';
+        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\" />";
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-feeds" />';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="editSave" />';
         echo '<div class="dlgSec">';
         echo __('Feed');
         echo '</div>';
@@ -585,7 +579,8 @@ class PrefFeeds extends ProtectedHandler
         echo __('URL:') . ' ';
         echo '<input data-dojo-type="dijit.form.ValidationTextBox" required="1" placeHolder="';
         echo __('Feed URL');
-        echo "\" regExp='^(http|https)://.*' style=\"width: 20em\" name=\"feed_url\" value=\"$feed_url\">";
+        echo '\" regExp="^(http|https)://.*" name="feed_url"';
+        echo " value=\"$feed_url\">";
         $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_error');
         if ($last_error) {
             echo '&nbsp;<span title="';
@@ -1608,7 +1603,7 @@ class PrefFeeds extends ProtectedHandler
         echo '</button> ';
 
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB_SECTION,
             'prefFeedsOPML'
         );
         echo '</div>';
@@ -1658,7 +1653,7 @@ class PrefFeeds extends ProtectedHandler
         echo '</button> ';
         echo '</p>';
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB_SECTION,
             'prefFeedsPublishedGenerated'
         );
         echo '</div>'; #pane

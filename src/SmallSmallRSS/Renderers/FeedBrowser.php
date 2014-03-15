@@ -82,7 +82,7 @@ class FeedBrowser extends \SmallSmallRSS\Renderers\Base
         }
         $params = array('lines' => $lines);
         if (!$lines) {
-            echo '<li style="text-align: center">';
+            echo '<li class="feeds_notice">';
             echo '<p>';
             echo __('No feeds found.');
             echo '</p>';

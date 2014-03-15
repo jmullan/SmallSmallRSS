@@ -42,19 +42,17 @@ if (!empty($login_error_msg)) {
 }
 ?>
       <div class="row">
-        <label><?php echo __('Login:') ?></label>
-        <input name="login" class="input"
+        <label for="login"><?php echo __('Login:') ?></label>
+        <input id="login" name="login" class="input"
           onchange="fetchProfiles()" onfocus="fetchProfiles()" onblur="fetchProfiles()"
-          style="width: 220px"
           required="1"
           value="<?php echo $fake_login ?>" />
     </div>
 
 
     <div class="row">
-      <label><?php echo __('Password:') ?></label>
-      <input type="password" name="password" required="1"
-        style="width: 220px" class="input"
+      <label for="password"><?php echo __('Password:') ?></label>
+      <input id="password" type="password" name="password" required="1" class="input"
         value="<?php echo $fake_password ?>"/>
 <?php
 if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) { ?>
@@ -103,7 +101,7 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) { 
       </div>
     </fieldset>
   </div>
-  <div class='footer'>
+  <div class="footer">
     <a href="http://tt-rss.org/"><?php echo $software_name; ?></a>
     &copy; 2005&ndash;<?php echo date('Y') ?> <a href="http://fakecake.org/">Andrew Dolgov</a>
   </div>

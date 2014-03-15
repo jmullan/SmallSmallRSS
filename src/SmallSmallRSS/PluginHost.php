@@ -88,14 +88,30 @@ class PluginHost
             return array();
         }
     }
+
+    public static function classRoot()
+    {
+        $class_dir = __DIR__ . "/../../plugins/";
+        if (!is_dir($class_dir)) {
+            Logger::log("Missing class dir $class_dir");
+            return false;
+        }
+        return $class_dir;
+    }
+
     public function load_all($kind, $owner_uid = false)
     {
-        $plugins = array_map('basename', glob('plugins/*'));
+        $class_root = self::classRoot();
+        if ($class_root === false) {
+            return;
+        }
+        $plugins = array_map('basename', glob($class_root . '*'));
         $this->load(join(',', $plugins), $kind, $owner_uid);
     }
 
     public function load($classlist, $kind, $owner_uid = false)
     {
+        $class_root = self::classRoot();
         $plugins = explode(',', $classlist);
         $this->owner_uid = (int) $owner_uid;
         foreach ($plugins as $class) {
@@ -104,7 +120,7 @@ class PluginHost
                 continue;
             }
             $class_file = strtolower(basename($class));
-            $class_dir = __DIR__ . "/../../plugins/$class_file";
+            $class_dir = $class_root . $class_file;
             if (!is_dir($class_dir)) {
                 Logger::log("Missing class dir $class_dir");
                 continue;
@@ -124,7 +140,7 @@ class PluginHost
                     Logger::log("Wrong class type $class: $subclassing");
                     continue;
                 }
-                $plugin = new $class ($this);
+                $plugin = new $class($this);
                 if ($plugin::API_VERSION < \SmallSmallRSS\PluginHost::API_VERSION) {
                     user_error(
                         "Plugin $class is not compatible with current API version (need: "

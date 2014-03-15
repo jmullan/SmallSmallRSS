@@ -352,7 +352,7 @@ class Pref_Users extends ProtectedHandler
         echo __('Reset password');
         echo '</button>';
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB_SECTION,
             'prefUsersToolbar'
         );
         echo '</div>';

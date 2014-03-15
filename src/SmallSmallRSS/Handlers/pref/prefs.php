@@ -440,7 +440,7 @@ class Pref_Prefs extends ProtectedHandler
             }
         }
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB_SECTION,
             'prefPrefsAuth'
         );
         echo '</div>'; #pane
@@ -614,7 +614,7 @@ class Pref_Prefs extends ProtectedHandler
                 echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\"
                     id=\"SSL_CERT_SERIAL\" readonly=\"1\"
                     name=\"$pref_name\" value=\"$value\">";
-                $cert_id = \Auth_Remote::getSSLCertificateId();
+                $cert_id = \SmallSmallRSS\Plugins\AuthRemote::getSSLCertificateId();
                 $cert_serial = htmlspecialchars($cert_id);
                 $has_serial = ($cert_serial) ? 'false' : 'true';
                 echo " <button data-dojo-type=\"dijit.form.Button\" disabled=\"$has_serial\"";
@@ -645,7 +645,7 @@ class Pref_Prefs extends ProtectedHandler
         $listed_boolean_prefs = htmlspecialchars(join(',', $listed_boolean_prefs));
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB_SECTION,
             'prefPrefsPrefsInside'
         );
         echo '</div>'; # inside pane
@@ -671,7 +671,7 @@ class Pref_Prefs extends ProtectedHandler
         echo '</button>';
         echo '&nbsp;';
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
-            \SmallSmallRSS\Hooks::RENDER_RENDER_PREFS_TAB_SECTION,
+            \SmallSmallRSS\Hooks::RENDER_PREFS_TAB_SECTION,
             'prefPrefsPrefsOutside'
         );
         echo '</form>';
@@ -743,12 +743,23 @@ class Pref_Prefs extends ProtectedHandler
                 }
                 echo '<tr>';
                 echo '<td align="center">';
-                echo "<input disabled=\"1\" data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" $checked />";
+                echo '<input disabled="1" data-dojo-type="dijit.form.CheckBox" type="checkbox"';
+                echo 'id="plugin_';
+                echo $name;
+                echo '"';
+                echo $checked;
+                echo '/>';
                 echo '</td>';
 
-                echo "<td>$name</td>";
+                echo '<td>';
+                echo '<label for="plugin_';
+                echo $name;
+                echo '">';
+                echo $name;
+                echo '</label>';
+                echo '</td>';
                 echo '<td>' . htmlspecialchars($about[1]);
-                if (@$about[4]) {
+                if (!empty($about[4])) {
                     echo ' &mdash; ';
                     echo '<a target="_blank" class="visibleLink" href="'.htmlspecialchars($about[4]).'">';
                     echo __('more info');

@@ -2,8 +2,6 @@
 
 class GoogleReaderKeys extends \SmallSmallRSS\Plugin
 {
-    private $host;
-
     const API_VERSION = 2;
     const VERSION = 1.0;
     const NAME = 'Google Reader Hotkeys';

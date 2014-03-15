@@ -72,6 +72,9 @@
         "ext-mbstring": "ext/mbstring for multibyte string manipulation"
     },
     "autoload": {
+        "psr-4": {
+            "SmallSmallRSS\\Plugins\\": "plugins/"
+        },
         "psr-0": {
             "SmallSmallRSS\\": "src/",
             "Base32": "vendor/lelag/otphp/vendor/"

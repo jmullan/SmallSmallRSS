@@ -2,9 +2,6 @@
 
 class Af_SFBG extends \SmallSmallRSS\Plugin
 {
-
-    private $host;
-
     const API_VERSION = 2;
     const VERSION = 1.1;
     const NAME = 'SF Bay Guardian Fixer';

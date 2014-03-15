@@ -1,9 +1,9 @@
 <?php
-if (file_exists('install') && !file_exists('config.ini')) {
+if (file_exists('install') && !file_exists('../config.ini')) {
     header('Location: install/');
 }
 
-if (!file_exists('config.ini')) {
+if (!file_exists('../config.ini')) {
     print '<b>Fatal Error</b>:';
     print "You forgot to copy <b>config.ini-dist</b> to <b>config.ini</b> and edit it.\n";
     exit;

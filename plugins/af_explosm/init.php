@@ -2,8 +2,6 @@
 
 class Af_Explosm extends \SmallSmallRSS\Plugin
 {
-    private $host;
-
     const API_VERSION = 2;
     const VERSION = 1.0;
     const NAME = 'Cyanide and Happiness Cleanup';

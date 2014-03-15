@@ -3,8 +3,8 @@ namespace SmallSmallRSS;
 
 abstract class Plugin
 {
-    private $dbh;
-    private $host;
+    protected $dbh;
+    protected $host;
 
     const API_VERSION_COMPAT = 1;
     const API_VERSION = 2;
@@ -19,11 +19,14 @@ abstract class Plugin
 
     public function __construct($pluginhost)
     {
+        assert($pluginhost);
         $this->host = $pluginhost;
     }
 
     public function register()
     {
+        assert($this->host);
+        Logger::log(var_export($this, true));
         foreach (static::$provides as $hook) {
             $this->host->add_hook($hook, $this);
         }

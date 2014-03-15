@@ -2,8 +2,6 @@
 
 class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers\IHandler
 {
-    private $host;
-
     const API_VERSION = 2;
     const VERSION = 1.0;
     const NAME = 'XML Import/Export';

@@ -520,6 +520,8 @@ ul.compact li {
     width: 100%;
     z-index : 100;
     position : absolute;
+    display: block;
+    overflow: hidden;
 }
 
 #overlay_inner {
@@ -806,6 +808,7 @@ div.fatalError textarea {
     overflow : hidden;
     box-shadow : inset 0px 0px 3px rgba(0,0,0,0.1);
     background : #f9fbff;
+    width: 20%;
 }
 
 #headlines-wrap-inner {
@@ -1148,3 +1151,23 @@ body#ttrssPrefs hr {
     text-shadow : 1px 1px 2px #fff;
 }
 
+.feeds_notice {
+    text-align: center;
+}
+
+#loading_bar {
+    width: 300px;
+}
+
+#collapse_feeds_btn {
+    display: inline;
+}
+
+#content-insert {
+    height: 50%;
+}
+
+#login,
+#password {
+    width: 220px;
+}

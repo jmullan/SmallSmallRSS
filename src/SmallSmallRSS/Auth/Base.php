@@ -8,7 +8,7 @@ class Auth_Base implements Auth_Interface
         return false;
     }
 
-    public static function authenticate($login, $password)
+    public function authenticate($login, $password)
     {
         return false;
     }

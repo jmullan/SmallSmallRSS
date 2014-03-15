@@ -1294,12 +1294,6 @@ function sanitize($str, $owner, $force_remove_images = false, $site_url = false)
         ($owner && \SmallSmallRSS\DBPrefs::read('STRIP_IMAGES', $owner))
         || $force_remove_images || !empty($_SESSION['bw_limit'])
     );
-    \SmallSmallRSS\Logger::log($owner);
-    \SmallSmallRSS\Logger::log(\SmallSmallRSS\DBPrefs::read('STRIP_IMAGES', $owner));
-    \SmallSmallRSS\Logger::log($force_remove_images);
-    \SmallSmallRSS\Logger::log($_SESSION['bw_limit']);
-    \SmallSmallRSS\Logger::log($strip_images);
-
 
     foreach ($entries as $entry) {
         if ($site_url) {

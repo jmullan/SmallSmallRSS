@@ -414,8 +414,7 @@ class Feeds extends ProtectedHandler
 
                 $score_pic = 'images/' . get_score_pic($score);
 
-                $score_pic = "<img class='hlScorePic' score='$score' onclick='changeScore($id, this)' src=\"$score_pic\"
-                    title=\"$score\">";
+                $score_pic = "<img class='hlScorePic' score='$score' onclick='changeScore($id, this)' src=\"$score_pic\" title=\"$score\" />";
 
                 if ($score > 500) {
                     $hlc_suffix = 'H';
@@ -452,7 +451,6 @@ class Feeds extends ProtectedHandler
                 }
 
                 if (!\SmallSmallRSS\DBPrefs::read('COMBINED_DISPLAY_MODE')) {
-
                     if (\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED')) {
                         if ($feed_id != $vgroup_last_feed && $line['feed_title']) {
 
@@ -492,7 +490,9 @@ class Feeds extends ProtectedHandler
                     echo \SmallSmallRSS\Utils::truncateString($line['title'], 200);
                     if (\SmallSmallRSS\DBPrefs::read('SHOW_CONTENT_PREVIEW')) {
                         if ($content_preview) {
-                            echo "<span class=\"contentPreview\"> - $content_preview</span>";
+                            echo '<span class=\"contentPreview\">';
+                            echo $content_preview;
+                            echo '</span>';
                         }
                     }
                     echo '</a></span>';
@@ -529,8 +529,8 @@ class Feeds extends ProtectedHandler
                     }
                     $line['content'] = sanitize(
                         $line['content_preview'],
-                        \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
                         $_SESSION['uid'],
+                        \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
                         $entry_site_url
                     );
                     \SmallSmallRSS\PluginHost::getInstance()->runHooks(
@@ -564,27 +564,22 @@ class Feeds extends ProtectedHandler
 
                     $expanded_class = $expand_cdm ? 'expanded' : 'expandable';
 
-                    echo "<div class=\"cdm $expanded_class $class\"
-                        id=\"RROW-$id\" $mouseover_attrs>";
-
+                    echo "<div class=\"cdm $expanded_class $class\" id=\"RROW-$id\" $mouseover_attrs>";
                     echo '<div class="cdmHeader">';
-                    echo '<div style="vertical-align : middle">';
 
-                    echo "<input data-dojo-type=\"dijit.form.CheckBox\"
-                            type=\"checkbox\" onclick=\"toggleSelectRow2(this, false, true)\"
-                            class='rchk'>";
-
+                    echo '<div>';
+                    echo '<input data-dojo-type="dijit.form.CheckBox"';
+                    echo ' type="checkbox" onclick="toggleSelectRow2(this, false, true)"';
+                    echo ' class="rchk">';
                     echo "$marked_pic";
                     echo "$published_pic";
-
                     echo '</div>';
 
                     echo "<span id=\"RTITLE-$id\"
                         onclick=\"return cdmClicked(event, $id);\"
-                        class=\"titleWrap$hlc_suffix\">
-                        <a class=\"title\"
-                        target=\"_blank\" href=\"".
-                        htmlspecialchars($line['link']);
+                        class=\"titleWrap$hlc_suffix\">";
+                    echo '<a class="title" target="_blank" href="';
+                    echo htmlspecialchars($line['link']);
                     echo '">';
                     echo $line['title'];
                     echo '</a>';
@@ -642,9 +637,10 @@ class Feeds extends ProtectedHandler
 
                     echo '</div>';
 
-                    echo "<div class=\"cdmContent\" $content_hidden
-                        onclick=\"return cdmClicked(event, $id);\"
-                        id=\"CICD-$id\">";
+                    echo '<div class="cdmContent"';
+                    echo $content_hidden;
+                    echo ' onclick="return cdmClicked(event, ' . $id . ');"';
+                    echo ' id="CICD-' . $id . '">';
 
                     echo "<div id=\"POSTNOTE-$id\">";
                     if ($line['note']) {
@@ -653,44 +649,42 @@ class Feeds extends ProtectedHandler
                     echo '</div>';
 
                     echo '<div class="cdmContentInner">';
-
                     if ($line['orig_feed_id']) {
-
                         $tmp_result = \SmallSmallRSS\Database::query(
                             'SELECT * FROM ttrss_archived_feeds
-                    WHERE id = '.$line['orig_feed_id']
+                             WHERE id = ' . $line['orig_feed_id']
                         );
-
                         if (\SmallSmallRSS\Database::num_rows($tmp_result) != 0) {
-
-                            echo "<div clear='both'>";
+                            echo '<div clear="both">';
                             echo __('Originally from:');
-
                             echo '&nbsp;';
-
                             $tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result);
 
-                            echo "<a target='_blank'
-                                href=' " . htmlspecialchars($tmp_line['site_url']) . "'>" .
-                                $tmp_line['title'] . '</a>';
-
+                            echo '<a target="_blank" href="';
+                            echo htmlspecialchars($tmp_line['site_url']);
+                            echo '">';
+                            echo htmlspecialchars($tmp_line['title']);
+                            echo '</a>';
                             echo '&nbsp;';
-
-                            echo "<a target='_blank' href='" . htmlspecialchars($tmp_line['feed_url']) . "'>";
-                            echo "<img title='";
+                            echo '<a target="_blank" href="';
+                            echo htmlspecialchars($tmp_line['feed_url']);
+                            echo '">';
+                            echo '<img title="';
                             echo __('Feed URL');
-                            echo "'class='tinyFeedIcon' src='images/pub_unset.svg'></a>";
-
+                            echo '" class="tinyFeedIcon" src="images/pub_unset.svg">';
+                            echo '</a>';
                             echo '</div>';
-                        }
+                       }
                     }
 
-                    echo "<span id=\"CWRAP-$id\">";
-                    echo "<span id=\"CENCW-$id\" style=\"display: none\">";
-                    echo htmlspecialchars($line['content']);
-                    echo '</span.';
-                    echo '</span>';
-                    $always_display_enclosures = \SmallSmallRSS\Database::fromSQLBool($line['always_display_enclosures']);
+                    echo "<div id=\"CWRAP-$id\">";
+                    echo "<div id=\"CENCW-$id\" style=\"display: none\">";
+                    echo $line['content'];
+                    echo '</div>';
+                    echo '</div>';
+                    $always_display_enclosures = \SmallSmallRSS\Database::fromSQLBool(
+                        $line['always_display_enclosures']
+                    );
                     echo format_article_enclosures(
                         $id,
                         $always_display_enclosures,
@@ -698,6 +692,7 @@ class Feeds extends ProtectedHandler
                         \SmallSmallRSS\Database::fromSQLBool($line['hide_images'])
                     );
                     echo '</div>';
+
                     echo '<div class="cdmFooter">';
                     \SmallSmallRSS\PluginHost::getInstance()->runHooks(
                         \SmallSmallRSS\Hooks::RENDER_ARTICLE_LEFT_BUTTON,
@@ -719,11 +714,13 @@ class Feeds extends ProtectedHandler
                         } else {
                             $comments_url = htmlspecialchars($line['link']);
                         }
-                        $entry_comments = "<a target='_blank' href=\"$comments_url\">$num_comments comments</a>";
+                        $entry_comments = "<a target='_blank' href=\"$comments_url\">";
+                        $entry_comments .= "$num_comments comments</a>";
                     } else {
                         if ($line['comments'] && $line['link'] != $line['comments']) {
-                            $entry_comments = "<a target='_blank' href=\"".htmlspecialchars($line['comments']);
-                            echo '">comments</a>';
+                            $entry_comments = "<a target='_blank' href=\""
+                                . htmlspecialchars($line['comments']);
+                            $entry_comments .= '">comments</a>';
                         }
                     }
 
@@ -749,7 +746,6 @@ class Feeds extends ProtectedHandler
 
         } else {
             $message = '';
-
             switch ($view_mode) {
                 case 'unread':
                     $message = __('No unread articles found to display.');
@@ -788,7 +784,6 @@ class Feeds extends ProtectedHandler
                 );
                 $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_errors');
                 if ($num_errors > 0) {
-                    echo '<br/>';
                     echo '<a class="insensitive" href="#" onclick="showFeedsWithErrors()">'.
                         __('Some feeds have update errors (click for details)');
                     echo '</a>';
@@ -998,7 +993,6 @@ class Feeds extends ProtectedHandler
         echo '<p><span class="insensitive">';
         echo sprintf(__('Feeds last updated at %s'), $last_updated);
         if ($num_errors > 0) {
-            echo '<br/>';
             echo '<a class="insensitive" href="#" onclick="showFeedsWithErrors()">'.
                 __('Some feeds have update errors (click for details)');
             echo '</a>';

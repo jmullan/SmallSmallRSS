@@ -1256,6 +1256,17 @@ function sanitize($str, $owner, $force_remove_images = false, $site_url = false)
     $xpath = new \DOMXPath($doc);
 
     $entries = $xpath->query('(//a[@href]|//img[@src])');
+    $strip_images = (
+        ($owner && \SmallSmallRSS\DBPrefs::read('STRIP_IMAGES', $owner))
+        || $force_remove_images || !empty($_SESSION['bw_limit'])
+    );
+    \SmallSmallRSS\Logger::log($owner);
+    \SmallSmallRSS\Logger::log(\SmallSmallRSS\DBPrefs::read('STRIP_IMAGES', $owner));
+    \SmallSmallRSS\Logger::log($force_remove_images);
+    \SmallSmallRSS\Logger::log($_SESSION['bw_limit']);
+    \SmallSmallRSS\Logger::log($strip_images);
+
+
     foreach ($entries as $entry) {
         if ($site_url) {
             if ($entry->hasAttribute('href')) {
@@ -1269,8 +1280,7 @@ function sanitize($str, $owner, $force_remove_images = false, $site_url = false)
                 if ($entry->hasAttribute('src')) {
                     \SmallSmallRSS\ImageCache::processEntry($entry, $site_url, false);
                 }
-                if (($owner && \SmallSmallRSS\DBPrefs::read('STRIP_IMAGES', $owner))
-                    || $force_remove_images || !empty($_SESSION['bw_limit'])) {
+                if ($strip_images) {
                     $p = $doc->createElement('p');
                     $a = $doc->createElement('a');
                     $a->setAttribute('href', $entry->getAttribute('src'));
@@ -1680,39 +1690,43 @@ function format_article_enclosures(
             $entry['url'] = $url;
             $entries[] = $entry;
         }
-
-        if ($_SESSION['uid'] && !\SmallSmallRSS\DBPrefs::read('STRIP_IMAGES') && !$_SESSION['bw_limit']) {
+        $image_entries = array();
+        if (!\SmallSmallRSS\DBPrefs::read('STRIP_IMAGES') && empty($_SESSION['bw_limit'])) {
             if ($always_display_enclosures
                 || !preg_match('/<img/i', $article_content)) {
                 foreach ($entries as $entry) {
-                    if (preg_match('/image/', $entry['type']) ||
-                        preg_match("/\.(jpg|png|gif|bmp)/i", $entry['filename'])) {
-                        if (!$hide_images) {
-                            echo '<p>';
-                            echo '<img alt="' . htmlspecialchars($entry['filename']) . '" src="';
-                            echo htmlspecialchars($entry['url']);
-                            echo '"/>';
-                            echo '</p>';
-                        } else {
-                            echo '<p>';
-                            echo '<a target="_blank" href="';
-                            echo htmlspecialchars($entry['url']);
-                            echo '">';
-                            echo htmlspecialchars($entry['url']);
-                            echo '</a>';
-                            echo '</p>';
-                        }
+                    if (preg_match('/image/', $entry['type'])
+                        || preg_match("/\.(jpg|png|gif|bmp)/i", $entry['filename'])) {
+                        $image_entries[] = $entry;
                     }
                 }
             }
         }
-
+        if ($image_entries) {
+            echo '<ul class="image_enclosures">';
+            foreach ($image_entries as $entry) {
+                echo '<li>';
+                if (!$hide_images) {
+                    echo '<img alt="' . htmlspecialchars($entry['filename']) . '" src="';
+                    echo htmlspecialchars($entry['url']);
+                    echo '"/>';
+                } else {
+                    echo '<a target="_blank" href="';
+                    echo htmlspecialchars($entry['url']);
+                    echo '">';
+                    echo htmlspecialchars($entry['filename']);
+                    echo '</a>';
+                }
+                echo '</li>';
+            }
+            echo '</ul>';
+        }
         if (count($entries_inline) > 0) {
-            echo "<hr clear='both'/>";
+            echo '<hr clear="both" />';
             foreach ($entries_inline as $entry) {
                 echo $entry;
             };
-            echo "<hr clear='both'/>";
+            echo '<hr clear="both" />';
         }
 
         echo '<select class="attachments" onchange="openSelectedAttachment(this)">';

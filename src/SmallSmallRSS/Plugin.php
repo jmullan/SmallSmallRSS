@@ -26,7 +26,6 @@ abstract class Plugin
     public function register()
     {
         assert($this->host);
-        Logger::log(var_export($this, true));
         foreach (static::$provides as $hook) {
             $this->host->add_hook($hook, $this);
         }

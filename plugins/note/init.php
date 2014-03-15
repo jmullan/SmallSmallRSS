@@ -22,14 +22,14 @@ class Note extends \SmallSmallRSS\Plugin
 
     public function hookRenderArticleButton($line)
     {
-        echo "<img src=\"plugins/note/note.png\"";
-        echo " style=\"cursor : pointer\" style=\"cursor: pointer\"";
-        echo " onclick=\"editArticleNote(";
+        echo '<img src="plugins/note/note.png"';
+        echo ' style="cursor : pointer" style="cursor: pointer"';
+        echo ' onclick="editArticleNote(';
         echo $line["id"];
-        echo ")\"";
-        echo " class='tagsPic' title='";
+        echo ')';
+        echo ' class="tagsPic" title="';
         echo __('Edit article note');
-        echo "'>";
+        echo '" />';
     }
 
     public function edit()

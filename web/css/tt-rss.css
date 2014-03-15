@@ -1,4 +1,7 @@
-body#ttrssMain, body#ttrssPrefs, body#ttrssLogin, body {
+#ttrssMain,
+#ttrssPrefs,
+#ttrssLogin,
+body {
     background : white;
     color : black;
     margin : 0px;
@@ -7,11 +10,11 @@ body#ttrssMain, body#ttrssPrefs, body#ttrssLogin, body {
     font-size: 14px;
 }
 
-body#ttrssPrefs {
+#ttrssPrefs {
     background-color : #ecf4ff;
 }
 
-body#ttrssPrefs #footer, body#ttrssPrefs #header {
+#ttrssPrefs #footer, #ttrssPrefs #header {
     background-color : #ecf4ff;
     padding-left : 8px;
     padding-right : 8px;
@@ -554,7 +557,7 @@ div.whiteBox {
     padding : 1em;
 }
 
-/* html, body#ttrssMain, #main {
+/* html, #ttrssMain, #main {
    width: 100%;
    height: 100%;
    padding: 0;
@@ -1024,7 +1027,7 @@ div.postHeader span.author {
     font-weight : normal;
 }
 
-body#ttrssZoom {
+#ttrssZoom {
     margin-left : auto;
     margin-right : auto;
     padding : 20px;
@@ -1032,34 +1035,34 @@ body#ttrssZoom {
     background : #f9fbff;
 }
 
-body#ttrssZoom div.postContent p {
+#ttrssZoom div.postContent p {
     max-width: 650px;
 }
 
-body#ttrssZoom div.postHeader {
+#ttrssZoom div.postHeader {
     margin : 10px;
     border : 1px solid #ccc;
     box-shadow : none;
     border-radius : 4px;
 }
 
-body#ttrssZoom div.postReply {
+#ttrssZoom div.postReply {
     border : 1px solid #ccc;
     border-radius : 4px;
     box-shadow : inset 0px 0px 3px rgba(0,0,0,0.1);
     background : white;
 }
 
-body#ttrssZoom div.postContent {
+#ttrssZoom div.postContent {
 
 }
 
-body#ttrssZoom div.footer {
+#ttrssZoom div.footer {
     margin-top : 1em;
     text-align : center;
 }
 
-body#ttrssZoom div.postContent img {
+#ttrssZoom div.postContent img {
     max-width: 650px;
     height : auto;
 }
@@ -1078,7 +1081,7 @@ div.hl.active {
     margin-right : 25px;
 }
 
-body#ttrssMain #feedTree .dijitTreeRow {
+#ttrssMain #feedTree .dijitTreeRow {
     padding : 2px 0px 2px;
     border-width: 1px;
     border-color : transparent;
@@ -1094,16 +1097,16 @@ body#ttrssMain #feedTree .dijitTreeRow {
     margin-left : 4px;
 }
 
-body#ttrssMain #feedTree .dijitTreeIsRoot > .dijitTreeRow > .dijitTreeExpando {
+#ttrssMain #feedTree .dijitTreeIsRoot > .dijitTreeRow > .dijitTreeExpando {
     margin-left : 5px;
 }
 
-body#ttrssMain #feedTree .dijitTreeNode {
+#ttrssMain #feedTree .dijitTreeNode {
     padding : 0px;
     border-width: 0px;
 }
 
-body#ttrssMain #feedTree {
+#ttrssMain #feedTree {
     height : 100%;
     overflow-x : hidden;
     font-family : "Segoe UI", Tahoma, sans-serif;
@@ -1138,7 +1141,7 @@ body#ttrssMain #feedTree {
     text-overflow: ellipsis;
 }
 
-body#ttrssPrefs hr {
+#ttrssPrefs hr {
     border-color : #ecf4ff;
     max-width: 100%;
 }
@@ -1170,4 +1173,8 @@ body#ttrssPrefs hr {
 #login,
 #password {
     width: 220px;
+}
+
+.cdmHeader {
+    vertical-align: middle;
 }

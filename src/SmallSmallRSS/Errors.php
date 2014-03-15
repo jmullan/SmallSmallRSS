@@ -19,7 +19,7 @@ class Errors extends \MabeEnum\Enum
 
     private $description = null;
 
-    public function dump()
+    public static function dump()
     {
         $ERRORS = array(
             self::UNSPECIFIED => __('No error'),

@@ -1,267 +1,267 @@
-div.cdmHeader img, div.cdmHeader input, div.cdmFooter img {
-	vertical-align : middle;
+.cdmHeader img, .cdmHeader input, .cdmFooter img {
+    vertical-align : middle;
 }
 
-div.cdmHeader {
-	display : table;
+.cdmHeader {
+    display : table;
 }
 
-div.cdmHeader > * {
-	display : table-cell;
-	padding : 5px;
+.cdmHeader > * {
+    display : table-cell;
+    padding : 5px;
 }
 
-div.cdmHeader > div {
-	white-space : nowrap;
+.cdmHeader > div {
+    white-space : nowrap;
 }
 
-div.cdmHeader > span {
-	width: 100%;
+.cdmHeader > span {
+    width: 100%;
 }
 
-div.cdmHeader span.updated {
-	color : #555;
-	font-weight : normal;
-	font-size: 11px;
-	white-space : nowrap;
-	vertical-align : middle;
+.cdmHeader span.updated {
+    color : #555;
+    font-weight : normal;
+    font-size: 11px;
+    white-space : nowrap;
+    vertical-align : middle;
 }
 
-div.cdmHeader input {
-	margin-right : 5px;
+.cdmHeader input {
+    margin-right : 5px;
 }
 
-div.cdmHeader div.updPic {
-	width: 25px;
-	display : inline-block;
-	text-align : center;
+.cdmHeader .updPic {
+    width: 25px;
+    display : inline-block;
+    text-align : center;
 }
 
-div.cdmHeader div.updPic img {
-	vertical-align : middle;
+.cdmHeader .updPic img {
+    vertical-align : middle;
 }
 
-div.cdmHeader img, div.cdmFooter img {
-	margin : 0px 4px;
+.cdmHeader img, .cdmFooter img {
+    margin : 0px 4px;
 }
 
-div.cdmHeader input {
-	margin-left : 4px;
-	margin-right : 4px;
+.cdmHeader input {
+    margin-left : 4px;
+    margin-right : 4px;
 }
 
-div.cdmContentInner {
-	margin : 10px;
-	line-height : 20px;
+.cdmContentInner {
+    margin : 10px;
+    line-height : 20px;
 }
 
-div.cdmContentInner img {
-	border-width: 0px;
-	max-width: 98%;
-	height : auto;
+.cdmContentInner img {
+    border-width: 0px;
+    max-width: 98%;
+    height : auto;
 }
 
-div.cdmFooter {
-	padding : 5px;
-	font-weight : normal;
-	color : #555;
-	clear : both;
+.cdmFooter {
+    padding : 5px;
+    font-weight : normal;
+    color : #555;
+    clear : both;
 }
 
-div.cdm.expanded {
-	margin-top : 4px;
-	margin-bottom : 4px;
+.cdm.expanded {
+    margin-top : 4px;
+    margin-bottom : 4px;
 }
 
-div.cdm.expandable {
-	background-color : #f0f0f0;
-	border-width: 0px 0px 1px 0px;
-	border-color : #c0c0c0;
-	border-style : solid;
+.cdm.expandable {
+    background-color : #f0f0f0;
+    border-width: 0px 0px 1px 0px;
+    border-color : #c0c0c0;
+    border-style : solid;
 }
 
-div.cdm.expandable > hr {
-	display: none;
+.cdm.expandable > hr {
+    display: none;
 }
 
-div.cdm.expanded > hr {
-	margin-top : 0px;
-	margin-bottom : 0px;
+.cdm.expanded > hr {
+    margin-top : 0px;
+    margin-bottom : 0px;
 }
 
-div.cdm.expandable.Unread {
-	background : white;
+.cdm.expandable.Unread {
+    background : white;
 }
 
-div.cdm.expandable.Selected {
-	background : #f9fbff;
+.cdm.expandable.Selected {
+    background : #f9fbff;
 }
 
-div.cdm.expandable.active {
-	box-shadow : inset 0px 0px 3px 0px rgba(0,0,0,0.1);
-	border-color : #88b0f0;
-	background : white ! important;
+.cdm.expandable.active {
+    box-shadow : inset 0px 0px 3px 0px rgba(0,0,0,0.1);
+    border-color : #88b0f0;
+    background : white ! important;
 }
 
-div.cdm.expandable div.cdmHeader span.titleWrap {
-	white-space : nowrap;
-	text-overflow : ellipsis;
-	overflow : hidden;
-	max-width: 500px;
+.cdm.expandable .cdmHeader span.titleWrap {
+    white-space : nowrap;
+    text-overflow : ellipsis;
+    overflow : hidden;
+    max-width: 500px;
 }
 
-div.cdm.expandable div.cdmHeader a.title {
-	font-weight : bold;
-	color : #555;
+.cdm.expandable .cdmHeader a.title {
+    font-weight : bold;
+    color : #555;
 }
 
-div.cdm.expandable.Unread div.cdmHeader a.title {
-	color : black;
+.cdm.expandable.Unread .cdmHeader a.title {
+    color : black;
 }
 
-div.cdm.expandable.active div.cdmHeader a.title {
-	color : #4684ff;
+.cdm.expandable.active .cdmHeader a.title {
+    color : #4684ff;
 }
 
-div.cdm.expanded div.cdmHeader {
-	background : transparent ! important;
+.cdm.expanded .cdmHeader {
+    background : transparent ! important;
 }
 
-div.cdm.expanded div.cdmHeader a.title {
-	font-size: 14px;
-	color : #999;
-	font-weight : bold;
+.cdm.expanded .cdmHeader a.title {
+    font-size: 14px;
+    color : #999;
+    font-weight : bold;
 }
 
-div.cdm.expanded.active {
-	background : white;
+.cdm.expanded.active {
+    background : white;
 }
 
-div.cdm.expanded.active div.cdmHeader a.title {
-	color : #4684ff;
+.cdm.expanded.active .cdmHeader a.title {
+    color : #4684ff;
 }
 
-div.cdm.expanded.Unread div.cdmHeader a.title {
-	color : black;
+.cdm.expanded.Unread .cdmHeader a.title {
+    color : black;
 }
 
-div.cdm.expanded div.cdmContent {
-	color : #555;
+.cdm.expanded .cdmContent {
+    color : #555;
 }
 
-div.cdm.expanded.Unread div.cdmContent {
-	color : black;
+.cdm.expanded.Unread .cdmContent {
+    color : black;
 }
 
-div.cdm.active div.cdmContent {
-	color : black;
+.cdm.active .cdmContent {
+    color : black;
 }
 
 span.cdmExcerpt {
-	font-size: 11px;
-	color : #555;
-	font-weight : normal;
-	cursor : pointer;
+    font-size: 11px;
+    color : #555;
+    font-weight : normal;
+    cursor : pointer;
 }
 
-div.cdmContent div.postEnclosures {
-	margin-top : 1em;
-	color : #555;
+.cdmContent .postEnclosures {
+    margin-top : 1em;
+    color : #555;
 }
 
-div.cdmFeedTitle {
-	border-color : #a0a0a0;
-	border-width: 0px 0px 1px 0px;
-	border-style : solid;
-	padding : 5px 3px 5px 5px;
-	background : url("images/toolbar.png") bottom left;
-	background-repeat : repeat-x;
+.cdmFeedTitle {
+    border-color : #a0a0a0;
+    border-width: 0px 0px 1px 0px;
+    border-style : solid;
+    padding : 5px 3px 5px 5px;
+    background : url("images/toolbar.png") bottom left;
+    background-repeat : repeat-x;
 }
 
-div.cdmFeedTitle a.title {
-	color : #555;
-	font-style : italic;
-	font-weight : bold;
+.cdmFeedTitle a.title {
+    color : #555;
+    font-style : italic;
+    font-weight : bold;
 }
 
-div.cdmFeedTitle a {
-	color : #555;
+.cdmFeedTitle a {
+    color : #555;
 }
 
-div.cdmFeedTitle a:hover {
-	color : #4684ff;
+.cdmFeedTitle a:hover {
+    color : #4684ff;
 }
 
-div.cdmHeader span.hlFeed {
-	float: right;
-	font-weight : normal;
-	font-style : italic;
+.cdmHeader span.hlFeed {
+    float: right;
+    font-weight : normal;
+    font-style : italic;
 }
 
-div.cdmHeader div.hlFeed, div.cdmHeader div.hlFeed a {
-	vertical-align : middle;
-	color : #555;
-	font-weight : normal;
-	font-style : italic;
-	font-size: 11px;
+.cdmHeader .hlFeed, .cdmHeader .hlFeed a {
+    vertical-align : middle;
+    color : #555;
+    font-weight : normal;
+    font-style : italic;
+    font-size: 11px;
 }
 
-div.cdm .hlFeed a {
-	border-radius : 4px;
-	display : inline-block;
-	padding : 1px 4px 1px 4px;
+.cdm .hlFeed a {
+    border-radius : 4px;
+    display : inline-block;
+    padding : 1px 4px 1px 4px;
 }
 
-div.cdmContentInner p {
-	max-width: 650px;
+.cdmContentInner p {
+    max-width: 650px;
 }
 
-div.cdmContentInner iframe {
-	min-width: 50%;
+.cdmContentInner iframe {
+    min-width: 50%;
 }
 
-div.cdmHeader span.author {
-	color : #555;
-	font-size: 11px;
-	font-weight : normal;
+.cdmHeader span.author {
+    color : #555;
+    font-size: 11px;
+    font-weight : normal;
 }
 
 
-div#floatingTitle {
-	position : absolute;
-	z-index : 5;
-	top : 30px;
-	right : 20px;
-	border : 1px solid #ccc;
-	background : white;
-	border-radius : 3px;
-	box-shadow : 0px 0px 3px 0px rgba(0,0,0,0.1);
-	color : #555;
-	font-size: 10px;
-	padding : 3px;
+#floatingTitle {
+    position : absolute;
+    z-index : 5;
+    top : 30px;
+    right : 20px;
+    border : 1px solid #ccc;
+    background : white;
+    border-radius : 3px;
+    box-shadow : 0px 0px 3px 0px rgba(0,0,0,0.1);
+    color : #555;
+    font-size: 10px;
+    padding : 3px;
 }
 
-div#floatingTitle > * {
-	display : table-cell;
-	white-space : nowrap;
-	vertical-align : middle;
+#floatingTitle > * {
+    display : table-cell;
+    white-space : nowrap;
+    vertical-align : middle;
 }
 
-div#floatingTitle span.titleWrap {
-	max-width: 200px;
-	overflow : hidden;
-	text-overflow : ellipsis;
+#floatingTitle span.titleWrap {
+    max-width: 200px;
+    overflow : hidden;
+    text-overflow : ellipsis;
 }
 
-div#floatingTitle img {
-	padding-right : 3px;
+#floatingTitle img {
+    padding-right : 3px;
 }
 
-div#floatingTitle .dijit, 
-div#floatingTitle span.updated, 
-div#floatingTitle div.scoreWrap,
-div#floatingTitle div.hlFeed, 
-div#floatingTitle span.author, 
-div#floatingTitle img.tinyFeedIcon {
-	display: none;
+#floatingTitle .dijit,
+#floatingTitle span.updated,
+#floatingTitle .scoreWrap,
+#floatingTitle .hlFeed,
+#floatingTitle span.author,
+#floatingTitle img.tinyFeedIcon {
+    display: none;
 }

@@ -4,7 +4,7 @@ namespace SmallSmallRSS\Handlers;
 class API extends Handler
 {
 
-    const API_LEVEL = 7;
+    const API_LEVEL = 8;
     const STATUS_OK = 0;
     const STATUS_ERR = 1;
 
@@ -347,7 +347,11 @@ class API extends Handler
                           feed_id,
                           comments,
                           int_id,
-                          marked,unread,published,score,
+                          marked,
+                          unread,
+                          published,
+                          score,
+                          note,
                           '.$substring_for_date."(updated,1,16) as updated,
                           author,
                           (
@@ -379,7 +383,8 @@ class API extends Handler
                         'feed_id' => $line['feed_id'],
                         'attachments' => $attachments,
                         'score' => (int) $line['score'],
-                        'feed_title' => $line['feed_title']
+                        'feed_title' => $line['feed_title'],
+                        'note' => $line['note']
                     );
                     $hooks = \SmallSmallRSS\PluginHost::getInstance()->getHooks(
                         \SmallSmallRSS\Hooks::FILTER_ARTICLE_API
@@ -737,6 +742,7 @@ class API extends Handler
             );
             $headline_row['author'] = $line['author'];
             $headline_row['score'] = (int) $line['score'];
+            $headline_row['note'] = (int) $line['note'];
             $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
                 \SmallSmallRSS\Hooks::FILTER_ARTICLE_API
             );

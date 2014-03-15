@@ -241,7 +241,7 @@ class Labels
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $checked = false;
             foreach ($article_labels as $al) {
-                if ($al[0] == $line['id']) {
+                if (self::fromFeedId($al[0]) == $line['id']) {
                     $checked = true;
                     break;
                 }
@@ -249,7 +249,7 @@ class Labels
             array_push(
                 $rv,
                 array(
-                    'id' => (int) $line['id'],
+                    'id' => (int) self::toFeedId($line['id']),
                     'caption' => $line['caption'],
                     'fg_color' => $line['fg_color'],
                     'bg_color' => $line['bg_color'],

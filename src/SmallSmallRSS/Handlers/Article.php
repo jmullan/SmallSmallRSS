@@ -25,7 +25,6 @@ class Article extends ProtectedHandler
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             $article_url = \SmallSmallRSS\Database::fetch_result($result, 0, 'link');
             $article_url = str_replace("\n", '', $article_url);
-
             header("Location: $article_url");
             return;
 
@@ -114,13 +113,7 @@ class Article extends ProtectedHandler
             $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'ref_id');
             $int_id = \SmallSmallRSS\UserEntries::getIntId($ref_id, $owner_uid);
             if (!is_null($int_id)) {
-                \SmallSmallRSS\Database::query(
-                    "UPDATE ttrss_entries
-                     SET
-                         content = '$content',
-                         content_hash = '$content_hash'
-                     WHERE id = '$ref_id'"
-                );
+                \SmallSmallRSS\Entries::updateContent($ref_id, $content);
                 \SmallSmallRSS\UserEntries::publishIds(array($ref_id), $owner_uid);
             } else {
                 \SmallSmallRSS\Database::query(
@@ -138,15 +131,8 @@ class Article extends ProtectedHandler
             }
             $rc = true;
         } else {
-            $result = \SmallSmallRSS\Database::query(
-                "INSERT INTO ttrss_entries
-                 (title, guid, link, updated, content, content_hash, date_entered, date_updated)
-                 VALUES
-                 ('$title', '$guid', '$url', NOW(), '$content', '$content_hash', NOW(), NOW())"
-            );
-            $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_entries WHERE guid = '$guid'");
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+            $ref_id = \SmallSmallRSS\Entries::insert($title, $guid, $url, $content);
+            if (false !== $ref_id) {
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_user_entries
                      (ref_id, uuid, feed_id, orig_feed_id, owner_uid, published, tag_cache, label_cache,

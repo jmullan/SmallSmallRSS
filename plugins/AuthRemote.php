@@ -32,6 +32,13 @@ class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_In
                 . $_SERVER["REDIRECT_SSL_CLIENT_S_DN"]
             );
         }
+        if (!empty($_SERVER["SSL_CLIENT_M_SERIAL"])) {
+            return sha1(
+                $_SERVER["SSL_CLIENT_M_SERIAL"]
+                . $_SERVER["SSL_CLIENT_V_START"]
+                . $_SERVER["SSL_CLIENT_V_END"]
+                . $_SERVER["SSL_CLIENT_S_DN"]);
+            }
         return "";
     }
 

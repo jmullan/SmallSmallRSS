@@ -22,7 +22,8 @@ class MySQLi implements DatabaseInterface
 
     public function escape_string($s, $strip_tags = true)
     {
-        if ($strip_tags) {  $s = strip_tags($s);
+        if ($strip_tags) {
+            $s = strip_tags($s);
         }
         return mysqli_real_escape_string($this->link, $s);
     }
@@ -42,7 +43,8 @@ class MySQLi implements DatabaseInterface
     public function fetch_assoc($result)
     {
         if (!$result) {
-            return null;
+            trigger_error("Cannot return associative array from result", E_USER_NOTICE);
+            return array();
         }
         return mysqli_fetch_assoc($result);
     }
@@ -50,17 +52,24 @@ class MySQLi implements DatabaseInterface
 
     public function num_rows($result)
     {
-        return mysqli_num_rows($result);
+        if ($result) {
+            return mysqli_num_rows($result);
+        } else {
+            trigger_error("Cannot count rows of a non-mysql result", E_USER_NOTICE);
+            return 0;
+        }
     }
 
     public function fetch_result($result, $row, $param)
     {
         if ($result && mysqli_data_seek($result, $row)) {
-            $line = mysqli_fetch_assoc($result);
-            return $line[$param];
-        } else {
-            return false;
+            $line = self::fetch_assoc($result);
+            if (isset($line[$param])) {
+                return $line[$param];
+            }
         }
+        trigger_error("Cannot get param from result", E_USER_NOTICE);
+        return false;
     }
 
     public function close()

@@ -350,10 +350,10 @@ class Feeds
         $file = \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico";
         return (is_file($file) && filesize($file));
     }
-    public static function getForCategory($cat_id, $owner_id)
+    public static function getForCategory($cat_id, $owner_uid)
     {
-        if ($cat != 0) {
-            $cat_query = "cat_id = '$cat'";
+        if ($cat_id != 0) {
+            $cat_query = "cat_id = '$cat_id'";
         } else {
             $cat_query = 'cat_id IS NULL';
         }
@@ -370,7 +370,7 @@ class Feeds
         }
         return $feed_ids;
     }
-    public static function getForSelectByCategory($cat_id, $owner_id)
+    public static function getForSelectByCategory($cat_id, $owner_uid)
     {
         if ($cat != 0) {
             $cat_query = "cat_id = '$cat'";
@@ -391,7 +391,7 @@ class Feeds
         }
         return $feeds;
     }
-    public static function getAllForSelectByCategory($owner_id)
+    public static function getAllForSelectByCategory($owner_uid)
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT id, title

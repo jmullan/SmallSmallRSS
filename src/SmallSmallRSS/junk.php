@@ -304,7 +304,7 @@ function getCategoryCounters($owner_uid)
 // only accepts real cats (>= 0)
 function getCategoryChildrenUnread($cat, $owner_uid)
 {
-    $unread = getCategoryUnread($cat, $owner_uid);;
+    $unread = getCategoryUnread($cat, $owner_uid);
     if ($cat == \SmallSmallRSS\FeedCategories::SPECIAL
         || $cat == \SmallSmallRSS\FeedCategories::LABELS
         || $cat == \SmallSmallRSS\FeedCategories::NONE
@@ -317,7 +317,8 @@ function getCategoryChildrenUnread($cat, $owner_uid)
     return $unread + $children_unread;
 }
 
-function getCategoriesUnread($cat_ids, $owner_uid) {
+function getCategoriesUnread($cat_ids, $owner_uid)
+{
     $unreads = array();
     $regular_cat_ids = array();
     foreach ($cat_ids as $cat_id) {

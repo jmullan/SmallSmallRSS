@@ -33,8 +33,8 @@ class FeedParser
             }
             $this->error = "";
             if ($error) {
-                foreach(libxml_get_errors() as $error) {
-                    if($error->level == LIBXML_ERR_FATAL) {
+                foreach (libxml_get_errors() as $error) {
+                    if ($error->level == LIBXML_ERR_FATAL) {
                         $this->error = $this->format_error($error);
                         // break here because currently we only show one error
                         break;
@@ -193,22 +193,22 @@ class FeedParser
         return $this->error;
     }
 
-    public function get_link()
+    public function getLink()
     {
         return $this->link;
     }
 
-    public function get_title()
+    public function getTitle()
     {
         return $this->title;
     }
 
-    public function get_items()
+    public function getItems()
     {
         return $this->items;
     }
 
-    public function get_links($rel)
+    public function getLinks($rel)
     {
         $rv = array();
 

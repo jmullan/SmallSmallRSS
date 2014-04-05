@@ -292,7 +292,7 @@ class RSSUpdater
         if (!$auth_pass && !$auth_login) {
             if (is_writable(\SmallSmallRSS\Config::get('CACHE_DIR') . '/simplepie')) {
                 $new_rss_hash = md5($feed_data);
-                if ($new_rss_hash != $rss_hash && count($rss->get_items()) > 0) {
+                if ($new_rss_hash != $rss_hash && count($rss->getItems()) > 0) {
                     @file_put_contents($cache_filename, $feed_data);
                 }
             } else {
@@ -329,7 +329,7 @@ class RSSUpdater
         $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, 'owner_uid');
 
         $site_url = \SmallSmallRSS\Database::escape_string(
-            mb_substr(\SmallSmallRSS\Utils::rewriteRelativeUrl($fetch_url, $rss->get_link()), 0, 245)
+            mb_substr(\SmallSmallRSS\Utils::rewriteRelativeUrl($fetch_url, $rss->getLink()), 0, 245)
         );
 
         if ($favicon_needs_check || $force_refetch) {
@@ -377,7 +377,7 @@ class RSSUpdater
         }
 
         if (!$registered_title || $registered_title == '[Unknown]') {
-            $feed_title = \SmallSmallRSS\Database::escape_string($rss->get_title());
+            $feed_title = \SmallSmallRSS\Database::escape_string($rss->getTitle());
             if ($feed_title) {
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_feeds
@@ -397,7 +397,7 @@ class RSSUpdater
 
         $filters = load_filters($feed, $owner_uid);
         $labels = \SmallSmallRSS\Labels::getAll($owner_uid);
-        $items = $rss->get_items();
+        $items = $rss->getItems();
         if (!is_array($items)) {
             \SmallSmallRSS\Feeds::markUpdated($feed);
             return;
@@ -405,7 +405,7 @@ class RSSUpdater
 
         if ($pubsub_state != 2 && \SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED')) {
             $feed_hub_url = false;
-            $links = $rss->get_links('hub');
+            $links = $rss->getLinks('hub');
             if ($links && is_array($links)) {
                 foreach ($links as $l) {
                     $feed_hub_url = $l;
@@ -428,10 +428,10 @@ class RSSUpdater
 
             $entry_guid = $item->get_id();
             if (!$entry_guid) {
-                $entry_guid = $item->get_link();
+                $entry_guid = $item->getLink();
             }
             if (!$entry_guid) {
-                $entry_guid = self::makeGUIDFromTitle($item->get_title());
+                $entry_guid = self::makeGUIDFromTitle($item->getTitle());
             }
             $hooks = $pluginhost->get_hooks(\SmallSmallRSS\Hooks::GUID_FILTER);
             foreach ($hooks as $plugin) {
@@ -452,8 +452,8 @@ class RSSUpdater
                 $no_orig_date = 'false';
             }
             $entry_timestamp_fmt = strftime('%Y/%m/%d %H:%M:%S', $entry_timestamp);
-            $entry_title = $item->get_title();
-            $entry_link = \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $item->get_link());
+            $entry_title = $item->getTitle();
+            $entry_link = \SmallSmallRSS\Utils::rewriteRelativeUrl($site_url, $item->getLink());
             if (!$entry_title) {
                 $entry_title = date('Y-m-d H:i:s', $entry_timestamp);
             };

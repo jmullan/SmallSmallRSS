@@ -33,7 +33,7 @@ class Af_SFBG extends \SmallSmallRSS\Plugin
 
     public function hookGuidFilter($args)
     {
-        $link = $args['item']->get_link();
+        $link = $args['item']->getLink();
         $guid = $args['guid'];
         if (self::shouldRunAgainst($link)) {
             $guid = self::cleanlink($link);

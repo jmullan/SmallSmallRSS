@@ -9,7 +9,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         if ($id) {
             return $id->nodeValue;
         } else {
-            return $this->get_link();
+            return $this->getLink();
         }
     }
 
@@ -29,7 +29,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    public function get_link()
+    public function getLink()
     {
         $links = $this->elem->getElementsByTagName('link');
         foreach ($links as $link) {
@@ -43,7 +43,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    public function get_title()
+    public function getTitle()
     {
         $title = $this->elem->getElementsByTagName('title')->item(0);
         if ($title) {

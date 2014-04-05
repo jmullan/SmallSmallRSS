@@ -16,8 +16,8 @@ abstract class FeedItem_Abstract
 
     abstract public function get_id();
     abstract public function get_date();
-    abstract public function get_link();
-    abstract public function get_title();
+    abstract public function getLink();
+    abstract public function getTitle();
     abstract public function get_description();
     abstract public function get_content();
     abstract public function get_categories();

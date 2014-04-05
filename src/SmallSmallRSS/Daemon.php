@@ -5,7 +5,7 @@ class Daemon
     public static $children = array();
     public static $ctimes = array();
 
-    public static function reap_children()
+    public static function reapChildren()
     {
         $tmp = array();
         foreach (self::$children as $pid) {
@@ -13,7 +13,7 @@ class Daemon
                 if (\SmallSmallRSS\Lockfiles::is_locked("update_daemon-$pid.lock")) {
                     array_push($tmp, $pid);
                 } else {
-                    \SmallSmallRSS\Logger::debug("[reap_children] child $pid seems active but lockfile is unlocked.");
+                    \SmallSmallRSS\Logger::debug("[reapChildren] child $pid seems active but lockfile is unlocked.");
                     unset(self::$ctimes[$pid]);
                 }
             } else {
@@ -24,7 +24,7 @@ class Daemon
         return count($tmp);
     }
 
-    public static function kill_stuck_children()
+    public static function killStuckChildren()
     {
         foreach (array_keys(self::$ctimes) as $pid) {
             $started = self::$ctimes[$pid];
@@ -35,12 +35,12 @@ class Daemon
         }
     }
 
-    public static function running_jobs()
+    public static function runningJobs()
     {
         return count(self::$children);
     }
 
-    public static function track_pid()
+    public static function trackPid()
     {
         array_push(self::$children, $pid);
         self::$ctimes[$pid] = time();

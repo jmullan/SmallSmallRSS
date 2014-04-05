@@ -13,7 +13,7 @@ $last_checkpoint = -1;
 
 function sigchld_handler($signal)
 {
-    $running_jobs = \SmallSmallRSS\Daemon::reap_children();
+    $runningJobs = \SmallSmallRSS\Daemon::reapChildren();
     $status = null;
     pcntl_waitpid(-1, $status, WNOHANG);
 }
@@ -104,13 +104,13 @@ while (true) {
     $next_spawn = $last_checkpoint + $spawn_interval - time();
 
     if ($next_spawn % 60 == 0) {
-        $running_jobs = \SmallSmallRSS\Daemon::running_jobs();
+        $runningJobs = \SmallSmallRSS\Daemon::runningJobs();
     }
 
     if ($last_checkpoint + $spawn_interval < time()) {
-        \SmallSmallRSS\Daemon::kill_stuck_children();
-        \SmallSmallRSS\Daemon::reap_children();
-        for ($j = \SmallSmallRSS\Daemon::running_jobs(); $j < $max_jobs; $j++) {
+        \SmallSmallRSS\Daemon::killStuckChildren();
+        \SmallSmallRSS\Daemon::reapChildren();
+        for ($j = \SmallSmallRSS\Daemon::runningJobs(); $j < $max_jobs; $j++) {
             $num_updates = $base_num_updates;
             if ($j < $fractional_updates) {
                 // Add in the remainder of the update jobs. It's probably wiser
@@ -132,7 +132,7 @@ while (true) {
                     register_shutdown_function('shutdown', posix_getpid());
                     $master_handlers_installed = true;
                 }
-                \SmallSmallRSS\Daemon::track_pid($pid);
+                \SmallSmallRSS\Daemon::trackPid($pid);
             } else {
                 pcntl_signal(SIGCHLD, SIG_IGN);
                 pcntl_signal(SIGINT, 'task_sigint_handler');

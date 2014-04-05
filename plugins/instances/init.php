@@ -29,7 +29,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function hookUpdateTask($args)
     {
-        $this->get_linked_feeds();
+        $this->getLinkedFeeds();
     }
 
     // Status codes:
@@ -39,7 +39,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
     // 2   - did not receive valid data
     // >10 - server error, code + 10 (e.g. 16 means server error 6)
 
-    public function get_linked_feeds($instance_id = false)
+    public function getLinkedFeeds($instance_id = false)
     {
         if ($instance_id) {
             $instance_qpart = "id = '$instance_id' AND ";
@@ -122,7 +122,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function getFeeds()
     {
-        $this->get_linked_feeds(false);
+        $this->getLinkedFeeds(false);
     }
 
     public function getPreferencesJavascript()

@@ -28,12 +28,11 @@ class Fetcher
         $post_query = false,
         $timeout = false,
         $timestamp = 0
-    )
-    {
+    ) {
         return $this->getFileContents($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
     }
 
-    static public function simpleFetch(
+    public static function simpleFetch(
         $url,
         $type = false,
         $login = false,
@@ -41,8 +40,7 @@ class Fetcher
         $post_query = false,
         $timeout = false,
         $timestamp = 0
-    )
-    {
+    ) {
         $fetcher = new self($url);
         return $fetcher->fetch($url, $type, $login, $pass, $post_query, $timeout, $timestamp);
     }
@@ -55,8 +53,7 @@ class Fetcher
         $post_query = false,
         $timeout = false,
         $timestamp = 0
-    )
-    {
+    ) {
         $url = str_replace(' ', '%20', $url);
         if (!defined('NO_CURL') && function_exists('curl_init')) {
             $this->fetch_curl_used = true;

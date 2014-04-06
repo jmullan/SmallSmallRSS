@@ -203,9 +203,9 @@ class RSSUpdater
         $date_feed_processed = date('Y-m-d H:i');
         $cache_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . '/simplepie/' . sha1($fetch_url) . '.xml';
         $pluginhost = new \SmallSmallRSS\PluginHost();
-        $pluginhost->init_all();
-        $pluginhost->init_user($owner_uid);
-        $pluginhost->load_data();
+        $pluginhost->initAll();
+        $pluginhost->initUser($owner_uid);
+        $pluginhost->loadData();
 
         $rss = false;
         $rss_hash = false;
@@ -223,7 +223,7 @@ class RSSUpdater
 
         }
         if (!$rss) {
-            $feed_fetching_hooks = $pluginhost->get_hooks(\SmallSmallRSS\Hooks::FETCH_FEED);
+            $feed_fetching_hooks = $pluginhost->getHooks(\SmallSmallRSS\Hooks::FETCH_FEED);
             foreach ($feed_fetching_hooks as $plugin) {
                 if (!$feed_data) {
                     $feed_data = $plugin->hook_fetch_feed($feed_data, $fetch_url, $owner_uid, $feed);
@@ -262,7 +262,7 @@ class RSSUpdater
                 return;
             }
         }
-        $fetched_feed_hooks = $pluginhost->get_hooks(\SmallSmallRSS\Hooks::FEED_FETCHED);
+        $fetched_feed_hooks = $pluginhost->getHooks(\SmallSmallRSS\Hooks::FEED_FETCHED);
         foreach ($fetched_feed_hooks as $plugin) {
             $feed_data = $plugin->hook_feed_fetched($feed_data, $fetch_url, $owner_uid, $feed);
         }
@@ -433,7 +433,7 @@ class RSSUpdater
             if (!$entry_guid) {
                 $entry_guid = self::makeGUIDFromTitle($item->getTitle());
             }
-            $hooks = $pluginhost->get_hooks(\SmallSmallRSS\Hooks::GUID_FILTER);
+            $hooks = $pluginhost->getHooks(\SmallSmallRSS\Hooks::GUID_FILTER);
             foreach ($hooks as $plugin) {
                 $args = array('item' => $item, 'guid' => $entry_guid);
                 $entry_guid = $plugin->hookGuidFilter($args);
@@ -531,7 +531,7 @@ class RSSUpdater
                 'stored' => $stored_article
             );
 
-            foreach ($pluginhost->get_hooks(\SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE) as $plugin) {
+            foreach ($pluginhost->getHooks(\SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE) as $plugin) {
                 $article = $plugin->hookFilterIncomingArticle($article);
             }
 

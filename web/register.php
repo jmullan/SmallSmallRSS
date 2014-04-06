@@ -6,7 +6,7 @@ require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 
 $action = $_REQUEST['action'];
 
-if (!\SmallSmallRSS\PluginHost::init_all()) {
+if (!\SmallSmallRSS\PluginHost::initAll()) {
     return;
 }
 

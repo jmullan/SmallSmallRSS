@@ -11,7 +11,7 @@ if (!file_exists('../config.ini')) {
 require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Sessions::init();
 
-if (!\SmallSmallRSS\PluginHost::init_all()) {
+if (!\SmallSmallRSS\PluginHost::initAll()) {
     return;
 }
 login_sequence();
@@ -56,7 +56,7 @@ foreach (array('lib/prototype.js',
 <script type="text/javascript">
     require({cache:{}});
 <?php
-foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
+foreach (\SmallSmallRSS\PluginHost::getInstance()->getPlugins() as $n => $p) {
     $js_renderer->render_minified($p->getPreferencesJavascript());
 }
 $js_renderer->render_minified_js_files(

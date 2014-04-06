@@ -37,12 +37,12 @@ class PluginHost
         return self::$instance;
     }
 
-    public function get_plugins()
+    public function getPlugins()
     {
         return $this->plugins;
     }
 
-    public function get_plugin($name)
+    public function getPlugin($name)
     {
         if (isset($this->plugins[$name])) {
             return $this->plugins[$name];
@@ -55,13 +55,13 @@ class PluginHost
     {
         $method = \SmallSmallRSS\Hooks::getHookMethod($type);
         if ($method !== false) {
-            foreach ($this->get_hooks($type) as $hook) {
+            foreach ($this->getHooks($type) as $hook) {
                 $hook->$method($args);
             }
         }
     }
 
-    public function add_hook($type, $sender)
+    public function addHook($type, $sender)
     {
         if (!isset($this->hooks[$type]) || !is_array($this->hooks[$type])) {
             $this->hooks[$type] = array();
@@ -70,7 +70,7 @@ class PluginHost
         array_push($this->hooks[$type], $sender);
     }
 
-    public function del_hook($type, $sender)
+    public function delete_hook($type, $sender)
     {
         if (is_array($this->hooks[$type])) {
             $key = array_Search($this->hooks[$type], $sender);
@@ -80,7 +80,7 @@ class PluginHost
         }
     }
 
-    public function get_hooks($type)
+    public function getHooks($type)
     {
         if (isset($this->hooks[$type])) {
             return $this->hooks[$type];
@@ -99,7 +99,7 @@ class PluginHost
         return $class_dir;
     }
 
-    public function load_all($kind, $owner_uid = false)
+    public function loadAll($kind, $owner_uid = false)
     {
         $class_root = self::classRoot();
         if ($class_root === false) {
@@ -174,7 +174,7 @@ class PluginHost
     }
 
     // only system plugins are allowed to modify routing
-    public function add_handler($handler, $method, $sender)
+    public function addHandler($handler, $method, $sender)
     {
         $handler = str_replace('-', '_', strtolower($handler));
         $method = strtolower($method);
@@ -187,7 +187,7 @@ class PluginHost
         }
     }
 
-    public function del_handler($handler, $method, $sender)
+    public function deleteHandler($handler, $method, $sender)
     {
         $handler = str_replace('-', '_', strtolower($handler));
         $method = strtolower($method);
@@ -196,7 +196,7 @@ class PluginHost
         }
     }
 
-    public function lookup_handler($handler, $method)
+    public function lookupHandler($handler, $method)
     {
         $handler = str_replace('-', '_', strtolower($handler));
         $method = strtolower($method);
@@ -228,14 +228,14 @@ class PluginHost
         );
     }
 
-    public function del_command($command)
+    public function delCommand($command)
     {
         $command = '-' . strtolower($command);
 
         unset($this->commands[$command]);
     }
 
-    public function lookup_command($command)
+    public function lookupCommand($command)
     {
         $command = '-' . strtolower($command);
 
@@ -248,14 +248,14 @@ class PluginHost
         return false;
     }
 
-    public function get_commands()
+    public function getCommands()
     {
         return $this->commands;
     }
 
-    public function run_commands($args)
+    public function runCommands($args)
     {
-        foreach ($this->get_commands() as $command => $data) {
+        foreach ($this->getCommands() as $command => $data) {
             if (isset($args[$command])) {
                 $command = str_replace('-', '', $command);
                 $data['class']->$command($args);
@@ -263,7 +263,7 @@ class PluginHost
         }
     }
 
-    public function load_data($force = false)
+    public function loadData($force = false)
     {
         if ($this->owner_uid) {
             $result = \SmallSmallRSS\Database::query(
@@ -277,7 +277,7 @@ class PluginHost
         }
     }
 
-    private function save_data($plugin)
+    private function saveData($plugin)
     {
         if ($this->owner_uid) {
             $plugin = \SmallSmallRSS\Database::escape_string($plugin);
@@ -327,7 +327,7 @@ class PluginHost
         $this->storage[$idx][$name] = $value;
 
         if ($sync) {
-            $this->save_data(get_class($sender));
+            $this->saveData(get_class($sender));
         }
     }
 
@@ -342,7 +342,7 @@ class PluginHost
         }
     }
 
-    public function get_all($sender)
+    public function getAll($sender)
     {
         $idx = get_class($sender);
         if (isset($this->storage[$idx])) {
@@ -351,7 +351,7 @@ class PluginHost
         return null;
     }
 
-    public function clear_data($sender)
+    public function clearData($sender)
     {
         if ($this->owner_uid) {
             $idx = get_class($sender);
@@ -367,7 +367,7 @@ class PluginHost
 
     // Plugin feed functions are *EXPERIMENTAL*!
     // cat_id: only -1 is supported (Special)
-    public function add_feed($cat_id, $title, $icon, $sender)
+    public function addFeed($cat_id, $title, $icon, $sender)
     {
         if (!isset($this->feeds[$cat_id])) {
             $this->feeds[$cat_id] = array();
@@ -392,7 +392,7 @@ class PluginHost
     }
 
     // convert feed_id (e.g. -129) to pfeed_id first
-    public function get_feed_handler($pfeed_id)
+    public function getFeedHandler($pfeed_id)
     {
         foreach ($this->feeds as $cat) {
             foreach ($cat as $feed) {
@@ -403,24 +403,24 @@ class PluginHost
         }
     }
 
-    public static function pfeed_to_feed_id($label)
+    public static function pfeedToFeedId($label)
     {
         return \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX - 1 - abs($label);
     }
 
-    public static function feed_to_pfeed_id($feed)
+    public static function feedToPfeedId($feed)
     {
         return \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX - 1 + abs($feed);
     }
 
-    public function add_api_method($name, $sender)
+    public function addApiMethod($name, $sender)
     {
         if ($sender::IS_SYSTEM) {
             $this->api_methods[strtolower($name)] = $sender;
         }
     }
 
-    public function get_api_method($name)
+    public function getApiMethod($name)
     {
         $name = strtolower($name);
         if (isset($this->api_methods[$name])) {
@@ -429,12 +429,12 @@ class PluginHost
         return null;
     }
 
-    public static function init_all()
+    public static function initAll()
     {
         self::getInstance()->load(\SmallSmallRSS\Config::get('PLUGINS'), self::KIND_ALL);
         return true;
     }
-    public function init_user($owner_uid)
+    public function initUser($owner_uid)
     {
         $user_plugins = \SmallSmallRSS\DBPrefs::read('_ENABLED_PLUGINS', $owner_uid);
         $this->load($user_plugins, self::KIND_USER, $owner_uid);
@@ -452,8 +452,7 @@ class PluginHost
             $owner_uid
         );
         if (\SmallSmallRSS\Sanity::getSchemaVersion() > 100) {
-            \SmallSmallRSS\PluginHost::getInstance()->load_data();
+            \SmallSmallRSS\PluginHost::getInstance()->loadData();
         }
     }
-
 }

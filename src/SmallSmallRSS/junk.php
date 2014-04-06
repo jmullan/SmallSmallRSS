@@ -16,7 +16,7 @@ function authenticate_user($login, $password, $check_only = false)
         return true;
     } else {
         $user_id = false;
-        $plugins = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::AUTH_USER);
+        $plugins = \SmallSmallRSS\PluginHost::getInstance()->getHooks(\SmallSmallRSS\Hooks::AUTH_USER);
         if (!$plugins) {
             \SmallSmallRSS\Logger::log('No authentication plugins!');
         }
@@ -185,7 +185,7 @@ function getVirtCounters($owner_uid)
             $count = $feed['sender']->get_unread($feed['id']);
             $time = (microtime(true) - $start) * 1000;
             $cv = array(
-                'id' => \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']),
+                'id' => \SmallSmallRSS\PluginHost::pfeedToFeedId($feed['id']),
                 'counter' => (int) $count,
                 'time' => $time
             );
@@ -314,7 +314,7 @@ function getCategoryChildrenUnread($cat, $owner_uid)
     $cat_ids = \SmallSmallRSS\FeedCategories::getDescendents($cat, $owner_uid);
     $unreads = getCategoriesUnread($cat_ids, $owner_uid);
     $unread += sum($unreads);
-    return $unread + $children_unread;
+    return $unread;
 }
 
 function getCategoriesUnread($cat_ids, $owner_uid)
@@ -1349,7 +1349,7 @@ function sanitize($str, $owner, $force_remove_images = false, $site_url = false)
 
     $disallowed_attributes = array('id', 'style', 'class');
 
-    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_hooks(\SmallSmallRSS\Hooks::SANITIZE) as $plugin) {
+    foreach (\SmallSmallRSS\PluginHost::getInstance()->getHooks(\SmallSmallRSS\Hooks::SANITIZE) as $plugin) {
         $retval = $plugin->hook_sanitize($doc, $site_url, $allowed_elements, $disallowed_attributes);
         if (is_array($retval)) {
             $doc = $retval[0];

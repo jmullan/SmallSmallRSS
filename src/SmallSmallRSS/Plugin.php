@@ -27,7 +27,7 @@ abstract class Plugin
     {
         assert($this->host);
         foreach (static::$provides as $hook) {
-            $this->host->add_hook($hook, $this);
+            $this->host->addHook($hook, $this);
         }
         $this->addCommands();
     }

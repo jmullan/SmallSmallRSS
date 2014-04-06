@@ -16,21 +16,21 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
 require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Sessions::init();
 $mobile = new \Mobile_Detect();
-if (!\SmallSmallRSS\PluginHost::init_all()) {
+if (!\SmallSmallRSS\PluginHost::initAll()) {
     return;
 }
 
 if (empty($_REQUEST['mobile'])) {
     if ($mobile->isTablet()
-        && \SmallSmallRSS\PluginHost::getInstance()->get_plugin('digest')) {
+        && \SmallSmallRSS\PluginHost::getInstance()->getPlugin('digest')) {
         header('Location: backend.php?op=digest');
         exit;
     } elseif ($mobile->isMobile()
-              && \SmallSmallRSS\PluginHost::getInstance()->get_plugin('mobile')) {
+              && \SmallSmallRSS\PluginHost::getInstance()->getPlugin('mobile')) {
         header('Location: backend.php?op=mobile');
         exit;
     } elseif ($mobile->isMobile()
-              && \SmallSmallRSS\PluginHost::getInstance()->get_plugin('digest')) {
+              && \SmallSmallRSS\PluginHost::getInstance()->getPlugin('digest')) {
         header('Location: backend.php?op=digest');
         exit;
     }
@@ -72,7 +72,7 @@ $stylesheet_renderer->renderUserStyleSheet();
 
   <style type="text/css">
 <?php
-foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $p) {
+foreach (\SmallSmallRSS\PluginHost::getInstance()->getPlugins() as $p) {
     echo $p->getCSS();
 }
 ?>
@@ -219,7 +219,7 @@ require({cache:{}});
 $js_renderer->render_minified_js_files(
     array('tt-rss', 'functions', 'feedlist', 'viewfeed', 'FeedTree', 'PluginHost')
 );
-foreach (\SmallSmallRSS\PluginHost::getInstance()->get_plugins() as $n => $p) {
+foreach (\SmallSmallRSS\PluginHost::getInstance()->getPlugins() as $n => $p) {
     $js_renderer->render_minified($p->getJavascript());
 }
 $translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();

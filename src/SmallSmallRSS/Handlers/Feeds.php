@@ -146,12 +146,12 @@ class Feeds extends ProtectedHandler
             echo '</option>';
 
         }
-        if (\SmallSmallRSS\PluginHost::getInstance()->get_plugin('mail')) {
+        if (\SmallSmallRSS\PluginHost::getInstance()->getPlugin('mail')) {
             echo '<option value="emailArticle(false)">';
             echo __('Forward by email').
                 '</option>';
         }
-        if (\SmallSmallRSS\PluginHost::getInstance()->get_plugin('mailto')) {
+        if (\SmallSmallRSS\PluginHost::getInstance()->getPlugin('mailto')) {
             echo '<option value="mailtoArticle(false)">';
             echo __('Forward by email').
                 '</option>';
@@ -263,8 +263,8 @@ class Feeds extends ProtectedHandler
             && $feed < \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX
             && $feed > \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
 
-            $handler = \SmallSmallRSS\PluginHost::getInstance()->get_feed_handler(
-                \SmallSmallRSS\PluginHost::feed_to_pfeed_id($feed)
+            $handler = \SmallSmallRSS\PluginHost::getInstance()->getFeedHandler(
+                \SmallSmallRSS\PluginHost::feedToPfeedId($feed)
             );
 
             if ($handler) {
@@ -283,7 +283,7 @@ class Feeds extends ProtectedHandler
                 );
 
                 $qfh_ret = $handler->get_headlines(
-                    \SmallSmallRSS\PluginHost::feed_to_pfeed_id($feed),
+                    \SmallSmallRSS\PluginHost::feedToPfeedId($feed),
                     $options
                 );
             }

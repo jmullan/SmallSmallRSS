@@ -1,7 +1,8 @@
 <?php
 namespace SmallSmallRSS;
 
-class SettingsProfiles {
+class SettingsProfiles
+{
     public static function deleteIds($ids, $owner_uid)
     {
         $id_part = join(',', array_unique(array_map('int', $ids)));

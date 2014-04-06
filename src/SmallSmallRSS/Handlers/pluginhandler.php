@@ -9,7 +9,7 @@ class pluginhandler extends ProtectedHandler
 
     public function catchall($method)
     {
-        $plugin = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_REQUEST['plugin']);
+        $plugin = \SmallSmallRSS\PluginHost::getInstance()->getPlugin($_REQUEST['plugin']);
 
         if ($plugin) {
             if (method_exists($plugin, $method)) {

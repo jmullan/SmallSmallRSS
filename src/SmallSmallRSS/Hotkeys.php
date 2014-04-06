@@ -150,7 +150,7 @@ class Hotkeys
                     $hotkeys[$group_name][$slug] = self::name($slug);
                 }
             }
-            $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+            $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->getHooks(
                 \SmallSmallRSS\Hooks::FILTER_HOTKEY_INFO
             );
             foreach ($hotkey_hooks as $plugin) {
@@ -229,7 +229,7 @@ class Hotkeys
             $hotkeys['^(40)|Ctrl-down'] = 'next_article_noscroll';
         }
 
-        $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+        $hotkey_hooks = \SmallSmallRSS\PluginHost::getInstance()->getHooks(
             \SmallSmallRSS\Hooks::FILTER_HOTKEY_MAP
         );
         foreach ($hotkey_hooks as $plugin) {

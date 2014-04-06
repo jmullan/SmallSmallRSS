@@ -2,7 +2,7 @@
 <?php
 require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 chdir(__DIR__);
-\SmallSmallRSS\PluginHost::init_all();
+\SmallSmallRSS\PluginHost::initAll();
 
 $longopts = array(
     "feeds",
@@ -23,7 +23,7 @@ $longopts = array(
     "help"
 );
 
-foreach (\SmallSmallRSS\PluginHost::getInstance()->get_commands() as $command => $data) {
+foreach (\SmallSmallRSS\PluginHost::getInstance()->getCommands() as $command => $data) {
     array_push($longopts, $command . $data["suffix"]);
 }
 
@@ -54,7 +54,7 @@ if (count($options) == 0 || isset($options["help"])) {
     print "  --num-updates N      - update this many feeds\n";
     print "Plugin options:\n";
 
-    foreach (\SmallSmallRSS\PluginHost::getInstance()->get_commands() as $command => $data) {
+    foreach (\SmallSmallRSS\PluginHost::getInstance()->getCommands() as $command => $data) {
         $args = $data['arghelp'];
         printf(" --%-19s - %s\n", "$command $args", $data["description"]);
     }
@@ -235,10 +235,10 @@ if (isset($options["update-schema"])) {
 
 if (isset($options["list-plugins"])) {
     $tmppluginhost = new \SmallSmallRSS\PluginHost();
-    $tmppluginhost->load_all($tmppluginhost::KIND_ALL);
+    $tmppluginhost->loadAll($tmppluginhost::KIND_ALL);
     $enabled = array_map('trim', explode(',', \SmallSmallRSS\Config::get('PLUGINS')));
     echo "List of all available plugins:\n";
-    foreach ($tmppluginhost->get_plugins() as $name => $plugin) {
+    foreach ($tmppluginhost->getPlugins() as $name => $plugin) {
         $about = $plugin->about();
         $status = $about[3] ? "system" : "user";
         if (in_array($name, $enabled)) {
@@ -256,5 +256,5 @@ if (isset($options["list-plugins"])) {
     echo "Plugins marked by * are currently enabled for all users.\n";
 }
 
-\SmallSmallRSS\PluginHost::getInstance()->run_commands($options);
+\SmallSmallRSS\PluginHost::getInstance()->runCommands($options);
 \SmallSmallRSS\Lockfiles::unlock($lock_filename);

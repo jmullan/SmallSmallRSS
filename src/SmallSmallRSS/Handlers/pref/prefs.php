@@ -124,7 +124,7 @@ class Pref_Prefs extends ProtectedHandler
             return;
         }
 
-        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION['auth_module']);
+        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->getPlugin($_SESSION['auth_module']);
 
         if (method_exists($authenticator, 'change_password')) {
             echo $authenticator->change_password($_SESSION['uid'], $old_pw, $new_pw);
@@ -282,7 +282,7 @@ class Pref_Prefs extends ProtectedHandler
         echo '</form>';
 
         if ($_SESSION['auth_module']) {
-            $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION['auth_module']);
+            $authenticator = \SmallSmallRSS\PluginHost::getInstance()->getPlugin($_SESSION['auth_module']);
         } else {
             $authenticator = false;
         }
@@ -730,10 +730,10 @@ class Pref_Prefs extends ProtectedHandler
         $user_enabled = array_map('trim', explode(',', \SmallSmallRSS\DBPrefs::read('_ENABLED_PLUGINS')));
 
         $tmppluginhost = new \SmallSmallRSS\PluginHost();
-        $tmppluginhost->load_all($tmppluginhost::KIND_ALL, $_SESSION['uid']);
-        $tmppluginhost->load_data(true);
+        $tmppluginhost->loadAll($tmppluginhost::KIND_ALL, $_SESSION['uid']);
+        $tmppluginhost->loadData(true);
 
-        foreach ($tmppluginhost->get_plugins() as $name => $plugin) {
+        foreach ($tmppluginhost->getPlugins() as $name => $plugin) {
             $about = $plugin->about();
             if (!empty($about[3]) && strpos($name, 'example') === false) {
                 if (in_array($name, $system_enabled)) {
@@ -768,7 +768,7 @@ class Pref_Prefs extends ProtectedHandler
                 echo '</td>';
                 echo '<td>' . htmlspecialchars(sprintf('%.2f', $about[0])) . '</td>';
                 echo '<td>' . htmlspecialchars($about[2]) . '</td>';
-                if (count($tmppluginhost->get_all($plugin)) > 0) {
+                if (count($tmppluginhost->getAll($plugin)) > 0) {
                     if (in_array($name, $system_enabled)) {
                         echo "<td><a href='#' onclick=\"clearPluginData('$name')\"
                             class='visibleLink'>".__('Clear data').'</a></td>';
@@ -785,7 +785,7 @@ class Pref_Prefs extends ProtectedHandler
         echo '<td width="5%">'.__('Version').'</td>';
         echo '<td width="10%">'.__('Author').'</td></tr>';
 
-        foreach ($tmppluginhost->get_plugins() as $name => $plugin) {
+        foreach ($tmppluginhost->getPlugins() as $name => $plugin) {
             $about = $plugin->about();
             if (empty($about[3]) && strpos($name, 'example') === false) {
                 if (in_array($name, $system_enabled)) {
@@ -815,7 +815,7 @@ class Pref_Prefs extends ProtectedHandler
                 echo '</td>';
                 echo '<td>' . htmlspecialchars(sprintf('%.2f', $about[0])) . '</td>';
                 echo '<td>' . htmlspecialchars($about[2]) . '</td>';
-                if (count($tmppluginhost->get_all($plugin)) > 0) {
+                if (count($tmppluginhost->getAll($plugin)) > 0) {
                     if (in_array($name, $system_enabled) || in_array($name, $user_enabled)) {
                         echo "<td><a href='#' onclick=\"clearPluginData('$name')\" class='visibleLink'>";
                         echo __('Clear data').'</a></td>';
@@ -865,7 +865,7 @@ class Pref_Prefs extends ProtectedHandler
         $password = $_REQUEST['password'];
         $otp = $_REQUEST['otp'];
 
-        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION['auth_module']);
+        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->getPlugin($_SESSION['auth_module']);
 
         if ($authenticator->checkPassword($_SESSION['uid'], $password)) {
             $result = \SmallSmallRSS\Database::query(
@@ -898,7 +898,7 @@ class Pref_Prefs extends ProtectedHandler
     public function otpdisable()
     {
         $password = \SmallSmallRSS\Database::escape_string($_REQUEST['password']);
-        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->get_plugin($_SESSION['auth_module']);
+        $authenticator = \SmallSmallRSS\PluginHost::getInstance()->getPlugin($_SESSION['auth_module']);
         if ($authenticator->checkPassword($_SESSION['uid'], $password)) {
             \SmallSmallRSS\Database::query(
                 'UPDATE ttrss_users
@@ -928,7 +928,7 @@ class Pref_Prefs extends ProtectedHandler
     {
         $name = \SmallSmallRSS\Database::escape_string($_REQUEST['name']);
 
-        \SmallSmallRSS\PluginHost::getInstance()->clear_data(\SmallSmallRSS\PluginHost::getInstance()->get_plugin($name));
+        \SmallSmallRSS\PluginHost::getInstance()->clearData(\SmallSmallRSS\PluginHost::getInstance()->getPlugin($name));
     }
 
     public function customizeCSS()

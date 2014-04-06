@@ -22,8 +22,8 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function addCommands()
     {
-        $this->host->add_handler("pref-instances", "*", $this);
-        $this->host->add_handler("public", "fbexport", $this);
+        $this->host->addHandler("pref-instances", "*", $this);
+        $this->host->addHandler("public", "fbexport", $this);
         $this->host->addCommand("get-feeds", "receive popular feeds from linked instances", $this);
     }
 

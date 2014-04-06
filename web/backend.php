@@ -31,7 +31,7 @@ $csrf_token = (isset($_REQUEST['csrf_token']) ? $_REQUEST['csrf_token'] : '');
 \SmallSmallRSS\Sessions::init();
 \SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
 $script_started = microtime(true);
-if (!\SmallSmallRSS\PluginHost::init_all()) {
+if (!\SmallSmallRSS\PluginHost::initAll()) {
     return;
 }
 header('Content-Type: application/json; charset=utf-8');
@@ -61,7 +61,7 @@ if (isset($legacy_ops[$op])) {
     $op = $legacy_ops[$op];
 }
 $handler = '\\SmallSmallRSS\\Handlers\\' . $op;
-$override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler($op, $method);
+$override = \SmallSmallRSS\PluginHost::getInstance()->lookupHandler($op, $method);
 $error_code = \SmallSmallRSS\Errors::NOTHING_TO_DO();
 if (class_exists($handler) || $override) {
     if ($override) {

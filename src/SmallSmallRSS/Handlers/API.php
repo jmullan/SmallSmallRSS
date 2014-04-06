@@ -479,7 +479,7 @@ class API extends Handler
 
     public function index($method)
     {
-        $plugin = \SmallSmallRSS\PluginHost::getInstance()->get_api_method(strtolower($method));
+        $plugin = \SmallSmallRSS\PluginHost::getInstance()->getApiMethod(strtolower($method));
         if ($plugin && method_exists($plugin, $method)) {
             $reply = $plugin->$method();
             $this->wrap($reply[0], $reply[1]);
@@ -743,7 +743,7 @@ class API extends Handler
             $headline_row['author'] = $line['author'];
             $headline_row['score'] = (int) $line['score'];
             $headline_row['note'] = (int) $line['note'];
-            $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+            $hooks = \SmallSmallRSS\PluginHost::getInstance()->getHooks(
                 \SmallSmallRSS\Hooks::FILTER_ARTICLE_API
             );
             foreach ($hooks as $p) {

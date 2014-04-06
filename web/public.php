@@ -9,11 +9,11 @@ if (isset($_SESSION['uid'])) {
 
 $script_started = microtime(true);
 
-if (!\SmallSmallRSS\PluginHost::init_all()) {
+if (!\SmallSmallRSS\PluginHost::initAll()) {
     return;
 }
 $method = $_REQUEST['op'];
-$override = \SmallSmallRSS\PluginHost::getInstance()->lookup_handler('public', $method);
+$override = \SmallSmallRSS\PluginHost::getInstance()->lookupHandler('public', $method);
 if ($override) {
     $handler = $override;
 } else {

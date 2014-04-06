@@ -166,7 +166,7 @@ class PrefFeeds extends ProtectedHandler
             $feeds = \SmallSmallRSS\PluginHost::getInstance()->getFeeds(-1);
             if ($feeds) {
                 foreach ($feeds as $feed) {
-                    $feed_id = \SmallSmallRSS\PluginHost::pfeed_to_feed_id($feed['id']);
+                    $feed_id = \SmallSmallRSS\PluginHost::pfeedToFeedId($feed['id']);
                     $item = array();
                     $item['id'] = 'FEED:' . $feed_id;
                     $item['bare_id'] = (int) $feed_id;

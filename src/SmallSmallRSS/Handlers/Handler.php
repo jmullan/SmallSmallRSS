@@ -114,7 +114,7 @@ class Handler implements IHandler
                 \SmallSmallRSS\Database::fromSQLBool($line['hide_images']),
                 $line['site_url']
             );
-            $hooks = \SmallSmallRSS\PluginHost::getInstance()->get_hooks(
+            $hooks = \SmallSmallRSS\PluginHost::getInstance()->getHooks(
                 \SmallSmallRSS\Hooks::FILTER_INCOMING_ARTICLE
             );
             foreach ($hooks as $p) {

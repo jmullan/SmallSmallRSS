@@ -24,7 +24,7 @@ require_once __DIR__ . '/../../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Config::set('AUTH_DISABLE_OTP', true);
 \SmallSmallRSS\Sessions::init('ttrss_api_sid');
 
-if (!\SmallSmallRSS\PluginHost::init_all()) {
+if (!\SmallSmallRSS\PluginHost::initAll()) {
     Logger::log('Error initializing plugins');
     return;
 }

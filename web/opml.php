@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
 \SmallSmallRSS\Sessions::init();
-if (!\SmallSmallRSS\PluginHost::init_all()) {
+if (!\SmallSmallRSS\PluginHost::initAll()) {
     return;
 }
 $op = $_REQUEST['op'];

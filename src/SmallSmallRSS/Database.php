@@ -50,12 +50,18 @@ class Database
         return self::adapter()->escape_string($s, $strip_tags);
     }
 
+    public static function quote_string($s, $strip_tags = true)
+    {
+        return "'" . self::adapter()->escape_string($s, $strip_tags) . "'";
+    }
+
     public static function query($query, $die_on_error = true)
     {
         $result = self::adapter()->query($query, $die_on_error);
         $error = self::last_error();
         if ($error) {
             \SmallSmallRSS\Logger::log('SQL error');
+            \SmallSmallRSS\Logger::log($error);
             \SmallSmallRSS\Logger::log($query);
         }
         return $result;

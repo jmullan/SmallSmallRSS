@@ -91,7 +91,7 @@ class Utils
         }
     }
 
-    public static function isHtml($string)
+    public static function isHtml($content)
     {
         return (
             (stripos($content, '<html') !== false)

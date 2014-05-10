@@ -11,7 +11,7 @@ class Fetcher
     public $last_error_code;
     public $fetch_last_content_code;
 
-    public function __construct($site_url)
+    public function __construct($site_url = false)
     {
         $this->site_url = $site_url;
         $this->fetch_curl_used = false;

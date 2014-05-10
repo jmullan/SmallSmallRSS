@@ -4,6 +4,7 @@ namespace SmallSmallRSS\Database;
 class MySQLi implements DatabaseInterface
 {
     private $link;
+    public static $queries = array();
 
     public function connect($host, $user, $pass, $db, $port)
     {
@@ -37,6 +38,7 @@ class MySQLi implements DatabaseInterface
                 $die_on_error ? E_USER_ERROR : E_USER_WARNING
             );
         }
+        self::$queries[] = $query;
         return $result;
     }
 
@@ -62,14 +64,24 @@ class MySQLi implements DatabaseInterface
 
     public function fetch_result($result, $row, $param)
     {
-        if ($result && mysqli_data_seek($result, $row)) {
-            $line = self::fetch_assoc($result);
-            if (isset($line[$param])) {
-                return $line[$param];
-            }
+        if (!$result) {
+            \SmallSmallRSS\Logger::trace("Cannot get param from non-result");
+            return false;
         }
-        trigger_error("Cannot get param from result", E_USER_NOTICE);
-        return false;
+        if (!mysqli_data_seek($result, $row)) {
+            \SmallSmallRSS\Logger::trace("Cannot seek '$row' in result");
+            return false;
+        }
+        $line = self::fetch_assoc($result);
+        if (!$line) {
+            \SmallSmallRSS\Logger::trace("Fetching an array returned nothing from result");
+            return false;
+        }
+        if (!array_key_exists($param, $line)) {
+            trigger_error("Cannot get row $row param $param from result", E_USER_NOTICE);
+            return false;
+        }
+        return $line[$param];
     }
 
     public function close()

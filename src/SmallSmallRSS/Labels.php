@@ -284,4 +284,13 @@ class Labels
         }
         return false;
     }
+    public static function count($owner_uid)
+    {
+        $result = \SmallSmallRSS\Database::query(
+            'SELECT COUNT(*) AS count
+             FROM ttrss_labels2
+             WHERE owner_uid = ' . $owner_uid
+        );
+        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'count');
+    }
 }

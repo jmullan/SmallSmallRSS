@@ -53,13 +53,19 @@ class Handler implements IHandler
         return $value;
     }
 
-    public static function getSQLEscapedStringFromRequest($key)
+    public static function getStringFromRequest($key)
     {
         $value = '';
         if (isset($_REQUEST[$key])) {
-            $value = $_REQUEST[$key];
+            return (string) $_REQUEST[$key];
+        } else {
+            return '';
         }
-        return \SmallSmallRSS\Database::escape_string($value);
+    }
+
+    public static function getSQLEscapedStringFromRequest($key)
+    {
+        return \SmallSmallRSS\Database::escape_string(self::getStringFromRequest($key));
     }
 
     public static function formatArticle($id, $mark_as_read, $zoom_mode, $owner_uid)

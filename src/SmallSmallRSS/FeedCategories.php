@@ -202,4 +202,42 @@ class FeedCategories
         }
         return array_unique($ancestors);
     }
+
+    public static function getAndChildCounts($enable_nested, $owner_uid)
+    {
+        // TODO do not return empty categories, return Uncategorized and standard virtual cats
+        if ($enable_nested) {
+            $nested_qpart = 'AND parent_cat IS NULL';
+        } else {
+            $nested_qpart = '';
+        }
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT
+                 id,
+                 title,
+                 order_id,
+                 (
+                     SELECT COUNT(id)
+                     FROM ttrss_feeds
+                     WHERE
+                         ttrss_feed_categories.id IS NOT NULL
+                         AND cat_id = ttrss_feed_categories.id
+                 ) AS num_feeds,
+                 (
+                     SELECT COUNT(id)
+                     FROM ttrss_feed_categories AS c2
+                     WHERE c2.parent_cat = ttrss_feed_categories.id
+                 ) AS num_cats
+             FROM ttrss_feed_categories
+             WHERE
+                 owner_uid = $owner_uid
+                 $nested_qpart
+            "
+        );
+        $cats = array();
+        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            $cats[] = $line;
+        }
+        return $cats;
+    }
 }

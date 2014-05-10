@@ -77,14 +77,22 @@ class Feeds
             return $special_feeds[$feed_id];
         } elseif ($id < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
             $label_id = feed_to_label_id($id);
-            $result = \SmallSmallRSS\Database::query("SELECT caption FROM ttrss_labels2 WHERE id = '$label_id'");
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT caption
+                 FROM ttrss_labels2
+                 WHERE id = '$label_id'"
+            );
             if (\SmallSmallRSS\Database::num_rows($result) == 1) {
                 return \SmallSmallRSS\Database::fetch_result($result, 0, 'caption');
             } else {
                 return "Unknown label ($label_id)";
             }
         } elseif (is_numeric($id) && $id > 0) {
-            $result = \SmallSmallRSS\Database::query("SELECT title FROM ttrss_feeds WHERE id = '$id'");
+            $result = \SmallSmallRSS\Database::query(
+                "SELECT title
+                 FROM ttrss_feeds
+                 WHERE id = '$id'"
+            );
             if (\SmallSmallRSS\Database::num_rows($result) == 1) {
                 return \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
             } else {
@@ -130,7 +138,9 @@ class Feeds
         }
         $rows = -1;
         $result = \SmallSmallRSS\Database::query(
-            "SELECT owner_uid FROM ttrss_feeds WHERE id = '$feed_id'"
+            "SELECT owner_uid
+             FROM ttrss_feeds
+             WHERE id = '$feed_id'"
         );
         $owner_uid = false;
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
@@ -239,7 +249,8 @@ class Feeds
     {
         $result = \SmallSmallRSS\Database::query(
             "SELECT owner_uid, update_interval
-             FROM ttrss_feeds WHERE id = '$feed_id'"
+             FROM ttrss_feeds
+             WHERE id = '$feed_id'"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
             $update_interval = \SmallSmallRSS\Database::fetch_result($result, 0, 'update_interval');
@@ -261,7 +272,7 @@ class Feeds
              FROM ttrss_feeds
              WHERE id = '$feed_id'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+        if ($result && \SmallSmallRSS\Database::num_rows($result) > 0) {
             return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'cat_id');
         } else {
             return false;
@@ -309,9 +320,11 @@ class Feeds
         );
     }
 
-    // this is called after user is created to initialize
-    // default feeds, labels or whatever else user preferences
-    // are checked on every login, not here
+    /**
+     * this is called after user is created to initialize
+     * default feeds, labels or whatever else user preferences
+     * are checked on every login, not here
+     */
     public static function newUser($uid)
     {
         \SmallSmallRSS\Database::query(
@@ -334,6 +347,7 @@ class Feeds
              )"
         );
     }
+
     public static function count($owner_uid)
     {
         $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
@@ -341,6 +355,19 @@ class Feeds
             'SELECT COUNT(id) AS fn
              FROM ttrss_feeds
              WHERE owner_uid = ' . $owner_uid
+        );
+        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'fn');
+    }
+
+    public static function countWithNullCat($owner_uid)
+    {
+        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $result = \SmallSmallRSS\Database::query(
+            'SELECT COUNT(id) AS fn
+             FROM ttrss_feeds
+             WHERE
+                 cat_id IS NULL
+                 AND owner_uid = ' . $owner_uid
         );
         return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'fn');
     }
@@ -485,5 +512,17 @@ class Feeds
         } else {
             return "getCategoryTitle($feed_id) failed";
         }
+    }
+    public static function checkOwner($feed_id, $owner_uid)
+    {
+        $feed_id = \SmallSmallRSS\Database::escape_string($feed_id);
+        $result = \SmallSmallRSS\Database::query(
+            "SELECT id
+             FROM ttrss_feeds
+             WHERE
+                 id = '$feed_id'
+                 AND owner_uid = " . $_SESSION['uid']
+        );
+        return \SmallSmallRSS\Database::num_rows($result) != 0;
     }
 }

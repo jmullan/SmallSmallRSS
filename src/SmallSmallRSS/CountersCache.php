@@ -139,8 +139,7 @@ class CountersCache
         $owner_uid,
         $is_cat = false,
         $update_pcat = true
-    )
-    {
+    ) {
 
         if (!is_numeric($feed_id)) {
             return;
@@ -161,6 +160,7 @@ class CountersCache
             $table = 'ttrss_cat_counters_cache';
         }
 
+        $unread = 0;
         if ($is_cat && $feed_id >= 0) {
             if ($feed_id != 0) {
                 $cat_qpart = "cat_id = '$feed_id'";
@@ -181,13 +181,16 @@ class CountersCache
 
             $result = \SmallSmallRSS\Database::query(
                 "SELECT SUM(value) AS sv
-                FROM ttrss_counters_cache, ttrss_feeds
-                WHERE id = feed_id AND $cat_qpart AND
-                ttrss_feeds.owner_uid = '$owner_uid'"
+                 FROM ttrss_counters_cache, ttrss_feeds
+                 WHERE id = feed_id AND $cat_qpart AND
+                 ttrss_feeds.owner_uid = '$owner_uid'"
             );
-
-            $unread = (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'sv');
-
+            if ($result) {
+                $row = \SmallSmallRSS\Database::fetch_assoc($result);
+                if (isset($row['sv'])) {
+                    $unread = (int) $row['sv'];
+                }
+            }
         } else {
             $unread = (int) countUnreadFeedArticles($feed_id, $is_cat, true, $owner_uid);
         }

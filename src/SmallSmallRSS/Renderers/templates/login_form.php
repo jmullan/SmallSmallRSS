@@ -1,5 +1,9 @@
 <?php
-\SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
+$uid = null;
+if (isset($_SESSION['uid'])) {
+    $uid = $_SESSION['uid'];
+}
+\SmallSmallRSS\Locale::startupGettext($uid);
 $login_error_msg = isset($_SESSION['login_error_msg']) ? $_SESSION['login_error_msg'] : '';
 $fake_login = isset($fake_login) ? $fake_login : '';
 $fake_password = isset($_SESSION['fake_password']) ? $_SESSION['fake_password'] : '';

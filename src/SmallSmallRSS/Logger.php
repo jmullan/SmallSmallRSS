@@ -40,6 +40,11 @@ class Logger
         return self::get()->adapter->log($string);
     }
 
+    public static function trace($string)
+    {
+        return self::get()->adapter->trace($string);
+    }
+
     private function __clone()
     {
     }

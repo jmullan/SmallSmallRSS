@@ -11,6 +11,10 @@ abstract class Logger_Abstract implements Logger_Interface
     {
         return false;
     }
+    public static function trace($string, $priority = LOG_ERR)
+    {
+        return false;
+    }
     public static function clearExpired()
     {
         return false;

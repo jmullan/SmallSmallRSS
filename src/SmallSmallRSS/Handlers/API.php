@@ -95,8 +95,8 @@ class API extends Handler
 
     public function getUnread()
     {
-        $feed_id = $this->getSQLEscapedStringFromRequest('feed_id');
-        $is_cat = $this->getSQLEscapedStringFromRequest('is_cat');
+        $feed_id = $this->getStringFromRequest('feed_id');
+        $is_cat = $this->getStringFromRequest('is_cat');
 
         if ($feed_id) {
             $this->wrap(
@@ -134,38 +134,9 @@ class API extends Handler
         $enable_nested = $this->getBooleanFromRequest('enable_nested');
         $include_empty = $this->getBooleanFromRequest('include_empty');
 
-        // TODO do not return empty categories, return Uncategorized and standard virtual cats
-
-        if ($enable_nested) {
-            $nested_qpart = 'parent_cat IS NULL';
-        } else {
-            $nested_qpart = 'true';
-        }
-
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT
-                 id,
-                 title,
-                 order_id,
-                 (
-                     SELECT COUNT(id)
-                     FROM ttrss_feeds
-                     WHERE
-                         ttrss_feed_categories.id IS NOT NULL
-                         AND cat_id = ttrss_feed_categories.id
-                 ) AS num_feeds,
-                 (
-                     SELECT COUNT(id)
-                     FROM ttrss_feed_categories AS c2
-                     WHERE c2.parent_cat = ttrss_feed_categories.id
-                 ) AS num_cats
-             FROM ttrss_feed_categories
-             WHERE
-                 $nested_qpart
-                 AND owner_uid = " . $_SESSION['uid']
-        );
         $cats = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        $raw_cats = \SmallSmallRSS\FeedCategories::getAndChildren($enable_nested, $_SESSION['uid']);
+        foreach ($raw_cats as $line) {
             if ($include_empty || $line['num_feeds'] > 0 || $line['num_cats'] > 0) {
                 $unread = countUnreadFeedArticles($line['id'], true, true, $_SESSION['uid']);
                 if ($enable_nested) {
@@ -181,7 +152,12 @@ class API extends Handler
                 }
             }
         }
-        foreach (array(-2, -1, 0) as $cat_id) {
+        $special_cats = array(
+            \SmallSmallRSS\FeedCategories::LABELS,
+            \SmallSmallRSS\FeedCategories::SPECIAL,
+            \SmallSmallRSS\FeedCategories::NONE
+        );
+        foreach ($special_cats as $cat_id) {
             if ($include_empty || !$this->isCategoryEmpty($cat_id)) {
                 $unread = countUnreadFeedArticles($cat_id, true, true, $_SESSION['uid']);
                 if ($unread || !$unread_only) {
@@ -358,7 +334,7 @@ class API extends Handler
                                SELECT title
                                FROM ttrss_feeds WHERE id = feed_id
                           ) AS feed_title
-                      FROM ttrss_entries,ttrss_user_entries
+                      FROM ttrss_entries, ttrss_user_entries
                       WHERE
                           id IN ($in_article_ids)
                           AND ref_id = id
@@ -411,12 +387,7 @@ class API extends Handler
             'icons_url' => \SmallSmallRSS\Config::get('ICONS_URL')
         );
         $config['daemon_is_running'] = \SmallSmallRSS\Lockfiles::is_locked('update_daemon.lock');
-        $result = \SmallSmallRSS\Database::query(
-            'SELECT COUNT(*) AS cf FROM
-             ttrss_feeds WHERE owner_uid = ' . $_SESSION['uid']
-        );
-        $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, 'cf');
-        $config['num_feeds'] = (int) $num_feeds;
+        $config['num_feeds'] = (int) \SmallSmallRSS\Feeds::count($_SESSION['uid']);
         $this->wrap(self::STATUS_OK, $config);
     }
 
@@ -719,9 +690,6 @@ class API extends Handler
                 } else {
                     $headline_row['content'] = $line['content_preview'];
                 }
-                if (!$headline_row['content']) {
-                    \SmallSmallRSS\Logger::log('No content');
-                }
             }
 
             // unify label output to ease parsing
@@ -757,14 +725,7 @@ class API extends Handler
     public function unsubscribeFeed()
     {
         $feed_id = (int) $this->getSQLEscapedStringFromRequest('feed_id');
-        $result = \SmallSmallRSS\Database::query(
-            "SELECT id
-             FROM ttrss_feeds
-             WHERE
-                 id = '$feed_id'
-                 AND owner_uid = " . $_SESSION['uid']
-        );
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+        if (\SmallSmallRSS\Feeds::checkOwner($feed_id, $_SESSION['uid'])) {
             PrefFeeds::removeFeed($feed_id, $_SESSION['uid']);
             $this->wrap(self::STATUS_OK, array('status' => 'OK'));
         } else {
@@ -804,21 +765,9 @@ class API extends Handler
     private function isCategoryEmpty($id)
     {
         if ($id == -2) {
-            $result = \SmallSmallRSS\Database::query(
-                'SELECT COUNT(*) AS count
-                 FROM ttrss_labels2
-                 WHERE owner_uid = ' . $_SESSION['uid']
-            );
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'count') == 0;
+            return \SmallSmallRSS\Labels::count($_SESSION['uid']);
         } elseif ($id == 0) {
-            $result = \SmallSmallRSS\Database::query(
-                'SELECT COUNT(*) AS count
-                 FROM ttrss_feeds
-                 WHERE
-                     cat_id IS NULL
-                     AND owner_uid = ' . $_SESSION['uid']
-            );
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'count') == 0;
+            return \SmallSmallRSS\Feeds::countWithNullCat($_SESSION['uid']) == 0;
         }
         return false;
     }

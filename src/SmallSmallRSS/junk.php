@@ -559,7 +559,7 @@ function subscribe_to_feed($url, $cat_id = 0, $auth_login = '', $auth_pass = '')
     if (!$url || !validate_feed_url($url)) {
         return array('code' => 2);
     }
-    $fetcher = new \SmallSmallRSS\Fetcher();
+    $fetcher = new \SmallSmallRSS\Fetcher($url);
     $contents = $fetcher->getFileContents($url, false, $auth_login, $auth_pass);
     $fetch_last_error = $fetcher->last_error;
     if (!$contents) {
@@ -1473,6 +1473,9 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
 {
     $filters = array();
     $cat_id = \SmallSmallRSS\Feeds::getCategory($feed_id);
+    if (false === $cat_id) {
+        return $filters;
+    }
     $check_cats = join(
         ',',
         array_merge(\SmallSmallRSS\FeedCategories::getAncestors($cat_id, $owner_uid), array($cat_id))

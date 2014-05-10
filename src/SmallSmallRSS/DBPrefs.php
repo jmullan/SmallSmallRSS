@@ -5,11 +5,19 @@ class DBPrefs
 {
     private static $cache = array();
 
+    private static function cachePref($user_id, $pref_name, $type_name, $value)
+    {
+        if (!isset(self::$cache[$user_id])) {
+            self::$cache[$user_id] = array();
+        }
+        self::$cache[$user_id][$pref_name] = array('type' => $type_name, 'value' => $value);
+    }
+
     public static function read($pref_name, $user_id = false, $die_on_error = false)
     {
 
         $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
-        $profile = false;
+        $profile = null;
 
         if (!$user_id) {
             $user_id = (!empty($_SESSION['uid']) ? $_SESSION['uid'] : null);
@@ -17,8 +25,8 @@ class DBPrefs
         }
         $user_id = sprintf('%d', $user_id);
 
-        if (isset(self::$cache[$pref_name])) {
-            $tuple = self::$cache[$pref_name];
+        if (isset(self::$cache[$user_id][$pref_name])) {
+            $tuple = self::$cache[$user_id][$pref_name];
             return self::convert($tuple['value'], $tuple['type']);
         }
 
@@ -37,7 +45,9 @@ class DBPrefs
                  value,
                  ttrss_prefs_types.type_name as type_name
              FROM
-                 ttrss_user_prefs,ttrss_prefs,ttrss_prefs_types
+                 ttrss_user_prefs,
+                 ttrss_prefs,
+                 ttrss_prefs_types
              WHERE
                  $profile_qpart
                  ttrss_user_prefs.pref_name = '$pref_name'
@@ -47,12 +57,10 @@ class DBPrefs
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            $value = \SmallSmallRSS\Database::fetch_result($result, 0, 'value');
-            $type_name = \SmallSmallRSS\Database::fetch_result($result, 0, 'type_name');
-            if (!empty($_SESSION['uid']) && $user_id == $_SESSION['uid']) {
-                self::$cache[$pref_name]['type'] = $type_name;
-                self::$cache[$pref_name]['value'] = $value;
-            }
+            $pref = \SmallSmallRSS\Database::fetch_assoc($result);
+            $value = $pref['value'];
+            $type_name = $pref['type_name'];
+            self::cachePref($user_id, $pref_name, $type_name, $value);
             return self::convert($value, $type_name);
         } else {
             user_error(
@@ -90,8 +98,9 @@ class DBPrefs
             $prefs_cache = false;
         }
 
+        $profile = \SmallSmallRSS\Database::quote_string($value, $strip_tags);
         if ($profile) {
-            $profile_qpart = "AND profile = '$profile'";
+            $profile_qpart = "AND profile = $profile";
         } else {
             $profile_qpart = 'AND profile IS NULL';
         }
@@ -103,9 +112,9 @@ class DBPrefs
         $type_name = '';
         $current_value = '';
 
-        if (isset(self::$cache[$pref_name])) {
-            $type_name = self::$cache[$pref_name]['type'];
-            $current_value = self::$cache[$pref_name]['value'];
+        if (isset(self::$cache[$user_id][$pref_name])) {
+            $type_name = self::$cache[$user_id][$pref_name]['type'];
+            $current_value = self::$cache[$user_id][$pref_name]['value'];
         }
 
         if (!$type_name) {
@@ -147,13 +156,9 @@ class DBPrefs
                  WHERE
                      pref_name = '$pref_name'
                      $profile_qpart
-                     AND owner_uid = " . $_SESSION['uid']
+                     AND owner_uid = " . $user_id
             );
-
-            if ($user_id == $_SESSION['uid']) {
-                self::$cache[$pref_name]['type'] = $type_name;
-                self::$cache[$pref_name]['value'] = $value;
-            }
+            self::cachePref($user_id, $pref_name, $type_name, $value);
         }
     }
 }

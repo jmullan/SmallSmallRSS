@@ -13,22 +13,27 @@ class UserEntries
                  AND owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'feed_id');
-        } else {
-            return 0;
+            $row = \SmallSmallRSS\Database::fetch_assoc($result);
+            if (isset($row['feed_id'])) {
+                return $row['feed_id'];
+            }
         }
+        return 0;
     }
     public static function getLastId($owner_uid)
     {
         $result = \SmallSmallRSS\Database::query(
-            "SELECT MAX(ref_id) AS id FROM ttrss_user_entries
+            "SELECT MAX(ref_id) AS id
+             FROM ttrss_user_entries
              WHERE owner_uid = $owner_uid"
         );
         if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
-        } else {
-            return -1;
+            $row = \SmallSmallRSS\Database::fetch_assoc($result);
+            if (isset($row['id'])) {
+                return $row['id'];
+            }
         }
+        return -1;
     }
 
     public static function catchupFeed($feed_id, $cat_view, $owner_uid, $max_id = false, $mode = 'all')
@@ -353,7 +358,13 @@ class UserEntries
                  ref_id = '$ref_id'
                  AND owner_uid = $owner_uid"
         );
-        return \SmallSmallRSS\Database::fetch_result($result, 0, 'tag_cache');
+        if ($result) {
+            $row = \SmallSmallRSS\Database::fetch_assoc($result);
+        }
+        if (isset($row['tag_cache'])) {
+            return $row['tag_cache'];
+        }
+        return '';
     }
     public static function setCachedTags($ref_id, $owner_uid, $tags_str)
     {

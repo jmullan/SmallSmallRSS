@@ -1,70 +1,19 @@
 <?php
-function authenticate_user($login, $password, $check_only = false)
-{
-    if (\SmallSmallRSS\Auth::is_single_user_mode()) {
-        $_SESSION['uid'] = 1;
-        $_SESSION['name'] = 'admin';
-        $_SESSION['access_level'] = 10;
-        $_SESSION['hide_hello'] = true;
-        $_SESSION['hide_logout'] = true;
-        $_SESSION['auth_module'] = false;
-        if (!$_SESSION['csrf_token']) {
-            $_SESSION['csrf_token'] = sha1(uniqid(rand(), true));
-        }
-        $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
-        \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], false);
-        return true;
-    } else {
-        $user_id = false;
-        $plugins = \SmallSmallRSS\PluginHost::getInstance()->getHooks(\SmallSmallRSS\Hooks::AUTH_USER);
-        if (!$plugins) {
-            \SmallSmallRSS\Logger::log('No authentication plugins!');
-        }
-        foreach ($plugins as $plugin) {
-            $user_id = (int) $plugin->authenticate($login, $password);
-            if ($user_id) {
-                $auth_module = get_class($plugin);
-                break;
-            }
-        }
-        if ($user_id && !$check_only) {
-            $_SESSION['auth_module'] = $auth_module;
-            $_SESSION['uid'] = $user_id;
-            $_SESSION['version'] = \SmallSmallRSS\Constants::VERSION;
-            $user_record = \SmallSmallRSS\Users::getByUid($user_id);
-            if (!$user_record) {
-                \SmallSmallRSS\Logger::log("Did not find user $user_id");
-                return false;
-            }
-            $_SESSION['name'] = $user_record['login'];
-            $_SESSION['access_level'] = $user_record['access_level'];
-            $_SESSION['csrf_token'] = sha1(uniqid(rand(), true));
-            \SmallSmallRSS\Users::markLogin($_SESSION['uid']);
-            $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
-            $_SESSION['user_agent'] = sha1($_SERVER['HTTP_USER_AGENT']);
-            $_SESSION['pwd_hash'] = $user_record['pwd_hash'];
-            $_SESSION['last_version_check'] = time();
-            \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], false);
-            return true;
-        }
-        return false;
-    }
-}
 
 function login_sequence()
 {
     if (\SmallSmallRSS\Auth::is_single_user_mode()) {
-        authenticate_user('admin', null);
+        \SmallSmallRSS\Auth::authenticate('admin', null);
         \SmallSmallRSS\PluginHost::loadUserPlugins($_SESSION['uid']);
     } else {
         if (!\SmallSmallRSS\Sessions::validate()) {
             $_SESSION['uid'] = false;
         }
         if (!$_SESSION['uid']) {
-            if (\SmallSmallRSS\Config::get('AUTH_AUTO_LOGIN') && authenticate_user(null, null)) {
+            if (\SmallSmallRSS\Config::get('AUTH_AUTO_LOGIN') && \SmallSmallRSS\Auth::authenticate(null, null)) {
                 $_SESSION['ref_schema_version'] = \SmallSmallRSS\Sanity::getSchemaVersion(true);
             } else {
-                authenticate_user(null, null, true);
+                \SmallSmallRSS\Auth::authenticate(null, null, true);
             }
             if (!$_SESSION['uid']) {
                 @session_destroy();

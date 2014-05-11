@@ -68,11 +68,11 @@ class API extends Handler
         }
 
         session_set_cookie_params(\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'));
-        if (authenticate_user($login, $password)) {
+        if (\SmallSmallRSS\Auth::authenticate($login, $password)) {
             // try login with normal password
             $this->wrap(self::STATUS_OK, array('session_id' => session_id(),
                                                'api_level' => self::API_LEVEL));
-        } elseif (authenticate_user($login, $password_base64)) {
+        } elseif (\SmallSmallRSS\Auth::authenticate($login, $password_base64)) {
             // else try with base64_decoded password
             $this->wrap(self::STATUS_OK, array('session_id' => session_id(),
                                                'api_level' => self::API_LEVEL));

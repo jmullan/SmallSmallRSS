@@ -393,7 +393,7 @@ class PublicHandler extends Handler
         }
 
         if (\SmallSmallRSS\Auth::is_single_user_mode()) {
-            authenticate_user('admin', null);
+            \SmallSmallRSS\Auth::authenticate('admin', null);
         }
 
         $owner_id = false;
@@ -583,7 +583,7 @@ class PublicHandler extends Handler
                 session_set_cookie_params(0);
             }
 
-            if (authenticate_user($login, $password)) {
+            if (\SmallSmallRSS\Auth::authenticate($login, $password)) {
                 $_POST['password'] = '';
                 if (\SmallSmallRSS\Sanity::getSchemaVersion() >= 120) {
                     $_SESSION['language'] = \SmallSmallRSS\DBPrefs::read('USER_LANGUAGE', $_SESSION['uid']);

@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class ProtectedHandler extends Handler
 {
     public function before($method)

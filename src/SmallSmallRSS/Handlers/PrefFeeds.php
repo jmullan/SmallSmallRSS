@@ -644,7 +644,7 @@ class PrefFeeds extends ProtectedHandler
         echo __('Password');
         echo "\" value=\"$auth_pass\">";
         echo '<div data-dojo-type="dijit.Tooltip" connectId="feedEditDlg_login" position="below">';
-        echo __('<b>Hint:</b> you need to fill in your login information if your feed requires authentication, except for Twitter feeds.');
+        echo __('<b>Hint:</b> you need to fill in your login information if your feed requires authentication except for Twitter feeds.');
         echo '</div>';
         echo '</div>';
         echo '<div class="dlgSec">';

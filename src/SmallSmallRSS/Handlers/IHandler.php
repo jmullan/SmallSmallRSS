@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 interface IHandler
 {
     public function ignoreCSRF($method);

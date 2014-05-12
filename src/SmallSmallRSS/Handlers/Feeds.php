@@ -9,7 +9,7 @@ class Feeds extends ProtectedHandler
         return array_search($method, $csrf_ignored) !== false;
     }
 
-    private function format_headline_subtoolbar(
+    private function formatHeadlineSubtoolbar(
         $feed_site_url,
         $feed_title,
         $feed_id,
@@ -317,7 +317,7 @@ class Feeds extends ProtectedHandler
 
         $vgroup_last_feed = $vgr_last_feed;
 
-        $reply['toolbar'] = $this->format_headline_subtoolbar(
+        $reply['toolbar'] = $this->formatHeadlineSubtoolbar(
             $feed_site_url,
             $feed_title,
             $feed,
@@ -823,7 +823,7 @@ class Feeds extends ProtectedHandler
                  unread = true
                  AND owner_uid = ' . $_SESSION['uid']
         );
-        \SmallSmallRSS\CountersCache::zero_all($_SESSION['uid']);
+        \SmallSmallRSS\CountersCache::zeroAll($_SESSION['uid']);
     }
 
     public function view()
@@ -849,7 +849,7 @@ class Feeds extends ProtectedHandler
          * when there's nothing to load - e.g. no stuff in fresh feed */
 
         if ($feed == -5) {
-            echo json_encode($this->generate_dashboard_feed());
+            echo json_encode($this->generateDashboardFeed());
             return;
         }
 
@@ -888,7 +888,7 @@ class Feeds extends ProtectedHandler
 
         if ($result && \SmallSmallRSS\Database::num_rows($result) == 0) {
             \SmallSmallRSS\Logger::log("Feed not found: $feed_type $feed");
-            echo json_encode($this->generate_error_feed(__('Feed not found.')));
+            echo json_encode($this->generateErrorFeed(__('Feed not found.')));
             return;
         }
 
@@ -966,7 +966,7 @@ class Feeds extends ProtectedHandler
         echo json_encode($reply);
     }
 
-    private function generate_dashboard_feed()
+    private function generateDashboardFeed()
     {
         $reply = array('headlines' => array());
         $reply['headlines']['label'] = __('Dashboard Feed');
@@ -1016,7 +1016,7 @@ class Feeds extends ProtectedHandler
         return $reply;
     }
 
-    private function generate_error_feed($error)
+    private function generateErrorFeed($error)
     {
         $reply = array();
         $reply['headlines']['label'] = __('Error Feed');

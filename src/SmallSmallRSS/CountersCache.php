@@ -29,7 +29,7 @@ class CountersCache
         );
     }
 
-    public static function zero_all($owner_uid)
+    public static function zeroAll($owner_uid)
     {
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_counters_cache SET
@@ -58,7 +58,7 @@ class CountersCache
 
     }
 
-    public static function update_all($owner_uid)
+    public static function updateAll($owner_uid)
     {
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS', $owner_uid)) {
@@ -150,7 +150,7 @@ class CountersCache
          * because labels are not cached */
 
         if ($feed_id < 0) {
-            self::update_all($owner_uid);
+            self::updateAll($owner_uid);
             return;
         }
 
@@ -229,7 +229,7 @@ class CountersCache
                 }
             }
         } elseif ($feed_id < 0) {
-            self::update_all($owner_uid);
+            self::updateAll($owner_uid);
         }
         return $unread;
     }

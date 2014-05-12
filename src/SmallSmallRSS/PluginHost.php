@@ -70,7 +70,7 @@ class PluginHost
         array_push($this->hooks[$type], $sender);
     }
 
-    public function delete_hook($type, $sender)
+    public function deleteHook($type, $sender)
     {
         if (is_array($this->hooks[$type])) {
             $key = array_Search($this->hooks[$type], $sender);

@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class backend extends Handler
 {
     public function loading()
@@ -18,7 +19,7 @@ class backend extends Handler
         print_r($rv);
     }
 
-    private function display_main_help()
+    private function displayMainHelp()
     {
         $info = \SmallSmallRSS\Hotkeys::info();
         $imap = \SmallSmallRSS\Hotkeys::map();
@@ -84,7 +85,7 @@ class backend extends Handler
         $topic = basename($_REQUEST['topic']);
         switch ($topic) {
             case 'main':
-                $this->display_main_help();
+                $this->displayMainHelp();
                 break;
             case 'prefs':
                 //$this->display_prefs_help();

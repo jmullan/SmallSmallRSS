@@ -10,5 +10,5 @@ matrix:
   allow_failures:
     - php: "hhvm"
 script:
-  - ./vendor/bin/phpcs -h --standard=PSR2 src
+  - ./vendor/bin/phpcs --standard=PSR2 src
 

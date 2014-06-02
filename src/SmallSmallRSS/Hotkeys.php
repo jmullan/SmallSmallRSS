@@ -4,7 +4,8 @@ namespace SmallSmallRSS;
 
 class Hotkeys
 {
-    public static function name($slug){
+    public static function name($slug)
+    {
         $names = array(
             'next_feed' => __('Open next feed'),
             'prev_feed' => __('Open previous feed'),
@@ -72,6 +73,7 @@ class Hotkeys
             return $slug;
         }
     }
+
     public static function info()
     {
         static $hotkeys = null;

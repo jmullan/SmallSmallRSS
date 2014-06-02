@@ -14,16 +14,16 @@ abstract class FeedItem_Abstract
         $this->doc = $doc;
     }
 
-    abstract public function get_id();
-    abstract public function get_date();
+    abstract public function getId();
+    abstract public function getDate();
     abstract public function getLink();
     abstract public function getTitle();
-    abstract public function get_description();
-    abstract public function get_content();
-    abstract public function get_categories();
-    abstract public function get_enclosures();
+    abstract public function getDescription();
+    abstract public function getContent();
+    abstract public function getCategories();
+    abstract public function getEnclosures();
 
-    public function get_author()
+    public function getAuthor()
     {
         $author = $this->elem->getElementsByTagName('author')->item(0);
         if ($author) {
@@ -44,14 +44,14 @@ abstract class FeedItem_Abstract
             return $author->nodeValue;
         }
     }
-    public function get_comments_count()
+    public function getCommentsCount()
     {
         $comments = $this->xpath->query('slash:comments', $this->elem)->item(0);
         if ($comments) {
             return $comments->nodeValue;
         }
     }
-    public function get_comments_url()
+    public function getCommentsUrl()
     {
     }
 }

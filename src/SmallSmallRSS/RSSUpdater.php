@@ -426,7 +426,7 @@ class RSSUpdater
                 print_r($item);
             }
 
-            $entry_guid = $item->get_id();
+            $entry_guid = $item->getId();
             if (!$entry_guid) {
                 $entry_guid = $item->getLink();
             }
@@ -444,7 +444,7 @@ class RSSUpdater
 
             $entry_guid = "$owner_uid,$entry_guid";
             $entry_guid_hashed = \SmallSmallRSS\Database::escape_string('SHA1:' . sha1($entry_guid));
-            $entry_timestamp = $item->get_date();
+            $entry_timestamp = $item->getDate();
             if ($entry_timestamp == -1 || !$entry_timestamp || $entry_timestamp > time()) {
                 $entry_timestamp = time();
                 $no_orig_date = 'true';
@@ -457,26 +457,26 @@ class RSSUpdater
             if (!$entry_title) {
                 $entry_title = date('Y-m-d H:i:s', $entry_timestamp);
             };
-            $entry_content = $item->get_content();
+            $entry_content = $item->getContent();
             if (!$entry_content) {
-                $entry_content = $item->get_description();
+                $entry_content = $item->getDescription();
             }
             if (!empty($_REQUEST['xdebug']) && $_REQUEST['xdebug'] == 2) {
                 print 'content: ';
                 print $entry_content;
                 print "\n";
             }
-            $entry_comments = $item->get_comments_url();
-            $entry_author = $item->get_author();
+            $entry_comments = $item->getCommentsUrl();
+            $entry_author = $item->getAuthor();
             $entry_guid = \SmallSmallRSS\Database::escape_string(mb_substr($entry_guid, 0, 245));
             $entry_comments = \SmallSmallRSS\Database::escape_string(mb_substr(trim($entry_comments), 0, 245));
             $entry_author = \SmallSmallRSS\Database::escape_string(mb_substr(trim($entry_author), 0, 245));
-            $num_comments = (int) $item->get_comments_count();
+            $num_comments = (int) $item->getCommentsCount();
 
             // parse <category> entries into tags
             $additional_tags = array();
 
-            $additional_tags_src = $item->get_categories();
+            $additional_tags_src = $item->getCategories();
 
             if (is_array($additional_tags_src)) {
                 foreach ($additional_tags_src as $tobj) {
@@ -814,7 +814,7 @@ class RSSUpdater
             );
             // enclosures
             $enclosures = array();
-            $encs = $item->get_enclosures();
+            $encs = $item->getEnclosures();
             if (is_array($encs)) {
                 foreach ($encs as $e) {
                     $e_item = array($e->link, $e->type, $e->length);

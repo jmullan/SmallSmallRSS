@@ -3,7 +3,7 @@ namespace SmallSmallRSS;
 
 class FeedItem_Atom extends FeedItem_Abstract
 {
-    public function get_id()
+    public function getId()
     {
         $id = $this->elem->getElementsByTagName('id')->item(0);
         if ($id) {
@@ -13,7 +13,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    public function get_date()
+    public function getDate()
     {
         $updated = $this->elem->getElementsByTagName('updated')->item(0);
         if ($updated) {
@@ -51,7 +51,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    public function get_content()
+    public function getContent()
     {
         $content = $this->elem->getElementsByTagName('content')->item(0);
         if ($content) {
@@ -64,7 +64,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         }
     }
 
-    public function get_description()
+    public function getDescription()
     {
         $content = $this->elem->getElementsByTagName('summary')->item(0);
         if ($content) {
@@ -78,7 +78,7 @@ class FeedItem_Atom extends FeedItem_Abstract
 
     }
 
-    public function get_categories()
+    public function getCategories()
     {
         $categories = $this->elem->getElementsByTagName('category');
         $cats = array();
@@ -94,7 +94,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         return $cats;
     }
 
-    public function get_enclosures()
+    public function getEnclosures()
     {
         $links = $this->elem->getElementsByTagName('link');
         $encs = array();

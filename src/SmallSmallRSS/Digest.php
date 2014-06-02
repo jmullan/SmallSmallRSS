@@ -134,7 +134,7 @@ class Digest
         for ($i = 0; $i < sizeof($headlines); $i++) {
             $line = $headlines[$i];
             array_push($affected_ids, $line['ref_id']);
-            $updated = make_local_datetime($line['last_updated'], false, $user_id);
+            $updated = \SmallSmallRSS\Utils::makeLocalDatetime($line['last_updated'], false, $user_id);
             if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS', $user_id)) {
                 $line['feed_title'] = $line['cat_title'] . ' / ' . $line['feed_title'];
             }

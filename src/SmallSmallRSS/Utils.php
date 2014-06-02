@@ -109,16 +109,16 @@ class Utils
     public static function convertTimestamp($timestamp, $source_tz, $dest_tz)
     {
         try {
-            $source_tz = new DateTimeZone($source_tz);
+            $source_tz = new \DateTimeZone($source_tz);
         } catch (Exception $e) {
-            $source_tz = new DateTimeZone('UTC');
+            $source_tz = new \DateTimeZone('UTC');
         }
         try {
-            $dest_tz = new DateTimeZone($dest_tz);
+            $dest_tz = new \DateTimeZone($dest_tz);
         } catch (Exception $e) {
-            $dest_tz = new DateTimeZone('UTC');
+            $dest_tz = new \DateTimeZone('UTC');
         }
-        $dt = new DateTime(date('Y-m-d H:i:s', $timestamp), $source_tz);
+        $dt = new \DateTime(date('Y-m-d H:i:s', $timestamp), $source_tz);
         return $dt->format('U') + $dest_tz->getOffset($dt);
     }
 
@@ -143,5 +143,43 @@ class Utils
             fclose($fp);
         }
         return $line;
+    }
+
+    public static function makeLocalDatetime($timestamp, $long, $owner_uid, $no_smart_dt = false)
+    {
+        static $utc_tz = null;
+        if (is_null($utc_tz)) {
+            $utc_tz = new \DateTimeZone('UTC');
+        }
+        if (!$timestamp) {
+            $timestamp = '1970-01-01 0:00';
+        }
+        $timestamp = substr($timestamp, 0, 19);
+        // We store date in UTC internally
+        $dt = new \DateTime($timestamp, $utc_tz);
+        $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $owner_uid);
+        if ($user_tz_string != 'Automatic') {
+            try {
+                $user_tz = new \DateTimeZone($user_tz_string);
+            } catch (Exception $e) {
+                $user_tz = $utc_tz;
+            }
+            $tz_offset = $user_tz->getOffset($dt);
+        } else {
+            $tz_offset = intval(0 - $_SESSION['clientTzOffset']);
+        }
+
+        $user_timestamp = $dt->format('U') + $tz_offset;
+
+        if (!$no_smart_dt) {
+            return \SmallSmallRSS\Utils::smartDateTime($user_timestamp, $owner_uid, $tz_offset);
+        } else {
+            if ($long) {
+                $format = \SmallSmallRSS\DBPrefs::read('LONG_DATE_FORMAT', $owner_uid);
+            } else {
+                $format = \SmallSmallRSS\DBPrefs::read('SHORT_DATE_FORMAT', $owner_uid);
+            }
+            return date($format, $user_timestamp);
+        }
     }
 }

@@ -68,7 +68,7 @@ class Pref_System extends ProtectedHandler
                 print "<td class='errstr'>" . $line['errstr'] . '</td>';
                 print "<td class='login'>" . $line['login'] . '</td>';
                 print "<td class='timestamp'>";
-                print make_local_datetime($line['created_at'], false, $_SESSION['uid']);
+                print \SmallSmallRSS\Utils::makeLocalDatetime($line['created_at'], false, $_SESSION['uid']);
                 print '</td>';
                 print '</tr>';
             }

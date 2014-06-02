@@ -45,12 +45,12 @@ class Pref_Users extends ProtectedHandler
 
         $login = \SmallSmallRSS\Database::fetch_result($result, 0, 'login');
         echo "<table width='100%'>";
-        $last_login = make_local_datetime(
+        $last_login = \SmallSmallRSS\Utils::makeLocalDatetime(
             \SmallSmallRSS\Database::fetch_result($result, 0, 'last_login'),
             true,
             $_SESSION['uid']
         );
-        $created = make_local_datetime(
+        $created = \SmallSmallRSS\Utils::makeLocalDatetime(
             \SmallSmallRSS\Database::fetch_result($result, 0, 'created'),
             true,
             $_SESSION['uid']
@@ -405,8 +405,8 @@ class Pref_Users extends ProtectedHandler
                 $uid = $line['id'];
                 echo "<tr id=\"UMRR-$uid\">";
                 $line['login'] = htmlspecialchars($line['login']);
-                $line['created'] = make_local_datetime($line['created'], false, $_SESSION['uid']);
-                $line['last_login'] = make_local_datetime($line['last_login'], false, $_SESSION['uid']);
+                $line['created'] = \SmallSmallRSS\Utils::makeLocalDatetime($line['created'], false, $_SESSION['uid']);
+                $line['last_login'] = \SmallSmallRSS\Utils::makeLocalDatetime($line['last_login'], false, $_SESSION['uid']);
                 echo "<td align='center'><input onclick='toggleSelectRow2(this);'";
                 echo " data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\"";
                 echo " id=\"UMCHK-$uid\"></td>";

@@ -156,7 +156,7 @@ class Handler implements IHandler
             if ($entry_author) {
                 $entry_author = __(' - ') . $entry_author;
             }
-            $parsed_updated = make_local_datetime(
+            $parsed_updated = \SmallSmallRSS\Utils::makeLocalDatetime(
                 $line['updated'],
                 true,
                 $owner_uid,

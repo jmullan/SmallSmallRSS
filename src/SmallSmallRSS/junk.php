@@ -4,7 +4,6 @@ function login_sequence()
 {
     if (\SmallSmallRSS\Auth::is_single_user_mode()) {
         \SmallSmallRSS\Auth::authenticate('admin', null);
-        \SmallSmallRSS\PluginHost::loadUserPlugins($_SESSION['uid']);
     } else {
         if (!\SmallSmallRSS\Sessions::validate()) {
             $_SESSION['uid'] = false;
@@ -17,7 +16,7 @@ function login_sequence()
             }
             if (!$_SESSION['uid']) {
                 @session_destroy();
-                setcookie(session_name(), '', time()-42000, '/');
+                setcookie(session_name(), '', time() - 42000, '/');
                 $renderer = new \SmallSmallRSS\Renderers\LoginPage();
                 $renderer->render();
                 exit;
@@ -26,52 +25,13 @@ function login_sequence()
             \SmallSmallRSS\Users::markLogin($_SESSION['uid']);
             $_SESSION['last_login_update'] = time();
         }
-
-        if ($_SESSION['uid']) {
-            \SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
-            \SmallSmallRSS\PluginHost::loadUserPlugins($_SESSION['uid']);
-            /* cleanup ccache */
-            \SmallSmallRSS\CountersCache::cleanup($_SESSION['uid']);
-            \SmallSmallRSS\CatCountersCache::cleanup($_SESSION['uid']);
-        }
     }
-}
-
-function make_local_datetime($timestamp, $long, $owner_uid, $no_smart_dt = false)
-{
-    static $utc_tz = null;
-    if (is_null($utc_tz)) {
-        $utc_tz = new DateTimeZone('UTC');
-    }
-    if (!$timestamp) {
-        $timestamp = '1970-01-01 0:00';
-    }
-    $timestamp = substr($timestamp, 0, 19);
-    // We store date in UTC internally
-    $dt = new DateTime($timestamp, $utc_tz);
-    $user_tz_string = \SmallSmallRSS\DBPrefs::read('USER_TIMEZONE', $owner_uid);
-    if ($user_tz_string != 'Automatic') {
-        try {
-            $user_tz = new DateTimeZone($user_tz_string);
-        } catch (Exception $e) {
-            $user_tz = $utc_tz;
-        }
-        $tz_offset = $user_tz->getOffset($dt);
-    } else {
-        $tz_offset = (int) -$_SESSION['clientTzOffset'];
-    }
-
-    $user_timestamp = $dt->format('U') + $tz_offset;
-
-    if (!$no_smart_dt) {
-        return \SmallSmallRSS\Utils::smartDateTime($user_timestamp, $owner_uid, $tz_offset);
-    } else {
-        if ($long) {
-            $format = \SmallSmallRSS\DBPrefs::read('LONG_DATE_FORMAT', $owner_uid);
-        } else {
-            $format = \SmallSmallRSS\DBPrefs::read('SHORT_DATE_FORMAT', $owner_uid);
-        }
-        return date($format, $user_timestamp);
+    if ($_SESSION['uid']) {
+        \SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
+        \SmallSmallRSS\PluginHost::loadUserPlugins($_SESSION['uid']);
+        /* cleanup ccache */
+        \SmallSmallRSS\CountersCache::cleanup($_SESSION['uid']);
+        \SmallSmallRSS\CatCountersCache::cleanup($_SESSION['uid']);
     }
 }
 
@@ -464,7 +424,7 @@ function getFeedCounters($owner_uid)
         $id = $line['id'];
         $count = $line['count'];
         $last_error = htmlspecialchars($line['last_error']);
-        $last_updated = make_local_datetime($line['last_updated'], false, $owner_uid);
+        $last_updated = \SmallSmallRSS\Utils::makeLocalDatetime($line['last_updated'], false, $owner_uid);
         $has_img = \SmallSmallRSS\Feeds::hasIcon($id);
         if (date('Y') - date('Y', strtotime($line['last_updated'])) > 2) {
             $last_updated = '';

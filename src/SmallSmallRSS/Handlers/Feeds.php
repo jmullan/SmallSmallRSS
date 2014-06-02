@@ -311,7 +311,7 @@ class Feeds extends ProtectedHandler
         $last_error = $qfh_ret[3];
         $last_updated = (
             (strpos($qfh_ret[4], '1970-') === false)
-            ? make_local_datetime($qfh_ret[4], false, $_SESSION['uid'])
+            ? \SmallSmallRSS\Utils::makeLocalDatetime($qfh_ret[4], false, $_SESSION['uid'])
             : __('Never')
         );
 
@@ -397,10 +397,10 @@ class Feeds extends ProtectedHandler
                         class=\"pubPic\"
                         alt=\"Publish article\" onclick='togglePub($id)'>";
                 }
-                $updated_fmt = make_local_datetime($line['updated'], false, $_SESSION['uid']);
+                $updated_fmt = \SmallSmallRSS\Utils::makeLocalDatetime($line['updated'], false, $_SESSION['uid']);
                 $date_entered_fmt = T_sprintf(
                     'Imported at %s',
-                    make_local_datetime($line['date_entered'], false, $_SESSION['uid'])
+                    \SmallSmallRSS\Utils::makeLocalDatetime($line['date_entered'], false, $_SESSION['uid'])
                 );
 
                 if (\SmallSmallRSS\DBPrefs::read('SHOW_CONTENT_PREVIEW')) {
@@ -777,7 +777,7 @@ class Feeds extends ProtectedHandler
                      WHERE owner_uid = ' . $_SESSION['uid']
                 );
                 $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
-                $last_updated = make_local_datetime($last_updated, false, $_SESSION['uid']);
+                $last_updated = \SmallSmallRSS\Utils::makeLocalDatetime($last_updated, false, $_SESSION['uid']);
                 $result = \SmallSmallRSS\Database::query(
                     "SELECT COUNT(id) AS num_errors
                     FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION['uid']
@@ -982,7 +982,7 @@ class Feeds extends ProtectedHandler
         );
 
         $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
-        $last_updated = make_local_datetime($last_updated, false, $_SESSION['uid']);
+        $last_updated = \SmallSmallRSS\Utils::makeLocalDatetime($last_updated, false, $_SESSION['uid']);
 
 
         $result = \SmallSmallRSS\Database::query(

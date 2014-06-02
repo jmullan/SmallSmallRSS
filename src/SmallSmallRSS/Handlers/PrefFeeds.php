@@ -113,7 +113,7 @@ class PrefFeeds extends ProtectedHandler
             $feed['unread'] = 0;
             $feed['error'] = $feed_line['last_error'];
             $feed['icon'] = getFeedIcon($feed_line['id']);
-            $feed['param'] = make_local_datetime($feed_line['last_updated'], true, $_SESSION['uid']);
+            $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime($feed_line['last_updated'], true, $_SESSION['uid']);
 
             array_push($items, $feed);
         }
@@ -275,7 +275,7 @@ class PrefFeeds extends ProtectedHandler
                 $feed['checkbox'] = false;
                 $feed['error'] = $feed_line['last_error'];
                 $feed['icon'] = getFeedIcon($feed_line['id']);
-                $feed['param'] = make_local_datetime($feed_line['last_updated'], true, $_SESSION['uid']);
+                $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime($feed_line['last_updated'], true, $_SESSION['uid']);
                 $feed['unread'] = 0;
                 $feed['type'] = 'feed';
 
@@ -312,7 +312,7 @@ class PrefFeeds extends ProtectedHandler
                 $feed['checkbox'] = false;
                 $feed['error'] = $feed_line['last_error'];
                 $feed['icon'] = getFeedIcon($feed_line['id']);
-                $feed['param'] = make_local_datetime($feed_line['last_updated'], true, $_SESSION['uid']);
+                $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime($feed_line['last_updated'], true, $_SESSION['uid']);
                 $feed['unread'] = 0;
                 $feed['type'] = 'feed';
 
@@ -1785,7 +1785,7 @@ class PrefFeeds extends ProtectedHandler
             echo '</a>';
 
             echo "</td><td class=\"insensitive\" align='right'>";
-            echo make_local_datetime($line['last_article'], false, $_SESSION['uid']);
+            echo \SmallSmallRSS\Utils::makeLocalDatetime($line['last_article'], false, $_SESSION['uid']);
             echo '</td>';
             echo '</tr>';
 

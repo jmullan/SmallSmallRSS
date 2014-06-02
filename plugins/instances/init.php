@@ -326,7 +326,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
             $id = $line['id'];
             $this_row_id = "id=\"LIRR-$id\"";
 
-            $line["last_connected"] = make_local_datetime($line["last_connected"], false);
+            $line["last_connected"] = \SmallSmallRSS\Utils::makeLocalDatetime($line["last_connected"], false);
 
             echo "<tr class=\"$class\" $this_row_id>";
 

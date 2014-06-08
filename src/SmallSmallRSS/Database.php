@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS;
+
 class Database
 {
     private static $adapter = null;

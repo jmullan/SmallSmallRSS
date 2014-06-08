@@ -134,7 +134,7 @@ class Sanity
                 );
             }
 
-            if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+            if (\SmallSmallRSS\Auth::isSingleUserMode()) {
                 $result = \SmallSmallRSS\Database::query('SELECT id FROM ttrss_users WHERE id = 1');
 
                 if (\SmallSmallRSS\Database::num_rows($result) != 1) {

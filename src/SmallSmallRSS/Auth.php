@@ -3,7 +3,7 @@ namespace SmallSmallRSS;
 
 class Auth
 {
-    public static function is_single_user_mode()
+    public static function isSingleUserMode()
     {
         return (bool) \SmallSmallRSS\Config::get('SINGLE_USER_MODE');
     }
@@ -34,7 +34,7 @@ class Auth
         }
     }
 
-    public static function authenticate_single_user()
+    public static function authenticateSingleUser()
     {
         $_SESSION['uid'] = 1;
         $_SESSION['name'] = 'admin';
@@ -49,7 +49,7 @@ class Auth
         \SmallSmallRSS\UserPrefs::initialize($_SESSION['uid'], false);
     }
 
-    public static function authenticate_via_plugins($login, $password, $check_only)
+    public static function authenticateViaPlugins($login, $password, $check_only)
     {
         $user_id = false;
         $plugins = \SmallSmallRSS\PluginHost::getInstance()->getHooks(\SmallSmallRSS\Hooks::AUTH_USER);
@@ -88,10 +88,10 @@ class Auth
 
     public static function authenticate($login, $password, $check_only = false)
     {
-        if (self::is_single_user_mode()) {
-            return self::authenticate_single_user();
+        if (self::isSingleUserMode()) {
+            return self::authenticateSingleUser();
         } else {
-            return self::authenticate_via_plugins($login, $password, $check_only);
+            return self::authenticateViaPlugins($login, $password, $check_only);
         }
     }
 }

@@ -18,7 +18,7 @@ class opml extends ProtectedHandler
         }
         $show_settings = $_REQUEST['settings'];
         $owner_uid = $_SESSION['uid'];
-        return $this->opml_export($output_name, $owner_uid, false, ($show_settings == 1));
+        return $this->renderExport($output_name, $owner_uid, false, ($show_settings == 1));
     }
 
     public function import()
@@ -37,8 +37,8 @@ class opml extends ProtectedHandler
         echo '<h1>'.__('OPML Utility').'</h1>';
         echo "<div class='content'>";
         \SmallSmallRSS\FeedCategories::add($owner_uid, 'Imported feeds');
-        $this->opml_notice(__('Importing OPML...'));
-        $this->opml_import($owner_uid);
+        $this->notice(__('Importing OPML...'));
+        $this->renderImport($owner_uid);
         echo '<br />';
         echo '<form method="GET" action="prefs.php">';
         echo '<input type="submit" value="'.__('Return to preferences').'" />';
@@ -50,7 +50,7 @@ class opml extends ProtectedHandler
 
     }
 
-    private function opml_export_category($owner_uid, $cat_id, $hide_private_feeds = false)
+    private function exportCategory($owner_uid, $cat_id, $hide_private_feeds = false)
     {
         if ($cat_id) {
             $feed_cat_qpart = "cat_id = '$cat_id'";
@@ -74,7 +74,7 @@ class opml extends ProtectedHandler
         $cat_ids = \SmallSmallRSS\FeedCategories::getChildrenForOPML($cat_id);
 
         foreach ($cat_ids as $cat_id) {
-            $out .= $this->opml_export_category($owner_uid, $line['id'], $hide_private_feeds);
+            $out .= $this->exportCategory($owner_uid, $line['id'], $hide_private_feeds);
         }
 
         $feeds_result = \SmallSmallRSS\Database::query(
@@ -108,7 +108,7 @@ class opml extends ProtectedHandler
         return $out;
     }
 
-    public function opml_export($name, $owner_uid, $hide_private_feeds = false, $include_settings = true)
+    public function renderExport($name, $owner_uid, $hide_private_feeds = false, $include_settings = true)
     {
         if (!$owner_uid) {
             return;
@@ -127,7 +127,7 @@ class opml extends ProtectedHandler
         $out .= "<title>$software_name : Feed Export</title>";
         $out .= '</head>';
         $out .= '<body>';
-        $out .= $this->opml_export_category($owner_uid, false, $hide_private_feeds);
+        $out .= $this->exportCategory($owner_uid, false, $hide_private_feeds);
 
         # export tt-rss settings
 
@@ -257,7 +257,7 @@ class opml extends ProtectedHandler
 
     // Import
 
-    private function opml_import_feed($doc, $node, $cat_id, $owner_uid)
+    private function importFeed($doc, $node, $cat_id, $owner_uid)
     {
         $attrs = $node->attributes;
         $feed_title = \SmallSmallRSS\Database::escape_string(
@@ -291,8 +291,7 @@ class opml extends ProtectedHandler
             );
 
             if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-                #$this->opml_notice("[FEED] [$feed_title/$feed_url] dst_CAT=$cat_id");
-                $this->opml_notice(T_sprintf('Adding feed: %s', $feed_title));
+                $this->notice(T_sprintf('Adding feed: %s', $feed_title));
 
                 if (!$cat_id) {
                     $cat_id = 'NULL';
@@ -305,12 +304,12 @@ class opml extends ProtectedHandler
                            $cat_id, '$site_url', 0)";
                 \SmallSmallRSS\Database::query($query);
             } else {
-                $this->opml_notice(T_sprintf('Duplicate feed: %s', $feed_title));
+                $this->notice(T_sprintf('Duplicate feed: %s', $feed_title));
             }
         }
     }
 
-    private function opml_import_label($doc, $node, $owner_uid)
+    private function opml_importLabel($doc, $node, $owner_uid)
     {
         $attrs = $node->attributes;
         $label_name = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-name')->nodeValue);
@@ -318,10 +317,10 @@ class opml extends ProtectedHandler
             $fg_color = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-fg-color')->nodeValue);
             $bg_color = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-bg-color')->nodeValue);
             if (!\SmallSmallRSS\Labels::findID($label_name, $owner_uid)) {
-                $this->opml_notice(T_sprintf('Adding label %s', htmlspecialchars($label_name)));
+                $this->notice(T_sprintf('Adding label %s', htmlspecialchars($label_name)));
                 \SmallSmallRSS\Labels::create($label_name, $owner_uid, $fg_color, $bg_color);
             } else {
-                $this->opml_notice(T_sprintf('Duplicate label: %s', htmlspecialchars($label_name)));
+                $this->notice(T_sprintf('Duplicate label: %s', htmlspecialchars($label_name)));
             }
         }
     }
@@ -333,14 +332,14 @@ class opml extends ProtectedHandler
 
         if ($pref_name) {
             $pref_value = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('value')->nodeValue);
-            $this->opml_notice(
+            $this->notice(
                 T_sprintf('Setting preference key %s to %s', $pref_name, $pref_value)
             );
             \SmallSmallRSS\DBPrefs::write($pref_name, $pref_value);
         }
     }
 
-    private function opml_import_filter($doc, $node, $owner_uid)
+    private function importFilter($doc, $node, $owner_uid)
     {
         $attrs = $node->attributes;
 
@@ -372,7 +371,7 @@ class opml extends ProtectedHandler
                 $filter_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
 
                 if ($filter_id) {
-                    $this->opml_notice(T_sprintf('Adding filter...'));
+                    $this->notice(T_sprintf('Adding filter...'));
 
                     foreach ($filter['rules'] as $rule) {
                         $feed_id = 'NULL';
@@ -427,7 +426,7 @@ class opml extends ProtectedHandler
         }
     }
 
-    private function opml_import_category($doc, $root_node, $owner_uid, $parent_id)
+    private function importCategory($doc, $root_node, $owner_uid, $parent_id)
     {
         $body = $doc->getElementsByTagName('body');
 
@@ -464,8 +463,8 @@ class opml extends ProtectedHandler
             $cat_id = 0;
         }
 
-        #$this->opml_notice("[CAT] $cat_title id: $cat_id P_id: $parent_id");
-        $this->opml_notice(T_sprintf('Processing category: %s', $cat_title ? $cat_title : __('Uncategorized')));
+        #$this->notice("[CAT] $cat_title id: $cat_id P_id: $parent_id");
+        $this->notice(T_sprintf('Processing category: %s', $cat_title ? $cat_title : __('Uncategorized')));
 
         foreach ($outlines as $node) {
             if ($node->hasAttributes() && strtolower($node->tagName) == 'outline') {
@@ -479,7 +478,7 @@ class opml extends ProtectedHandler
                 $node_feed_url = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('xmlUrl')->nodeValue);
 
                 if ($node_cat_title && !$node_feed_url) {
-                    $this->opml_import_category($doc, $node, $owner_uid, $cat_id);
+                    $this->importCategory($doc, $node, $owner_uid, $cat_id);
                 } else {
 
                     if (!$cat_id) {
@@ -493,20 +492,20 @@ class opml extends ProtectedHandler
                             $this->opml_import_preference($doc, $node, $owner_uid);
                             break;
                         case 'tt-rss-labels':
-                            $this->opml_import_label($doc, $node, $owner_uid);
+                            $this->opml_importLabel($doc, $node, $owner_uid);
                             break;
                         case 'tt-rss-filters':
-                            $this->opml_import_filter($doc, $node, $owner_uid);
+                            $this->importFilter($doc, $node, $owner_uid);
                             break;
                         default:
-                            $this->opml_import_feed($doc, $node, $dst_cat_id, $owner_uid);
+                            $this->importFeed($doc, $node, $dst_cat_id, $owner_uid);
                     }
                 }
             }
         }
     }
 
-    public function opml_import($owner_uid)
+    public function renderImport($owner_uid)
     {
         if (!$owner_uid) {
             return;
@@ -548,21 +547,22 @@ class opml extends ProtectedHandler
             return;
         }
         if ($doc) {
-            $this->opml_import_category($doc, false, $owner_uid, false);
+            $this->importCategory($doc, false, $owner_uid, false);
         } else {
             \SmallSmallRSS\Renderers\Messages::renderError(__('Error while parsing document.'));
         }
     }
 
-    private function opml_notice($msg)
+    private function notice($msg)
     {
         echo "$msg<br/>";
     }
 
-    public static function opml_publish_url()
+    public static function publishUrl($owner_uid)
     {
         $url_path = get_self_url_prefix();
-        $url_path .= '/opml.php?op=publish&key=' . \SmallSmallRSS\AccessKeys::getForFeed('OPML:Publish', false, $_SESSION['uid']);
+        $url_path .= '/opml.php?op=publish&key=';
+        $url_path .= \SmallSmallRSS\AccessKeys::getForFeed('OPML:Publish', false, $owner_uid);
         return $url_path;
     }
 }

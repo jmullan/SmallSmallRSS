@@ -260,29 +260,19 @@ class Pref_Labels extends ProtectedHandler
     {
         $caption = \SmallSmallRSS\Database::escape_string($_REQUEST['caption']);
         $output = \SmallSmallRSS\Database::escape_string($_REQUEST['output']);
-
         if ($caption) {
-
             if (\SmallSmallRSS\Labels::create($caption, $_SESSION['uid'])) {
                 if (!$output) {
                     echo T_sprintf('Created label <b>%s</b>', htmlspecialchars($caption));
                 }
             }
-
             if ($output == 'select') {
                 header('Content-Type: text/xml');
-
                 echo '<rpc-reply><payload>';
-
-                print_label_select(
-                    'select_label',
-                    $caption, ''
-                );
-
+                print_label_select('select_label', $caption, '');
                 echo '</payload></rpc-reply>';
             }
         }
-
         return;
     }
 

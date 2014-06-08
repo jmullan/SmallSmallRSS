@@ -95,8 +95,7 @@ class CountersCache
         $owner_uid,
         $is_cat = false,
         $no_update = false
-    )
-    {
+    ) {
 
         if (!is_numeric($feed_id)) {
             return;

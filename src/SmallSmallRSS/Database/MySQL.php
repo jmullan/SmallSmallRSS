@@ -22,7 +22,8 @@ class MySQL implements DatabaseInterface
 
     public function escape_string($s, $strip_tags = true)
     {
-        if ($strip_tags) {  $s = strip_tags($s);
+        if ($strip_tags) {
+            $s = strip_tags($s);
         }
         return mysql_real_escape_string($s, $this->link);
     }

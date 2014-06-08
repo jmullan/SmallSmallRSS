@@ -2,7 +2,7 @@
 
 function login_sequence()
 {
-    if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+    if (\SmallSmallRSS\Auth::isSingleUserMode()) {
         \SmallSmallRSS\Auth::authenticate('admin', null);
     } else {
         if (!\SmallSmallRSS\Sessions::validate()) {
@@ -662,7 +662,7 @@ function make_runtime_info()
     $feeds_stamp = \SmallSmallRSS\Lockfiles::whenStamped('update_feeds');
     $daemon_stamp = \SmallSmallRSS\Lockfiles::whenStamped('update_daemon');
     $data['daemon_is_running'] = (
-        \SmallSmallRSS\Lockfiles::is_locked('update_daemon.lock')
+        \SmallSmallRSS\Lockfiles::isLocked('update_daemon.lock')
         || (bool) $feeds_stamp
         || (bool) $daemon_stamp
     );

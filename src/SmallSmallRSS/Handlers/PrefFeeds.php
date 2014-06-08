@@ -609,7 +609,7 @@ class PrefFeeds extends ProtectedHandler
         $form_elements_renderer->renderSelect(
             'update_interval',
             $update_interval,
-            \SmallSmallRSS\Constants::update_intervals(),
+            \SmallSmallRSS\Constants::updateIntervals(),
             'data-dojo-type="dijit.form.Select"'
         );
         /* Purge intl */
@@ -619,7 +619,7 @@ class PrefFeeds extends ProtectedHandler
         $form_elements_renderer->renderSelect(
             'purge_interval',
             $purge_interval,
-            \SmallSmallRSS\Constants::purge_intervals(),
+            \SmallSmallRSS\Constants::purgeIntervals(),
             'data-dojo-type="dijit.form.Select" '
             . ((\SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') == 0) ? '' : 'disabled="1"')
         );
@@ -883,7 +883,7 @@ class PrefFeeds extends ProtectedHandler
         $form_elements_renderer->renderSelect(
             'update_interval',
             '',
-            \SmallSmallRSS\Constants::update_intervals(),
+            \SmallSmallRSS\Constants::updateIntervals(),
             'disabled="1" data-dojo-type="dijit.form.Select"'
         );
 
@@ -898,7 +898,7 @@ class PrefFeeds extends ProtectedHandler
             $renderer->renderSelect(
                 'purge_interval',
                 '',
-                \SmallSmallRSS\Constants::purge_intervals(),
+                \SmallSmallRSS\Constants::purgeIntervals(),
                 'disabled="1" data-dojo-type="dijit.form.Select"'
             );
 
@@ -1042,7 +1042,7 @@ class PrefFeeds extends ProtectedHandler
             self::checkBoxToBool($_POST['mark_unread_on_update'])
         );
 
-        if (\SmallSmallRSS\Crypt::is_enabled()) {
+        if (\SmallSmallRSS\Crypt::isEnabled()) {
             $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
             $auth_pass_encrypted = 'true';
         } else {
@@ -2081,7 +2081,7 @@ class PrefFeeds extends ProtectedHandler
                     WHERE feed_url = '$feed' AND owner_uid = ".$_SESSION['uid']
                 );
 
-                if (\SmallSmallRSS\Crypt::is_enabled()) {
+                if (\SmallSmallRSS\Crypt::isEnabled()) {
                     $pass = substr(\SmallSmallRSS\Crypt::en($pass), 0, 250);
                     $auth_pass_encrypted = 'true';
                 } else {
@@ -2106,7 +2106,7 @@ class PrefFeeds extends ProtectedHandler
     public function regenOPMLKey()
     {
         $this->updateFeedAccessKey('OPML:Publish', false, $_SESSION['uid']);
-        $new_link = Opml::opml_publish_url();
+        $new_link = Opml::publishUrl($_SESSION['uid']);
         echo json_encode(array('link' => $new_link));
     }
 

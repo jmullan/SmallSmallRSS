@@ -132,7 +132,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function hookRenderPreferencesTabs($args)
     {
-        if ($_SESSION["access_level"] >= 10 || \SmallSmallRSS\Auth::is_single_user_mode()) {
+        if ($_SESSION["access_level"] >= 10 || \SmallSmallRSS\Auth::isSingleUserMode()) {
             echo '<div id="instanceConfigTab" data-dojo-type="dijit.layout.ContentPane"';
             echo ' href="backend.php?op=pref-instances"';
             echo ' title="';

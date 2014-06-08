@@ -36,7 +36,7 @@ if (!\SmallSmallRSS\PluginHost::initAll()) {
 }
 header('Content-Type: application/json; charset=utf-8');
 
-if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+if (\SmallSmallRSS\Auth::isSingleUserMode()) {
     \SmallSmallRSS\Auth::authenticate('admin', null);
 }
 

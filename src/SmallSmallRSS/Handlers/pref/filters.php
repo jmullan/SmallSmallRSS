@@ -8,7 +8,6 @@ class Pref_Filters extends ProtectedHandler
     {
         $csrf_ignored = array('index', 'getfiltertree', 'edit', 'newfilter', 'newrule',
                               'newaction', 'savefilterorder');
-
         return array_search($method, $csrf_ignored) !== false;
     }
 
@@ -68,8 +67,16 @@ class Pref_Filters extends ProtectedHandler
         }
 
         $qfh_ret = queryFeedHeadlines(
-            -4, 30, '', false, false, false,
-            'date_entered DESC', 0, $_SESSION['uid'], $filter
+            -4,
+            30,
+            '',
+            false,
+            false,
+            false,
+            'date_entered DESC',
+            0,
+            $_SESSION['uid'],
+            $filter
         );
         $result = $qfh_ret[0];
         $articles = array();
@@ -80,9 +87,7 @@ class Pref_Filters extends ProtectedHandler
         while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
             $entry_timestamp = strtotime($line['updated']);
             $entry_tags = get_article_tags($line['id'], $_SESSION['uid']);
-            $content_preview = \SmallSmallRSS\Utils::truncateString(
-                strip_tags($line['content_preview']), 100, '...'
-            );
+            $content_preview = \SmallSmallRSS\Utils::truncateString(strip_tags($line['content_preview']), 100, '...');
             if ($line['feed_title']) {
                 $feed_title = $line['feed_title'];
             }
@@ -105,15 +110,19 @@ class Pref_Filters extends ProtectedHandler
             echo "<tr><td align='center'>";
             echo __('No recent articles matching this filter have been found.');
             echo "</td></tr>";
-            echo "<tr><td class=\"insensitive\" align=\"center\">";
-            echo __('Complex expressions might not give results while testing due to issues with database server regexp implementation.');
+            echo '<tr>';
+            echo '<td class="insensitive" align="center">';
+            echo __(
+                'Complex expressions might not give results while testing'
+                . ' due to issues with database server regexp implementation.'
+            );
             echo '</td>';
             echo '</tr>';
         }
         echo '</table>';
         echo '</div>';
         echo "<div style='text-align : center'>";
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('filterTestDlg').hide()\">";
+        echo '<button data-dojo-type="dijit.form.Button" onclick="dijit.byId(\'filterTestDlg\').hide()">';
         echo __('Close this window');
         echo '</button>';
         echo '</div>';
@@ -226,51 +235,81 @@ class Pref_Filters extends ProtectedHandler
                  AND owner_uid = " . $_SESSION['uid']
         );
 
-        $enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'enabled'));
-        $match_any_rule = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'match_any_rule'));
-        $inverse = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'inverse'));
+        $enabled = \SmallSmallRSS\Database::fromSQLBool(
+            \SmallSmallRSS\Database::fetch_result($result, 0, 'enabled')
+        );
+        $match_any_rule = \SmallSmallRSS\Database::fromSQLBool(
+            \SmallSmallRSS\Database::fetch_result($result, 0, 'match_any_rule')
+        );
+        $inverse = \SmallSmallRSS\Database::fromSQLBool(
+            \SmallSmallRSS\Database::fetch_result($result, 0, 'inverse')
+        );
         $title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'title'));
 
-        echo "<form id=\"filter_edit_form\" onsubmit='return false'>";
+        $rules_result = \SmallSmallRSS\Database::query(
+            "SELECT *
+             FROM ttrss_filters2_rules
+             WHERE filter_id = '$filter_id'
+             ORDER BY reg_exp, id"
+        );
 
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-filters">';
-        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$filter_id\">";
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="editSave">';
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="csrf_token" value="'.$_SESSION['csrf_token'].'">';
+        $actions_result = \SmallSmallRSS\Database::query(
+            "SELECT *
+             FROM ttrss_filters2_actions
+             WHERE filter_id = '$filter_id'
+             ORDER BY id"
+        );
 
-        echo '<div class="dlgSec">'.__('Caption').'</div>';
+        echo '<form id="filter_edit_form" onsubmit="return false">';
 
-        echo "<input required=\"true\" data-dojo-type=\"dijit.form.ValidationTextBox\" style=\"width: 20em;\" name=\"title\" value=\"$title\">";
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-filters" />';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="id" value=\"';
+        echo $filter_id;
+        echo '" />';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="editSave" />';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="csrf_token" value="';
+        echo $_SESSION['csrf_token'];
+        echo '" />';
 
+        echo '<div class="dlgSec">';
+        echo __('Caption');
         echo '</div>';
 
-        echo '<div class="dlgSec">'.__('Match').'</div>';
+        echo '<input data-dojo-type="dijit.form.ValidationTextBox" required="true" name="title" value="';
+        echo $title;
+        echo '">';
+        echo '</div>';
+
+        echo '<div class="dlgSec">';
+        echo __('Match');
+        echo '</div>';
 
         echo '<div data-dojo-type="dijit.Toolbar">';
 
-        echo '<div data-dojo-type="dijit.form.DropDownButton">'.
-            '<span>' . __('Select').'</span>';
+        echo '<div data-dojo-type="dijit.form.DropDownButton">';
+        echo '<span>' . __('Select');
+        echo '</span>';
         echo '<div data-dojo-type="dijit.Menu" style="display: none;">';
-        echo "<div onclick=\"dijit.byId('filterEditDlg').selectRules(true)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('All').'</div>';
-        echo "<div onclick=\"dijit.byId('filterEditDlg').selectRules(false)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
-        echo '</div></div>';
+        echo '<div onclick="dijit.byId(\'filterEditDlg\').selectRules(true)" data-dojo-type="dijit.MenuItem">';
+        echo __('All');
+        echo '</div>';
+        echo '<div onclick="dijit.byId(\'filterEditDlg\').selectRules(false)" data-dojo-type="dijit.MenuItem">';
+        echo __('None');
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addRule()\">".
-            __('Add').'</button> ';
-
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').deleteRule()\">".
-            __('Delete').'</button> ';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'filterEditDlg\').addRule()">';
+        echo __('Add');
+        echo '</button>';
+        echo ' ';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'filterEditDlg\').deleteRule()">';
+        echo __('Delete');
+        echo '</button>';
 
         echo '</div>';
 
-        echo "<ul id='filterDlg_Matches'>";
-
-        $rules_result = \SmallSmallRSS\Database::query(
-            "SELECT * FROM ttrss_filters2_rules
-            WHERE filter_id = '$filter_id' ORDER BY reg_exp, id"
-        );
+        echo '<ul id="filterDlg_Matches">';
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($rules_result)) {
             if (\SmallSmallRSS\Database::fromSQLBool($line['cat_filter'])) {
@@ -281,47 +320,48 @@ class Pref_Filters extends ProtectedHandler
             unset($line['cat_id']);
             unset($line['filter_id']);
             unset($line['id']);
-            if (!\SmallSmallRSS\Database::fromSQLBool($line['inverse'])) {  unset($line['inverse']);
+            if (!\SmallSmallRSS\Database::fromSQLBool($line['inverse'])) {
+                unset($line['inverse']);
             }
-
             $data = htmlspecialchars(json_encode($line));
-
-            echo "<li><input data-dojo-type='dijit.form.CheckBox' type='checkbox' onclick='toggleSelectListRow2(this)'>".
-                "<span onclick=\"dijit.byId('filterEditDlg').editRule(this)\">".$this->getRuleName($line).'</span>'.
-                "<input type='hidden' name='rule[]' value=\"$data\"/></li>";
+            echo "<li>";
+            echo '<input data-dojo-type="dijit.form.CheckBox" type="checkbox" onclick="toggleSelectListRow2(this)">';
+            echo '<span onclick="dijit.byId(\'filterEditDlg\').editRule(this)" />';
+            echo $this->getRuleName($line);
+            echo '</span>';
+            echo "<input type='hidden' name='rule[]' value=\"$data\"/>";
+            echo "</li>";
         }
-
         echo '</ul>';
-
         echo '</div>';
-
-        echo '<div class="dlgSec">'.__('Apply actions').'</div>';
-
+        echo '<div class="dlgSec">';
+        echo __('Apply actions');
+        echo '</div>';
         echo '<div data-dojo-type="dijit.Toolbar">';
-
-        echo '<div data-dojo-type="dijit.form.DropDownButton">'.
-            '<span>' . __('Select').'</span>';
+        echo '<div data-dojo-type="dijit.form.DropDownButton">';
+        echo '<span>' . __('Select');
+        echo '</span>';
         echo '<div data-dojo-type="dijit.Menu" style="display: none;">';
-        echo "<div onclick=\"dijit.byId('filterEditDlg').selectActions(true)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('All').'</div>';
-        echo "<div onclick=\"dijit.byId('filterEditDlg').selectActions(false)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
+        echo "<div onclick=\"dijit.byId('filterEditDlg').selectActions(true)\" data-dojo-type=\"dijit.MenuItem\">";
+        echo __('All');
+        echo '</div>';
+        echo "<div onclick=\"dijit.byId('filterEditDlg').selectActions(false)\" data-dojo-type=\"dijit.MenuItem\">";
+        echo __('None');
+        echo '</div>';
         echo '</div></div>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addAction()\">".
-            __('Add').'</button> ';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'filterEditDlg\').addAction()">';
+        echo __('Add');
+        echo '</button> ';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').deleteAction()\">".
-            __('Delete').'</button> ';
+        echo '<button data-dojo-type="dijit.form.Button"';
+        echo ' onclick="return dijit.byId(\'filterEditDlg\').deleteAction()">';
+        echo __('Delete');
+        echo '</button> ';
 
         echo '</div>';
 
         echo "<ul id='filterDlg_Actions'>";
-
-        $actions_result = \SmallSmallRSS\Database::query(
-            "SELECT * FROM ttrss_filters2_actions
-            WHERE filter_id = '$filter_id' ORDER BY id"
-        );
 
         while ($line = \SmallSmallRSS\Database::fetch_assoc($actions_result)) {
             $line['action_param_label'] = $line['action_param'];
@@ -331,9 +371,15 @@ class Pref_Filters extends ProtectedHandler
 
             $data = htmlspecialchars(json_encode($line));
 
-            echo "<li><input data-dojo-type='dijit.form.CheckBox' type='checkbox' onclick='toggleSelectListRow2(this)'>".
-                "<span onclick=\"dijit.byId('filterEditDlg').editAction(this)\">".$this->getActionName($line).'</span>'.
-                "<input type='hidden' name='action[]' value=\"$data\"/></li>";
+            echo '<li>';
+            echo '<input data-dojo-type="dijit.form.CheckBox" type="checkbox" onclick="toggleSelectListRow2(this)">';
+            echo '<span onclick="dijit.byId(\'filterEditDlg\').editAction(this)">';
+            echo $this->getActionName($line);
+            echo '</span>';
+            echo '<input type="hidden" name="action[]" value="';
+            echo $data;
+            echo '"/>';
+            echo '</li>';
         }
 
         echo '</ul>';
@@ -347,7 +393,9 @@ class Pref_Filters extends ProtectedHandler
         }
 
         echo "<input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"enabled\" id=\"enabled\" $checked>
-                <label for=\"enabled\">".__('Enabled').'</label>';
+                <label for=\"enabled\">";
+        echo __('Enabled');
+        echo '</label>';
 
         if ($match_any_rule) {
             $checked = ' checked="1"';
@@ -358,19 +406,25 @@ class Pref_Filters extends ProtectedHandler
         echo "<br/>";
         echo "<input type=\"checkbox\" name=\"match_any_rule\" id=\"match_any_rule\"";
         echo " $checked data-dojo-type=\"dijit.form.CheckBox\">";
-        echo "<label for=\"match_any_rule\">".__('Match any rule').'</label>';
+        echo "<label for=\"match_any_rule\">";
+        echo __('Match any rule');
+        echo '</label>';
         if ($inverse) {
             $checked = ' checked="1"';
         } else {
             $checked = '';
         }
-        echo "<br/>";
-        echo "<input data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\" name=\"inverse\" id=\"inverse\" $checked>";
-        echo "<label for=\"inverse\">".__('Inverse matching').'</label>';
+        echo '<br />';
+        echo '<input data-dojo-type="dijit.form.CheckBox" type="checkbox" name="inverse" id="inverse"';
+        echo $checked;
+        echo '/>';
+        echo '<label for="inverse">';
+        echo __('Inverse matching');
+        echo '</label>';
         echo '<p/>';
         echo '<div class="dlgButtons">';
         echo '<div style="float: left">';
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').removeFilter()\">";
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'filterEditDlg\').removeFilter()">';
         echo __('Remove');
         echo '</button>';
         echo '</div>';
@@ -415,8 +469,11 @@ class Pref_Filters extends ProtectedHandler
         $filter_type = \SmallSmallRSS\Database::fetch_result($result, 0, 'description');
 
         return T_sprintf(
-            '%s on %s in %s %s', strip_tags($rule['reg_exp']),
-            $filter_type, $feed, isset($rule['inverse']) ? __('(inverse)') : ''
+            '%s on %s in %s %s',
+            strip_tags($rule['reg_exp']),
+            $filter_type,
+            $feed,
+            isset($rule['inverse']) ? __('(inverse)') : ''
         );
     }
 
@@ -514,15 +571,15 @@ class Pref_Filters extends ProtectedHandler
                         $cat_filter = \SmallSmallRSS\Database::toSQLBool(true);
                         $cat_id = (int) substr($feed_id, 4);
                         $feed_id = 'NULL';
-
-                        if (!$cat_id) {  $cat_id = 'NULL'; // Uncategorized
+                        if (!$cat_id) {
+                            $cat_id = 'NULL'; // Uncategorized
                         }
                     } else {
                         $cat_filter = \SmallSmallRSS\Database::toSQLBool(false);
                         $feed_id = (int) $feed_id;
                         $cat_id = 'NULL';
-
-                        if (!$feed_id) {  $feed_id = 'NULL'; // Uncategorized
+                        if (!$feed_id) {
+                            $feed_id = 'NULL'; // Uncategorized
                         }
                     }
 
@@ -611,38 +668,50 @@ class Pref_Filters extends ProtectedHandler
         echo "<div style='float: right; padding-right : 4px;'>
             <input data-dojo-type=\"dijit.form.TextBox\" id=\"filter_search\" size=\"20\" type=\"search\"
                 value=\"$filter_search\">
-            <button data-dojo-type=\"dijit.form.Button\" onclick=\"updateFilterList()\">".
-            __('Search').'</button>
+            <button data-dojo-type=\"dijit.form.Button\" onclick=\"updateFilterList()\">";
+        echo __('Search');
+        echo '</button>
             </div>';
 
-        echo '<div data-dojo-type="dijit.form.DropDownButton">'.
-            '<span>' . __('Select').'</span>';
+        echo '<div data-dojo-type="dijit.form.DropDownButton">';
+        echo '<span>' . __('Select');
+        echo '</span>';
         echo '<div data-dojo-type="dijit.Menu" style="display: none;">';
         echo "<div onclick=\"dijit.byId('filterTree').model.setAllChecked(true)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('All').'</div>';
+            data-dojo-type=\"dijit.MenuItem\">";
+        echo __('All');
+        echo '</div>';
         echo "<div onclick=\"dijit.byId('filterTree').model.setAllChecked(false)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
+            data-dojo-type=\"dijit.MenuItem\">";
+        echo __('None');
+        echo '</div>';
         echo '</div></div>';
 
-        echo '<button data-dojo-type="dijit.form.Button" onclick="return quickAddFilter()">'.
-            __('Create filter').'</button> ';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return quickAddFilter()">';
+        echo __('Create filter');
+        echo '</button> ';
 
-        echo '<button data-dojo-type="dijit.form.Button" onclick="return joinSelectedFilters()">'.
-            __('Combine').'</button> ';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return joinSelectedFilters()">';
+        echo __('Combine');
+        echo '</button> ';
 
-        echo '<button data-dojo-type="dijit.form.Button" onclick="return editSelectedFilter()">'.
-            __('Edit').'</button> ';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return editSelectedFilter()">';
+        echo __('Edit');
+        echo '</button> ';
 
-        echo '<button data-dojo-type="dijit.form.Button" onclick="return resetFilterOrder()">'.
-            __('Reset sort order').'</button> ';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return resetFilterOrder()">';
+        echo __('Reset sort order');
+        echo '</button> ';
 
 
-        echo '<button data-dojo-type="dijit.form.Button" onclick="return removeSelectedFilters()">'.
-            __('Remove').'</button> ';
+        echo '<button data-dojo-type="dijit.form.Button" onclick="return removeSelectedFilters()">';
+        echo __('Remove');
+        echo '</button> ';
 
         if (defined('_ENABLE_FEED_DEBUGGING')) {
-            echo '<button data-dojo-type="dijit.form.Button" onclick="rescore_all_feeds()">'.
-                __('Rescore articles').'</button> ';
+            echo '<button data-dojo-type="dijit.form.Button" onclick="rescore_all_feeds()">';
+            echo __('Rescore articles');
+            echo '</button> ';
         }
 
         echo '</div>'; # toolbar
@@ -650,8 +719,9 @@ class Pref_Filters extends ProtectedHandler
         echo '<div id="pref-filter-content" data-dojo-type="dijit.layout.ContentPane" region="center">';
 
         echo "<div id=\"filterlistLoading\">
-        <img src='images/indicator_tiny.gif'>".
-            __('Loading, please wait...').'</div>';
+        <img src='images/indicator_tiny.gif'>";
+        echo __('Loading, please wait...');
+        echo '</div>';
 
         echo "<div data-dojo-type=\"fox.PrefFilterStore\" jsId=\"filterStore\"
             url=\"backend.php?op=pref-filters&method=getfiltertree\">
@@ -696,30 +766,42 @@ class Pref_Filters extends ProtectedHandler
 
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-filters">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="add">';
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="csrf_token" value="'.$_SESSION['csrf_token'].'">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="csrf_token" value="';
+        echo $_SESSION['csrf_token'];
+        echo '">';
 
-        echo '<div class="dlgSec">'.__('Caption').'</div>';
+        echo '<div class="dlgSec">';
+        echo __('Caption');
+        echo '</div>';
 
         echo '<input required="true" data-dojo-type="dijit.form.ValidationTextBox" style="width: 20em;" name="title" value="">';
 
-        echo '<div class="dlgSec">'.__('Match').'</div>';
+        echo '<div class="dlgSec">';
+        echo __('Match');
+        echo '</div>';
 
         echo '<div data-dojo-type="dijit.Toolbar">';
 
-        echo '<div data-dojo-type="dijit.form.DropDownButton">'.
-            '<span>' . __('Select').'</span>';
+        echo '<div data-dojo-type="dijit.form.DropDownButton">';
+        echo '<span>';
+        echo __('Select');
+        echo '</span>';
         echo '<div data-dojo-type="dijit.Menu" style="display: none;">';
-        echo "<div onclick=\"dijit.byId('filterEditDlg').selectRules(true)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('All').'</div>';
-        echo "<div onclick=\"dijit.byId('filterEditDlg').selectRules(false)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
+        echo '<div onclick="dijit.byId(\'filterEditDlg\').selectRules(true)" data-dojo-type="dijit.MenuItem">';
+        echo __('All');
+        echo '</div>';
+        echo '<div onclick="dijit.byId(\'filterEditDlg\').selectRules(false)" data-dojo-type="dijit.MenuItem">';
+        echo __('None');
+        echo '</div>';
         echo '</div></div>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addRule()\">".
-            __('Add').'</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addRule()\">";
+        echo __('Add');
+        echo '</button> ';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').deleteRule()\">".
-            __('Delete').'</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').deleteRule()\">";
+        echo __('Delete');
+        echo '</button> ';
 
         echo '</div>';
 
@@ -729,55 +811,67 @@ class Pref_Filters extends ProtectedHandler
 
         echo '</div>';
 
-        echo '<div class="dlgSec">'.__('Apply actions').'</div>';
+        echo '<div class="dlgSec">';
+        echo __('Apply actions');
+        echo '</div>';
 
         echo '<div data-dojo-type="dijit.Toolbar">';
 
-        echo '<div data-dojo-type="dijit.form.DropDownButton">'.
-            '<span>' . __('Select').'</span>';
+        echo '<div data-dojo-type="dijit.form.DropDownButton">';
+        echo '<span>' . __('Select');
+        echo '</span>';
         echo '<div data-dojo-type="dijit.Menu" style="display: none;">';
         echo "<div onclick=\"dijit.byId('filterEditDlg').selectActions(true)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('All').'</div>';
+            data-dojo-type=\"dijit.MenuItem\">";
+        echo __('All');
+        echo '</div>';
         echo "<div onclick=\"dijit.byId('filterEditDlg').selectActions(false)\"
-            data-dojo-type=\"dijit.MenuItem\">".__('None').'</div>';
+            data-dojo-type=\"dijit.MenuItem\">";
+        echo __('None');
+        echo '</div>';
         echo '</div></div>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addAction()\">".
-            __('Add').'</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addAction()\">";
+        echo __('Add');
+        echo '</button> ';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').deleteAction()\">".
-            __('Delete').'</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').deleteAction()\">";
+        echo __('Delete');
+        echo '</button> ';
 
         echo '</div>';
 
         echo "<ul id='filterDlg_Actions'>";
-        #        echo "<li>No actions</li>";
         echo '</ul>';
 
-        /*        echo "<div class=\"dlgSec\">".__("Options")."</div>";
-                  echo "<div class=\"dlgSecCont\">"; */
-
         echo '<input data-dojo-type="dijit.form.CheckBox" type="checkbox" name="enabled" id="enabled" checked="1">
-                <label for="enabled">'.__('Enabled').'</label>';
+                <label for="enabled">';
+        echo __('Enabled');
+        echo '</label>';
 
         echo '<br/><input data-dojo-type="dijit.form.CheckBox" type="checkbox" name="match_any_rule" id="match_any_rule">
-                <label for="match_any_rule">'.__('Match any rule').'</label>';
+                <label for="match_any_rule">';
+        echo __('Match any rule');
+        echo '</label>';
 
         echo '<br/><input data-dojo-type="dijit.form.CheckBox" type="checkbox" name="inverse" id="inverse">
-                <label for="inverse">'.__('Inverse matching').'</label>';
-
-        //        echo "</div>";
+                <label for="inverse">';
+        echo __('Inverse matching');
+        echo '</label>';
 
         echo '<div class="dlgButtons">';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').test()\">".
-            __('Test').'</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').test()\">";
+        echo __('Test');
+        echo '</button> ';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').execute()\">".
-            __('Create').'</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').execute()\">";
+        echo __('Create');
+        echo '</button> ';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').hide()\">".
-            __('Cancel').'</button>';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').hide()\">";
+        echo __('Cancel');
+        echo '</button>';
 
         echo '</div>';
 
@@ -822,7 +916,9 @@ class Pref_Filters extends ProtectedHandler
             $filter_types[$line['id']] = __($line['description']);
         }
 
-        echo '<div class="dlgSec">'.__('Match').'</div>';
+        echo '<div class="dlgSec">';
+        echo __('Match');
+        echo '</div>';
         echo '<div class="dlgSecCont">';
         echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\"
              required=\"true\" id=\"filterDlg_regExp\"
@@ -832,12 +928,18 @@ class Pref_Filters extends ProtectedHandler
         echo '<hr/>';
         echo "<input id=\"filterDlg_inverse\" data-dojo-type=\"dijit.form.CheckBox\"
              name=\"inverse\" $inverse_checked/>";
-        echo '<label for="filterDlg_inverse">'.__('Inverse regular expression matching').'</label>';
+        echo '<label for="filterDlg_inverse">';
+        echo __('Inverse regular expression matching');
+        echo '</label>';
 
-        echo '<hr/>' .  __('on field') . ' ';
+        echo '<hr/>';
+        echo __('on field');
+        echo ' ';
         $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
         $form_elements_renderer->renderSelect(
-            'filter_type', $filter_type, $filter_types,
+            'filter_type',
+            $filter_type,
+            $filter_types,
             'data-dojo-type="dijit.form.Select"'
         );
 
@@ -857,11 +959,13 @@ class Pref_Filters extends ProtectedHandler
 
         echo '<div class="dlgButtons">';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewRuleDlg').execute()\">".
-            ($rule ? __('Save rule') : __('Add rule')).'</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewRuleDlg').execute()\">";
+        echo ($rule ? __('Save rule') : __('Add rule'));
+        echo '</button> ';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewRuleDlg').hide()\">".
-            __('Cancel').'</button>';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewRuleDlg').hide()\">";
+        echo __('Cancel');
+        echo '</button>';
 
         echo '</div>';
 
@@ -880,7 +984,9 @@ class Pref_Filters extends ProtectedHandler
             $action_id = 0;
         }
         echo "<form name='filter_new_action_form' id='filter_new_action_form'>";
-        echo '<div class="dlgSec">'.__('Perform Action').'</div>';
+        echo '<div class="dlgSec">';
+        echo __('Perform Action');
+        echo '</div>';
         echo '<div class="dlgSecCont">';
         echo '<select name="action_id" data-dojo-type="dijit.form.Select"
             onchange="filterDlgCheckAction(this)">';
@@ -911,18 +1017,20 @@ class Pref_Filters extends ProtectedHandler
             id=\"filterDlg_actionParam\" style=\"$param_hidden\"
             name=\"action_param\" value=\"$action_param\">";
         print_label_select(
-            'action_param_label', $action_param,
-            "id=\"filterDlg_actionParamLabel\" style=\"$label_param_hidden\"
-            data-dojo-type=\"dijit.form.Select\""
+            'action_param_label',
+            $action_param,
+            "id=\"filterDlg_actionParamLabel\" style=\"$label_param_hidden\" data-dojo-type=\"dijit.form.Select\""
         );
         echo '</span>';
         echo '&nbsp;'; // tiny layout hack
         echo '</div>';
         echo '<div class="dlgButtons">';
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewActionDlg').execute()\">".
-            ($action ? __('Save action') : __('Add action')).'</button> ';
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewActionDlg').hide()\">".
-            __('Cancel').'</button>';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewActionDlg').execute()\">";
+        echo ($action ? __('Save action') : __('Add action'));
+        echo '</button> ';
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewActionDlg').hide()\">";
+        echo __('Cancel');
+        echo '</button>';
         echo '</div>';
         echo '</form>';
     }

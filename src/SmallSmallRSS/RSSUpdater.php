@@ -36,7 +36,7 @@ class RSSUpdater
     {
         // Test if the user has loggued in recently. If not, do not update
         // their feeds.
-        $single_user = \SmallSmallRSS\Auth::is_single_user_mode();
+        $single_user = \SmallSmallRSS\Auth::isSingleUserMode();
         $daemon_update_login_limit = \SmallSmallRSS\Config::get('DAEMON_UPDATE_LOGIN_LIMIT');
         if (!$single_user && $daemon_update_login_limit > 0) {
             if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {

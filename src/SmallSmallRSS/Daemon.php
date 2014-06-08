@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS;
+
 class Daemon
 {
     public static $children = array();
@@ -10,7 +11,7 @@ class Daemon
         $tmp = array();
         foreach (self::$children as $pid) {
             if (pcntl_waitpid($pid, $status, WNOHANG) != $pid) {
-                if (\SmallSmallRSS\Lockfiles::is_locked("update_daemon-$pid.lock")) {
+                if (\SmallSmallRSS\Lockfiles::isLocked("update_daemon-$pid.lock")) {
                     array_push($tmp, $pid);
                 } else {
                     \SmallSmallRSS\Logger::debug("[reapChildren] child $pid seems active but lockfile is unlocked.");

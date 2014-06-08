@@ -131,7 +131,9 @@ class FeedItem_Atom extends FeedItem_Abstract
                 $enc->title = strip_tags($desc->nodeValue);
             } else {
                 $desc = $this->xpath->query("media:description", $enclosure)->item(0);
-                if ($desc) $enc->title = strip_tags($desc->nodeValue);
+                if ($desc) {
+                    $enc->title = strip_tags($desc->nodeValue);
+                }
             }
             $encs[] = $enc;
         }

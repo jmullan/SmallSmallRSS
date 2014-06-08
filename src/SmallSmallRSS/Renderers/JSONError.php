@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Renderers;
+
 class JSONError extends \SmallSmallRSS\Renderers\Base
 {
 

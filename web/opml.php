@@ -9,7 +9,7 @@ if ($op == 'publish') {
     $owner_uid = \SmallSmallRSS\AccessKeys::getOwner($_REQUEST['key']);
     if ($owner_uid !== false) {
         $opml = new Opml($_REQUEST);
-        $opml->opml_export('', $owner_uid, true, false);
+        $opml->renderExport('', $owner_uid, true, false);
     } else {
         print '<error>User not found</error>';
     }

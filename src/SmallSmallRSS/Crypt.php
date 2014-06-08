@@ -3,7 +3,7 @@ namespace SmallSmallRSS;
 
 class Crypt
 {
-    public static function is_enabled()
+    public static function isEnabled()
     {
         return strlen(\SmallSmallRSS\Config::get('FEED_CRYPT_KEY')) > 0;
     }

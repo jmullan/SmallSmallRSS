@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS;
+
 class Constants
 {
     const VERSION = '1.8';
@@ -11,7 +12,7 @@ class Constants
     # one year in seconds
     const COOKIE_LIFETIME_LONG = 31536000;
 
-    public static function purge_intervals()
+    public static function purgeIntervals()
     {
         return array(
             0 => __('Use default'),
@@ -24,7 +25,7 @@ class Constants
         );
     }
 
-    public static function update_intervals()
+    public static function updateIntervals()
     {
         return array(
             0 => __('Default interval'),
@@ -38,7 +39,7 @@ class Constants
             10080 => __('Weekly')
         );
     }
-    public static function update_intervals_nodefault()
+    public static function updateIntervalsWithNoDefault()
     {
         return array(
             -1 => __('Disable updates'),
@@ -51,7 +52,7 @@ class Constants
             10080 => __('Weekly')
         );
     }
-    public static function access_level_names()
+    public static function accessLevelNames()
     {
         return array(
             0 => __('User'),

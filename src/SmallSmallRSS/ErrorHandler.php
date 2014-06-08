@@ -1,8 +1,9 @@
 <?php
 namespace SmallSmallRSS;
+
 class ErrorHandler
 {
-    public static function handle_error($errno, $errstr, $file, $line, $context)
+    public static function handleError($errno, $errstr, $file, $line, $context)
     {
         if (error_reporting() == 0 || !$errno) {
             return false;
@@ -11,7 +12,7 @@ class ErrorHandler
         return \SmallSmallRSS\Logger::logError($errno, $errstr, $file, $line, $context);
     }
 
-    public static function shutdown_function()
+    public static function shutdownFunction()
     {
         $error = error_get_last();
         if ($error !== null) {
@@ -35,8 +36,8 @@ class ErrorHandler
         static $singleton = false;
         if (!$singleton) {
             $singleton = true;
-            register_shutdown_function('\SmallSmallRSS\ErrorHandler::shutdown_function');
-            set_error_handler('\SmallSmallRSS\ErrorHandler::handle_error');
+            register_shutdown_function('\SmallSmallRSS\ErrorHandler::shutdownFunction');
+            set_error_handler('\SmallSmallRSS\ErrorHandler::handleError');
         }
     }
 }

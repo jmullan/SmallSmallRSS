@@ -1,5 +1,6 @@
 <?php
 namespace SmallSmallRSS\Handlers;
+
 class Dlg extends ProtectedHandler
 {
     private $param;
@@ -22,7 +23,7 @@ class Dlg extends ProtectedHandler
         \SmallSmallRSS\Database::query('BEGIN');
         echo "<ul class='nomarks'>";
         $opml = new Opml($_REQUEST);
-        $opml->opml_import($_SESSION['uid']);
+        $opml->renderImport($_SESSION['uid']);
         \SmallSmallRSS\Database::query('COMMIT');
         echo '</ul>';
         echo '</div>';
@@ -36,7 +37,7 @@ class Dlg extends ProtectedHandler
 
     public function pubOPMLUrl()
     {
-        $url_path = Opml::opml_publish_url();
+        $url_path = Opml::publishUrl($_SESSION['uid']);
         echo __('Your Public OPML URL is:');
         echo '<div class="tagCloudContainer">';
         echo "<a id='pub_opml_url' href='$url_path' target='_blank'>$url_path</a>";

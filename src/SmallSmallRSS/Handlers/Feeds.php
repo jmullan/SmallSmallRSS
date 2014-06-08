@@ -674,7 +674,7 @@ class Feeds extends ProtectedHandler
                             echo '" class="tinyFeedIcon" src="images/pub_unset.svg">';
                             echo '</a>';
                             echo '</div>';
-                       }
+                        }
                     }
 
                     echo "<div id=\"CWRAP-$id\">";

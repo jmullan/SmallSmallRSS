@@ -200,7 +200,7 @@ class Pref_Prefs extends ProtectedHandler
     public function index()
     {
         $form_element_renderer = new \SmallSmallRSS\Renderers\FormElements();
-        $access_level_names = \SmallSmallRSS\Constants::access_level_names();
+        $access_level_names = \SmallSmallRSS\Constants::accessLevelNames();
         $prefs_blacklist = array('STRIP_UNSAFE_TAGS', 'REVERSE_HEADLINES',
                                  'SORT_HEADLINES_BY_FEED_DATE', 'DEFAULT_ARTICLE_LIMIT');
 
@@ -265,7 +265,7 @@ class Pref_Prefs extends ProtectedHandler
         echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox"';
         echo " name=\"email\" required=\"1\" value=\"$email\"></td></tr>";
 
-        if (!\SmallSmallRSS\Auth::is_single_user_mode() && empty($_SESSION['hide_hello'])) {
+        if (!\SmallSmallRSS\Auth::isSingleUserMode() && empty($_SESSION['hide_hello'])) {
             $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, 'access_level');
             echo '<tr><td width="40%">'.__('Access level').'</td>';
             echo '<td>' . $access_level_names[$access_level] . '</td></tr>';
@@ -513,10 +513,7 @@ class Pref_Prefs extends ProtectedHandler
             if (!$short_desc) {
                 continue;
             }
-            if (!empty($_SESSION['profile']) && in_array(
-                    $line['pref_name'],
-                    $profile_blacklist
-                )) {
+            if (!empty($_SESSION['profile']) && in_array($line['pref_name'], $profile_blacklist)) {
                 continue;
             }
             if ($active_section != $line['section_id']) {
@@ -574,7 +571,7 @@ class Pref_Prefs extends ProtectedHandler
                 $form_element_renderer->renderSelect(
                     $pref_name,
                     $value,
-                    \SmallSmallRSS\Constants::update_intervals_nodefault(),
+                    \SmallSmallRSS\Constants::updateIntervalsWithNoDefault(),
                     'data-dojo-type="dijit.form.Select"'
                 );
             } elseif ($type_name == 'bool') {

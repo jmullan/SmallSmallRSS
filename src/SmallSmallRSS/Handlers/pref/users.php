@@ -98,7 +98,7 @@ class Pref_Users extends ProtectedHandler
 
     public function edit()
     {
-        $access_level_names = \SmallSmallRSS\Constants::access_level_names();
+        $access_level_names = \SmallSmallRSS\Constants::accessLevelNames();
 
         $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
         echo "<form id=\"user_edit_form\" onsubmit='return false' data-dojo-type=\"dijit.form.Form\">";
@@ -306,7 +306,7 @@ class Pref_Users extends ProtectedHandler
     }
     public function index()
     {
-        $access_level_names = \SmallSmallRSS\Constants::access_level_names();
+        $access_level_names = \SmallSmallRSS\Constants::accessLevelNames();
         echo '<div id="pref-user-wrap" data-dojo-type="dijit.layout.BorderContainer" gutters="false">';
         echo '<div id="pref-user-header" data-dojo-type="dijit.layout.ContentPane" region="top">';
         echo '<div id="pref-user-toolbar" data-dojo-type="dijit.Toolbar">';

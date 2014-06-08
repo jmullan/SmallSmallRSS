@@ -29,7 +29,7 @@ class Sessions
         ini_set('session.use_only_cookies', true);
         ini_set('session.gc_maxlifetime', self::$session_expire);
         ini_set('session.cookie_lifetime', self::$session_expire);
-        if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
+        if (!\SmallSmallRSS\Auth::isSingleUserMode()) {
             session_set_save_handler(
                 '\SmallSmallRSS\Sessions::open',
                 '\SmallSmallRSS\Sessions::close',
@@ -45,7 +45,7 @@ class Sessions
 
     public static function validate()
     {
-        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+        if (\SmallSmallRSS\Auth::isSingleUserMode()) {
             return true;
         }
 

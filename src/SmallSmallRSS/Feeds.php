@@ -131,7 +131,7 @@ class Feeds
      * @access public
      * @return void
      */
-    public static function purge($feed_id, $purge_interval=0)
+    public static function purge($feed_id, $purge_interval = 0)
     {
         if (!$purge_interval) {
             $purge_interval = self::purgeInterval($feed_id);
@@ -454,7 +454,7 @@ class Feeds
         } else {
             $cat_qpart = "'$cat_id'";
         }
-        if (\SmallSmallRSS\Crypt::is_enabled()) {
+        if (\SmallSmallRSS\Crypt::isEnabled()) {
             $auth_pass = substr(\SmallSmallRSS\Crypt::en($auth_pass), 0, 250);
             $auth_pass_encrypted = 'true';
         } else {
@@ -481,7 +481,8 @@ class Feeds
                  MAX(id) AS max_feed_id,
                  COUNT(*) AS num_feeds
              FROM ttrss_feeds
-             WHERE owner_uid = $owner_uid");
+             WHERE owner_uid = $owner_uid"
+        );
         while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
             $counts = $line;
         }

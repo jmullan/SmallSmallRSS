@@ -15,8 +15,7 @@ class PublicHandler extends Handler
         $view_mode = false,
         $format = 'atom',
         $order = false
-    )
-    {
+    ) {
         if (!$limit) {
             $limit = 60;
         }
@@ -392,7 +391,7 @@ class PublicHandler extends Handler
             $format = 'atom';
         }
 
-        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+        if (\SmallSmallRSS\Auth::isSingleUserMode()) {
             \SmallSmallRSS\Auth::authenticate('admin', null);
         }
 
@@ -439,7 +438,7 @@ class PublicHandler extends Handler
 
     public function sharepopup()
     {
-        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+        if (\SmallSmallRSS\Auth::isSingleUserMode()) {
             login_sequence();
         }
 
@@ -485,85 +484,137 @@ class PublicHandler extends Handler
             } else {
                 $title = htmlspecialchars($_REQUEST['title']);
                 $url = htmlspecialchars($_REQUEST['url']);
-?>
-                <table height="100%" width="100%">
-                     <tr>
-                     <td colspan="2">
-                     <h1><?php echo __('Share with Tiny Tiny RSS') ?></h1>
-                     </td>
-                     </tr>
 
-                     <form id='share_form' name='share_form'>
-
-                     <input type="hidden" name="op" value="sharepopup">
-                     <input type="hidden" name="action" value="share">
-
-                     <tr><td align='right'><?php echo __('Title:') ?></td>
-                     <td width='80%'><input name='title' value="<?php echo $title ?>"></td></tr>
-                     <tr><td align='right'><?php echo __('URL:') ?></td>
-                     <td><input name='url' value="<?php echo $url ?>"></td></tr>
-                     <tr><td align='right'><?php echo __('Content:') ?></td>
-                     <td><input name='content' value=""></td></tr>
-                     <tr><td align='right'><?php echo __('Labels:') ?></td>
-                     <td><input name='labels' id="labels_value" placeholder='Alpha, Beta, Gamma' value="" /></td>
-                     </tr>
-
-                     <tr><td>
-                     <div class="autocomplete" id="labels_choices"
-                     style="display : block"></div></td></tr>
-
-                     <script type='text/javascript'>document.forms[0].title.focus();</script>
-                                                                                          <script type='text/javascript'>
-                                                                                          new Ajax.Autocompleter(
-                                                                                              'labels_value', 'labels_choices',
-                                                                                              "backend.php?op=rpc&method=completeLabels",
-                                                                                              { tokens: ',', paramName: "search" });
-                </script>
-                      <tr><td colspan='2'>
-                      <div style='float: right' class='insensitive-small'>
-<?php echo __('Shared article will appear in the Published feed.') ?>
-                      </div>
-                      <button type="submit"><?php echo __('Share') ?></button>
-                      <button onclick="return window.close()"><?php echo __('Cancel') ?></button>
-                      </div>
-
-                      </form>
-                      </td></tr></table>
-                      </body></html>
-<?php
-
-                      }
+                echo '<table height="100%" width="100%">';
+                echo '<tr>';
+                echo '<td colspan="2">';
+                echo '<h1>';
+                echo __('Share with Tiny Tiny RSS');
+                echo '</h1>';
+                echo '</td>';
+                echo '</tr>';
+                echo '<form id="share_form" name="share_form">';
+                echo '<input type="hidden" name="op" value="sharepopup" />';
+                echo '<input type="hidden" name="action" value="share">';
+                echo '<tr>';
+                echo '<th>';
+                echo __('Title:');
+                echo '</th>';
+                echo '<td width="80%">';
+                echo '<input name="title" value="';
+                echo $title;
+                echo '">';
+                echo '</td>';
+                echo '</tr>';
+                echo '<tr>';
+                echo '<th>';
+                echo __('URL:');
+                echo '</th>';
+                echo '<td>';
+                echo '<input name="url" value="';
+                echo $url;
+                echo '"/>';
+                echo '</td>';
+                echo '</tr>';
+                echo '<tr>';
+                echo '<th>';
+                echo __('Content:');
+                echo '</th>';
+                echo '<td>';
+                echo '<input name="content" value="">';
+                echo '</td>';
+                echo '</tr>';
+                echo '<tr>';
+                echo '<th>';
+                echo __('Labels:');
+                echo '</th>';
+                echo '<td>';
+                echo '<input name="labels" id="labels_value" placeholder="Alpha, Beta, Gamma" value="" />';
+                echo '</td>';
+                echo '</tr>';
+                echo '<tr>';
+                echo '<td>';
+                echo '<div class="autocomplete" id="labels_choices"';
+                echo ' style="display : block">';
+                echo '</div>';
+                echo '</td>';
+                echo '</tr>';
+                echo '<script type="text/javascript">document.forms[0].title.focus();</script>';
+                echo '<script type="text/javascript:>';
+                ?>
+                new Ajax.Autocompleter(
+                    'labels_value', 'labels_choices',
+                    "backend.php?op=rpc&method=completeLabels",
+                    {tokens: ',', paramName: "search"});
+                <?php
+                echo '</script>';
+                echo '<tr>';
+                echo '<td colspan="2">';
+                echo '<div style="float: right" class="insensitive-small">';
+                echo __('Shared article will appear in the Published feed.');
+                echo '</div>';
+                echo '<button type="submit">';
+                echo __('Share');
+                echo '</button>';
+                echo '<button onclick="return window.close()">';
+                echo __('Cancel');
+                echo '</button>';
+                echo '</div>';
+                echo '</form>';
+                echo '</td>';
+                echo '</tr>';
+                echo '</table>';
+                echo '</body>';
+                echo '</html>';
+            }
         } else {
 
-            $return = urlencode($_SERVER['REQUEST_URI'])
-?>
-
-                <form action="public.php?return=<?php echo $return ?>"
-                method="POST" id="loginForm" name="loginForm">
-
-                <input type="hidden" name="op" value="login">
-
-                <table height='100%' width='100%'><tr><td colspan='2'>
-                <h1><?php echo __('Not logged in') ?></h1></td></tr>
-
-                <tr><td align="right"><?php echo __('Login:') ?></td>
-                <td align="right"><input name="login"
-                value="<?php echo $_SESSION['fake_login'] ?>"></td></tr>
-                <tr><td align="right"><?php echo __('Password:') ?></td>
-                <td align="right"><input type="password" name="password"
-                value="<?php echo $_SESSION['fake_password'] ?>"></td></tr>
-                <tr><td colspan='2'>
-                <button type="submit">
-<?php echo __('Log in') ?></button>
-
-                <button onclick="return window.close()">
-<?php echo __('Cancel') ?></button>
-                </td></tr>
-                </table>
-
-                </form>
-<?php
-                }
+            $return = urlencode($_SERVER['REQUEST_URI']);
+            echo '<form action="public.php?return=';
+            echo $return;
+            echo '" method="POST" id="loginForm" name="loginForm">';
+            echo '<input type="hidden" name="op" value="login" />';
+            echo '<table>';
+            echo '<tr>';
+            echo '<td colspan="2">';
+            echo '<h1>';
+            echo __('Not logged in');
+            echo '</h1>';
+            echo '</td>';
+            echo '</tr>';
+            echo '<tr>';
+            echo '<th>';
+            echo __('Login:');
+            echo '</th>';
+            echo '<th>';
+            echo '<input name="login" value="';
+            echo $_SESSION['fake_login'];
+            echo '" />';
+            echo '</th>';
+            echo '</tr>';
+            echo '<tr>';
+            echo '<th>';
+            echo __('Password:');
+            echo '</th>';
+            echo '<td>';
+            echo '<input type="password" name="password" value="';
+            echo $_SESSION['fake_password'];
+            echo '">';
+            echo '</td>';
+            echo '</tr>';
+            echo '<tr>';
+            echo '<td colspan="2">';
+            echo '<button type="submit">';
+            echo __('Log in');
+            echo '</button>';
+            echo '<button onclick="return window.close()">';
+            echo __('Cancel');
+            echo '</button>';
+            echo '</td>';
+            echo '</tr>';
+            echo '</table>';
+            echo '</form>';
+        }
     }
 
     public function login()
@@ -572,11 +623,11 @@ class PublicHandler extends Handler
         $password = $_POST['password'];
         $remember_me = !empty($_POST['remember_me']);
 
-        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+        if (\SmallSmallRSS\Auth::isSingleUserMode()) {
             $login = 'admin';
         }
 
-        if (!\SmallSmallRSS\Auth::is_single_user_mode()) {
+        if (!\SmallSmallRSS\Auth::isSingleUserMode()) {
             if ($remember_me) {
                 session_set_cookie_params(\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME'));
             } else {
@@ -623,7 +674,7 @@ class PublicHandler extends Handler
 
     public function subscribe()
     {
-        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+        if (\SmallSmallRSS\Auth::isSingleUserMode()) {
             login_sequence();
         }
         $feed_urls = false;
@@ -936,7 +987,7 @@ class PublicHandler extends Handler
     {
         \SmallSmallRSS\Locale::startupGettext($_SESSION['uid']);
 
-        if (!\SmallSmallRSS\Auth::is_single_user_mode() && $_SESSION['access_level'] < 10) {
+        if (!\SmallSmallRSS\Auth::isSingleUserMode() && $_SESSION['access_level'] < 10) {
             $_SESSION['login_error_msg'] = __('Your access level is insufficient to run this script.');
             $renderer = new \SmallSmallRSS\Renderers\LoginPage();
             $renderer->render();

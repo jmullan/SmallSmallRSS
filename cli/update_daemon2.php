@@ -76,7 +76,7 @@ if (isset($options["log"])) {
     define('LOGFILE', $options["log"]);
 }
 
-if (\SmallSmallRSS\Lockfiles::is_locked("update_daemon.lock")) {
+if (\SmallSmallRSS\Lockfiles::isLocked("update_daemon.lock")) {
     print "error: Can't create lockfile. Maybe another daemon is already running.\n";
     exit(1);
 }

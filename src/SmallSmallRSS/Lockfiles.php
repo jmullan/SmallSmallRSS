@@ -15,7 +15,7 @@ class Lockfiles
         $files = glob(\SmallSmallRSS\Config::get('LOCK_DIRECTORY') . '/*.lock');
         if ($files) {
             foreach ($files as $file) {
-                if (!self::is_locked(basename($file)) && time() - filemtime($file) > 86400 * 2) {
+                if (!self::isLocked(basename($file)) && time() - filemtime($file) > 86400 * 2) {
                     unlink($file);
                     ++$num_deleted;
                 }
@@ -23,7 +23,7 @@ class Lockfiles
         }
     }
 
-    public static function get_contents($lockfile)
+    public static function getContents($lockfile)
     {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (is_file($full_path) && is_readable($full_path)) {
@@ -72,7 +72,7 @@ class Lockfiles
         return $fp;
     }
 
-    public static function is_locked($lockfile)
+    public static function isLocked($lockfile)
     {
         $full_path = \SmallSmallRSS\Config::get('LOCK_DIRECTORY') . "/$lockfile";
         if (!file_exists($full_path)) {
@@ -123,10 +123,11 @@ class Lockfiles
         fclose($fp);
         return true;
     }
+
     public static function whenStamped($stamp)
     {
         $lockfile = $stamp . '.stamp';
-        return self::get_contents($lockfile);
+        return self::getContents($lockfile);
 
     }
 }

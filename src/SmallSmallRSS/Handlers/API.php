@@ -52,7 +52,7 @@ class API extends Handler
         $login = $_REQUEST['user'];
         $password = $_REQUEST['password'];
         $password_base64 = base64_decode($password);
-        if (\SmallSmallRSS\Auth::is_single_user_mode()) {
+        if (\SmallSmallRSS\Auth::isSingleUserMode()) {
             $login = 'admin';
         }
         $uid = \SmallSmallRSS\Users::findUserByLogin($login);
@@ -386,7 +386,7 @@ class API extends Handler
             'icons_dir' => \SmallSmallRSS\Config::get('ICONS_DIR'),
             'icons_url' => \SmallSmallRSS\Config::get('ICONS_URL')
         );
-        $config['daemon_is_running'] = \SmallSmallRSS\Lockfiles::is_locked('update_daemon.lock');
+        $config['daemon_is_running'] = \SmallSmallRSS\Lockfiles::isLocked('update_daemon.lock');
         $config['num_feeds'] = (int) \SmallSmallRSS\Feeds::count($_SESSION['uid']);
         $this->wrap(self::STATUS_OK, $config);
     }

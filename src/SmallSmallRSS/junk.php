@@ -70,10 +70,15 @@ function getGlobalCounters($owner_uid)
 function getVirtCounters($owner_uid)
 {
     $ret_arr = array();
+    $auxFeedTypes = array(
+        \SmallSmallRSS\Feeds::ARCHIVED,
+        \SmallSmallRSS\Feeds::STARRED,
+        \SmallSmallRSS\Feeds::PUBLISHED
+    );
     for ($i = 0; $i >= -4; $i--) {
         $start = microtime(true);
         $count = countUnreadFeedArticles($i, false, true, $owner_uid);
-        if ($i == 0 || $i == -1 || $i == -2) {
+        if (in_array($i, $auxFeedTypes)) {
             $auxctr = countUnreadFeedArticles($i, false, false, $owner_uid);
         } else {
             $auxctr = 0;
@@ -87,7 +92,7 @@ function getVirtCounters($owner_uid)
         );
         $ret_arr[] = $cv;
     }
-    $feeds = \SmallSmallRSS\PluginHost::getInstance()->getFeeds(-1);
+    $feeds = \SmallSmallRSS\PluginHost::getInstance()->getFeeds(\SmallSmallRSS\FeedCategories::SPECIAL);
     if (is_array($feeds)) {
         foreach ($feeds as $feed) {
             $start = microtime(true);
@@ -271,10 +276,10 @@ function getCategoryUnread($cat, $owner_uid)
         return $unread;
     } elseif ($cat == \SmallSmallRSS\FeedCategories::SPECIAL) {
         return (
-            countUnreadFeedArticles(-1, false, true, $owner_uid)
-            + countUnreadFeedArticles(-2, false, true, $owner_uid)
-            + countUnreadFeedArticles(-3, false, true, $owner_uid)
-            + countUnreadFeedArticles(0, false, true, $owner_uid)
+            countUnreadFeedArticles(\SmallSmallRSS\Feeds::ARCHIVED, false, true, $owner_uid)
+            + countUnreadFeedArticles(\SmallSmallRSS\Feeds::STARRED, false, true, $owner_uid)
+            + countUnreadFeedArticles(\SmallSmallRSS\Feeds::FRESH, false, true, $owner_uid)
+            + countUnreadFeedArticles(\SmallSmallRSS\Feeds::PUBLISHED, false, true, $owner_uid)
         );
     } elseif ($cat == \SmallSmallRSS\FeedCategories::LABELS) {
         $result = \SmallSmallRSS\Database::query(

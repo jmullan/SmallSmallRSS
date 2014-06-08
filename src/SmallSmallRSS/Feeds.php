@@ -53,15 +53,22 @@ namespace SmallSmallRSS;
 
 class Feeds
 {
+    const RECENTLY_READ = -6;
+    const ALL = -4;
+    const FRESH = -3;
+    const PUBLISHED = -2;
+    const STARRED = -1;
+    const ARCHIVED = 0;
+
     public static function getSpecialFeeds()
     {
         return array(
-            -4 => __('All articles'),
-            -3 => __('Fresh articles'),
-            -2 => __('Starred articles'),
-            -1 => __('Published articles'),
-            0 => __('Archived articles'),
-            -6 => __('Recently read')
+            self::ALL => __('All articles'),
+            self::FRESH => __('Fresh articles'),
+            self::PUBLISHED => __('Published articles'),
+            self::STARRED => __('Starred articles'),
+            self::ARCHRIVED => __('Archived articles'),
+            self::RECENTLY_READ => __('Recently read')
         );
     }
 

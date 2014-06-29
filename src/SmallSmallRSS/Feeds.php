@@ -67,7 +67,7 @@ class Feeds
             self::FRESH => __('Fresh articles'),
             self::PUBLISHED => __('Published articles'),
             self::STARRED => __('Starred articles'),
-            self::ARCHRIVED => __('Archived articles'),
+            self::ARCHIVED => __('Archived articles'),
             self::RECENTLY_READ => __('Recently read')
         );
     }

@@ -309,7 +309,7 @@ class opml extends ProtectedHandler
         }
     }
 
-    private function opml_importLabel($doc, $node, $owner_uid)
+    private function importLabel($doc, $node, $owner_uid)
     {
         $attrs = $node->attributes;
         $label_name = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-name')->nodeValue);
@@ -325,7 +325,7 @@ class opml extends ProtectedHandler
         }
     }
 
-    private function opml_import_preference($doc, $node, $owner_uid)
+    private function importPreference($doc, $node, $owner_uid)
     {
         $attrs = $node->attributes;
         $pref_name = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('pref-name')->nodeValue);
@@ -489,10 +489,10 @@ class opml extends ProtectedHandler
 
                     switch ($cat_title) {
                         case 'tt-rss-prefs':
-                            $this->opml_import_preference($doc, $node, $owner_uid);
+                            $this->importPreference($doc, $node, $owner_uid);
                             break;
                         case 'tt-rss-labels':
-                            $this->opml_importLabel($doc, $node, $owner_uid);
+                            $this->importLabel($doc, $node, $owner_uid);
                             break;
                         case 'tt-rss-filters':
                             $this->importFilter($doc, $node, $owner_uid);

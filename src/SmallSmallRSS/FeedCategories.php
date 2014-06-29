@@ -184,11 +184,13 @@ class FeedCategories
         return $ids;
     }
 
-    public static function getDescendents($cat_ids, $owner_uid)
+    public static function getDescendents($cat_ids, $owner_uid, $seen=array())
     {
         # TODO: make this more efficient
+        $seen = array_merge($seen, $cat_ids);
         $descendents = self::getChildren($cat_ids, $owner_uid);
-        $descendents = array_merge($descendents, self::getDescendents($descendents, $owner_uid));
+        $grandchildren = array_diff($descendents, $seen);
+        $descendents = array_merge($descendents, self::getDescendents($grandchildren, $owner_uid, $seen));
         return array_unique($descendents);
     }
 
@@ -203,7 +205,7 @@ class FeedCategories
         return array_unique($ancestors);
     }
 
-    public static function getAndChildCounts($enable_nested, $owner_uid)
+    public static function getWithChildCounts($enable_nested, $owner_uid)
     {
         // TODO do not return empty categories, return Uncategorized and standard virtual cats
         if ($enable_nested) {

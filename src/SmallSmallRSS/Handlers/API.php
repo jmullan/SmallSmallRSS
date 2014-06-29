@@ -32,7 +32,9 @@ class API extends Handler
 
     public function wrap($status, $reply)
     {
-        print json_encode(array('seq' => $this->seq, 'status' => $status, 'content' => $reply));
+        $result = array('seq' => $this->seq, 'status' => $status, 'content' => $reply);
+        \SmallSmallRSS\Logger::log(var_export($result, true));
+        print json_encode($result);
     }
 
     public function getVersion()
@@ -57,12 +59,12 @@ class API extends Handler
         }
         $uid = \SmallSmallRSS\Users::findUserByLogin($login);
         if (!$uid) {
-            \SmallSmallRss\Logger::log("Could not find user: '$login'");
+            \SmallSmallRSS\Logger::log("Could not find user: '$login'");
             $this->wrap(self::STATUS_ERR, array('error' => 'LOGIN_ERROR'));
             return;
         }
         if (!\SmallSmallRSS\DBPrefs::read('ENABLE_API_ACCESS', $uid)) {
-            \SmallSmallRss\Logger::log("Api access disabled for: '$login'");
+            \SmallSmallRSS\Logger::log("Api access disabled for: '$login'");
             $this->wrap(self::STATUS_ERR, array('error' => 'API_DISABLED'));
             return;
         }
@@ -77,7 +79,7 @@ class API extends Handler
             $this->wrap(self::STATUS_OK, array('session_id' => session_id(),
                                                'api_level' => self::API_LEVEL));
         } else {
-            \SmallSmallRss\Logger::log("Could not log in: '$login'");
+            \SmallSmallRSS\Logger::log("Could not log in: '$login'");
             $this->wrap(self::STATUS_ERR, array('error' => 'LOGIN_ERROR'));
         }
     }
@@ -135,7 +137,7 @@ class API extends Handler
         $include_empty = $this->getBooleanFromRequest('include_empty');
 
         $cats = array();
-        $raw_cats = \SmallSmallRSS\FeedCategories::getAndChildren($enable_nested, $_SESSION['uid']);
+        $raw_cats = \SmallSmallRSS\FeedCategories::getWithChildCounts($enable_nested, $_SESSION['uid']);
         foreach ($raw_cats as $line) {
             if ($include_empty || $line['num_feeds'] > 0 || $line['num_cats'] > 0) {
                 $unread = countUnreadFeedArticles($line['id'], true, true, $_SESSION['uid']);
@@ -735,6 +737,8 @@ class API extends Handler
 
     public function subscribeToFeed()
     {
+        \SmallSmallRSS\Logger::log(var_export($_REQUEST, true));
+
         $feed_url = $this->getSQLEscapedStringFromRequest('feed_url');
         $category_id = (int) $this->getSQLEscapedStringFromRequest('category_id');
         $login = $this->getSQLEscapedStringFromRequest('login');

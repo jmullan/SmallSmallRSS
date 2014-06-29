@@ -1584,6 +1584,24 @@ function get_feeds_from_html($url, $content)
             $feedUrls[$feedUrl] = $title;
         }
     }
+    if (count($feedUrls) > 1) {
+        $finalUrls = array();
+        foreach ($feedUrls as $url => $title) {
+            if (preg_match('@^https?://@i', $url) && !preg_match('/comments/i', $url)) {
+                $finalUrls[$url] = $title;
+            }
+        }
+        if ($finalUrls) {
+            $feedUrls = $finalUrls;
+        }
+    }
+    if (count($feedUrls) > 1) {
+        $finalUrls = array();
+        foreach ($feedUrls as $url => $title) {
+            $finalUrls[$url] = $title;
+            break;
+        }
+    }
     return $feedUrls;
 }
 

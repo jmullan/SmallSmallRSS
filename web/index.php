@@ -13,7 +13,7 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
     print "<b>Fatal Error</b>: PHP version 5.3.0 or newer required.\n";
     exit;
 }
-require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
+require_once __DIR__ . '/../src/bootstrap.php';
 \SmallSmallRSS\Sessions::init();
 $mobile = new \Mobile_Detect();
 if (!\SmallSmallRSS\PluginHost::initAll()) {

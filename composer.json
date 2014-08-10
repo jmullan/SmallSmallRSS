@@ -74,10 +74,10 @@
     },
     "autoload": {
         "psr-4": {
+            "SmallSmallRSS\\": "src/",
             "SmallSmallRSS\\Plugins\\": "plugins/"
         },
         "psr-0": {
-            "SmallSmallRSS\\": "src/",
             "Base32": "vendor/lelag/otphp/vendor/"
         }
     }

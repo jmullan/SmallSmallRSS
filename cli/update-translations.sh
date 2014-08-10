@@ -14,7 +14,7 @@ update_lang() {
     fi
 }
 
-LANGS=`find src/SmallSmallRSS/locale -name 'messages.po'`
+LANGS=`find src/locale -name 'messages.po'`
 
 for lang in $LANGS; do
     echo Updating $lang...

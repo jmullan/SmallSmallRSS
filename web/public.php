@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../src/SmallSmallRSS/bootstrap.php';
+require_once __DIR__ . '/../src/bootstrap.php';
 \SmallSmallRSS\Sessions::init();
 $user_id = null;
 if (isset($_SESSION['uid'])) {

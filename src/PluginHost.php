@@ -91,7 +91,7 @@ class PluginHost
 
     public static function classRoot()
     {
-        $class_dir = __DIR__ . "/../../plugins/";
+        $class_dir = __DIR__ . "/../plugins/";
         if (!is_dir($class_dir)) {
             Logger::log("Missing class dir $class_dir");
             return false;

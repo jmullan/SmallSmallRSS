@@ -2,7 +2,7 @@
 /**
  * Set up an application to use SmallSmallRSS
  */
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 error_reporting(-1);
 \SmallSmallRSS\Sanity::initialCheck();
 \SmallSmallRSS\ErrorHandler::register();

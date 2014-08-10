@@ -17,7 +17,7 @@ class Config
 
     private static function read_from_ini()
     {
-        $ini_file = __DIR__ . '/../../config.ini';
+        $ini_file = __DIR__ . '/../config.ini';
         if (!file_exists($ini_file)) {
             return;
         }

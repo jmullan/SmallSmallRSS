@@ -184,7 +184,7 @@ class FeedCategories
         return $ids;
     }
 
-    public static function getDescendents($cat_ids, $owner_uid, $seen=array())
+    public static function getDescendents($cat_ids, $owner_uid, $seen = array())
     {
         # TODO: make this more efficient
         $seen = array_merge($seen, $cat_ids);

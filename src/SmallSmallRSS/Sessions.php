@@ -64,11 +64,11 @@ class Sessions
                 $check_ip = '';
                 break;
             case 1:
-                $check_ip = substr($check_ip, 0, strrpos($check_ip, '.')+1);
+                $check_ip = substr($check_ip, 0, strrpos($check_ip, '.') + 1);
                 break;
             case 2:
                 $check_ip = substr($check_ip, 0, strrpos($check_ip, '.'));
-                $check_ip = substr($check_ip, 0, strrpos($check_ip, '.')+1);
+                $check_ip = substr($check_ip, 0, strrpos($check_ip, '.') + 1);
                 break;
         };
 

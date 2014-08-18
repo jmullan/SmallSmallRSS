@@ -12,10 +12,10 @@ class PDOWrapper implements DatabaseInterface
             $connstr .= ';charset=utf8';
         }
         try {
-            $this->pdo = new PDO($connstr, $user, $pass);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo = new \PDO($connstr, $user, $pass);
+            $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->init();
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             die($e->getMessage());
         }
         return $this->pdo;
@@ -34,7 +34,7 @@ class PDOWrapper implements DatabaseInterface
     {
         try {
             return new \SmallSmallRSS\Database\PDOStatement($this->pdo->query($query));
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             user_error($e->getMessage(), $die_on_error ? E_USER_ERROR : E_USER_WARNING);
         }
     }
@@ -47,7 +47,7 @@ class PDOWrapper implements DatabaseInterface
             } else {
                 return null;
             }
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             user_error($e->getMessage(), E_USER_WARNING);
         }
     }
@@ -60,7 +60,7 @@ class PDOWrapper implements DatabaseInterface
             } else {
                 return false;
             }
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             user_error($e->getMessage(), E_USER_WARNING);
         }
     }
@@ -83,14 +83,19 @@ class PDOWrapper implements DatabaseInterface
             } else {
                 return null;
             }
-        } catch (PDOException $e) {
+        } catch (\PDOException $e) {
             user_error($e->getMessage(), E_USER_WARNING);
         }
     }
 
     public function last_error()
     {
-        return join(' ', $this->pdo->errorInfo());
+        $errorInfo = $this->pdo->errorInfo();
+        if ($errorInfo[0] && $errorInfo[0] !== '00000') {
+            return join(' ', $errorInfo);
+        } else {
+            return null;
+        }
     }
 
     public function init()

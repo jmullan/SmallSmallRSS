@@ -31,6 +31,10 @@
             "url": "https://github.com/jmullan/MiniTemplatorForPhp"
         },
         {
+            "type": "vcs",
+            "url": "https://github.com/jmullan/jmullan-sessions"
+        },
+        {
             "type": "package",
             "package": {
                 "name": "php-gettext/php-gettext",
@@ -60,6 +64,7 @@
         "jmullan/pubsubhubbub": "*@dev",
         "jmullan/otphp": "*@dev",
         "jmullan/minitemplator": "*@dev",
+        "jmullan/sessions": "*@dev",
         "mobiledetect/mobiledetectlib": "*",
         "gigablah/sphinxphp": "2.0.*",
         "marc-mabe/php-enum": "*"

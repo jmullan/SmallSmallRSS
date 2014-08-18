@@ -5,7 +5,7 @@ class Constants
 {
     const VERSION = '1.8';
     const EXPECTED_CONFIG_VERSION = 26;
-    const SCHEMA_VERSION = 121;
+    const SCHEMA_VERSION = 122;
     const LABEL_BASE_INDEX = -1024;
     const PLUGIN_FEED_BASE_INDEX = -128;
 

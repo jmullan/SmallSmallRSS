@@ -29,17 +29,12 @@ class Sessions
         ini_set('session.use_only_cookies', true);
         ini_set('session.gc_maxlifetime', self::$session_expire);
         ini_set('session.cookie_lifetime', self::$session_expire);
-        if (!\SmallSmallRSS\Auth::isSingleUserMode()) {
-            session_set_save_handler(
-                '\SmallSmallRSS\Sessions::open',
-                '\SmallSmallRSS\Sessions::close',
-                '\SmallSmallRSS\Sessions::read',
-                '\SmallSmallRSS\Sessions::write',
-                '\SmallSmallRSS\Sessions::destroy',
-                '\SmallSmallRSS\Sessions::gc'
-            );
-            register_shutdown_function('session_write_close');
-        }
+        $session_dsn = 'mysql:dbname=jmullan_sessions;host=127.0.0.1';
+        $handler = new \Jmullan\Sessions\Handler();
+        $link = \SmallSmallRSS\Database::getLink();
+        $handler->setDbConnection($link);
+        $handler->setDBTable('sessions');
+        session_set_save_handler($handler, true);
         session_start();
     }
 
@@ -95,70 +90,6 @@ class Sessions
             }
         }
         return true;
-    }
-
-    public static function open($s, $n)
-    {
-        return true;
-    }
-
-    public static function read($id)
-    {
-        $res = \SmallSmallRSS\Database::query(
-            "SELECT data
-             FROM ttrss_sessions
-             WHERE id='$id'"
-        );
-        if (\SmallSmallRSS\Database::num_rows($res) != 1) {
-            $expire = time() + \SmallSmallRSS\Sessions::$session_expire;
-            \SmallSmallRSS\Database::query(
-                "INSERT INTO ttrss_sessions
-                 (id, data, expire)
-                 VALUES ('$id', '', $expire)"
-            );
-            return '';
-        } else {
-            return base64_decode(\SmallSmallRSS\Database::fetch_result($res, 0, 'data'));
-        }
-
-    }
-
-    public static function write($id, $data)
-    {
-        $data = base64_encode($data);
-        $expire = time() + \SmallSmallRSS\Sessions::$session_expire;
-        \SmallSmallRSS\Database::query(
-            "UPDATE ttrss_sessions
-             SET
-                data='$data',
-                expire=$expire
-             WHERE id='$id'"
-        );
-        return true;
-    }
-
-    public static function close()
-    {
-        return true;
-    }
-
-    public static function destroy($id)
-    {
-        \SmallSmallRSS\Database::query(
-            "DELETE FROM ttrss_sessions
-             WHERE id = '$id'"
-        );
-
-        return true;
-    }
-
-    public static function gc($expire)
-    {
-        $expire = time();
-        \SmallSmallRSS\Database::query(
-            'DELETE FROM ttrss_sessions
-             WHERE expire < ' . $expire
-        );
     }
 
     public static function validateCSRF($csrf_token)

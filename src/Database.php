@@ -46,6 +46,11 @@ class Database
         return self::$adapter;
     }
 
+    public static function getLink() {
+        self::adapter();
+        return self::$link;
+    }
+
     public static function escape_string($s, $strip_tags = true)
     {
         return self::adapter()->escape_string($s, $strip_tags);

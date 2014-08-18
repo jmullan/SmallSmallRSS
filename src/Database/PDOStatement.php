@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Database;
 
-class PDOStatement implements DatabaseInterface
+class PDOStatement
 {
     private $stmt;
     private $cache;

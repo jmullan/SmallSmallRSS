@@ -67,7 +67,8 @@
         "jmullan/sessions": "*@dev",
         "mobiledetect/mobiledetectlib": "*",
         "gigablah/sphinxphp": "2.0.*",
-        "marc-mabe/php-enum": "*"
+        "marc-mabe/php-enum": "*",
+        "mustache/mustache": "~2.5"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.*",

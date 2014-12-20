@@ -136,7 +136,6 @@ class Fetcher
             curl_close($ch);
             return $contents;
         } else {
-
             $this->fetch_curl_used = false;
 
             if ($login && $pass) {

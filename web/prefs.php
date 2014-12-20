@@ -50,16 +50,16 @@ foreach (array('lib/prototype.js',
                'lib/dojo/tt-rss-layer.js',
                'errors.php?mode=js') as $jsfile) {
     $js_renderer = new \SmallSmallRSS\Renderers\JS();
-    $js_renderer->render_script_tag($jsfile);
+    $js_renderer->renderScriptTag($jsfile);
 }
 ?>
 <script type="text/javascript">
     require({cache:{}});
 <?php
 foreach (\SmallSmallRSS\PluginHost::getInstance()->getPlugins() as $n => $p) {
-    $js_renderer->render_minified($p->getPreferencesJavascript());
+    $js_renderer->renderMinified($p->getPreferencesJavascript());
 }
-$js_renderer->render_minified_js_files(
+$js_renderer->renderMinifiedJsFiles(
     array('../lib/CheckBoxTree', 'functions', 'deprecated', 'prefs', 'PrefFeedTree', 'PrefFilterTree', 'PrefLabelTree')
 );
 $translation_renderer->render();

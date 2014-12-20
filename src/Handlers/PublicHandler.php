@@ -452,8 +452,8 @@ class PublicHandler extends Handler
         $renderer = new \SmallSmallRSS\Renderers\CSS();
         $renderer->renderStylesheetTag('css/utility.css');
         $js_renderer = new \SmallSmallRSS\Renderers\JS();
-        $js_renderer->render_script_tag('lib/prototype.js');
-        $js_renderer->render_script_tag('lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls');
+        $js_renderer->renderScriptTag('lib/prototype.js');
+        $js_renderer->renderScriptTag('lib/scriptaculous/scriptaculous.js?load=effects,dragdrop,controls');
         echo "\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>";
         echo "\n</head>";
         echo "\n<body id=\"sharepopup\">";
@@ -897,7 +897,7 @@ class PublicHandler extends Handler
         $renderer = new \SmallSmallRSS\Renderers\CSS();
         $renderer->renderStylesheetTag('css/utility.css');
         $js_renderer = new \SmallSmallRSS\Renderers\JS();
-        $js_renderer->render_script_tag('lib/prototype.js');
+        $js_renderer->renderScriptTag('lib/prototype.js');
 
         echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>
             </head><body id='forgotpass'>";

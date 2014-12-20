@@ -12,10 +12,10 @@ class Config
             return;
         }
         self::$initialized = true;
-        self::read_from_ini();
+        self::readFromIni();
     }
 
-    private static function read_from_ini()
+    private static function readFromIni()
     {
         $ini_file = __DIR__ . '/../config.ini';
         if (!file_exists($ini_file)) {

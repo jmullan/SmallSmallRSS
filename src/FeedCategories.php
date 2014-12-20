@@ -78,7 +78,6 @@ class FeedCategories
         );
 
         if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-
             $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_feed_categories (owner_uid,title,parent_cat)
                 VALUES ('$owner_uid', '$feed_cat', $parent_insert)"

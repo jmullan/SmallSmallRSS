@@ -5,15 +5,15 @@ class JS extends \SmallSmallRSS\Renderers\Base
 {
     public static $minify = false;
 
-    public function render_minified_js_files($basenames)
+    public function renderMinifiedJsFiles($basenames)
     {
         $rv = '';
         foreach ($basenames as $basename) {
-            $this->render_minified_js_file($basename);
+            $this->renderMinifiedJsFile($basename);
         }
     }
 
-    public function render_minified_js_file($js)
+    public function renderMinifiedJsFile($js)
     {
         if (self::$minify) {
             $cached_file = \SmallSmallRSS\Config::get('CACHE_DIR') . '/js/' . basename($js) . '.js';
@@ -31,7 +31,7 @@ class JS extends \SmallSmallRSS\Renderers\Base
             echo file_get_contents("js/$js.js");
         }
     }
-    public function render_script_tag($filename)
+    public function renderScriptTag($filename)
     {
         $parts = parse_url($filename);
         $query = '';
@@ -49,7 +49,7 @@ class JS extends \SmallSmallRSS\Renderers\Base
         echo "\n";
     }
 
-    public function render_minified($js)
+    public function renderMinified($js)
     {
         if (self::$minify) {
             echo \JShrink\Minifier::minify($js);

@@ -82,7 +82,7 @@ foreach (\SmallSmallRSS\PluginHost::getInstance()->getPlugins() as $p) {
 <?php
 foreach ($js_files as $jsfile) {
     echo "<!-- $jsfile -->";
-    $js_renderer->render_script_tag($jsfile);
+    $js_renderer->renderScriptTag($jsfile);
 }
 ?>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -216,11 +216,11 @@ if (empty($_SESSION['hide_logout'])) {
 <script type="text/javascript">
 require({cache:{}});
 <?php
-$js_renderer->render_minified_js_files(
+$js_renderer->renderMinifiedJsFiles(
     array('tt-rss', 'functions', 'feedlist', 'viewfeed', 'FeedTree', 'PluginHost')
 );
 foreach (\SmallSmallRSS\PluginHost::getInstance()->getPlugins() as $n => $p) {
-    $js_renderer->render_minified($p->getJavascript());
+    $js_renderer->renderMinified($p->getJavascript());
 }
 $translation_renderer = new \SmallSmallRSS\Renderers\JSTranslations();
 $translation_renderer->render();

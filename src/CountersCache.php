@@ -62,7 +62,6 @@ class CountersCache
     {
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS', $owner_uid)) {
-
             $result = \SmallSmallRSS\Database::query(
                 "SELECT feed_id FROM ttrss_cat_counters_cache
                  WHERE feed_id > 0 AND owner_uid = '$owner_uid'"

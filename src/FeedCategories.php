@@ -190,7 +190,10 @@ class FeedCategories
         $seen = array_merge($seen, $cat_ids);
         $descendents = self::getChildren($cat_ids, $owner_uid);
         $grandchildren = array_diff($descendents, $seen);
-        $descendents = array_merge($descendents, self::getDescendents($grandchildren, $owner_uid, $seen));
+        $seen = array_merge($seen, $grandchildren);
+        if ($grandchildren) {
+            $descendents = array_merge($descendents, self::getDescendents($grandchildren, $owner_uid, $seen));
+        }
         return array_unique($descendents);
     }
 

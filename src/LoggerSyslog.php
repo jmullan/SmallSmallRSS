@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 
-class Logger_Syslog implements \SmallSmallRSS\Logger_Interface
+class LoggerSyslog implements \SmallSmallRSS\LoggerInterface
 {
     public static function logError($errno, $errstr, $file, $line, $context)
     {

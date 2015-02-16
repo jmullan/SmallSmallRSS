@@ -132,8 +132,8 @@ class UserEntries
                      ) as tmp
                  )"
                 );
-
-            } elseif ($feed_id < 0 && $feed_id > \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // special, like starred
+            } elseif ($feed_id < 0 && $feed_id > \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
+                // special, like starred
                 if ($feed_id == -1) {
                     \SmallSmallRSS\Database::query(
                         "UPDATE ttrss_user_entries

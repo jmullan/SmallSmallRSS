@@ -214,7 +214,7 @@ class PrefUsers extends ProtectedHandler
     {
 
         $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['login']));
-        $tmp_user_pwd = \SmallSmallRSS\Users::make_password(8);
+        $tmp_user_pwd = \SmallSmallRSS\Users::makePassword(8);
         $salt = \SmallSmallRSS\Auth::getSalt();
         $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($tmp_user_pwd, $salt, true);
         $result = \SmallSmallRSS\Database::query(
@@ -261,7 +261,7 @@ class PrefUsers extends ProtectedHandler
         $email = \SmallSmallRSS\Database::fetch_result($result, 0, 'email');
         $salt = \SmallSmallRSS\Database::fetch_result($result, 0, 'salt');
         $new_salt = \SmallSmallRSS\Auth::getSalt();
-        $tmp_user_pwd = \SmallSmallRSS\Users::make_password(8);
+        $tmp_user_pwd = \SmallSmallRSS\Users::makePassword(8);
         $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($tmp_user_pwd, $new_salt, true);
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users
@@ -406,7 +406,8 @@ class PrefUsers extends ProtectedHandler
                 echo "<tr id=\"UMRR-$uid\">";
                 $line['login'] = htmlspecialchars($line['login']);
                 $line['created'] = \SmallSmallRSS\Utils::makeLocalDatetime($line['created'], false, $_SESSION['uid']);
-                $line['last_login'] = \SmallSmallRSS\Utils::makeLocalDatetime($line['last_login'], false, $_SESSION['uid']);
+                $line['last_login'] = \SmallSmallRSS\Utils::makeLocalDatetime(
+                    $line['last_login'], false, $_SESSION['uid']);
                 echo "<td align='center'><input onclick='toggleSelectRow2(this);'";
                 echo " data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\"";
                 echo " id=\"UMCHK-$uid\"></td>";

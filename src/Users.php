@@ -71,7 +71,7 @@ class Users
         }
         return $password;
     }
-
+    
     public static function create($login, $email = '', $password = false)
     {
         $login = \SmallSmallRSS\Database::escape_string(mb_strtolower(trim($login)));
@@ -140,23 +140,4 @@ class Users
              WHERE id = '$owner_uid'"
         );
     }
-
-    function make_password($length = 8)
-    {
-        $password = "";
-        $possible = "0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ*%+^";
-        $i = 0;
-
-        while ($i < $length) {
-            $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
-
-            if (!strstr($password, $char)) {
-                $password .= $char;
-                $i++;
-            }
-        }
-        return $password;
-    }
-
-
 }

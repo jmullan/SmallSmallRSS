@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 
-class Logger_SQL extends Logger_Abstract implements Logger_Interface
+class LoggerSQL extends LoggerAbstract implements LoggerInterface
 {
     public static function logError($errno, $errstr, $file, $line, $context)
     {

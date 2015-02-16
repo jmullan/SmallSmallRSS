@@ -364,9 +364,7 @@ class Colors
 
         // to enable .ico support place floIcon.php into lib/
         if (strtolower($size['mime']) == 'image/vnd.microsoft.icon') {
-
             if (class_exists('floIcon')) {
-
                 $ico = new floIcon();
                 @$ico->readICO($imageFile);
 

@@ -1,11 +1,11 @@
 <?php
 namespace SmallSmallRSS;
 
-class FeedItem_Atom extends FeedItem_Abstract
+class FeedItemRSS extends FeedItemAbstract
 {
     public function getId()
     {
-        $id = $this->elem->getElementsByTagName('id')->item(0);
+        $id = $this->elem->getElementsByTagName('guid')->item(0);
         if ($id) {
             return $id->nodeValue;
         } else {
@@ -15,13 +15,9 @@ class FeedItem_Atom extends FeedItem_Abstract
 
     public function getDate()
     {
-        $updated = $this->elem->getElementsByTagName('updated')->item(0);
-        if ($updated) {
-            return strtotime($updated->nodeValue);
-        }
-        $published = $this->elem->getElementsByTagName('published')->item(0);
-        if ($published) {
-            return strtotime($published->nodeValue);
+        $pubDate = $this->elem->getElementsByTagName('pubDate')->item(0);
+        if ($pubDate) {
+            return strtotime($pubDate->nodeValue);
         }
         $date = $this->xpath->query('dc:date', $this->elem)->item(0);
         if ($date) {
@@ -31,15 +27,22 @@ class FeedItem_Atom extends FeedItem_Abstract
 
     public function getLink()
     {
-        $links = $this->elem->getElementsByTagName('link');
+        $links = $this->xpath->query('atom:link', $this->elem);
         foreach ($links as $link) {
-            if ($link
-                && $link->hasAttribute('href')
+            if ($link && $link->hasAttribute('href')
                 && (!$link->hasAttribute('rel')
                     || $link->getAttribute('rel') == 'alternate'
                     || $link->getAttribute('rel') == 'standout')) {
                 return $link->getAttribute('href');
             }
+        }
+        $link = $this->elem->getElementsByTagName('guid')->item(0);
+        if ($link && $link->hasAttributes() && $link->getAttribute('isPermaLink') == 'true') {
+            return $link->nodeValue;
+        }
+        $link = $this->elem->getElementsByTagName('link')->item(0);
+        if ($link) {
+            return $link->nodeValue;
         }
     }
 
@@ -53,29 +56,22 @@ class FeedItem_Atom extends FeedItem_Abstract
 
     public function getContent()
     {
-        $content = $this->elem->getElementsByTagName('content')->item(0);
+        $content = $this->xpath->query('content:encoded', $this->elem)->item(0);
         if ($content) {
-            if ($content->hasAttribute('type')) {
-                if ($content->getAttribute('type') == 'xhtml') {
-                    return $this->doc->saveXML($content->firstChild->nextSibling);
-                }
-            }
+            return $content->nodeValue;
+        }
+        $content = $this->elem->getElementsByTagName('description')->item(0);
+        if ($content) {
             return $content->nodeValue;
         }
     }
 
     public function getDescription()
     {
-        $content = $this->elem->getElementsByTagName('summary')->item(0);
-        if ($content) {
-            if ($content->hasAttribute('type')) {
-                if ($content->getAttribute('type') == 'xhtml') {
-                    return $this->doc->saveXML($content->firstChild->nextSibling);
-                }
-            }
-            return $content->nodeValue;
+        $summary = $this->elem->getElementsByTagName('description')->item(0);
+        if ($summary) {
+            return $summary->nodeValue;
         }
-
     }
 
     public function getCategories()
@@ -83,9 +79,7 @@ class FeedItem_Atom extends FeedItem_Abstract
         $categories = $this->elem->getElementsByTagName('category');
         $cats = array();
         foreach ($categories as $cat) {
-            if ($cat->hasAttribute('term')) {
-                array_push($cats, $cat->getAttribute('term'));
-            }
+            array_push($cats, $cat->nodeValue);
         }
         $categories = $this->xpath->query('dc:subject', $this->elem);
         foreach ($categories as $cat) {
@@ -96,18 +90,14 @@ class FeedItem_Atom extends FeedItem_Abstract
 
     public function getEnclosures()
     {
-        $links = $this->elem->getElementsByTagName('link');
+        $enclosures = $this->elem->getElementsByTagName('enclosure');
         $encs = array();
-        foreach ($links as $link) {
-            if ($link && $link->hasAttribute('href') && $link->hasAttribute('rel')) {
-                if ($link->getAttribute('rel') == 'enclosure') {
-                    $enc = new \SmallSmallRSS\FeedEnclosure();
-                    $enc->type = $link->getAttribute('type');
-                    $enc->link = $link->getAttribute('href');
-                    $enc->length = $link->getAttribute('length');
-                    array_push($encs, $enc);
-                }
-            }
+        foreach ($enclosures as $enclosure) {
+            $enc = new \SmallSmallRSS\FeedEnclosure();
+            $enc->type = $enclosure->getAttribute('type');
+            $enc->link = $enclosure->getAttribute('url');
+            $enc->length = $enclosure->getAttribute('length');
+            $encs[] = $enc;
         }
         $enclosures = $this->xpath->query('media:content', $this->elem);
         foreach ($enclosures as $enclosure) {
@@ -117,9 +107,7 @@ class FeedItem_Atom extends FeedItem_Abstract
             $enc->length = $enclosure->getAttribute('length');
             $encs[] = $enc;
         }
-
         $enclosures = $this->xpath->query("media:group", $this->elem);
-
         foreach ($enclosures as $enclosure) {
             $enc = new FeedEnclosure();
             $content = $this->xpath->query("media:content", $enclosure)->item(0);

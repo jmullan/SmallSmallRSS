@@ -74,7 +74,7 @@ class NSFW extends \SmallSmallRSS\Plugin
                    });
                  }
                </script>";
-        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
+        print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"op\" value=\"PluginHandler\">";
         print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"save\">";
         print "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"nsfw\">";
         print "<table width=\"100%\" class=\"prefPrefsList\">";

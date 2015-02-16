@@ -945,20 +945,24 @@ function queryFeedHeadlines(
         } else {
             $query_strategy_part = "feed_id = '$feed'";
         }
-    } elseif ($feed == 0 && !$cat_view) { // archive virtual feed
+    } elseif ($feed == 0 && !$cat_view) {
+        // archive virtual feed
         $query_strategy_part = 'feed_id IS NULL';
         $allow_archived = true;
-    } elseif ($feed == 0 && $cat_view) { // uncategorized
+    } elseif ($feed == 0 && $cat_view) {
+        // uncategorized
         $query_strategy_part = 'cat_id IS NULL AND feed_id IS NOT NULL';
         $vfeed_query_part = 'ttrss_feeds.title AS feed_title,';
-    } elseif ($feed == -1) { // starred virtual feed
+    } elseif ($feed == -1) {
+        // starred virtual feed
         $query_strategy_part = 'marked = true';
         $vfeed_query_part = 'ttrss_feeds.title AS feed_title,';
         $allow_archived = true;
         if (!$override_order) {
             $override_order = 'last_marked DESC, date_entered DESC, updated DESC';
         }
-    } elseif ($feed == -2) { // published virtual feed OR labels category
+    } elseif ($feed == -2) {
+        // published virtual feed OR labels category
         if (!$cat_view) {
             $query_strategy_part = 'published = true';
             $vfeed_query_part = 'ttrss_feeds.title AS feed_title,';
@@ -972,14 +976,16 @@ function queryFeedHeadlines(
             $query_strategy_part = 'ttrss_labels2.id = ttrss_user_labels2.label_id
                                     AND ttrss_user_labels2.article_id = ref_id';
         }
-    } elseif ($feed == -6) { // recently read
+    } elseif ($feed == -6) {
+        // recently read
         $query_strategy_part = 'unread = false AND last_read IS NOT NULL';
         $vfeed_query_part = 'ttrss_feeds.title AS feed_title,';
         $allow_archived = true;
         if (!$override_order) {
             $override_order = 'last_read DESC';
         }
-    } elseif ($feed == -3) { // fresh virtual feed
+    } elseif ($feed == -3) {
+        // fresh virtual feed
         $query_strategy_part = 'unread = true AND score >= 0';
         $intl = \SmallSmallRSS\DBPrefs::read('FRESH_ARTICLE_MAX_AGE', $owner_uid);
         if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
@@ -988,11 +994,13 @@ function queryFeedHeadlines(
             $query_strategy_part .= " AND date_entered > DATE_SUB(NOW(), INTERVAL $intl HOUR) ";
         }
         $vfeed_query_part = 'ttrss_feeds.title AS feed_title,';
-    } elseif ($feed == -4) { // all articles virtual feed
+    } elseif ($feed == -4) {
+        // all articles virtual feed
         $allow_archived = true;
         $query_strategy_part = 'true';
         $vfeed_query_part = 'ttrss_feeds.title AS feed_title,';
-    } elseif ($feed <= \SmallSmallRSS\Constants::LABEL_BASE_INDEX) { // labels
+    } elseif ($feed <= \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
+        // labels
         $label_id = \SmallSmallRSS\Labels::fromFeedId($feed);
         $query_strategy_part = "label_id = '$label_id'
                     AND ttrss_labels2.id = ttrss_user_labels2.label_id

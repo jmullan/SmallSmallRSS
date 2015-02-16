@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
 
-class opml extends ProtectedHandler
+class Opml extends ProtectedHandler
 {
 
     public function ignoreCSRF($method)
@@ -480,7 +480,6 @@ class opml extends ProtectedHandler
                 if ($node_cat_title && !$node_feed_url) {
                     $this->importCategory($doc, $node, $owner_uid, $cat_id);
                 } else {
-
                     if (!$cat_id) {
                         $dst_cat_id = $default_cat_id;
                     } else {

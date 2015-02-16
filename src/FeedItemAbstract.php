@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 
-abstract class FeedItem_Abstract
+abstract class FeedItemAbstract
 {
     protected $elem;
     protected $xpath;

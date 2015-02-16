@@ -1,5 +1,5 @@
 <?php
-class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_Interface
+class Auth_Internal extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\AuthInterface
 {
     const API_VERSION = 2;
     const VERSION = 1.0;

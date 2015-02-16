@@ -53,13 +53,13 @@ class Logger
     {
         switch (\SmallSmallRSS\Config::get('LOG_DESTINATION')) {
             case 'sql':
-                $this->adapter = new Logger_SQL();
+                $this->adapter = new LoggerSQL();
                 break;
             case 'syslog':
-                $this->adapter = new Logger_Syslog();
+                $this->adapter = new LoggerSyslog();
                 break;
             default:
-                $this->adapter = new Logger_Dummy();
+                $this->adapter = new LoggerDummy();
         }
     }
 

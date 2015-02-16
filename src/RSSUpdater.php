@@ -333,7 +333,6 @@ class RSSUpdater
         );
 
         if ($favicon_needs_check || $force_refetch) {
-
             /* terrible hack: if we crash on floicon shit here, we won't check
              * the icon avgcolor again (unless the icon got updated) */
 
@@ -683,7 +682,6 @@ class RSSUpdater
 
                 // okay it doesn't exist - create user entry
                 if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-
                     if ($score >= -500 && !\SmallSmallRSS\ArticleFilters::matchArticle($article_filters, 'catchup')) {
                         $unread = 'true';
                         $last_read_qpart = 'NULL';

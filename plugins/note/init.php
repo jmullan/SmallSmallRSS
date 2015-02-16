@@ -38,7 +38,7 @@ class Note extends \SmallSmallRSS\Plugin
         $note = \SmallSmallRSS\UserEntries::getNote($param, $_SESSION['uid']);
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" ";
-        echo " style=\"display: none\" name=\"op\" value=\"pluginhandler\">";
+        echo " style=\"display: none\" name=\"op\" value=\"PluginHandler\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"method\" value=\"setNote\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"plugin\" value=\"note\">";
 

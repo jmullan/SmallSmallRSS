@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 
-interface Auth_Interface
+interface AuthInterface
 {
     public function authenticate($login, $password);
 }

@@ -99,7 +99,7 @@ function make_config(
     $rv = "";
     $finished = false;
     if (function_exists("mcrypt_decrypt")) {
-        $crypt_key = \SmallSmallRSS\Users::make_password(24);
+        $crypt_key = \SmallSmallRSS\Users::makePassword(24);
     } else {
         $crypt_key = "";
     }

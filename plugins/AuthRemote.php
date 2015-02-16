@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Plugins;
 
-class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_Interface
+class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\AuthInterface
 {
     private $base;
 
@@ -19,7 +19,7 @@ class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Auth_In
     public function __construct($pluginhost)
     {
         $this->host = $pluginhost;
-        $this->base = new \SmallSmallRSS\Auth_Base();
+        $this->base = new \SmallSmallRSS\AuthBase();
     }
 
     public static function getSSLCertificateId()

@@ -212,14 +212,12 @@ class Handler implements IHandler
             echo "$entry_comments</div>";
 
             if ($line['orig_feed_id']) {
-
                 $tmp_result = \SmallSmallRSS\Database::query(
                     'SELECT * FROM ttrss_archived_feeds
                  WHERE id = '.$line['orig_feed_id']
                 );
 
                 if (\SmallSmallRSS\Database::num_rows($tmp_result) != 0) {
-
                     echo "<div clear='both'>";
                     echo __('Originally from:');
 

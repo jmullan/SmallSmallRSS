@@ -32,7 +32,7 @@ class Mail extends \SmallSmallRSS\Plugin
     {
         $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
-        echo " name=\"op\" value=\"pluginhandler\">";
+        echo " name=\"op\" value=\"PluginHandler\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
         echo " name=\"plugin\" value=\"mail\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";

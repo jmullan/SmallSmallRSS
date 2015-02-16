@@ -1,7 +1,6 @@
 <?php
 namespace SmallSmallRSS;
 
-
 class Hooks
 {
     const RENDER_ARTICLE_BUTTON = 1;

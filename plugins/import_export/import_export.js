@@ -1,6 +1,6 @@
 function exportData() {
     try {
-        var query = "backend.php?op=pluginhandler&plugin=import_export&method=exportData";
+        var query = "backend.php?op=PluginHandler&plugin=import_export&method=exportData";
         if (dijit.byId("dataExportDlg")) {
             dijit.byId("dataExportDlg").destroyRecursive();
         }
@@ -12,7 +12,7 @@ function exportData() {
             prepare: function() {
                 notify_progress("Loading, please wait...");
                 new Ajax.Request("backend.php", {
-                    parameters: "op=pluginhandler&plugin=import_export&method=exportrun&offset=" + exported,
+                    parameters: "op=PluginHandler&plugin=import_export&method=exportrun&offset=" + exported,
                     onComplete: function(transport) {
                         try {
                             var rv = JSON.parse(transport.responseText);
@@ -29,7 +29,7 @@ function exportData() {
                                         "Finished, exported %d articles. You can download the data <a class='visibleLink' href='%u'>here</a>.",
                                     exported).replace("%d", exported).replace(
                                         "%u",
-                                        "backend.php?op=pluginhandler&plugin=import_export&subop=exportget");
+                                        "backend.php?op=PluginHandler&plugin=import_export&subop=exportget");
                                     exported = 0;
                                 }
                             } else {

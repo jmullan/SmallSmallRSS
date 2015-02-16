@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS;
 
-class Auth_Base implements Auth_Interface
+class AuthBase implements AuthInterface
 {
     public static function checkPassword($owner_uid, $password)
     {

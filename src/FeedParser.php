@@ -113,7 +113,7 @@ class FeedParser
                         $articles = $xpath->query('//atom03:entry');
                     }
                     foreach ($articles as $article) {
-                        array_push($this->items, new \SmallSmallRSS\FeedItem_Atom($article, $this->doc, $this->xpath));
+                        array_push($this->items, new \SmallSmallRSS\FeedItemAtom($article, $this->doc, $this->xpath));
                     }
 
                     break;
@@ -137,7 +137,7 @@ class FeedParser
                     $articles = $xpath->query('//channel/item');
 
                     foreach ($articles as $article) {
-                        array_push($this->items, new \SmallSmallRSS\FeedItem_RSS($article, $this->doc, $this->xpath));
+                        array_push($this->items, new \SmallSmallRSS\FeedItemRSS($article, $this->doc, $this->xpath));
                     }
 
                     break;
@@ -159,7 +159,7 @@ class FeedParser
                     $articles = $xpath->query('//rssfake:item');
 
                     foreach ($articles as $article) {
-                        array_push($this->items, new \SmallSmallRSS\FeedItem_RSS($article, $this->doc, $this->xpath));
+                        array_push($this->items, new \SmallSmallRSS\FeedItemRSS($article, $this->doc, $this->xpath));
                     }
 
                     break;

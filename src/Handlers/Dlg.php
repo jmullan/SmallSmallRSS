@@ -22,7 +22,7 @@ class Dlg extends ProtectedHandler
         $owner_uid = $_SESSION['uid'];
         \SmallSmallRSS\Database::query('BEGIN');
         echo "<ul class='nomarks'>";
-        $opml = new Opml($_REQUEST);
+        $opml = new \SmallSmallRSS\Handlers\Opml($_REQUEST);
         $opml->renderImport($_SESSION['uid']);
         \SmallSmallRSS\Database::query('COMMIT');
         echo '</ul>';

@@ -375,7 +375,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
             enctype=\"multipart/form-data\" method=\"POST\"
             action=\"backend.php\">
             <input id=\"starred_file\" name=\"starred_file\" type=\"file\">&nbsp;
-            <input type=\"hidden\" name=\"op\" value=\"pluginhandler\">
+            <input type=\"hidden\" name=\"op\" value=\"PluginHandler\">
             <input type=\"hidden\" name=\"method\" value=\"import\">
             <input type=\"hidden\" name=\"plugin\" value=\"googlereaderimport\">
             <button data-dojo-type=\"dijit.form.Button\" onclick=\"return starredImport();\" type=\"submit\">" .

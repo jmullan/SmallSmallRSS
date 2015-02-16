@@ -7,7 +7,7 @@ function embedOriginalArticle(id) {
 			return;
 		}
 
-		var query = "op=pluginhandler&plugin=embed_original&method=getUrl&id=" +
+		var query = "op=PluginHandler&plugin=embed_original&method=getUrl&id=" +
 			param_escape(id);
 
 		var c = false;

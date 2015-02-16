@@ -72,7 +72,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
             enctype=\"multipart/form-data\" method=\"POST\"
             action=\"backend.php\">
             <input id=\"export_file\" name=\"export_file\" type=\"file\">&nbsp;
-            <input type=\"hidden\" name=\"op\" value=\"pluginhandler\">
+            <input type=\"hidden\" name=\"op\" value=\"PluginHandler\">
             <input type=\"hidden\" name=\"plugin\" value=\"import_export\">
             <input type=\"hidden\" name=\"method\" value=\"dataimport\">
             <button data-dojo-type=\"dijit.form.Button\" onclick=\"return importData();\" type=\"submit\">" .

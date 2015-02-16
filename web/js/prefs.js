@@ -1715,7 +1715,7 @@ function insertSSLserial(value) {
 
 function gotoExportOpml(filename, settings) {
         tmp = settings ? 1 : 0;
-        document.location.href = "backend.php?op=opml&method=export&filename=" + filename + "&settings=" + tmp;
+        document.location.href = "backend.php?op=Opml&method=export&filename=" + filename + "&settings=" + tmp;
 }
 
 
@@ -1800,5 +1800,3 @@ function clearSqlLog() {
 
         }
 }
-
-

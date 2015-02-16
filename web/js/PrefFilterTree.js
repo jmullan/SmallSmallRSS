@@ -10,7 +10,7 @@ dojo.declare("fox.PrefFilterStore", dojo.data.ItemFileWriteStore, {
 
 		dojo.xhrPost({
 			url: "backend.php",
-			content: {op: "pref-filters", method: "savefilterorder",
+			content: {op: "PrefFilters", method: "savefilterorder",
 				payload: newFileContentString},
 			error: saveFailedCallback,
 			load: saveCompleteCallback});

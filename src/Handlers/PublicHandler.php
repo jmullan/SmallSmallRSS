@@ -828,7 +828,7 @@ class PublicHandler extends Handler
 
         if ($feed_urls) {
             echo '<form action="backend.php">';
-            echo '<input type="hidden" name="op" value="pref-feeds">';
+            echo '<input type="hidden" name="op" value="PrefFeeds">';
             echo '<input type="hidden" name="quiet" value="1">';
             echo '<input type="hidden" name="method" value="add">';
 
@@ -960,7 +960,7 @@ class PublicHandler extends Handler
                 );
                 if (\SmallSmallRSS\Database::num_rows($result) != 0) {
                     $id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
-                    Pref_Users::resetUserPassword($id, false);
+                    PrefUsers::resetUserPassword($id, false);
                     echo '<p>';
                     echo '<p>'.'Completed.'.'</p>';
                     echo '<form method="GET" action="index.php">';

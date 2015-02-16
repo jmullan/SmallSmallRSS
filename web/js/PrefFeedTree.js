@@ -11,7 +11,7 @@ dojo.declare("fox.PrefFeedStore", dojo.data.ItemFileWriteStore, {
 
 		dojo.xhrPost({
 			url: "backend.php",
-			content: {op: "pref-feeds", method: "savefeedorder",
+			content: {op: "PrefFeeds", method: "savefeedorder",
 				payload: newFileContentString},
 			error: saveFailedCallback,
 			load: saveCompleteCallback});

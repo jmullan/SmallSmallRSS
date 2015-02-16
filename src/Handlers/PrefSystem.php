@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
 
-class Pref_System extends ProtectedHandler
+class PrefSystem extends ProtectedHandler
 {
     public function before($method)
     {

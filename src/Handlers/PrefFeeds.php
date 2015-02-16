@@ -559,7 +559,7 @@ class PrefFeeds extends ProtectedHandler
         $title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'title'));
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\" />";
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-feeds" />';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefFeeds" />';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="editSave" />';
         echo '<div class="dlgSec">';
         echo __('Feed');
@@ -765,7 +765,7 @@ class PrefFeeds extends ProtectedHandler
             enctype=\"multipart/form-data\" method=\"POST\"
             action=\"backend.php\">
             <input id=\"icon_file\" size=\"10\" name=\"icon_file\" type=\"file\">
-            <input type=\"hidden\" name=\"op\" value=\"pref-feeds\">
+            <input type=\"hidden\" name=\"op\" value=\"PrefFeeds\">
             <input type=\"hidden\" name=\"feed_id\" value=\"$feed_id\">
             <input type=\"hidden\" name=\"method\" value=\"uploadicon\">
             <button data-dojo-type=\"dijit.form.Button\" onclick=\"return uploadFeedIcon();\"
@@ -832,7 +832,7 @@ class PrefFeeds extends ProtectedHandler
         echo '<p>';
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"ids\" value=\"$feed_ids\">";
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-feeds">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefFeeds">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="batchEditSave">';
 
         echo '<div class="dlgSec">';
@@ -1373,7 +1373,7 @@ class PrefFeeds extends ProtectedHandler
     {
 
         echo '<div data-dojo-type="dijit.layout.AccordionContainer" region="center">';
-        echo '<div id="pref-feeds-feeds" data-dojo-type="dijit.layout.AccordionPane" title="';
+        echo '<div id="PrefFeeds-feeds" data-dojo-type="dijit.layout.AccordionPane" title="';
         echo __('Feeds');
         echo '">';
         $result = \SmallSmallRSS\Database::query(
@@ -1529,7 +1529,7 @@ class PrefFeeds extends ProtectedHandler
         echo __('Loading, please wait...');
         echo '</div>';
         echo "<div data-dojo-type=\"fox.PrefFeedStore\" jsId=\"feedStore\"
-            url=\"backend.php?op=pref-feeds&method=getfeedtree\">
+            url=\"backend.php?op=PrefFeeds&method=getfeedtree\">
         </div>";
         echo "<div data-dojo-type=\"lib.CheckBoxStoreModel\" jsId=\"feedModel\" store=\"feedStore\"
         query=\"{id:'root'}\" rootId=\"root\" rootLabel=\"Feeds\"
@@ -1998,7 +1998,7 @@ class PrefFeeds extends ProtectedHandler
 
     public function batchSubscribe()
     {
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-feeds">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefFeeds">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="batchaddfeeds">';
 
         echo '<table width="100%">';

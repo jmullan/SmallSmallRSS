@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
 
-class Pref_Prefs extends ProtectedHandler
+class PrefPrefs extends ProtectedHandler
 {
 
     private $pref_help = array();
@@ -273,7 +273,7 @@ class Pref_Prefs extends ProtectedHandler
 
         echo '</table>';
 
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-prefs">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="changeemail">';
 
         echo '<p><button data-dojo-type="dijit.form.Button" type="submit">'.
@@ -347,7 +347,7 @@ class Pref_Prefs extends ProtectedHandler
             echo ' type="password" required="1" name="confirm_password"></td></tr>';
             echo '</table>';
             echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"';
-            echo ' name="op" value="pref-prefs">';
+            echo ' name="op" value="PrefPrefs">';
             echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"';
             echo ' name="method" value="changepassword">';
             echo '<p><button data-dojo-type="dijit.form.Button" type="submit">'.
@@ -383,7 +383,7 @@ class Pref_Prefs extends ProtectedHandler
                     echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox" type="password" required="1"
                     name="password"></td></tr>';
                     echo '</table>';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-prefs">';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs">';
                     echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="otpdisable">';
                     echo '<p><button data-dojo-type="dijit.form.Button" type="submit">'.
                         __('Disable OTP').'</button>';
@@ -394,9 +394,9 @@ class Pref_Prefs extends ProtectedHandler
                     );
                     echo '<p>'.__('Scan the following code by the Authenticator application:').'</p>';
                     $csrf_token = $_SESSION['csrf_token'];
-                    echo "<img src=\"backend.php?op=pref-prefs&method=otpqrcode&csrf_token=$csrf_token\">";
+                    echo "<img src=\"backend.php?op=PrefPrefs&method=otpqrcode&csrf_token=$csrf_token\">";
                     echo '<form data-dojo-type="dijit.form.Form" id="changeOtpForm">';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-prefs">';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs">';
                     echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="otpenable">';
                     echo "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
                     evt.preventDefault();
@@ -647,7 +647,7 @@ class Pref_Prefs extends ProtectedHandler
         );
         echo '</div>'; # inside pane
         echo '<div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: \'bottom\'">';
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-prefs">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="saveconfig">';
         echo '<div data-dojo-type="dijit.form.ComboButton" type="submit">';
         echo '<span>';
@@ -697,7 +697,7 @@ class Pref_Prefs extends ProtectedHandler
             } });
         }
         </script>";
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-prefs">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="setplugins">';
         echo '<table width="100%" class="prefPluginsList">';
         echo '<tr>';

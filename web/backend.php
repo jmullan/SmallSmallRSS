@@ -55,6 +55,7 @@ $legacy_ops = array(
     'dlg' => 'Dlg',
     'feeds' => 'Feeds',
     'pref_feeds' => 'PrefFeeds',
+    'pref_users' => 'PrefUsers'
 
 );
 if (isset($legacy_ops[$op])) {

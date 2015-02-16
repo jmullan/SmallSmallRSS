@@ -159,7 +159,7 @@ if (!$max_users || $avail_users) {
                     echo '<input type="submit" value="'.__('Return to Tiny Tiny RSS').'">';
                     echo '</form>';
                 } else {
-                    \SmallSmallRSS\Feeds\newUser($new_uid);
+                    \SmallSmallRSS\Feeds::newUser($new_uid);
                     $reg_text = "Hi!\n".
                         "\n".
                         "You are receiving this message, because you (or somebody else) have opened\n".

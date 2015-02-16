@@ -8,6 +8,7 @@ class Users
         $result = \SmallSmallRSS\Database::query('SELECT COUNT(*) AS cu FROM ttrss_users');
         return \SmallSmallRSS\Database::fetch_result($result, 0, 'cu');
     }
+
     public static function clearExpired()
     {
         if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
@@ -139,4 +140,23 @@ class Users
              WHERE id = '$owner_uid'"
         );
     }
+
+    function make_password($length = 8)
+    {
+        $password = "";
+        $possible = "0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ*%+^";
+        $i = 0;
+
+        while ($i < $length) {
+            $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
+
+            if (!strstr($password, $char)) {
+                $password .= $char;
+                $i++;
+            }
+        }
+        return $password;
+    }
+
+
 }

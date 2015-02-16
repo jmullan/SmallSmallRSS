@@ -741,7 +741,7 @@ function rescoreCurrentFeed() {
     if (confirm(pr)) {
         notify_progress("Rescoring articles...");
 
-        var query = "?op=pref-feeds&method=rescore&quiet=1&ids=" + actid;
+        var query = "?op=PrefFeeds&method=rescore&quiet=1&ids=" + actid;
 
         new Ajax.Request("backend.php", {
                              parameters: query,

@@ -207,7 +207,7 @@ if (isset($options["convert-filters"])) {
             $_REQUEST = $filter;
             $_SESSION["uid"] = $owner_uid;
 
-            $filters = new Pref_Filters($_REQUEST);
+            $filters = new PrefFilters($_REQUEST);
             $filters->add();
         }
     }

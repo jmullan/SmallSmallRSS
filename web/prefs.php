@@ -94,27 +94,27 @@ $translation_renderer->render();
 
     <div id="main" data-dojo-type="dijit.layout.BorderContainer">
 
-    <div data-dojo-type="dijit.layout.TabContainer" data-dojo-props="region: 'center'" id="pref-tabs">
+    <div data-dojo-type="dijit.layout.TabContainer" data-dojo-props="region: 'center'" id="PrefTabs">
     <div id="genConfigTab" data-dojo-type="dijit.layout.ContentPane"
-    href="backend.php?op=pref-prefs"
+    href="backend.php?op=PrefPrefs"
     title="<?php echo __('Preferences') ?>"></div>
     <div id="feedConfigTab" data-dojo-type="dijit.layout.ContentPane"
-    href="backend.php?op=pref-feeds"
+    href="backend.php?op=PrefFeeds"
     title="<?php echo __('Feeds') ?>"></div>
     <div id="filterConfigTab" data-dojo-type="dijit.layout.ContentPane"
-    href="backend.php?op=pref-filters"
+    href="backend.php?op=PrefFilters"
     title="<?php echo __('Filters') ?>"></div>
     <div id="labelConfigTab" data-dojo-type="dijit.layout.ContentPane"
-    href="backend.php?op=pref-labels"
+    href="backend.php?op=PrefLabels"
     title="<?php echo __('Labels') ?>"></div>
 <?php
 if ($_SESSION['access_level'] >= 10) {
 ?>
     <div id="userConfigTab" data-dojo-type="dijit.layout.ContentPane"
-     href="backend.php?op=pref-users"
+     href="backend.php?op=PrefUsers"
      title="<?php echo __('Users') ?>"></div>
      <div id="systemConfigTab" data-dojo-type="dijit.layout.ContentPane"
-     href="backend.php?op=pref-system"
+     href="backend.php?op=PrefSystem"
      title="<?php echo __('System') ?>"></div>
 <?php
 }

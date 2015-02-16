@@ -16,7 +16,7 @@ function updateFeedList(sort_key) {
         if (user_search) { search = user_search.value; }
 
         new Ajax.Request("backend.php", {
-                parameters: "?op=pref-feeds&search=" + param_escape(search),
+                parameters: "?op=PrefFeeds&search=" + param_escape(search),
                 onComplete: function(transport) {
                         dijit.byId('feedConfigTab').attr('content', transport.responseText);
                         selectTab("feedConfig", true);
@@ -31,7 +31,7 @@ function updateUsersList(sort_key) {
                 var search = "";
                 if (user_search) { search = user_search.value; }
 
-                var query = "?op=pref-users&sort="
+                var query = "?op=PrefUsers&sort="
                         + param_escape(sort_key) +
                         "&search=" + param_escape(search);
 
@@ -65,7 +65,7 @@ function addUser() {
 
                 notify_progress("Adding user...");
 
-                var query = "?op=pref-users&method=add&login=" +
+                var query = "?op=PrefUsers&method=add&login=" +
                         param_escape(login);
 
                 new Ajax.Request("backend.php", {
@@ -83,7 +83,7 @@ function addUser() {
 function editUser(id, event) {
 
         try {
-                var query = "backend.php?op=pref-users&method=edit&id=" +
+                var query = "backend.php?op=PrefUsers&method=edit&id=" +
                         param_escape(id);
 
                 if (dijit.byId("userEditDlg"))
@@ -121,7 +121,7 @@ function editUser(id, event) {
 function editFilter(id) {
         try {
 
-                var query = "backend.php?op=pref-filters&method=edit&id=" + param_escape(id);
+                var query = "backend.php?op=PrefFilters&method=edit&id=" + param_escape(id);
 
                 if (dijit.byId("feedEditDlg"))
                         dijit.byId("feedEditDlg").destroyRecursive();
@@ -187,7 +187,7 @@ function editFilter(id) {
 
                                         var id = this.attr('value').id;
 
-                                        var query = "?op=pref-filters&method=remove&ids="+
+                                        var query = "?op=PrefFilters&method=remove&ids="+
                                                 param_escape(id);
 
                                         new Ajax.Request("backend.php", {
@@ -295,7 +295,7 @@ function removeSelectedLabels() {
                 if (ok) {
                         notify_progress("Removing selected labels...");
 
-                        var query = "?op=pref-labels&method=remove&ids="+
+                        var query = "?op=PrefLabels&method=remove&ids="+
                                 param_escape(sel_rows.toString());
 
                         new Ajax.Request("backend.php", {
@@ -325,7 +325,7 @@ function removeSelectedUsers() {
                         if (ok) {
                                 notify_progress("Removing selected users...");
 
-                                var query = "?op=pref-users&method=remove&ids="+
+                                var query = "?op=PrefUsers&method=remove&ids="+
                                         param_escape(sel_rows.toString());
 
                                 new Ajax.Request("backend.php", {
@@ -360,7 +360,7 @@ function removeSelectedFilters() {
                         if (ok) {
                                 notify_progress("Removing selected filters...");
 
-                                var query = "?op=pref-filters&method=remove&ids="+
+                                var query = "?op=PrefFilters&method=remove&ids="+
                                         param_escape(sel_rows.toString());
 
                                 new Ajax.Request("backend.php", {
@@ -395,7 +395,7 @@ function removeSelectedFeeds() {
 
                                 notify_progress("Unsubscribing from selected feeds...", true);
 
-                                var query = "?op=pref-feeds&method=remove&ids="+
+                                var query = "?op=PrefFeeds&method=remove&ids="+
                                         param_escape(sel_rows.toString());
 
                                 new Ajax.Request("backend.php", {
@@ -514,7 +514,7 @@ function resetSelectedUserPass() {
 
                         var id = rows[0];
 
-                        var query = "?op=pref-users&method=resetPass&id=" +
+                        var query = "?op=PrefUsers&method=resetPass&id=" +
                                 param_escape(id);
 
                         new Ajax.Request("backend.php", {
@@ -548,7 +548,7 @@ function selectedUserDetails() {
 
                 var id = rows[0];
 
-                var query = "backend.php?op=pref-users&method=userdetails&id=" + id;
+                var query = "backend.php?op=PrefUsers&method=userdetails&id=" + id;
 
                 if (dijit.byId("userDetailsDlg"))
                         dijit.byId("userDetailsDlg").destroyRecursive();
@@ -602,7 +602,7 @@ function joinSelectedFilters() {
         if (ok) {
                 notify_progress("Joining filters...");
 
-                var query = "?op=pref-filters&method=join&ids="+
+                var query = "?op=PrefFilters&method=join&ids="+
                         param_escape(rows.toString());
 
                 new Ajax.Request("backend.php", {
@@ -643,7 +643,7 @@ function editSelectedFeeds() {
 
                 notify_progress("Loading, please wait...");
 
-                var query = "backend.php?op=pref-feeds&method=editfeeds&ids=" +
+                var query = "backend.php?op=PrefFeeds&method=editfeeds&ids=" +
                         param_escape(rows.toString());
 
                 if (dijit.byId("feedEditDlg"))
@@ -801,7 +801,7 @@ function updateFilterList() {
         if (user_search) { search = user_search.value; }
 
         new Ajax.Request("backend.php", {
-                parameters: "?op=pref-filters&search=" + param_escape(search),
+                parameters: "?op=PrefFilters&search=" + param_escape(search),
                 onComplete: function(transport) {
                         dijit.byId('filterConfigTab').attr('content', transport.responseText);
                         notify("");
@@ -810,7 +810,7 @@ function updateFilterList() {
 
 function updateLabelList() {
         new Ajax.Request("backend.php", {
-                parameters: "?op=pref-labels",
+                parameters: "?op=PrefLabels",
                 onComplete: function(transport) {
                         dijit.byId('labelConfigTab').attr('content', transport.responseText);
                         notify("");
@@ -819,7 +819,7 @@ function updateLabelList() {
 
 function updatePrefsList() {
         new Ajax.Request("backend.php", {
-                parameters: "?op=pref-prefs",
+                parameters: "?op=PrefPrefs",
                 onComplete: function(transport) {
                         dijit.byId('genConfigTab').attr('content', transport.responseText);
                         notify("");
@@ -828,7 +828,7 @@ function updatePrefsList() {
 
 function updateSystemList() {
         new Ajax.Request("backend.php", {
-                parameters: "?op=pref-system",
+                parameters: "?op=PrefSystem",
                 onComplete: function(transport) {
                         dijit.byId('systemConfigTab').attr('content', transport.responseText);
                         notify("");
@@ -855,7 +855,7 @@ function selectTab(id, noupdate, method) {
                         }
 
                         var tab = dijit.byId(id + "Tab");
-                        dijit.byId("pref-tabs").selectChild(tab);
+                        dijit.byId("PrefTabs").selectChild(tab);
 
                 }
 
@@ -876,7 +876,7 @@ function init_second_stage() {
 
                         if (tab) {
                                 tab = dijit.byId(tab + "Tab");
-                                if (tab) dijit.byId("pref-tabs").selectChild(tab);
+                                if (tab) dijit.byId("PrefTabs").selectChild(tab);
                         }
 
                         var method = getURLParam('method');
@@ -957,7 +957,7 @@ function validatePrefsReset() {
 
                 if (ok) {
 
-                        query = "?op=pref-prefs&method=resetconfig";
+                        query = "?op=PrefPrefs&method=resetconfig";
                         new Ajax.Request("backend.php", {
                                 parameters: query,
                                 onComplete: function(transport) {
@@ -1068,7 +1068,7 @@ function removeCategory(id, item) {
                 var ok = confirm(__("Remove category %s? Any nested feeds would be placed into Uncategorized.").replace("%s", item.name));
 
                 if (ok) {
-                        var query = "?op=pref-feeds&method=removeCat&ids="+
+                        var query = "?op=PrefFeeds&method=removeCat&ids="+
                                 param_escape(id);
 
                         notify_progress("Removing category...");
@@ -1097,7 +1097,7 @@ function removeSelectedCategories() {
                 if (ok) {
                         notify_progress("Removing selected categories...");
 
-                        var query = "?op=pref-feeds&method=removeCat&ids="+
+                        var query = "?op=PrefFeeds&method=removeCat&ids="+
                                 param_escape(sel_rows.toString());
 
                         new Ajax.Request("backend.php", {
@@ -1122,7 +1122,7 @@ function createCategory() {
 
                         notify_progress("Creating category...");
 
-                        var query = "?op=pref-feeds&method=addCat&cat=" +
+                        var query = "?op=PrefFeeds&method=addCat&cat=" +
                                 param_escape(title);
 
                         new Ajax.Request("backend.php", {
@@ -1140,7 +1140,7 @@ function createCategory() {
 
 function showInactiveFeeds() {
         try {
-                var query = "backend.php?op=pref-feeds&method=inactiveFeeds";
+                var query = "backend.php?op=PrefFeeds&method=inactiveFeeds";
 
                 if (dijit.byId("inactiveFeedsDlg"))
                         dijit.byId("inactiveFeedsDlg").destroyRecursive();
@@ -1161,7 +1161,7 @@ function showInactiveFeeds() {
                                         if (ok) {
                                                 notify_progress("Removing selected feeds...", true);
 
-                                                var query = "?op=pref-feeds&method=remove&ids="+
+                                                var query = "?op=PrefFeeds&method=remove&ids="+
                                                         param_escape(sel_rows.toString());
 
                                                 new Ajax.Request("backend.php", {
@@ -1200,7 +1200,7 @@ function opmlRegenKey() {
 
                         notify_progress("Trying to change address...", true);
 
-                        var query = "?op=pref-feeds&method=regenOPMLKey";
+                        var query = "?op=PrefFeeds&method=regenOPMLKey";
 
                         new Ajax.Request("backend.php", {
                                 parameters: query,
@@ -1285,7 +1285,7 @@ function clearFeedArticles(feed_id) {
 
         notify_progress("Clearing feed...");
 
-        var query = "?op=pref-feeds&quiet=1&method=clear&id=" + feed_id;
+        var query = "?op=PrefFeeds&quiet=1&method=clear&id=" + feed_id;
 
         new Ajax.Request("backend.php", {
                 parameters: query,
@@ -1308,7 +1308,7 @@ function rescoreSelectedFeeds() {
                 if (ok) {
                         notify_progress("Rescoring selected feeds...", true);
 
-                        var query = "?op=pref-feeds&method=rescore&quiet=1&ids="+
+                        var query = "?op=PrefFeeds&method=rescore&quiet=1&ids="+
                                 param_escape(sel_rows.toString());
 
                         new Ajax.Request("backend.php", {
@@ -1331,7 +1331,7 @@ function rescore_all_feeds() {
         if (ok) {
                 notify_progress("Rescoring feeds...", true);
 
-                var query = "?op=pref-feeds&method=rescoreAll&quiet=1";
+                var query = "?op=PrefFeeds&method=rescoreAll&quiet=1";
 
                 new Ajax.Request("backend.php", {
                         parameters: query,
@@ -1349,7 +1349,7 @@ function labelColorReset() {
                         var ok = confirm(__("Reset selected labels to default colors?"));
 
                         if (ok) {
-                                var query = "?op=pref-labels&method=colorreset&ids="+
+                                var query = "?op=PrefLabels&method=colorreset&ids="+
                                         param_escape(labels.toString());
 
                                 new Ajax.Request("backend.php", {
@@ -1379,7 +1379,7 @@ function editProfiles() {
                 if (dijit.byId("profileEditDlg"))
                         dijit.byId("profileEditDlg").destroyRecursive();
 
-                var query = "backend.php?op=pref-prefs&method=editPrefProfiles";
+                var query = "backend.php?op=PrefPrefs&method=editPrefProfiles";
 
                 dialog = new dijit.Dialog({
                         id: "profileEditDlg",
@@ -1500,7 +1500,7 @@ function clearFeedAccessKeys() {
         if (ok) {
                 notify_progress("Clearing URLs...");
 
-                var query = "?op=pref-feeds&method=clearKeys";
+                var query = "?op=PrefFeeds&method=clearKeys";
 
                 new Ajax.Request("backend.php", {
                         parameters: query,
@@ -1536,7 +1536,7 @@ function resetFilterOrder() {
                 notify_progress("Loading, please wait...");
 
                 new Ajax.Request("backend.php", {
-                        parameters: "?op=pref-filters&method=filtersortreset",
+                        parameters: "?op=PrefFilters&method=filtersortreset",
                         onComplete: function(transport) {
                                 updateFilterList();
                         } });
@@ -1553,7 +1553,7 @@ function resetFeedOrder() {
                 notify_progress("Loading, please wait...");
 
                 new Ajax.Request("backend.php", {
-                        parameters: "?op=pref-feeds&method=feedsortreset",
+                        parameters: "?op=PrefFeeds&method=feedsortreset",
                         onComplete: function(transport) {
                                 updateFeedList();
                         } });
@@ -1569,7 +1569,7 @@ function resetCatOrder() {
                 notify_progress("Loading, please wait...");
 
                 new Ajax.Request("backend.php", {
-                        parameters: "?op=pref-feeds&method=catsortreset",
+                        parameters: "?op=PrefFeeds&method=catsortreset",
                         onComplete: function(transport) {
                                 updateFeedList();
                         } });
@@ -1590,7 +1590,7 @@ function editCat(id, item, event) {
 
                         new Ajax.Request("backend.php", {
                         parameters: {
-                                op: 'pref-feeds',
+                                op: 'PrefFeeds',
                                 method: 'renamecat',
                                 id: id,
                                 title: new_name,
@@ -1607,7 +1607,7 @@ function editCat(id, item, event) {
 
 function editLabel(id, event) {
         try {
-                var query = "backend.php?op=pref-labels&method=edit&id=" +
+                var query = "backend.php?op=PrefLabels&method=edit&id=" +
                         param_escape(id);
 
                 if (dijit.byId("labelEditDlg"))
@@ -1632,7 +1632,7 @@ function editLabel(id, event) {
                                         color = bg;
                                 }
 
-                                var query = "?op=pref-labels&method=colorset&kind="+kind+
+                                var query = "?op=PrefLabels&method=colorset&kind="+kind+
                                         "&ids=" + param_escape(id) + "&fg=" + param_escape(fg) +
                                         "&bg=" + param_escape(bg) + "&color=" + param_escape(color);
 
@@ -1677,7 +1677,7 @@ function editLabel(id, event) {
 
 function customizeCSS() {
         try {
-                var query = "backend.php?op=pref-prefs&method=customizeCSS";
+                var query = "backend.php?op=PrefPrefs&method=customizeCSS";
 
                 if (dijit.byId("cssEditDlg"))
                         dijit.byId("cssEditDlg").destroyRecursive();
@@ -1721,7 +1721,7 @@ function gotoExportOpml(filename, settings) {
 
 function batchSubscribe() {
         try {
-                var query = "backend.php?op=pref-feeds&method=batchSubscribe";
+                var query = "backend.php?op=PrefFeeds&method=batchSubscribe";
 
                 // overlapping widgets
                 if (dijit.byId("batchSubDlg")) dijit.byId("batchSubDlg").destroyRecursive();
@@ -1758,7 +1758,7 @@ function toggleAdvancedPrefs() {
                 notify_progress("Loading, please wait...");
 
                 new Ajax.Request("backend.php", {
-                        parameters: "?op=pref-prefs&method=toggleadvanced",
+                        parameters: "?op=PrefPrefs&method=toggleadvanced",
                         onComplete: function(transport) {
                                 updatePrefsList();
                         } });
@@ -1774,7 +1774,7 @@ function clearPluginData(name) {
                         notify_progress("Loading, please wait...");
 
                         new Ajax.Request("backend.php", {
-                                parameters: "?op=pref-prefs&method=clearplugindata&name=" + param_escape(name),
+                                parameters: "?op=PrefPrefs&method=clearplugindata&name=" + param_escape(name),
                                 onComplete: function(transport) {
                                         notify('');
                                         updatePrefsList();
@@ -1790,7 +1790,7 @@ function clearSqlLog() {
         if (confirm(__("Clear all messages in the error log?"))) {
 
                 notify_progress("Loading, please wait...");
-                var query = "?op=pref-system&method=clearLog";
+                var query = "?op=PrefSystem&method=clearLog";
 
                 new Ajax.Request("backend.php", {
                         parameters: query,

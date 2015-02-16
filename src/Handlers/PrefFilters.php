@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
 
-class Pref_Filters extends ProtectedHandler
+class PrefFilters extends ProtectedHandler
 {
 
     public function ignoreCSRF($method)
@@ -262,7 +262,7 @@ class Pref_Filters extends ProtectedHandler
 
         echo '<form id="filter_edit_form" onsubmit="return false">';
 
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-filters" />';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefFilters" />';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="id" value=\"';
         echo $filter_id;
         echo '" />';
@@ -724,7 +724,7 @@ class Pref_Filters extends ProtectedHandler
         echo '</div>';
 
         echo "<div data-dojo-type=\"fox.PrefFilterStore\" jsId=\"filterStore\"
-            url=\"backend.php?op=pref-filters&method=getfiltertree\">
+            url=\"backend.php?op=PrefFilters&method=getfiltertree\">
         </div>
         <div data-dojo-type=\"lib.CheckBoxStoreModel\" jsId=\"filterModel\" store=\"filterStore\"
             query=\"{id:'root'}\" rootId=\"root\" rootLabel=\"Filters\"
@@ -764,7 +764,7 @@ class Pref_Filters extends ProtectedHandler
 
         echo "<form name='filter_new_form' id='filter_new_form'>";
 
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-filters">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefFilters">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="add">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="csrf_token" value="';
         echo $_SESSION['csrf_token'];

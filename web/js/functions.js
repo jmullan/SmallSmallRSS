@@ -555,7 +555,7 @@ function uploadIconHandler(rc) {
 function removeFeedIcon(id) {
     try {
         if (confirm(__("Remove stored feed icon?"))) {
-            var query = "backend.php?op=pref-feeds&method=removeicon&feed_id=" + param_escape(id);
+            var query = "backend.php?op=PrefFeeds&method=removeicon&feed_id=" + param_escape(id);
             notify_progress("Removing feed icon...", true);
             new Ajax.Request("backend.php", {
                                  parameters: query,
@@ -597,7 +597,7 @@ function addLabel(select, callback) {
                 alert(__("Can't create label: missing caption."));
                 return false;
             }
-            var query = "?op=pref-labels&method=add&caption=" +
+            var query = "?op=PrefLabels&method=add&caption=" +
                 param_escape(caption);
             if (select)
                 query += "&output=select";
@@ -697,7 +697,7 @@ function createNewRuleElement(parentNode, replaceNode) {
     try {
         var form = document.forms["filter_new_rule_form"];
         form.reg_exp.value = form.reg_exp.value.replace(/(<([^>]+)>)/ig,"");
-        var query = "backend.php?op=pref-filters&method=printrulename&rule="+
+        var query = "backend.php?op=PrefFilters&method=printrulename&rule="+
             param_escape(dojo.formToJson(form));
         new Ajax.Request("backend.php", {
                              parameters: query,
@@ -736,7 +736,7 @@ function createNewActionElement(parentNode, replaceNode) {
         if (form.action_id.value == 7) {
             form.action_param.value = form.action_param_label.value;
         }
-        var query = "backend.php?op=pref-filters&method=printactionname&action="+
+        var query = "backend.php?op=PrefFilters&method=printactionname&action="+
             param_escape(dojo.formToJson(form));
         new Ajax.Request("backend.php", {
                              parameters: query,
@@ -774,7 +774,7 @@ function addFilterRule(replaceNode, ruleStr) {
     try {
         if (dijit.byId("filterNewRuleDlg"))
             dijit.byId("filterNewRuleDlg").destroyRecursive();
-        var query = "backend.php?op=pref-filters&method=newrule&rule=" +
+        var query = "backend.php?op=PrefFilters&method=newrule&rule=" +
             param_escape(ruleStr);
         var rule_dlg = new dijit.Dialog({
             id: "filterNewRuleDlg",
@@ -796,7 +796,7 @@ function addFilterAction(replaceNode, actionStr) {
     try {
         if (dijit.byId("filterNewActionDlg"))
             dijit.byId("filterNewActionDlg").destroyRecursive();
-        var query = "backend.php?op=pref-filters&method=newaction&action=" +
+        var query = "backend.php?op=PrefFilters&method=newaction&action=" +
             param_escape(actionStr);
         var rule_dlg = new dijit.Dialog({
             id: "filterNewActionDlg",
@@ -819,11 +819,11 @@ function quickAddFilter() {
     try {
         var query = "";
         if (!inPreferences()) {
-            query = "backend.php?op=pref-filters&method=newfilter&feed=" +
+            query = "backend.php?op=PrefFilters&method=newfilter&feed=" +
                 param_escape(getActiveFeedId()) + "&is_cat=" +
                 param_escape(activeFeedIsCat());
         } else {
-            query = "backend.php?op=pref-filters&method=newfilter";
+            query = "backend.php?op=PrefFilters&method=newfilter";
         }
         if (dijit.byId("feedEditDlg"))
             dijit.byId("feedEditDlg").destroyRecursive();
@@ -922,7 +922,7 @@ function resetPubSub(feed_id, title) {
     var msg = __("Reset subscription? Tiny Tiny RSS will try to subscribe to the notification hub again on next feed update.").replace("%s", title);
     if (title == undefined || confirm(msg)) {
         notify_progress("Loading, please wait...");
-        var query = "?op=pref-feeds&quiet=1&method=resetPubSub&ids=" + feed_id;
+        var query = "?op=PrefFeeds&quiet=1&method=resetPubSub&ids=" + feed_id;
         new Ajax.Request("backend.php", {
                              parameters: query,
                              onComplete: function(transport) {
@@ -937,7 +937,7 @@ function unsubscribeFeed(feed_id, title) {
     var msg = __("Unsubscribe from %s?").replace("%s", title);
     if (title == undefined || confirm(msg)) {
         notify_progress("Removing feed...");
-        var query = "?op=pref-feeds&quiet=1&method=remove&ids=" + feed_id;
+        var query = "?op=PrefFeeds&quiet=1&method=remove&ids=" + feed_id;
         new Ajax.Request("backend.php", {
                              parameters: query,
                              onComplete: function(transport) {
@@ -1034,7 +1034,7 @@ function genUrlChangeKey(feed, is_cat) {
         var ok = confirm(__("Generate new syndication address for this feed?"));
         if (ok) {
             notify_progress("Trying to change address...", true);
-            var query = "?op=pref-feeds&method=regenFeedKey&id=" + param_escape(feed) +
+            var query = "?op=PrefFeeds&method=regenFeedKey&id=" + param_escape(feed) +
                 "&is_cat=" + param_escape(is_cat);
             new Ajax.Request("backend.php", {
                                  parameters: query,
@@ -1173,7 +1173,7 @@ function editFeed(feed, event) {
     try {
         if (feed <= 0)
             return alert(__("You can't edit this kind of feed."));
-        var query = "backend.php?op=pref-feeds&method=editfeed&id=" +
+        var query = "backend.php?op=PrefFeeds&method=editfeed&id=" +
             param_escape(feed);
         if (dijit.byId("filterEditDlg"))
             dijit.byId("filterEditDlg").destroyRecursive();
@@ -1309,7 +1309,7 @@ function feedBrowser() {
 }
 function showFeedsWithErrors() {
     try {
-        var query = "backend.php?op=pref-feeds&method=feedsWithErrors";
+        var query = "backend.php?op=PrefFeeds&method=feedsWithErrors";
         if (dijit.byId("errorFeedsDlg"))
             dijit.byId("errorFeedsDlg").destroyRecursive();
         dialog = new dijit.Dialog({
@@ -1326,7 +1326,7 @@ function showFeedsWithErrors() {
                                               var ok = confirm(__("Remove selected feeds?"));
                                               if (ok) {
                                                   notify_progress("Removing selected feeds...", true);
-                                                  var query = "?op=pref-feeds&method=remove&ids="+
+                                                  var query = "?op=PrefFeeds&method=remove&ids="+
                                                       param_escape(sel_rows.toString());
                                                   new Ajax.Request("backend.php", {
                                                                        parameters: query,

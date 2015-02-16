@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
 
-class Pref_Users extends ProtectedHandler
+class PrefUsers extends ProtectedHandler
 {
     public function before($method)
     {
@@ -104,7 +104,7 @@ class Pref_Users extends ProtectedHandler
         echo "<form id=\"user_edit_form\" onsubmit='return false' data-dojo-type=\"dijit.form.Form\">";
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$id\">";
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-users">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefUsers">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="editSave">';
 
         $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_users WHERE id = '$id'");
@@ -214,7 +214,7 @@ class Pref_Users extends ProtectedHandler
     {
 
         $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['login']));
-        $tmp_user_pwd = make_password(8);
+        $tmp_user_pwd = \SmallSmallRSS\Users::make_password(8);
         $salt = \SmallSmallRSS\Auth::getSalt();
         $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($tmp_user_pwd, $salt, true);
         $result = \SmallSmallRSS\Database::query(
@@ -236,7 +236,7 @@ class Pref_Users extends ProtectedHandler
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
                     T_sprintf('Added user <b>%s</b> with password <b>%s</b>', $login, $tmp_user_pwd)
                 );
-                \SmallSmallRSS\Feeds\newUser($new_uid);
+                \SmallSmallRSS\Feeds::newUser($new_uid);
             } else {
                 \SmallSmallRSS\Renderers\Messages::renderWarning(
                     T_sprintf('Could not create user <b>%s</b>', $login)
@@ -261,7 +261,7 @@ class Pref_Users extends ProtectedHandler
         $email = \SmallSmallRSS\Database::fetch_result($result, 0, 'email');
         $salt = \SmallSmallRSS\Database::fetch_result($result, 0, 'salt');
         $new_salt = \SmallSmallRSS\Auth::getSalt();
-        $tmp_user_pwd = make_password(8);
+        $tmp_user_pwd = \SmallSmallRSS\Users::make_password(8);
         $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($tmp_user_pwd, $new_salt, true);
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users
@@ -302,7 +302,7 @@ class Pref_Users extends ProtectedHandler
     public function resetPass()
     {
         $uid = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-        Pref_Users::resetUserPassword($uid, true);
+        self::resetUserPassword($uid, true);
     }
     public function index()
     {

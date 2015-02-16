@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
 
-class Pref_Labels extends ProtectedHandler
+class PrefLabels extends ProtectedHandler
 {
 
     public function ignoreCSRF($method)
@@ -23,7 +23,7 @@ class Pref_Labels extends ProtectedHandler
         $line = \SmallSmallRSS\Database::fetch_assoc($result);
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$label_id\">";
-        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="pref-labels">';
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefLabels">';
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="save">';
         echo '<div class="dlgSec">'.__('Caption').'</div>';
         echo '<div class="dlgSecCont">';
@@ -326,7 +326,7 @@ class Pref_Labels extends ProtectedHandler
         echo '</div>';
 
         echo "<div data-dojo-type=\"dojo.data.ItemFileWriteStore\" jsId=\"labelStore\"";
-        echo " url=\"backend.php?op=pref-labels&method=getlabeltree\">";
+        echo " url=\"backend.php?op=PrefLabels&method=getlabeltree\">";
         echo "</div>";
         echo "<div data-dojo-type=\"lib.CheckBoxStoreModel\" jsId=\"labelModel\" store=\"labelStore\"";
         echo " query=\"{id:'root'}\" rootId=\"root\"";

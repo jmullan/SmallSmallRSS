@@ -1,21 +1,5 @@
 <?php
 require_once __DIR__ . '/../../src/bootstrap.php';
-function make_password($length = 8)
-{
-    $password = "";
-    $possible = "0123456789abcdfghjkmnpqrstvwxyzABCDFGHJKMNPQRSTVWXYZ*%+^";
-    $i = 0;
-
-    while ($i < $length) {
-        $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
-
-        if (!strstr($password, $char)) {
-            $password .= $char;
-            $i++;
-        }
-    }
-    return $password;
-}
 
 
 function sanity_check($db_type)
@@ -115,7 +99,7 @@ function make_config(
     $rv = "";
     $finished = false;
     if (function_exists("mcrypt_decrypt")) {
-        $crypt_key = make_password(24);
+        $crypt_key = \SmallSmallRSS\Users::make_password(24);
     } else {
         $crypt_key = "";
     }

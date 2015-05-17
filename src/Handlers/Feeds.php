@@ -220,7 +220,7 @@ class Feeds extends ProtectedHandler
                     \SmallSmallRSS\RSSUpdater::updateFeed($feed, true);
                 } else {
                     \SmallSmallRSS\Database::query(
-                        "UPDATE ttrss_feeds'
+                        "UPDATE ttrss_feeds
                          SET last_updated = '1970-01-01',
                              last_update_started = '1970-01-01'
                          WHERE id = '$feed'"

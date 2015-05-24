@@ -18,8 +18,6 @@ class CSS
         $timestamp = '';
         if (file_exists($real_filename)) {
             $timestamp = filemtime($real_filename);
-        } else {
-
         }
         echo '<link rel="stylesheet" type="text/css" href="' . $filename . '?' . $timestamp . '"/>';
     }

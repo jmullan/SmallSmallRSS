@@ -10,6 +10,6 @@ while (<STDIN>) {
 
 		$msg =~ s/\"/\\\"/g;
 
-		print "print T_js_decl(\"$msg\");\n";
+		print "print renderJsDeclaration(\"$msg\");\n";
 	}
 }

@@ -4,7 +4,7 @@ namespace SmallSmallRSS\Handlers;
 class PublicHandler extends Handler
 {
 
-    private function generate_syndicated_feed(
+    private function generateSyndicatedFeed(
         $owner_uid,
         $feed,
         $is_cat,
@@ -122,7 +122,6 @@ class PublicHandler extends Handler
             $tpl->setVariable('SELF_URL', htmlspecialchars(get_self_url_prefix()), true);
 
             while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
                 $tpl->setVariable('ARTICLE_ID', htmlspecialchars($line['link']), true);
                 $tpl->setVariable('ARTICLE_LINK', htmlspecialchars($line['link']), true);
                 $tpl->setVariable('ARTICLE_TITLE', htmlspecialchars($line['title']), true);
@@ -214,7 +213,8 @@ class PublicHandler extends Handler
                 $article['id'] = $line['link'];
                 $article['link'] = $line['link'];
                 $article['title'] = $line['title'];
-                $article['excerpt'] = \SmallSmallRSS\Utils::truncateString(strip_tags($line['content_preview']), 100, '...');
+                $article['excerpt'] = \SmallSmallRSS\Utils::truncateString(
+                    strip_tags($line['content_preview']), 100, '...');
                 $article['content'] = sanitize($line['content_preview'], $owner_uid);
                 $article['updated'] = date('c', strtotime($line['updated']));
                 if ($line['note']) {
@@ -412,7 +412,7 @@ class PublicHandler extends Handler
         }
 
         if ($owner_id) {
-            $this->generate_syndicated_feed(
+            $this->generateSyndicatedFeed(
                 $owner_id,
                 $feed,
                 $is_cat,
@@ -461,9 +461,7 @@ class PublicHandler extends Handler
         $action = $_REQUEST['action'];
 
         if ($_SESSION['uid']) {
-
             if ($action == 'share') {
-
                 $title = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST['title']));
                 $url = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST['url']));
                 $content = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST['content']));
@@ -568,7 +566,6 @@ class PublicHandler extends Handler
                 echo '</html>';
             }
         } else {
-
             $return = urlencode($_SERVER['REQUEST_URI']);
             echo '<form action="public.php?return=';
             echo $return;
@@ -910,7 +907,8 @@ class PublicHandler extends Handler
 
         if (!$method) {
             \SmallSmallRSS\Renderers\Messages::renderNotice(
-                __('You will need to provide valid account name and email. New password will be sent on your email address.')
+                __('You will need to provide valid account name and email.')
+                . __('New password will be sent to your email address.')
             );
 
             echo "<form method='POST' action='public.php'>";
@@ -937,7 +935,6 @@ class PublicHandler extends Handler
 
             echo '</form>';
         } elseif ($method == 'do') {
-
             $login = \SmallSmallRSS\Database::escape_string($_POST['login']);
             $email = \SmallSmallRSS\Database::escape_string($_POST['email']);
             $test = \SmallSmallRSS\Database::escape_string($_POST['test']);

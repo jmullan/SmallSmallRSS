@@ -407,7 +407,10 @@ class PrefUsers extends ProtectedHandler
                 $line['login'] = htmlspecialchars($line['login']);
                 $line['created'] = \SmallSmallRSS\Utils::makeLocalDatetime($line['created'], false, $_SESSION['uid']);
                 $line['last_login'] = \SmallSmallRSS\Utils::makeLocalDatetime(
-                    $line['last_login'], false, $_SESSION['uid']);
+                    $line['last_login'],
+                    false,
+                    $_SESSION['uid']
+                );
                 echo "<td align='center'><input onclick='toggleSelectRow2(this);'";
                 echo " data-dojo-type=\"dijit.form.CheckBox\" type=\"checkbox\"";
                 echo " id=\"UMCHK-$uid\"></td>";

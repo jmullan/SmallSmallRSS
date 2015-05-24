@@ -288,7 +288,6 @@ class PrefPrefs extends ProtectedHandler
         }
 
         if ($authenticator && method_exists($authenticator, 'change_password')) {
-
             echo '<h2>' . __('Password') . '</h2>';
 
             $result = \SmallSmallRSS\Database::query(
@@ -380,13 +379,17 @@ class PrefPrefs extends ProtectedHandler
                 </script>";
                     echo '<table width="100%" class="prefPrefsList">';
                     echo '<tr><td width="40%">'.__('Enter your password').'</td>';
-                    echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox" type="password" required="1"
-                    name="password"></td></tr>';
+                    echo '<td class="prefValue">';
+                    echo '<input data-dojo-type="dijit.form.ValidationTextBox" type="password" required="1" name="password" />';
+                    echo '</td>';
+                    echo '</tr>';
                     echo '</table>';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs">';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="otpdisable">';
-                    echo '<p><button data-dojo-type="dijit.form.Button" type="submit">'.
-                        __('Disable OTP').'</button>';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs" />';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="otpdisable" />';
+                    echo '<p>';
+                    echo '<button data-dojo-type="dijit.form.Button" type="submit">';
+                    echo __('Disable OTP');
+                    echo '</button>';
                     echo '</form>';
                 } elseif (function_exists('imagecreatefromstring')) {
                     \SmallSmallRSS\Renderers\Messages::renderWarning(
@@ -394,10 +397,10 @@ class PrefPrefs extends ProtectedHandler
                     );
                     echo '<p>'.__('Scan the following code by the Authenticator application:').'</p>';
                     $csrf_token = $_SESSION['csrf_token'];
-                    echo "<img src=\"backend.php?op=PrefPrefs&method=otpqrcode&csrf_token=$csrf_token\">";
+                    echo "<img src=\"backend.php?op=PrefPrefs&method=otpqrcode&csrf_token=$csrf_token\" />";
                     echo '<form data-dojo-type="dijit.form.Form" id="changeOtpForm">';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs">';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="otpenable">';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs" />';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="otpenable" />';
                     echo "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
                     evt.preventDefault();
                     if (this.validate()) {

@@ -22,11 +22,11 @@ class JSTranslations
         for ($i = 0; $i < $l10n->total; $i++) {
             $orig = $l10n->get_original_string($i);
             $translation = __($orig);
-            self::T_js_decl($orig, $translation);
+            self::renderJsDeclaration($orig, $translation);
         }
     }
 
-    public static function T_js_decl($s1, $s2)
+    public static function renderJsDeclaration($s1, $s2)
     {
         if ($s1 && $s2) {
             $s1 = preg_replace("/\n/", '', $s1);

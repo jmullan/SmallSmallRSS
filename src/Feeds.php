@@ -130,7 +130,7 @@ class Feeds
     }
 
     /**
-     * Purge a feed old of posts.
+     * Purge a feed of old posts.
      *
      * @param mixed $feed_id The id of the purged feed.
      * @param mixed $purge_interval Olderness of purged posts.

@@ -88,7 +88,8 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) {
 <?php echo __('Does not display images in articles, reduces automatic refreshes.'); ?>
     </div>
 
-    <?php if (\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') > 0) {
+    <?php
+          if (\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') > 0) {
 ?>
 
     <div class="row">
@@ -97,18 +98,21 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) {
       <label for="remember_me"><?php echo __('Remember me') ?></label>
     </div>
 
-    <?php }
+    <?php
+            }
     ?>
 
       <div class="row" style='text-align : right'>
         <button data-dojo-type="dijit.form.Button" type="submit"><?php echo __('Log in') ?></button>
-        <?php if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
+        <?php
+            if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
         ?>
         <button onclick="return gotoRegForm()" data-dojo-type="dijit.form.Button">
           <?php echo __('Create new account') ?>
         </button>
-        <?php }
-             ?>
+        <?php
+            }
+?>
       </div>
     </fieldset>
   </div>

@@ -600,17 +600,15 @@ class PrefPrefs extends ProtectedHandler
                 echo '<input  value="1" type="checkbox"';
                 echo " id=\"CB_$pref_name\" name=\"$pref_name\" $checked $disabled";
                 echo ' data-dojo-type="dijit.form.CheckBox">';
-            } elseif (
-                false !== array_search(
-                    $pref_name,
-                    array(
-                        'FRESH_ARTICLE_MAX_AGE',
-                        'PURGE_OLD_DAYS',
-                        'LONG_DATE_FORMAT',
-                        'SHORT_DATE_FORMAT'
-                    )
+            } elseif (false !== array_search(
+                $pref_name,
+                array(
+                    'FRESH_ARTICLE_MAX_AGE',
+                    'PURGE_OLD_DAYS',
+                    'LONG_DATE_FORMAT',
+                    'SHORT_DATE_FORMAT'
                 )
-            ) {
+            )) {
                 $regexp = ($type_name == 'integer') ? 'regexp="^\d*$"' : '';
                 if ($pref_name == 'PURGE_OLD_DAYS' && \SmallSmallRSS\Config::get('FORCE_ARTICLE_PURGE') != 0) {
                     $disabled = 'disabled="1"';

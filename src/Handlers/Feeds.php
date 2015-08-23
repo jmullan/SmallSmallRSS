@@ -258,8 +258,7 @@ class Feeds extends ProtectedHandler
             $search_mode = $method;
         }
 
-        if (
-            !$cat_view
+        if (!$cat_view
             && is_numeric($feed)
             && $feed < \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX
             && $feed > \SmallSmallRSS\Constants::LABEL_BASE_INDEX

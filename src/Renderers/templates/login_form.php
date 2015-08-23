@@ -38,8 +38,7 @@ $software_name = \SmallSmallRSS\Config::get('SOFTWARE_NAME');
   <div class='form'>
     <fieldset>
 <?php
-if (!empty($login_error_msg)) {
-?>
+if (!empty($login_error_msg)) { ?>
       <div class="row-error"><?php echo $login_error_msg ?></div>
 <?php $login_error_msg = ''; ?>
 <?php
@@ -59,8 +58,7 @@ if (!empty($login_error_msg)) {
       <input id="password" type="password" name="password" required="1" class="input"
         value="<?php echo $fake_password ?>"/>
 <?php
-if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) {
-    ?>
+if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) { ?>
       <a class='forgotpass' href="public.php?op=forgotpass"><?php echo __('I forgot my password') ?></a>
     <?php
 }
@@ -89,8 +87,7 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) {
     </div>
 
     <?php
-    if (\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') > 0) {
-?>
+    if (\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') > 0) { ?>
 
     <div class="row">
       <label>&nbsp;</label>
@@ -105,8 +102,7 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) {
       <div class="row" style='text-align : right'>
         <button data-dojo-type="dijit.form.Button" type="submit"><?php echo __('Log in') ?></button>
         <?php
-        if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
-        ?>
+        if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) { ?>
         <button onclick="return gotoRegForm()" data-dojo-type="dijit.form.Button">
             <?php echo __('Create new account') ?>
         </button>

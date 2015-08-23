@@ -86,7 +86,6 @@ class FeedParser
 
             switch ($this->type) {
                 case self::FEED_ATOM:
-
                     $title = $xpath->query('//atom:feed/atom:title')->item(0);
 
                     if (!$title) {

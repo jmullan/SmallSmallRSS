@@ -112,7 +112,11 @@ class PrefFeeds extends ProtectedHandler
             $feed['unread'] = 0;
             $feed['error'] = $feed_line['last_error'];
             $feed['icon'] = getFeedIcon($feed_line['id']);
-            $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime($feed_line['last_updated'], true, $_SESSION['uid']);
+            $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime(
+                $feed_line['last_updated'],
+                true,
+                $_SESSION['uid']
+            );
 
             array_push($items, $feed);
         }
@@ -273,7 +277,11 @@ class PrefFeeds extends ProtectedHandler
                 $feed['checkbox'] = false;
                 $feed['error'] = $feed_line['last_error'];
                 $feed['icon'] = getFeedIcon($feed_line['id']);
-                $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime($feed_line['last_updated'], true, $_SESSION['uid']);
+                $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime(
+                    $feed_line['last_updated'],
+                    true,
+                    $_SESSION['uid']
+                );
                 $feed['unread'] = 0;
                 $feed['type'] = 'feed';
 
@@ -310,7 +318,11 @@ class PrefFeeds extends ProtectedHandler
                 $feed['checkbox'] = false;
                 $feed['error'] = $feed_line['last_error'];
                 $feed['icon'] = getFeedIcon($feed_line['id']);
-                $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime($feed_line['last_updated'], true, $_SESSION['uid']);
+                $feed['param'] = \SmallSmallRSS\Utils::makeLocalDatetime(
+                    $feed_line['last_updated'],
+                    true,
+                    $_SESSION['uid']
+                );
                 $feed['unread'] = 0;
                 $feed['type'] = 'feed';
 
@@ -389,7 +401,6 @@ class PrefFeeds extends ProtectedHandler
                 $bare_id = substr($id, strpos($id, ':')+1);
                 if ($item['_reference']) {
                     if (strpos($id, 'FEED') === 0) {
-
                         $cat_id = ($item_id != 'root') ?
                             \SmallSmallRSS\Database::escapeString($bare_item_id) : 'NULL';
 
@@ -642,7 +653,8 @@ class PrefFeeds extends ProtectedHandler
         echo __('Password');
         echo "\" value=\"$auth_pass\">";
         echo '<div data-dojo-type="dijit.Tooltip" connectId="feedEditDlg_login" position="below">';
-        echo __('<b>Hint:</b> you need to fill in your login information if your feed requires authentication except for Twitter feeds.');
+        echo __('<b>Hint:</b> you need to fill in your login information if your feed requires authentication.');
+        echo __('Except for Twitter feeds.');
         echo '</div>';
         echo '</div>';
         echo '<div class="dlgSec">';
@@ -1208,7 +1220,6 @@ class PrefFeeds extends ProtectedHandler
         $ids = explode(',', $this->getSQLEscapedStringFromRequest('ids'));
 
         foreach ($ids as $id) {
-
             $filters = load_filters($id, $_SESSION['uid'], 6);
             $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
             $result = \SmallSmallRSS\Database::query(
@@ -1498,7 +1509,6 @@ class PrefFeeds extends ProtectedHandler
         echo $inactive_button;
 
         if (defined('_ENABLE_FEED_DEBUGGING')) {
-
             echo '<select id="feedActionChooser" onchange="feedActionChange()">
                 <option value="facDefault" selected>';
             echo __('More actions...');
@@ -1592,7 +1602,9 @@ class PrefFeeds extends ProtectedHandler
         echo '<hr/>';
         echo '<p>';
         echo __('Your OPML can be published publicly and can be subscribed to by anyone who knows the URL below.');
-        echo __('Published OPML does not include your RSS settings, feeds that require authentication, or feeds hidden from Popular feeds.');
+        echo __('Published OPML does not include your RSS settings');
+        echo __('Published OPML does not include feeds that require authentication');
+        echo __('Published OPML does not include feeds hidden from Popular feeds.');
         echo '</p>';
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return displayDlg('";
         echo __('Public OPML URL');
@@ -1627,7 +1639,7 @@ class PrefFeeds extends ProtectedHandler
         echo __('Published & shared articles / Generated feeds');
         echo '">';
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            __('Published articles are exported as a public RSS feed and can be subscribed to by anyone who knows the URL.')
+            __('Published articles are exported publicly and can be subscribed to by anyone who knows the URL.')
         );
         $rss_url = '-2::' . htmlspecialchars(
             get_self_url_prefix() .
@@ -1759,7 +1771,6 @@ class PrefFeeds extends ProtectedHandler
         $lnum = 1;
 
         while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
-
             $feed_id = $line['id'];
             $this_row_id = "id=\"FUPDD-$feed_id\"";
 
@@ -1795,13 +1806,14 @@ class PrefFeeds extends ProtectedHandler
 
         echo '<div class="dlgButtons">';
         echo '<div style="float: left">';
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').removeSelected()\">";
+        echo "<button data-dojo-type=\"dijit.form.Button\"";
+        echo " onclick=\"dijit.byId('inactiveFeedsDlg').removeSelected()\">";
         echo __('Unsubscribe from selected feeds');
         echo '</button> ';
         echo '</div>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').hide()\">".
-            __('Close this window');
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('inactiveFeedsDlg').hide()\">";
+        echo __('Close this window');
         echo '</button>';
 
         echo '</div>';
@@ -1838,7 +1850,6 @@ class PrefFeeds extends ProtectedHandler
         $lnum = 1;
 
         while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
-
             $feed_id = $line['id'];
             $this_row_id = "id=\"FERDD-$feed_id\"";
 
@@ -1876,13 +1887,13 @@ class PrefFeeds extends ProtectedHandler
 
         echo '<div class="dlgButtons">';
         echo '<div style="float: left">';
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').removeSelected()\">"
-            .__('Unsubscribe from selected feeds');
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').removeSelected()\">";
+        echo __('Unsubscribe from selected feeds');
         echo '</button> ';
         echo '</div>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').hide()\">".
-            __('Close this window');
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('errorFeedsDlg').hide()\">";
+        echo __('Close this window');
         echo '</button>';
 
         echo '</div>';
@@ -2065,7 +2076,6 @@ class PrefFeeds extends ProtectedHandler
             $feed = \SmallSmallRSS\Database::escapeString(trim($feed));
 
             if (validate_feed_url($feed)) {
-
                 \SmallSmallRSS\Database::query('BEGIN');
 
                 if ($cat_id == '0' || !$cat_id) {

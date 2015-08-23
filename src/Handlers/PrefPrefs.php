@@ -39,7 +39,7 @@ class PrefPrefs extends ProtectedHandler
             'CDM_EXPANDED' => array(__('Automatically expand articles in combined mode'), ''),
             'COMBINED_DISPLAY_MODE' => array(
                 __('Combined feed display'),
-                __('Display expanded list of feed articles, instead of separate displays for headlines and article content')
+                __('Display expanded list of feed articles')
             ),
             'CONFIRM_FEED_CATCHUP' => array(__('Confirm marking feed as read'), ''),
             'DEFAULT_ARTICLE_LIMIT' => array(__('Amount of articles to display at once'), ''),
@@ -50,7 +50,7 @@ class PrefPrefs extends ProtectedHandler
             'DIGEST_CATCHUP' => array(__('Mark articles in e-mail digest as read'), ''),
             'DIGEST_ENABLE' => array(
                 __('Enable e-mail digest'),
-                __('This option enables sending daily digest of new (and unread) headlines on your configured e-mail address')
+                __('This option enables sending daily digest of new headlines on your configured e-mail address')
             ),
             'DIGEST_PREFERRED_TIME' => array(
                 __('Try to send digests around specified time'),
@@ -67,7 +67,7 @@ class PrefPrefs extends ProtectedHandler
             'HIDE_READ_SHOWS_SPECIAL' => array(__('Show special feeds when hiding read feeds'), ''),
             'LONG_DATE_FORMAT' => array(
                 __('Long date format'),
-                __("The syntax used is identical to the PHP <a href='http://php.net/manual/function.date.php'>date()</a> function.")
+                __("The syntax used is identical to <a href='http://php.net/manual/function.date.php'>date()</a>.")
             ),
             'ON_CATCHUP_SHOW_NEXT_FEED' => array(
                 __('On catchup show next feed'),
@@ -255,7 +255,9 @@ class PrefPrefs extends ProtectedHandler
 
         $email = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, 'email'));
         $full_name = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, 'full_name'));
-        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetchResult($result, 0, 'otp_enabled'));
+        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'otp_enabled')
+        );
 
         echo '<tr><td width="40%">'.__('Full name').'</td>';
         echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox"';
@@ -380,12 +382,15 @@ class PrefPrefs extends ProtectedHandler
                     echo '<table width="100%" class="prefPrefsList">';
                     echo '<tr><td width="40%">'.__('Enter your password').'</td>';
                     echo '<td class="prefValue">';
-                    echo '<input data-dojo-type="dijit.form.ValidationTextBox" type="password" required="1" name="password" />';
+                    echo '<input data-dojo-type="dijit.form.ValidationTextBox"';
+                    echo ' type="password" required="1" name="password" />';
                     echo '</td>';
                     echo '</tr>';
                     echo '</table>';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs" />';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="otpdisable" />';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"';
+                    echo ' name="op" value="PrefPrefs" />';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"';
+                    echo ' name="method" value="otpdisable" />';
                     echo '<p>';
                     echo '<button data-dojo-type="dijit.form.Button" type="submit">';
                     echo __('Disable OTP');
@@ -393,14 +398,17 @@ class PrefPrefs extends ProtectedHandler
                     echo '</form>';
                 } elseif (function_exists('imagecreatefromstring')) {
                     \SmallSmallRSS\Renderers\Messages::renderWarning(
-                        __('You will need a compatible Authenticator to use this. Changing your password would automatically disable OTP.')
+                        __('You will need a compatible Authenticator to use this.')
+                        . __('Changing your password would automatically disable OTP.')
                     );
                     echo '<p>'.__('Scan the following code by the Authenticator application:').'</p>';
                     $csrf_token = $_SESSION['csrf_token'];
                     echo "<img src=\"backend.php?op=PrefPrefs&method=otpqrcode&csrf_token=$csrf_token\" />";
                     echo '<form data-dojo-type="dijit.form.Form" id="changeOtpForm">';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefPrefs" />';
-                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="method" value="otpenable" />';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"';
+                    echo ' name="op" value="PrefPrefs" />';
+                    echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"';
+                    echo ' name="method" value="otpenable" />';
                     echo "<script type=\"dojo/method\" event=\"onSubmit\" args=\"evt\">
                     evt.preventDefault();
                     if (this.validate()) {
@@ -421,12 +429,14 @@ class PrefPrefs extends ProtectedHandler
                     </script>";
                     echo '<table width="100%" class="prefPrefsList">';
                     echo '<tr><td width="40%">'.__('Enter your password').'</td>';
-                    echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox" type="password" required="1"
-                        name="password"></td></tr>';
-                    echo '<tr><td width="40%">'.__('Enter the generated one time password').'</td>';
-                    echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox" autocomplete="off"
-                        required="1"
-                        name="otp"></td></tr>';
+                    echo '<td class="prefValue">';
+                    echo '<input data-dojo-type="dijit.form.ValidationTextBox" type="password" required="1"';
+                    echo ' name="password"></td></tr>';
+                    echo '<tr>';
+                    echo '<td width="40%">'.__('Enter the generated one time password');
+                    echo '</td>';
+                    echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox"';
+                    echo ' autocomplete="off" required="1" name="otp"></td></tr>';
                     echo '<tr><td colspan="2">';
                     echo '</td></tr><tr><td colspan="2">';
                     echo '</td></tr>';
@@ -471,7 +481,8 @@ class PrefPrefs extends ProtectedHandler
         }
         </script>";
         echo '<div data-dojo-type="dijit.layout.BorderContainer" gutters="false">';
-        echo '<div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: \'center\'" style="overflow-y : auto">';
+        echo '<div data-dojo-type="dijit.layout.ContentPane" data-dojo-props="region: \'center\'"';
+        echo ' style="overflow-y : auto">';
 
         if (!empty($_SESSION['profile'])) {
             \SmallSmallRSS\Renderers\Messages::renderNotice(
@@ -643,7 +654,10 @@ class PrefPrefs extends ProtectedHandler
 
         echo '</table>';
         $listed_boolean_prefs = htmlspecialchars(join(',', $listed_boolean_prefs));
-        echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"boolean_prefs\" value=\"$listed_boolean_prefs\">";
+        echo '<input data-dojo-type="dijit.form.TextBox" style="display: none"';
+        echo ' name="boolean_prefs" value="';
+        echo $listed_boolean_prefs;
+        echo '">';
         \SmallSmallRSS\PluginHost::getInstance()->runHooks(
             \SmallSmallRSS\Hooks::RENDER_PREFS_TAB_SECTION,
             'prefPrefsPrefsInside'
@@ -681,7 +695,12 @@ class PrefPrefs extends ProtectedHandler
         echo '<div data-dojo-type="dijit.layout.AccordionPane" title="'.__('Plugins').'">';
         echo '<p>' . __('You will need to reload Tiny Tiny RSS for plugin changes to take effect.') . '</p>';
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            __('Download more plugins at tt-rss.org <a class="visibleLink" target="_blank" href="http://tt-rss.org/forum/viewforum.php?f=22">forums</a> or <a target="_blank" class="visibleLink" href="http://tt-rss.org/wiki/Plugins">wiki</a>.')
+            __('Download more plugins at tt-rss.org').
+            ' <a class="visibleLink" target="_blank" href="http://tt-rss.org/forum/viewforum.php?f=22">'
+            . __('forums')
+            . '</a> or <a target="_blank" class="visibleLink" href="http://tt-rss.org/wiki/Plugins">'
+            . __('wiki')
+            . '</a>.'
         );
 
         echo '<form data-dojo-type="dijit.form.Form" id="changePluginsForm">';
@@ -851,7 +870,9 @@ class PrefPrefs extends ProtectedHandler
 
         $base32 = new \OTPHP\Base32();
         $login = \SmallSmallRSS\Database::fetchResult($result, 0, 'login');
-        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetchResult($result, 0, 'otp_enabled'));
+        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'otp_enabled')
+        );
 
         if (!$otp_enabled) {
             $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetchResult($result, 0, 'salt')));
@@ -938,8 +959,9 @@ class PrefPrefs extends ProtectedHandler
         $value = str_replace('<br/>', "\n", $value);
 
         \SmallSmallRSS\Renderers\Messages::renderNotice(
-            T_sprintf(
-                'You can override colors, fonts and layout of your currently selected theme with custom CSS declarations here. <a target="_blank" class="visibleLink" href="%s">This file</a> can be used as a baseline.',
+            __('You can override colors, fonts and layout of your currently selected theme with custom CSS here.')
+            . T_sprintf(
+                '<a target="_blank" class="visibleLink" href="%s">This file</a> can be used as a baseline.',
                 'css/tt-rss.css'
             )
         );
@@ -1057,7 +1079,7 @@ class PrefPrefs extends ProtectedHandler
         echo "<div style='float: left'>";
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').removeSelected()\">";
         echo __('Remove selected profiles').'</button>';
-        echo " <button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').activateProfile()\">";
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').activateProfile()\">";
         echo __('Activate profile').'</button>';
         echo '</div>';
         echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"dijit.byId('profileEditDlg').hide()\">";

@@ -258,11 +258,12 @@ class Feeds extends ProtectedHandler
             $search_mode = $method;
         }
 
-        if (!$cat_view
+        if (
+            !$cat_view
             && is_numeric($feed)
             && $feed < \SmallSmallRSS\Constants::PLUGIN_FEED_BASE_INDEX
-            && $feed > \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
-
+            && $feed > \SmallSmallRSS\Constants::LABEL_BASE_INDEX
+        ) {
             $handler = \SmallSmallRSS\PluginHost::getInstance()->getFeedHandler(
                 \SmallSmallRSS\PluginHost::feedToPfeedId($feed)
             );
@@ -414,7 +415,15 @@ class Feeds extends ProtectedHandler
 
                 $score_pic = 'images/' . get_score_pic($score);
 
-                $score_pic = "<img class='hlScorePic' score='$score' onclick='changeScore($id, this)' src=\"$score_pic\" title=\"$score\" />";
+                $score_pic = '<img class="hlScorePic" score="';
+                echo $score;
+                echo '" onclick="changeScore(';
+                echo $id;
+                echo ', this);" src="';
+                echo $score_pic;
+                echo '" title="';
+                echo $score;
+                echo '" />';
 
                 if ($score > 500) {
                     $hlc_suffix = 'H';
@@ -453,7 +462,6 @@ class Feeds extends ProtectedHandler
                 if (!\SmallSmallRSS\DBPrefs::read('COMBINED_DISPLAY_MODE')) {
                     if (\SmallSmallRSS\DBPrefs::read('VFEED_GROUP_BY_FEED')) {
                         if ($feed_id != $vgroup_last_feed && $line['feed_title']) {
-
                             $cur_feed_title = $line['feed_title'];
                             $vgroup_last_feed = $feed_id;
 
@@ -745,6 +753,8 @@ class Feeds extends ProtectedHandler
             }
 
         } else {
+            $long_message = __('You can assign all selected articles to labels from article header context menu.');
+            $long_message .= __('You can assign articles to labels using a filter.');
             $message = '';
             switch ($view_mode) {
                 case 'unread':
@@ -759,8 +769,7 @@ class Feeds extends ProtectedHandler
                 default:
                     $message = __('No articles found to display.');
                     if ($feed < \SmallSmallRSS\Constants::LABEL_BASE_INDEX) {
-                        $message .= __('You can assign all selected articles to labels from article header context menu.');
-                        $message .= __('You can assign articles to labels using a filter.');
+                        $message .= $long_message;
                     }
             }
 

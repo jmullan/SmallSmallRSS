@@ -10,7 +10,7 @@ class Digest
      * @param integer $limit The maximum number of articles by digest.
      * @return boolean Return false if digests are not enabled.
      */
-    public static function send_headlines($debug = false)
+    public static function sendHeadlines($debug = false)
     {
 
         $user_limit = 15; // amount of users to process (e.g. emails to send out)
@@ -36,14 +36,13 @@ class Digest
                 // try to send digests within 2 hours of preferred time
                 if ($preferred_ts && $since >= 0 && $since < 7200) {
                     $do_catchup = \SmallSmallRSS\DBPrefs::read('DIGEST_CATCHUP', $uid, false);
-                    $tuple = prepare_headlines_digest($uid, 1, $limit);
+                    $tuple = self::prepareHeadlines($uid, 1, $limit);
                     $digest = $tuple[0];
                     $headlines_count = $tuple[1];
                     $affected_ids = $tuple[2];
                     $digest_text = $tuple[3];
 
                     if ($headlines_count > 0) {
-
                         $mail = new \SmallSmallRSS\Mailer();
 
                         $rc = $mail->quickMail(
@@ -70,7 +69,7 @@ class Digest
         }
     }
 
-    public static function prepare_headlines($user_id, $days = 1, $limit = 1000)
+    public static function prepareHeadlines($user_id, $days = 1, $limit = 1000)
     {
 
         $tpl = new \MiniTemplator\Engine();

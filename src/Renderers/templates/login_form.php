@@ -89,7 +89,7 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) {
     </div>
 
     <?php
-          if (\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') > 0) {
+    if (\SmallSmallRSS\Config::get('SESSION_COOKIE_LIFETIME') > 0) {
 ?>
 
     <div class="row">
@@ -99,19 +99,19 @@ if (strpos(\SmallSmallRSS\Config::get('PLUGINS'), 'auth_internal') !== false) {
     </div>
 
     <?php
-            }
+    }
     ?>
 
       <div class="row" style='text-align : right'>
         <button data-dojo-type="dijit.form.Button" type="submit"><?php echo __('Log in') ?></button>
         <?php
-            if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
+        if (\SmallSmallRSS\Config::get('ENABLE_REGISTRATION')) {
         ?>
         <button onclick="return gotoRegForm()" data-dojo-type="dijit.form.Button">
-          <?php echo __('Create new account') ?>
+            <?php echo __('Create new account') ?>
         </button>
         <?php
-            }
+        }
 ?>
       </div>
     </fieldset>

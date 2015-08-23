@@ -17,7 +17,9 @@ class Dlg extends ProtectedHandler
 
     public function importOpml()
     {
-        echo __('If you have imported labels and/or filters, you might need to reload preferences to see your new data.') . '</p>';
+        echo '<p>';
+        echo __('If you have imported labels and/or filters, you might need to reload preferences to see new data.');
+        echo '</p>';
         echo '<div class="prefFeedOPMLHolder">';
         $owner_uid = $_SESSION['uid'];
         \SmallSmallRSS\Database::query('BEGIN');
@@ -54,13 +56,17 @@ class Dlg extends ProtectedHandler
     {
         echo '<div class="errorExplained">';
         if ($this->param == 1) {
-            echo __('Update daemon is enabled in configuration, but daemon process is not running, which prevents all feeds from updating. Please start the daemon process or contact instance owner.');
+            echo __('Update daemon is enabled in configuration, but daemon process is not running.');
+            echo __('This prevents all feeds from updating.');
+            echo __('Please start the daemon process or contact instance owner.');
             $stamp = (int) \SmallSmallRSS\Lockfiles::whenStamped('update_daemon');
             echo '<p>' . __('Last update:') . ' ' . date('Y.m.d, G:i', $stamp) . '</p>';
 
         }
         if ($this->param == 3) {
-            echo __('Update daemon is taking too long to perform a feed update.  This could indicate a problem like crash or a hang. Please check the daemon process or contact instance owner.');
+            echo __('Update daemon is taking too long to perform a feed update.');
+            echo __('This could indicate a problem like a crash or a hang.');
+            echo __('Please check the daemon process or contact instance owner.');
             $stamp = (int) \SmallSmallRSS\Lockfiles::whenStamped('update_daemon');
             echo '<p>' . __('Last update:') . ' ' . date('Y.m.d, G:i', $stamp) . '</p>';
         }
@@ -104,7 +110,8 @@ class Dlg extends ProtectedHandler
         $min_qty = min(array_values($tags));
         // find the range of values
         $spread = $max_qty - $min_qty;
-        if ($spread == 0) { // we don't want to divide by zero
+        if ($spread == 0) {
+            // we don't want to divide by zero
             $spread = 1;
         }
 

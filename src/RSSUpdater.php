@@ -29,7 +29,7 @@ class RSSUpdater
         foreach ($feed_ids as $feed_id) {
             self::updateFeed($feed_id, true);
         }
-        \SmallSmallRSS\Digest::send_headlines();
+        \SmallSmallRSS\Digest::sendHeadlines();
         return count($feed_ids);
     }
     public static function getUpdateableFeeds($limit = null)

@@ -214,7 +214,10 @@ class PublicHandler extends Handler
                 $article['link'] = $line['link'];
                 $article['title'] = $line['title'];
                 $article['excerpt'] = \SmallSmallRSS\Utils::truncateString(
-                    strip_tags($line['content_preview']), 100, '...');
+                    strip_tags($line['content_preview']),
+                    100,
+                    '...'
+                );
                 $article['content'] = sanitize($line['content_preview'], $owner_uid);
                 $article['updated'] = date('c', strtotime($line['updated']));
                 if ($line['note']) {
@@ -676,7 +679,6 @@ class PublicHandler extends Handler
         }
         $feed_urls = false;
         if (!empty($_SESSION['uid'])) {
-
             $feed_url = \SmallSmallRSS\Database::escapeString(trim($_REQUEST['feed_url']));
 
             header('Content-Type: text/html; charset=utf-8');

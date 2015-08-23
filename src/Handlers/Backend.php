@@ -14,7 +14,7 @@ class Backend extends Handler
     public function digestTest()
     {
         header('Content-type: text/html');
-        $rv = \SmallSmallRSS\Digest::prepare_headlines($_SESSION['uid'], 1, 1000);
+        $rv = \SmallSmallRSS\Digest::prepareHeadlines($_SESSION['uid'], 1, 1000);
         $rv[3] = '<pre>' . $rv[3] . '</pre>';
         print_r($rv);
     }

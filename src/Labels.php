@@ -24,8 +24,8 @@ class Labels
                  AND owner_uid = '$owner_uid'
              LIMIT 1"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+        if (\SmallSmallRSS\Database::numRows($result) == 1) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
         } else {
             return 0;
         }
@@ -41,8 +41,8 @@ class Labels
                  ref_id = '$id'
                  AND owner_uid = '$owner_uid'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            $label_cache = \SmallSmallRSS\Database::fetch_result($result, 0, 'label_cache');
+        if (\SmallSmallRSS\Database::numRows($result) > 0) {
+            $label_cache = \SmallSmallRSS\Database::fetchResult($result, 0, 'label_cache');
             if ($label_cache) {
                 $label_cache = json_decode($label_cache, true);
                 if ($label_cache['no-labels'] == 1) {
@@ -67,7 +67,7 @@ class Labels
                  AND owner_uid = $owner_uid
              ORDER BY caption"
         );
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $rk = array(
                 $line['label_id'],
                 $line['caption'],
@@ -95,8 +95,8 @@ class Labels
                  AND owner_uid = '$owner_uid'
              LIMIT 1"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'caption');
+        if (\SmallSmallRSS\Database::numRows($result) == 1) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'caption');
         } else {
             return '';
         }
@@ -110,7 +110,7 @@ class Labels
         if (!$labels) {
             $labels = self::getForArticle($id, $owner_uid);
         }
-        $labels = \SmallSmallRSS\Database::escape_string(json_encode($labels));
+        $labels = \SmallSmallRSS\Database::escapeString(json_encode($labels));
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries
              SET label_cache = '$labels'
@@ -163,7 +163,7 @@ class Labels
                  AND owner_uid = '$owner_uid'
              LIMIT 1"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_user_labels2
                  (label_id, article_id)
@@ -181,13 +181,13 @@ class Labels
              FROM ttrss_labels2
              WHERE id = '$id'"
         );
-        $caption = \SmallSmallRSS\Database::fetch_result($result, 0, 'caption');
+        $caption = \SmallSmallRSS\Database::fetchResult($result, 0, 'caption');
         $result = \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_labels2
              WHERE id = '$id'
              AND owner_uid = $owner_uid"
         );
-        if (\SmallSmallRSS\Database::affected_rows($result) != 0 && $caption) {
+        if (\SmallSmallRSS\Database::affectedRows($result) != 0 && $caption) {
             $ext_id = \SmallSmallRSS\Constants::LABEL_BASE_INDEX - 1 - $id;
             \SmallSmallRSS\AccessKeys::delete($ext_id, $owner_uid);
             \SmallSmallRSS\Database::query(
@@ -210,14 +210,14 @@ class Labels
              WHERE
                  caption = '$caption' AND owner_uid = $owner_uid"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_labels2
                  (caption, owner_uid, fg_color, bg_color)
                  VALUES
                  ('$caption', '$owner_uid', '$fg_color', '$bg_color')"
             );
-            $result = \SmallSmallRSS\Database::affected_rows($result) != 0;
+            $result = \SmallSmallRSS\Database::affectedRows($result) != 0;
         }
         \SmallSmallRSS\Database::query('COMMIT');
         return $result;
@@ -238,7 +238,7 @@ class Labels
              ORDER BY caption"
         );
         $rv = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $checked = false;
             foreach ($article_labels as $al) {
                 if (self::fromFeedId($al[0]) == $line['id']) {
@@ -269,7 +269,7 @@ class Labels
              ORDER BY $order_by"
         );
         $rv = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $rv[] = $line;
         }
         return $rv;
@@ -291,6 +291,6 @@ class Labels
              FROM ttrss_labels2
              WHERE owner_uid = ' . $owner_uid
         );
-        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'count');
+        return (int) \SmallSmallRSS\Database::fetchResult($result, 0, 'count');
     }
 }

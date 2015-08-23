@@ -16,7 +16,7 @@ class DBPrefs
     public static function read($pref_name, $user_id = false, $die_on_error = false)
     {
 
-        $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
+        $pref_name = \SmallSmallRSS\Database::escapeString($pref_name);
         $profile = null;
 
         if (!$user_id) {
@@ -56,8 +56,8 @@ class DBPrefs
                  AND ttrss_user_prefs.pref_name = ttrss_prefs.pref_name"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            $pref = \SmallSmallRSS\Database::fetch_assoc($result);
+        if (\SmallSmallRSS\Database::numRows($result) > 0) {
+            $pref = \SmallSmallRSS\Database::fetchAssoc($result);
             $value = $pref['value'];
             $type_name = $pref['type_name'];
             self::cachePref($user_id, $pref_name, $type_name, $value);
@@ -84,8 +84,8 @@ class DBPrefs
 
     public static function write($pref_name, $value, $user_id = false, $strip_tags = true)
     {
-        $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
-        $value = \SmallSmallRSS\Database::escape_string($value, $strip_tags);
+        $pref_name = \SmallSmallRSS\Database::escapeString($pref_name);
+        $value = \SmallSmallRSS\Database::escapeString($value, $strip_tags);
         $profile = null;
 
         if (!$user_id) {
@@ -98,7 +98,7 @@ class DBPrefs
             $prefs_cache = false;
         }
 
-        $profile = \SmallSmallRSS\Database::quote_string($value, $strip_tags);
+        $profile = \SmallSmallRSS\Database::quoteString($value, $strip_tags);
         if ($profile) {
             $profile_qpart = "AND profile = $profile";
         } else {
@@ -128,8 +128,8 @@ class DBPrefs
                      AND type_id = ttrss_prefs_types.id"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-                $type_name = \SmallSmallRSS\Database::fetch_result($result, 0, 'type_name');
+            if (\SmallSmallRSS\Database::numRows($result) > 0) {
+                $type_name = \SmallSmallRSS\Database::fetchResult($result, 0, 'type_name');
             }
         } elseif ($current_value == $value) {
             return;

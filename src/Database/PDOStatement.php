@@ -12,7 +12,7 @@ class PDOStatement
         $this->cache = false;
     }
 
-    public function fetch_result($row, $param)
+    public function fetchResult($row, $param)
     {
         if (!$this->cache) {
             $this->cache = $this->stmt->fetchAll();

@@ -20,7 +20,7 @@ class MySQL implements DatabaseInterface
         }
     }
 
-    public function escape_string($s, $strip_tags = true)
+    public function escapeString($s, $strip_tags = true)
     {
         if ($strip_tags) {
             $s = strip_tags($s);
@@ -40,18 +40,18 @@ class MySQL implements DatabaseInterface
         return $result;
     }
 
-    public function fetch_assoc($result)
+    public function fetchAssoc($result)
     {
         return mysql_fetch_assoc($result);
     }
 
 
-    public function num_rows($result)
+    public function numRows($result)
     {
         return mysql_num_rows($result);
     }
 
-    public function fetch_result($result, $row, $param)
+    public function fetchResult($result, $row, $param)
     {
         return mysql_result($result, $row, $param);
     }
@@ -61,12 +61,12 @@ class MySQL implements DatabaseInterface
         return mysql_close($this->link);
     }
 
-    public function affected_rows($result)
+    public function affectedRows($result)
     {
         return mysql_affected_rows($this->link);
     }
 
-    public function last_error()
+    public function lastError()
     {
         return mysql_error();
     }

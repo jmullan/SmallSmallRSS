@@ -38,25 +38,25 @@ class PrefUsers extends ProtectedHandler
                 WHERE id = '$uid'"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             echo '<h1>'.__('User not found').'</h1>';
             return;
         }
 
-        $login = \SmallSmallRSS\Database::fetch_result($result, 0, 'login');
+        $login = \SmallSmallRSS\Database::fetchResult($result, 0, 'login');
         echo "<table width='100%'>";
         $last_login = \SmallSmallRSS\Utils::makeLocalDatetime(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'last_login'),
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'last_login'),
             true,
             $_SESSION['uid']
         );
         $created = \SmallSmallRSS\Utils::makeLocalDatetime(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'created'),
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'created'),
             true,
             $_SESSION['uid']
         );
-        $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, 'access_level');
-        $stored_articles = \SmallSmallRSS\Database::fetch_result($result, 0, 'stored_articles');
+        $access_level = \SmallSmallRSS\Database::fetchResult($result, 0, 'access_level');
+        $stored_articles = \SmallSmallRSS\Database::fetchResult($result, 0, 'stored_articles');
         echo '<tr><td>'.__('Registered')."</td><td>$created</td></tr>";
         echo '<tr><td>'.__('Last logged in')."</td><td>$last_login</td></tr>";
         $result = \SmallSmallRSS\Database::query(
@@ -64,7 +64,7 @@ class PrefUsers extends ProtectedHandler
              FROM ttrss_feeds
              WHERE owner_uid = '$uid'"
         );
-        $num_feeds = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_feeds');
+        $num_feeds = \SmallSmallRSS\Database::fetchResult($result, 0, 'num_feeds');
         echo '<tr><td>'.__('Subscribed feeds count')."</td><td>$num_feeds</td></tr>";
         echo '</table>';
         echo '<h1>'.__('Subscribed feeds').'</h1>';
@@ -75,7 +75,7 @@ class PrefUsers extends ProtectedHandler
              ORDER BY title"
         );
         echo '<ul class="userFeedList">';
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $icon_file = \SmallSmallRSS\Config::get('ICONS_URL') . '/' . $line['id'] . '.ico';
             if (file_exists($icon_file) && filesize($icon_file) > 0) {
                 $feed_icon = "<img class=\"tinyFeedIcon\" src=\"$icon_file\" />";
@@ -84,7 +84,7 @@ class PrefUsers extends ProtectedHandler
             }
             echo "<li>$feed_icon&nbsp;<a href=\"".$line['site_url'].'">'.$line['title'].'</a></li>';
         }
-        if (\SmallSmallRSS\Database::num_rows($result) < $num_feeds) {
+        if (\SmallSmallRSS\Database::numRows($result) < $num_feeds) {
             // FIXME - add link to show ALL subscribed feeds here somewhere
             echo '<li><img
                     class="tinyFeedIcon" src="images/blank_icon.gif">&nbsp;...</li>';
@@ -100,7 +100,7 @@ class PrefUsers extends ProtectedHandler
     {
         $access_level_names = \SmallSmallRSS\Constants::accessLevelNames();
 
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
+        $id = \SmallSmallRSS\Database::escapeString($_REQUEST['id']);
         echo "<form id=\"user_edit_form\" onsubmit='return false' data-dojo-type=\"dijit.form.Form\">";
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$id\">";
@@ -109,9 +109,9 @@ class PrefUsers extends ProtectedHandler
 
         $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_users WHERE id = '$id'");
 
-        $login = \SmallSmallRSS\Database::fetch_result($result, 0, 'login');
-        $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, 'access_level');
-        $email = \SmallSmallRSS\Database::fetch_result($result, 0, 'email');
+        $login = \SmallSmallRSS\Database::fetchResult($result, 0, 'login');
+        $access_level = \SmallSmallRSS\Database::fetchResult($result, 0, 'access_level');
+        $email = \SmallSmallRSS\Database::fetchResult($result, 0, 'email');
 
         $sel_disabled = ($id == $_SESSION['uid']) ? 'disabled' : '';
 
@@ -175,10 +175,10 @@ class PrefUsers extends ProtectedHandler
 
     public function editSave()
     {
-        $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['login']));
-        $uid = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
+        $login = \SmallSmallRSS\Database::escapeString(trim($_REQUEST['login']));
+        $uid = \SmallSmallRSS\Database::escapeString($_REQUEST['id']);
         $access_level = (int) $_REQUEST['access_level'];
-        $email = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['email']));
+        $email = \SmallSmallRSS\Database::escapeString(trim($_REQUEST['email']));
         $password = $_REQUEST['password'];
         if ($password) {
             $salt = \SmallSmallRSS\Auth::getSalt();
@@ -201,7 +201,7 @@ class PrefUsers extends ProtectedHandler
 
     public function remove()
     {
-        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['ids']));
+        $ids = explode(',', \SmallSmallRSS\Database::escapeString($_REQUEST['ids']));
         foreach ($ids as $id) {
             if ($id != $_SESSION['uid'] && $id != 1) {
                 \SmallSmallRSS\Database::query("DELETE FROM ttrss_tags WHERE owner_uid = '$id'");
@@ -213,7 +213,7 @@ class PrefUsers extends ProtectedHandler
     public function add()
     {
 
-        $login = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['login']));
+        $login = \SmallSmallRSS\Database::escapeString(trim($_REQUEST['login']));
         $tmp_user_pwd = \SmallSmallRSS\Users::makePassword(8);
         $salt = \SmallSmallRSS\Auth::getSalt();
         $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($tmp_user_pwd, $salt, true);
@@ -221,7 +221,7 @@ class PrefUsers extends ProtectedHandler
             "SELECT id FROM ttrss_users WHERE
                 login = '$login'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_users
                     (login,pwd_hash,access_level,last_login,created, salt)
@@ -231,8 +231,8 @@ class PrefUsers extends ProtectedHandler
                 "SELECT id FROM ttrss_users WHERE
                     login = '$login' AND pwd_hash = '$pwd_hash'"
             );
-            if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-                $new_uid = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+            if (\SmallSmallRSS\Database::numRows($result) == 1) {
+                $new_uid = \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
                 \SmallSmallRSS\Renderers\Messages::renderNotice(
                     T_sprintf('Added user <b>%s</b> with password <b>%s</b>', $login, $tmp_user_pwd)
                 );
@@ -257,9 +257,9 @@ class PrefUsers extends ProtectedHandler
              FROM ttrss_users
              WHERE id = '$uid'"
         );
-        $login = \SmallSmallRSS\Database::fetch_result($result, 0, 'login');
-        $email = \SmallSmallRSS\Database::fetch_result($result, 0, 'email');
-        $salt = \SmallSmallRSS\Database::fetch_result($result, 0, 'salt');
+        $login = \SmallSmallRSS\Database::fetchResult($result, 0, 'login');
+        $email = \SmallSmallRSS\Database::fetchResult($result, 0, 'email');
+        $salt = \SmallSmallRSS\Database::fetchResult($result, 0, 'salt');
         $new_salt = \SmallSmallRSS\Auth::getSalt();
         $tmp_user_pwd = \SmallSmallRSS\Users::makePassword(8);
         $pwd_hash = \SmallSmallRSS\Auth::encryptPassword($tmp_user_pwd, $new_salt, true);
@@ -301,7 +301,7 @@ class PrefUsers extends ProtectedHandler
 
     public function resetPass()
     {
-        $uid = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
+        $uid = \SmallSmallRSS\Database::escapeString($_REQUEST['id']);
         self::resetUserPassword($uid, true);
     }
     public function index()
@@ -310,7 +310,7 @@ class PrefUsers extends ProtectedHandler
         echo '<div id="pref-user-wrap" data-dojo-type="dijit.layout.BorderContainer" gutters="false">';
         echo '<div id="pref-user-header" data-dojo-type="dijit.layout.ContentPane" region="top">';
         echo '<div id="pref-user-toolbar" data-dojo-type="dijit.Toolbar">';
-        $user_search = \SmallSmallRSS\Database::escape_string($_REQUEST['search']);
+        $user_search = \SmallSmallRSS\Database::escapeString($_REQUEST['search']);
         if (array_key_exists('search', $_REQUEST)) {
             $_SESSION['prefs_user_search'] = $user_search;
         } else {
@@ -323,7 +323,7 @@ class PrefUsers extends ProtectedHandler
         echo __('Search');
         echo '</button>';
         echo '</div>';
-        $sort = \SmallSmallRSS\Database::escape_string($_REQUEST['sort']);
+        $sort = \SmallSmallRSS\Database::escapeString($_REQUEST['sort']);
         if (!$sort || $sort == 'undefined') {
             $sort = 'login';
         }
@@ -384,7 +384,7 @@ class PrefUsers extends ProtectedHandler
              ORDER BY $sort"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+        if (\SmallSmallRSS\Database::numRows($result) > 0) {
             echo '<p><table width="100%" cellspacing="0" class="prefUserList" id="prefUserList">';
             echo '<tr class="title">';
             echo "<td align='center' width=\"5%\">&nbsp;</td>";
@@ -401,7 +401,7 @@ class PrefUsers extends ProtectedHandler
             echo __('Last login');
             echo '</a></td></tr>';
             $lnum = 0;
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 $uid = $line['id'];
                 echo "<tr id=\"UMRR-$uid\">";
                 $line['login'] = htmlspecialchars($line['login']);

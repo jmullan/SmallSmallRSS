@@ -93,7 +93,7 @@ class NSFW extends \SmallSmallRSS\Plugin
 
     public function save()
     {
-        $tags = explode(",", \SmallSmallRSS\Database::escape_string($_POST["tags"]));
+        $tags = explode(",", \SmallSmallRSS\Database::escapeString($_POST["tags"]));
         $tags = array_map("trim", $tags);
         $tags = array_map("mb_strtolower", $tags);
         $tags = join(", ", $tags);

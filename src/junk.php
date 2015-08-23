@@ -131,7 +131,7 @@ function getLabelCounters($owner_uid, $descriptions = false)
              ttrss_labels2.id, ttrss_labels2.caption"
     );
     $ret_arr = array();
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+    while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
         $id = \SmallSmallRSS\Labels::toFeedId($line['id']);
         $cv = array(
             'id' => $id,
@@ -196,7 +196,7 @@ function getCategoryCounters($owner_uid)
                 AND ttrss_feed_categories.owner_uid = ' . $owner_uid
     );
     $query_time = (microtime(true) - $start) * 1000;
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+    while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
         $start = microtime(true);
         $line['cat_id'] = (int) $line['cat_id'];
         if ($line['num_children'] > 0) {
@@ -261,7 +261,7 @@ function getCategoriesUnread($cat_ids, $owner_uid)
                  AND ttrss_user_entries.unread = true
                  AND ttrss_user_entries.owner_uid = $owner_uid"
         );
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $unreads[$line['cat_id']] == $line['unread'];
         }
     }
@@ -292,7 +292,7 @@ function getCategoryUnread($cat, $owner_uid)
                  AND unread = true
                  AND ttrss_user_entries.owner_uid = '$owner_uid'"
         );
-        $unread = \SmallSmallRSS\Database::fetch_result($result, 0, 'unread');
+        $unread = \SmallSmallRSS\Database::fetchResult($result, 0, 'unread');
         return $unread;
     }
 }
@@ -308,8 +308,8 @@ function getLabelUnread($label_id, $owner_uid)
              AND label_id = '$label_id'
              AND article_id = ref_id"
     );
-    if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-        return \SmallSmallRSS\Database::fetch_result($result, 0, 'unread');
+    if (\SmallSmallRSS\Database::numRows($result) != 0) {
+        return \SmallSmallRSS\Database::fetchResult($result, 0, 'unread');
     } else {
         return 0;
     }
@@ -329,7 +329,7 @@ function countUnreadFeedArticles($feed, $is_cat, $unread_only, $owner_uid)
     } elseif ($n_feed == -6) {
         return 0;
     } elseif ($feed != '0' && $n_feed == 0) {
-        $feed = \SmallSmallRSS\Database::escape_string($feed);
+        $feed = \SmallSmallRSS\Database::escapeString($feed);
         $result = \SmallSmallRSS\Database::query(
             "SELECT SUM(
                  (
@@ -346,7 +346,7 @@ function countUnreadFeedArticles($feed, $is_cat, $unread_only, $owner_uid)
                  owner_uid = $owner_uid
                  AND tag_name = '$feed'"
         );
-        return \SmallSmallRSS\Database::fetch_result($result, 0, 'count');
+        return \SmallSmallRSS\Database::fetchResult($result, 0, 'count');
     } elseif ($n_feed == -1) {
         $match_part = 'marked = true';
     } elseif ($n_feed == -2) {
@@ -400,7 +400,7 @@ function countUnreadFeedArticles($feed, $is_cat, $unread_only, $owner_uid)
                  AND ttrss_tags.owner_uid = " . $owner_uid
         );
     }
-    $unread = \SmallSmallRSS\Database::fetch_result($result, 0, 'unread');
+    $unread = \SmallSmallRSS\Database::fetchResult($result, 0, 'unread');
     return $unread;
 }
 
@@ -425,7 +425,7 @@ function getFeedCounters($owner_uid)
 
     $result = \SmallSmallRSS\Database::query($query);
     $fctrs_modified = false;
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+    while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
         $id = $line['id'];
         $count = $line['count'];
         $last_error = htmlspecialchars($line['last_error']);
@@ -710,7 +710,7 @@ function search_to_sql($search)
             case 'title':
                 if ($commandpair[1]) {
                     $query_keywords[] = "($not (LOWER(ttrss_entries.title) LIKE '%"
-                        . \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))";
+                        . \SmallSmallRSS\Database::escapeString(mb_strtolower($commandpair[1]))."%'))";
                 } else {
                     $query_keywords[] = "(UPPER(ttrss_entries.title) $not LIKE UPPER('%$k%')"
                         . " OR UPPER(ttrss_entries.content) $not LIKE UPPER('%$k%'))";
@@ -721,7 +721,7 @@ function search_to_sql($search)
                     array_push(
                         $query_keywords,
                         "($not (LOWER(author) LIKE '%"
-                        . \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))"
+                        . \SmallSmallRSS\Database::escapeString(mb_strtolower($commandpair[1]))."%'))"
                     );
                 } else {
                     array_push(
@@ -741,7 +741,7 @@ function search_to_sql($search)
                         array_push(
                             $query_keywords,
                             "($not (LOWER(note) LIKE '%"
-                            . \SmallSmallRSS\Database::escape_string(mb_strtolower($commandpair[1]))."%'))"
+                            . \SmallSmallRSS\Database::escapeString(mb_strtolower($commandpair[1]))."%'))"
                         );
                     }
                 } else {
@@ -857,7 +857,7 @@ function queryFeedHeadlines(
             false
         );
         if ($result) {
-            $test = \SmallSmallRSS\Database::fetch_result($result, 0, 'true_val');
+            $test = \SmallSmallRSS\Database::fetchResult($result, 0, 'true_val');
             if (!$test) {
                 $filter_query_part = 'false AND';
             } else {
@@ -1040,10 +1040,10 @@ function queryFeedHeadlines(
                          id = '$feed'
                          AND owner_uid = $owner_uid"
                 );
-                $feed_title = \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
-                $feed_site_url = \SmallSmallRSS\Database::fetch_result($result, 0, 'site_url');
-                $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_error');
-                $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
+                $feed_title = \SmallSmallRSS\Database::fetchResult($result, 0, 'title');
+                $feed_site_url = \SmallSmallRSS\Database::fetchResult($result, 0, 'site_url');
+                $last_error = \SmallSmallRSS\Database::fetchResult($result, 0, 'last_error');
+                $last_updated = \SmallSmallRSS\Database::fetchResult($result, 0, 'last_updated');
             } else {
                 $feed_title = \SmallSmallRSS\Feeds::getTitle($feed);
             }
@@ -1334,7 +1334,7 @@ function catchupArticlesById($ids, $mark_mode, $owner_uid)
 
 function get_article_tags($id, $owner_uid, $tag_cache = false)
 {
-    $a_id = \SmallSmallRSS\Database::escape_string($id);
+    $a_id = \SmallSmallRSS\Database::escapeString($id);
     $tags = array();
     if ($tag_cache === false) {
         $tag_cache = \SmallSmallRSS\UserEntries::getCachedTags($id, $owner_uid);
@@ -1421,7 +1421,7 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
         $rules = array();
         $actions = array();
 
-        while (($rule_line = \SmallSmallRSS\Database::fetch_assoc($result2))) {
+        while (($rule_line = \SmallSmallRSS\Database::fetchAssoc($result2))) {
             $rule = array();
             $rule['reg_exp'] = $rule_line['reg_exp'];
             $rule['type'] = $rule_line['type_name'];
@@ -1438,7 +1438,7 @@ function load_filters($feed_id, $owner_uid, $action_id = false)
                  action_id = t.id AND filter_id = '$filter_id'"
         );
 
-        while (($action_line = \SmallSmallRSS\Database::fetch_assoc($result2))) {
+        while (($action_line = \SmallSmallRSS\Database::fetchAssoc($result2))) {
             $action = array();
             $action['type'] = $action_line['type_name'];
             $action['param'] = $action_line['action_param'];
@@ -1799,7 +1799,7 @@ function filter_to_sql($filter, $owner_uid)
     foreach ($filter['rules'] as $rule) {
         $regexp_valid = preg_match('/' . $rule['reg_exp'] . '/', $rule['reg_exp']) !== false;
         if ($regexp_valid) {
-            $rule['reg_exp'] = \SmallSmallRSS\Database::escape_string($rule['reg_exp']);
+            $rule['reg_exp'] = \SmallSmallRSS\Database::escapeString($rule['reg_exp']);
             switch ($rule['type']) {
                 case 'title':
                     $qpart = "LOWER(ttrss_entries.title) $reg_qpart LOWER('".
@@ -1831,7 +1831,7 @@ function filter_to_sql($filter, $owner_uid)
                 $qpart = "NOT ($qpart)";
             }
             if (isset($rule['feed_id']) && $rule['feed_id'] > 0) {
-                $qpart .= ' AND feed_id = ' . \SmallSmallRSS\Database::escape_string($rule['feed_id']);
+                $qpart .= ' AND feed_id = ' . \SmallSmallRSS\Database::escapeString($rule['feed_id']);
             }
             if (isset($rule['cat_id'])) {
                 if ($rule['cat_id'] > 0) {

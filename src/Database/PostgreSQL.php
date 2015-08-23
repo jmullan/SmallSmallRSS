@@ -25,7 +25,7 @@ class PostgreSQL implements DatabaseInterface
         return $this->link;
     }
 
-    public function escape_string($s, $strip_tags = true)
+    public function escapeString($s, $strip_tags = true)
     {
         if ($strip_tags) {
             $s = strip_tags($s);
@@ -46,18 +46,18 @@ class PostgreSQL implements DatabaseInterface
         return $result;
     }
 
-    public function fetch_assoc($result)
+    public function fetchAssoc($result)
     {
         return \pg_fetch_assoc($result);
     }
 
 
-    public function num_rows($result)
+    public function numRows($result)
     {
         return \pg_num_rows($result);
     }
 
-    public function fetch_result($result, $row, $param)
+    public function fetchResult($result, $row, $param)
     {
         return \pg_fetch_result($result, $row, $param);
     }
@@ -67,12 +67,12 @@ class PostgreSQL implements DatabaseInterface
         return \pg_close($this->link);
     }
 
-    public function affected_rows($result)
+    public function affectedRows($result)
     {
         return \pg_affected_rows($result);
     }
 
-    public function last_error()
+    public function lastError()
     {
         return \pg_last_error($this->link);
     }

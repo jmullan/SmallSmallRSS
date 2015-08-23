@@ -12,7 +12,7 @@ class Article extends ProtectedHandler
 
     public function redirect()
     {
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
+        $id = \SmallSmallRSS\Database::escapeString($_REQUEST['id']);
         $result = \SmallSmallRSS\Database::query(
             "SELECT link
              FROM ttrss_entries, ttrss_user_entries
@@ -22,8 +22,8 @@ class Article extends ProtectedHandler
              LIMIT 1"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            $article_url = \SmallSmallRSS\Database::fetch_result($result, 0, 'link');
+        if (\SmallSmallRSS\Database::numRows($result) == 1) {
+            $article_url = \SmallSmallRSS\Database::fetchResult($result, 0, 'link');
             $article_url = str_replace("\n", '', $article_url);
             header("Location: $article_url");
             return;
@@ -35,10 +35,10 @@ class Article extends ProtectedHandler
 
     public function view()
     {
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-        $cids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['cids']));
-        $mode = \SmallSmallRSS\Database::escape_string($_REQUEST['mode']);
-        $omode = \SmallSmallRSS\Database::escape_string($_REQUEST['omode']);
+        $id = \SmallSmallRSS\Database::escapeString($_REQUEST['id']);
+        $cids = explode(',', \SmallSmallRSS\Database::escapeString($_REQUEST['cids']));
+        $mode = \SmallSmallRSS\Database::escapeString($_REQUEST['mode']);
+        $omode = \SmallSmallRSS\Database::escapeString($_REQUEST['omode']);
 
         // in prefetch mode we only output requested cids, main article
         // just gets marked as read (it already exists in client cache)
@@ -109,8 +109,8 @@ class Article extends ProtectedHandler
                  AND owner_uid = '$owner_uid'
              LIMIT 1"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'ref_id');
+        if (\SmallSmallRSS\Database::numRows($result) != 0) {
+            $ref_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'ref_id');
             $int_id = \SmallSmallRSS\UserEntries::getIntId($ref_id, $owner_uid);
             if (!is_null($int_id)) {
                 \SmallSmallRSS\Entries::updateContent($ref_id, $content);
@@ -182,8 +182,8 @@ class Article extends ProtectedHandler
     }
     public function setScore()
     {
-        $ids = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
-        $score = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['score']);
+        $ids = \SmallSmallRSS\Database::escapeString($_REQUEST['id']);
+        $score = (int) \SmallSmallRSS\Database::escapeString($_REQUEST['score']);
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries
              SET score = '$score'
@@ -228,7 +228,7 @@ class Article extends ProtectedHandler
 
     public function completeTags()
     {
-        $search = \SmallSmallRSS\Database::escape_string($_REQUEST['search']);
+        $search = \SmallSmallRSS\Database::escapeString($_REQUEST['search']);
         $result = \SmallSmallRSS\Database::query(
             "SELECT DISTINCT tag_name FROM ttrss_tags
                 WHERE owner_uid = '".$_SESSION['uid']."' AND
@@ -236,7 +236,7 @@ class Article extends ProtectedHandler
                 LIMIT 10"
         );
         echo '<ul>';
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             echo '<li>' . $line['tag_name'] . '</li>';
         }
         echo '</ul>';
@@ -255,9 +255,9 @@ class Article extends ProtectedHandler
     private function labelops($assign)
     {
         $reply = array();
-        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['ids']));
-        $label_id = \SmallSmallRSS\Database::escape_string($_REQUEST['lid']);
-        $label = \SmallSmallRSS\Database::escape_string(
+        $ids = explode(',', \SmallSmallRSS\Database::escapeString($_REQUEST['ids']));
+        $label_id = \SmallSmallRSS\Database::escapeString($_REQUEST['lid']);
+        $label = \SmallSmallRSS\Database::escapeString(
             \SmallSmallRSS\Labels::findCaption($label_id, $_SESSION['uid'])
         );
         $reply['info-for-headlines'] = array();

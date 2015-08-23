@@ -12,8 +12,8 @@ class UserEntries
                  ref_id = '$ref_id'
                  AND owner_uid = $owner_uid"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            $row = \SmallSmallRSS\Database::fetch_assoc($result);
+        if (\SmallSmallRSS\Database::numRows($result) != 0) {
+            $row = \SmallSmallRSS\Database::fetchAssoc($result);
             if (isset($row['feed_id'])) {
                 return $row['feed_id'];
             }
@@ -27,8 +27,8 @@ class UserEntries
              FROM ttrss_user_entries
              WHERE owner_uid = $owner_uid"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            $row = \SmallSmallRSS\Database::fetch_assoc($result);
+        if (\SmallSmallRSS\Database::numRows($result) == 1) {
+            $row = \SmallSmallRSS\Database::fetchAssoc($result);
             if (isset($row['id'])) {
                 return $row['id'];
             }
@@ -327,7 +327,7 @@ class UserEntries
                      AND feed_id IN($in_feed_ids)
                      AND owner_uid = $owner_uid"
             );
-            while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+            while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
                 $unread += $line['unread'];
             }
         }
@@ -344,7 +344,7 @@ class UserEntries
                  AND owner_uid = $owner_uid"
         );
         $feed_ids = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $feed_ids[] = $line['feed_id'];
         }
         return $feed_ids;
@@ -359,7 +359,7 @@ class UserEntries
                  AND owner_uid = $owner_uid"
         );
         if ($result) {
-            $row = \SmallSmallRSS\Database::fetch_assoc($result);
+            $row = \SmallSmallRSS\Database::fetchAssoc($result);
         }
         if (isset($row['tag_cache'])) {
             return $row['tag_cache'];
@@ -368,7 +368,7 @@ class UserEntries
     }
     public static function setCachedTags($ref_id, $owner_uid, $tags_str)
     {
-        $tags_str = \SmallSmallRSS\Database::escape_string($tags_str);
+        $tags_str = \SmallSmallRSS\Database::escapeString($tags_str);
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries
              SET tag_cache = '$tags_str'
@@ -469,8 +469,8 @@ class UserEntries
     }
     public static function getIntId($ref_id, $owner_uid)
     {
-        $ref_id = \SmallSmallRSS\Database::escape_string($ref_id);
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $ref_id = \SmallSmallRSS\Database::escapeString($ref_id);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
         $result = \SmallSmallRSS\Database::query(
             "SELECT int_id
              FROM ttrss_user_entries
@@ -479,17 +479,17 @@ class UserEntries
                  AND owner_uid = '$owner_uid'
              LIMIT 1"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'int_id');
+        if (\SmallSmallRSS\Database::numRows($result) != 0) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'int_id');
         } else {
             return null;
         }
     }
     public static function setNote($ref_id, $owner_uid, $note)
     {
-        $ref_id = \SmallSmallRSS\Database::escape_string($ref_id);
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
-        $note = \SmallSmallRSS\Database::escape_string(trim(strip_tags($note)));
+        $ref_id = \SmallSmallRSS\Database::escapeString($ref_id);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
+        $note = \SmallSmallRSS\Database::escapeString(trim(strip_tags($note)));
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_user_entries
              SET note = '$note'
@@ -502,8 +502,8 @@ class UserEntries
 
     public static function getNote($ref_id, $owner_uid)
     {
-        $ref_id = \SmallSmallRSS\Database::escape_string($ref_id);
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $ref_id = \SmallSmallRSS\Database::escapeString($ref_id);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
         $result = \SmallSmallRSS\Database::query(
             "SELECT note
              FROM ttrss_user_entries
@@ -511,8 +511,8 @@ class UserEntries
                  ref_id = '$ref_id'
                  AND owner_uid = $owner_uid"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, "note");
+        if (\SmallSmallRSS\Database::numRows($result) != 0) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, "note");
         } else {
             return '';
         }
@@ -533,6 +533,6 @@ class UserEntries
                      ref_id IN ($in_article_ids)
                      AND owner_uid = $owner_uid"
         );
-        return \SmallSmallRSS\Database::affected_rows($result);
+        return \SmallSmallRSS\Database::affectedRows($result);
     }
 }

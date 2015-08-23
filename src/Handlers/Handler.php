@@ -65,7 +65,7 @@ class Handler implements IHandler
 
     public static function getSQLEscapedStringFromRequest($key)
     {
-        return \SmallSmallRSS\Database::escape_string(self::getStringFromRequest($key));
+        return \SmallSmallRSS\Database::escapeString(self::getStringFromRequest($key));
     }
 
     public static function formatArticle($id, $mark_as_read, $zoom_mode, $owner_uid)
@@ -110,7 +110,7 @@ class Handler implements IHandler
         );
 
         if ($result) {
-            $line = \SmallSmallRSS\Database::fetch_assoc($result);
+            $line = \SmallSmallRSS\Database::fetchAssoc($result);
             $tag_cache = $line['tag_cache'];
             $line['tags'] = get_article_tags($id, $owner_uid, $line['tag_cache']);
             unset($line['tag_cache']);
@@ -217,13 +217,13 @@ class Handler implements IHandler
                  WHERE id = '.$line['orig_feed_id']
                 );
 
-                if (\SmallSmallRSS\Database::num_rows($tmp_result) != 0) {
+                if (\SmallSmallRSS\Database::numRows($tmp_result) != 0) {
                     echo "<div clear='both'>";
                     echo __('Originally from:');
 
                     echo '&nbsp;';
 
-                    $tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result);
+                    $tmp_line = \SmallSmallRSS\Database::fetchAssoc($tmp_result);
 
                     echo "<a target='_blank'
                         href=' " . htmlspecialchars($tmp_line['site_url']) . "'>" .

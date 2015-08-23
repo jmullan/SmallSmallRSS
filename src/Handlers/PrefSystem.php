@@ -56,7 +56,7 @@ class PrefSystem extends ProtectedHandler
             print "<td width='5%'>".__('User').'</td>';
             print "<td width='5%'>".__('Date').'</td>';
             print '</tr>';
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 print '<tr class="errrow">';
                 foreach ($line as $k => $v) {
                     $line[$k] = htmlspecialchars($v);

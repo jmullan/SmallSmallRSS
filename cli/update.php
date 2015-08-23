@@ -172,7 +172,7 @@ if (isset($options["convert-filters"])) {
 
     $result = \SmallSmallRSS\Database::query("SELECT * FROM ttrss_filters ORDER BY id");
 
-    while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+    while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
         $owner_uid = $line["owner_uid"];
 
         // date filters are removed

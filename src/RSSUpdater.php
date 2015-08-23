@@ -128,7 +128,7 @@ class RSSUpdater
         // We search for feed needing update.
         $result = \SmallSmallRSS\Database::query($query);
         $feed_ids = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $feed_ids[] = $line['feed_id'];
         }
         return $feed_ids;
@@ -175,12 +175,12 @@ class RSSUpdater
              FROM ttrss_feeds WHERE id = '$feed'"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             \SmallSmallRSS\Logger::debug("feed $feed NOT FOUND/SKIPPED");
             return false;
         }
 
-        $row = \SmallSmallRSS\Database::fetch_assoc($result);
+        $row = \SmallSmallRSS\Database::fetchAssoc($result);
 
         $last_updated = $row['last_updated'];
         $last_article_timestamp = strtotime($row['last_article_timestamp']);
@@ -199,7 +199,7 @@ class RSSUpdater
         $cache_images = \SmallSmallRSS\Database::fromSQLBool($row['cache_images']);
         $fetch_url = $row['feed_url'];
         \SmallSmallRSS\Feeds::markUpdateStarted(array($feed));
-        $feed = \SmallSmallRSS\Database::escape_string($feed);
+        $feed = \SmallSmallRSS\Database::escapeString($feed);
         $date_feed_processed = date('Y-m-d H:i');
         $cache_filename = \SmallSmallRSS\Config::get('CACHE_DIR') . '/simplepie/' . sha1($fetch_url) . '.xml';
         $pluginhost = new \SmallSmallRSS\PluginHost();
@@ -253,7 +253,7 @@ class RSSUpdater
                 $error_escaped = '';
                 // If-Modified-Since
                 if ($fetch_last_error_code != 304) {
-                    $error_escaped = \SmallSmallRSS\Database::escape_string($fetch_last_error);
+                    $error_escaped = \SmallSmallRSS\Database::escapeString($fetch_last_error);
                 }
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_feeds
@@ -275,9 +275,9 @@ class RSSUpdater
             $rss->init();
         }
 
-        $feed = \SmallSmallRSS\Database::escape_string($feed);
+        $feed = \SmallSmallRSS\Database::escapeString($feed);
         if ($rss->error()) {
-            $error_msg = \SmallSmallRSS\Database::escape_string(mb_substr($rss->error(), 0, 245));
+            $error_msg = \SmallSmallRSS\Database::escapeString(mb_substr($rss->error(), 0, 245));
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds
                  SET
@@ -319,16 +319,16 @@ class RSSUpdater
              WHERE id = '$feed'"
         );
 
-        $registered_title = \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
-        $orig_site_url = \SmallSmallRSS\Database::fetch_result($result, 0, 'site_url');
+        $registered_title = \SmallSmallRSS\Database::fetchResult($result, 0, 'title');
+        $orig_site_url = \SmallSmallRSS\Database::fetchResult($result, 0, 'site_url');
         $favicon_needs_check = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'favicon_needs_check')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'favicon_needs_check')
         );
-        $favicon_avg_color = \SmallSmallRSS\Database::fetch_result($result, 0, 'favicon_avg_color');
+        $favicon_avg_color = \SmallSmallRSS\Database::fetchResult($result, 0, 'favicon_avg_color');
 
-        $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, 'owner_uid');
+        $owner_uid = \SmallSmallRSS\Database::fetchResult($result, 0, 'owner_uid');
 
-        $site_url = \SmallSmallRSS\Database::escape_string(
+        $site_url = \SmallSmallRSS\Database::escapeString(
             mb_substr(\SmallSmallRSS\Utils::rewriteRelativeUrl($fetch_url, $rss->getLink()), 0, 245)
         );
 
@@ -359,7 +359,7 @@ class RSSUpdater
                      SET favicon_avg_color = 'fail'
                      WHERE id = '$feed'"
                 );
-                $favicon_color = \SmallSmallRSS\Database::escape_string(
+                $favicon_color = \SmallSmallRSS\Database::escapeString(
                     \SmallSmallRSS\Colors::calculateAverage($favicon_file)
                 );
                 $favicon_colorstring = ",favicon_avg_color = '".$favicon_color."'";
@@ -376,7 +376,7 @@ class RSSUpdater
         }
 
         if (!$registered_title || $registered_title == '[Unknown]') {
-            $feed_title = \SmallSmallRSS\Database::escape_string($rss->getTitle());
+            $feed_title = \SmallSmallRSS\Database::escapeString($rss->getTitle());
             if ($feed_title) {
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_feeds
@@ -442,7 +442,7 @@ class RSSUpdater
             }
 
             $entry_guid = "$owner_uid,$entry_guid";
-            $entry_guid_hashed = \SmallSmallRSS\Database::escape_string('SHA1:' . sha1($entry_guid));
+            $entry_guid_hashed = \SmallSmallRSS\Database::escapeString('SHA1:' . sha1($entry_guid));
             $entry_timestamp = $item->getDate();
             if ($entry_timestamp == -1 || !$entry_timestamp || $entry_timestamp > time()) {
                 $entry_timestamp = time();
@@ -467,9 +467,9 @@ class RSSUpdater
             }
             $entry_comments = $item->getCommentsUrl();
             $entry_author = $item->getAuthor();
-            $entry_guid = \SmallSmallRSS\Database::escape_string(mb_substr($entry_guid, 0, 245));
-            $entry_comments = \SmallSmallRSS\Database::escape_string(mb_substr(trim($entry_comments), 0, 245));
-            $entry_author = \SmallSmallRSS\Database::escape_string(mb_substr(trim($entry_author), 0, 245));
+            $entry_guid = \SmallSmallRSS\Database::escapeString(mb_substr($entry_guid, 0, 245));
+            $entry_comments = \SmallSmallRSS\Database::escapeString(mb_substr(trim($entry_comments), 0, 245));
+            $entry_author = \SmallSmallRSS\Database::escapeString(mb_substr(trim($entry_author), 0, 245));
             $num_comments = (int) $item->getCommentsCount();
 
             // parse <category> entries into tags
@@ -499,19 +499,19 @@ class RSSUpdater
                  ref_id = id
                  AND owner_uid = $owner_uid
                  AND (
-                     guid = '" . \SmallSmallRSS\Database::escape_string($entry_guid) . "'
+                     guid = '" . \SmallSmallRSS\Database::escapeString($entry_guid) . "'
                      OR guid = '$entry_guid_hashed'
                  )"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                $entry_plugin_data = \SmallSmallRSS\Database::fetch_result($result, 0, 'plugin_data');
+            if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                $entry_plugin_data = \SmallSmallRSS\Database::fetchResult($result, 0, 'plugin_data');
                 $stored_article = array(
-                    'title' => \SmallSmallRSS\Database::fetch_result($result, 0, 'title'),
-                    'content' => \SmallSmallRSS\Database::fetch_result($result, 0, 'content'),
-                    'link' => \SmallSmallRSS\Database::fetch_result($result, 0, 'link'),
-                    'tags' => explode(',', \SmallSmallRSS\Database::fetch_result($result, 0, 'tag_cache')),
-                    'author' => \SmallSmallRSS\Database::fetch_result($result, 0, 'author')
+                    'title' => \SmallSmallRSS\Database::fetchResult($result, 0, 'title'),
+                    'content' => \SmallSmallRSS\Database::fetchResult($result, 0, 'content'),
+                    'link' => \SmallSmallRSS\Database::fetchResult($result, 0, 'link'),
+                    'tags' => explode(',', \SmallSmallRSS\Database::fetchResult($result, 0, 'tag_cache')),
+                    'author' => \SmallSmallRSS\Database::fetchResult($result, 0, 'author')
                 );
             } else {
                 $entry_plugin_data = '';
@@ -535,18 +535,18 @@ class RSSUpdater
             }
 
             $entry_tags = $article['tags'];
-            $entry_guid = \SmallSmallRSS\Database::escape_string($entry_guid);
-            $entry_title = \SmallSmallRSS\Database::escape_string($article['title']);
-            $entry_author = \SmallSmallRSS\Database::escape_string($article['author']);
-            $entry_link = \SmallSmallRSS\Database::escape_string($article['link']);
-            $entry_plugin_data = \SmallSmallRSS\Database::escape_string($article['plugin_data']);
+            $entry_guid = \SmallSmallRSS\Database::escapeString($entry_guid);
+            $entry_title = \SmallSmallRSS\Database::escapeString($article['title']);
+            $entry_author = \SmallSmallRSS\Database::escapeString($article['author']);
+            $entry_link = \SmallSmallRSS\Database::escapeString($article['link']);
+            $entry_plugin_data = \SmallSmallRSS\Database::escapeString($article['plugin_data']);
             $entry_content = $article['content']; // escaped below
 
             if ($cache_images && is_writable(\SmallSmallRSS\Config::get('CACHE_DIR') . '/images')) {
                 $entry_content = \SmallSmallRSS\ImageCache::processImages($entry_content, $site_url);
             }
 
-            $entry_content = \SmallSmallRSS\Database::escape_string($entry_content, false);
+            $entry_content = \SmallSmallRSS\Database::escapeString($entry_content, false);
 
             $content_hash = 'SHA1:' . sha1($entry_content);
 
@@ -557,7 +557,7 @@ class RSSUpdater
                  WHERE (guid = '$entry_guid' OR guid = '$entry_guid_hashed')"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::numRows($result) == 0) {
                 // base post entry does not exist, create it
                 $query = "
                 INSERT INTO ttrss_entries (
@@ -599,7 +599,7 @@ class RSSUpdater
                 // dupes when the entry gets purged and reinserted again e.g.
                 // in the case of SLOW SLOW OMG SLOW updating feeds
 
-                $base_entry_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+                $base_entry_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
 
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_entries
@@ -630,17 +630,17 @@ class RSSUpdater
             $entry_ref_id = 0;
             $entry_int_id = 0;
             $article_filters = array();
-            if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+            if (\SmallSmallRSS\Database::numRows($result) == 1) {
                 // this will be used below in update handler
-                $orig_content_hash = \SmallSmallRSS\Database::fetch_result($result, 0, 'content_hash');
-                $orig_title = \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
-                $orig_num_comments = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_comments');
+                $orig_content_hash = \SmallSmallRSS\Database::fetchResult($result, 0, 'content_hash');
+                $orig_title = \SmallSmallRSS\Database::fetchResult($result, 0, 'title');
+                $orig_num_comments = \SmallSmallRSS\Database::fetchResult($result, 0, 'num_comments');
                 $orig_date_updated = strtotime(
-                    \SmallSmallRSS\Database::fetch_result($result, 0, 'date_updated')
+                    \SmallSmallRSS\Database::fetchResult($result, 0, 'date_updated')
                 );
-                $orig_plugin_data = \SmallSmallRSS\Database::fetch_result($result, 0, 'plugin_data');
+                $orig_plugin_data = \SmallSmallRSS\Database::fetchResult($result, 0, 'plugin_data');
 
-                $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+                $ref_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
                 $entry_ref_id = $ref_id;
 
                 // check for user post link to main table
@@ -681,7 +681,7 @@ class RSSUpdater
                 $result = \SmallSmallRSS\Database::query($query);
 
                 // okay it doesn't exist - create user entry
-                if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                if (\SmallSmallRSS\Database::numRows($result) == 0) {
                     if ($score >= -500 && !\SmallSmallRSS\ArticleFilters::matchArticle($article_filters, 'catchup')) {
                         $unread = 'true';
                         $last_read_qpart = 'NULL';
@@ -716,7 +716,7 @@ class RSSUpdater
                                  AND owner_uid = $owner_uid"
                         );
 
-                        $ngram_similar = \SmallSmallRSS\Database::fetch_result($result, 0, 'similar');
+                        $ngram_similar = \SmallSmallRSS\Database::fetchResult($result, 0, 'similar');
 
                         if ($ngram_similar > 0) {
                             $unread = 'false';
@@ -755,12 +755,12 @@ class RSSUpdater
                          LIMIT 1"
                     );
 
-                    if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-                        $entry_int_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'int_id');
+                    if (\SmallSmallRSS\Database::numRows($result) == 1) {
+                        $entry_int_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'int_id');
                     }
                 } else {
-                    $entry_ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'ref_id');
-                    $entry_int_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'int_id');
+                    $entry_ref_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'ref_id');
+                    $entry_int_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'int_id');
                 }
                 $post_needs_update = false;
                 $update_insignificant = false;
@@ -780,7 +780,7 @@ class RSSUpdater
                     $update_insignificant = false;
                 }
 
-                if (\SmallSmallRSS\Database::escape_string($orig_title) != $entry_title) {
+                if (\SmallSmallRSS\Database::escapeString($orig_title) != $entry_title) {
                     $post_needs_update = true;
                     $update_insignificant = false;
                 }
@@ -855,7 +855,7 @@ class RSSUpdater
                     if (!\SmallSmallRSS\Tags::isValid($tag)) {
                         continue;
                     }
-                    $tag = \SmallSmallRSS\Database::escape_string($tag);
+                    $tag = \SmallSmallRSS\Database::escapeString($tag);
                     $result = \SmallSmallRSS\Database::query(
                         "SELECT id
                          FROM ttrss_tags
@@ -865,7 +865,7 @@ class RSSUpdater
                              AND owner_uid = '$owner_uid' LIMIT 1"
                     );
 
-                    if ($result && \SmallSmallRSS\Database::num_rows($result) == 0) {
+                    if ($result && \SmallSmallRSS\Database::numRows($result) == 0) {
                         \SmallSmallRSS\Database::query(
                             "INSERT INTO ttrss_tags
                          (owner_uid,tag_name,post_int_id)
@@ -880,7 +880,7 @@ class RSSUpdater
 
                 $tags_to_cache = array_unique($tags_to_cache);
 
-                $tags_str = \SmallSmallRSS\Database::escape_string(join(',', $tags_to_cache));
+                $tags_str = \SmallSmallRSS\Database::escapeString(join(',', $tags_to_cache));
 
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_user_entries

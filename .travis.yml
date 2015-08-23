@@ -11,4 +11,4 @@ matrix:
     - php: "hhvm"
 script:
   - ./vendor/bin/phpcs --standard=PSR2 src
-
+  - phpunit tests

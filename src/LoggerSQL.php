@@ -6,10 +6,10 @@ class LoggerSQL extends LoggerAbstract implements LoggerInterface
     public static function logError($errno, $errstr, $file, $line, $context)
     {
         if (\SmallSmallRSS\Sanity::getSchemaVersion() > 117) {
-            $errno = \SmallSmallRSS\Database::escape_string($errno);
-            $errstr = \SmallSmallRSS\Database::escape_string($errstr);
-            $file = \SmallSmallRSS\Database::escape_string($file);
-            $line = \SmallSmallRSS\Database::escape_string($line);
+            $errno = \SmallSmallRSS\Database::escapeString($errno);
+            $errstr = \SmallSmallRSS\Database::escapeString($errstr);
+            $file = \SmallSmallRSS\Database::escapeString($file);
+            $line = \SmallSmallRSS\Database::escapeString($line);
             $context = '';
             $owner_uid = 'NULL';
             if (!isset($_SESSION)) {
@@ -24,7 +24,7 @@ class LoggerSQL extends LoggerAbstract implements LoggerInterface
                  VALUES
                  ($errno, '$errstr', '$file', '$line', '$context', $owner_uid, NOW())"
             );
-            return \SmallSmallRSS\Database::affected_rows($result) != 0;
+            return \SmallSmallRSS\Database::affectedRows($result) != 0;
         }
         return false;
     }

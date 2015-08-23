@@ -19,8 +19,8 @@ class FeedCategories
                  FROM ttrss_feed_categories
                  WHERE id = '$cat_id'"
             );
-            if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-                return \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
+            if (\SmallSmallRSS\Database::numRows($result) == 1) {
+                return \SmallSmallRSS\Database::fetchResult($result, 0, 'title');
             } else {
                 return __('Uncategorized');
             }
@@ -43,10 +43,10 @@ class FeedCategories
                  AND title = '$feed_cat'
                  AND owner_uid = $owner_uid"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             return false;
         } else {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
         }
     }
 
@@ -77,7 +77,7 @@ class FeedCategories
                  AND owner_uid = $owner_uid"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_feed_categories (owner_uid,title,parent_cat)
                 VALUES ('$owner_uid', '$feed_cat', $parent_insert)"
@@ -105,7 +105,7 @@ class FeedCategories
              ORDER BY order_id"
         );
         $cat_ids = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $cat_ids[] = $line['id'];
         }
     }
@@ -133,7 +133,7 @@ class FeedCategories
              ORDER BY title ASC"
         );
         $children = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $children[] = $line;
         }
         return $children;
@@ -153,7 +153,7 @@ class FeedCategories
                   AND owner_uid = $owner_uid"
         );
         $parents = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $parents[] = $line['parent_cat'];
         }
         return $parents;
@@ -177,7 +177,7 @@ class FeedCategories
                  $qpart
                  AND owner_uid = $owner_uid"
         );
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $ids[] = $line['id'];
         }
         return $ids;
@@ -239,7 +239,7 @@ class FeedCategories
             "
         );
         $cats = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $cats[] = $line;
         }
         return $cats;

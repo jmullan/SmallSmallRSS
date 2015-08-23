@@ -35,7 +35,7 @@ class Embed_Original extends \SmallSmallRSS\Plugin
 
     public function getUrl()
     {
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
+        $id = \SmallSmallRSS\Database::escapeString($_REQUEST['id']);
         $result = \SmallSmallRSS\Database::query(
             "SELECT link
              FROM ttrss_entries, ttrss_user_entries
@@ -45,8 +45,8 @@ class Embed_Original extends \SmallSmallRSS\Plugin
                  AND owner_uid = " .$_SESSION['uid']
         );
         $url = "";
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            $url = \SmallSmallRSS\Database::fetch_result($result, 0, "link");
+        if (\SmallSmallRSS\Database::numRows($result) != 0) {
+            $url = \SmallSmallRSS\Database::fetchResult($result, 0, "link");
 
         }
         print json_encode(array("url" => $url, "id" => $id));

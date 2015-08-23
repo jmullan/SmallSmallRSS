@@ -18,11 +18,11 @@ class Entries
     }
     public static function insert($title, $guid, $url, $content)
     {
-        $title = \SmallSmallRSS\Database::escape_string($title);
-        $guid = \SmallSmallRSS\Database::escape_string($guid);
-        $url = \SmallSmallRSS\Database::escape_string($url);
+        $title = \SmallSmallRSS\Database::escapeString($title);
+        $guid = \SmallSmallRSS\Database::escapeString($guid);
+        $url = \SmallSmallRSS\Database::escapeString($url);
         $content_hash = sha1($content);
-        $content = \SmallSmallRSS\Database::escape_string($content);
+        $content = \SmallSmallRSS\Database::escapeString($content);
 
         $result = \SmallSmallRSS\Database::query(
             "INSERT INTO ttrss_entries
@@ -31,8 +31,8 @@ class Entries
              ('$title', '$guid', '$url', NOW(), '$content', '$content_hash', NOW(), NOW())"
         );
         $result = \SmallSmallRSS\Database::query("SELECT id FROM ttrss_entries WHERE guid = '$guid'");
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+        if (\SmallSmallRSS\Database::numRows($result) != 0) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
         } else {
             return false;
         }
@@ -42,7 +42,7 @@ class Entries
     public static function updateContent($ref_id, $content)
     {
         $content_hash = sha1($content);
-        $content = \SmallSmallRSS\Database::escape_string($content);
+        $content = \SmallSmallRSS\Database::escapeString($content);
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_entries
              SET

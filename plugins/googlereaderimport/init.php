@@ -32,16 +32,16 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
             return;
         }
         print "please enter your username:";
-        $username = \SmallSmallRSS\Database::escape_string(trim(\SmallSmallRSS\Utils::readStdin()));
+        $username = \SmallSmallRSS\Database::escapeString(trim(\SmallSmallRSS\Utils::readStdin()));
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_users
              WHERE login = '$username'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             \SmallSmallRSS\Logger::debug("user not found.");
             return;
         }
-        $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+        $owner_uid = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
         $this->import($file, $owner_uid);
     }
 
@@ -97,32 +97,32 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
             if (isset($doc['items'])) {
                 $processed = 0;
                 foreach ($doc['items'] as $item) {
-                    $guid = \SmallSmallRSS\Database::escape_string(mb_substr($item['id'], 0, 250));
-                    $title = \SmallSmallRSS\Database::escape_string($item['title']);
+                    $guid = \SmallSmallRSS\Database::escapeString(mb_substr($item['id'], 0, 250));
+                    $title = \SmallSmallRSS\Database::escapeString($item['title']);
                     $updated = date('Y-m-d h:i:s', $item['updated']);
                     $link = '';
                     $content = '';
-                    $author = \SmallSmallRSS\Database::escape_string($item['author']);
+                    $author = \SmallSmallRSS\Database::escapeString($item['author']);
                     $tags = array();
                     $orig_feed_data = array();
 
                     if (is_array($item['alternate'])) {
                         foreach ($item['alternate'] as $alt) {
                             if (isset($alt['type']) && $alt['type'] == 'text/html') {
-                                $link = \SmallSmallRSS\Database::escape_string($alt['href']);
+                                $link = \SmallSmallRSS\Database::escapeString($alt['href']);
                             }
                         }
                     }
 
                     if (is_array($item['summary'])) {
-                        $content = \SmallSmallRSS\Database::escape_string(
+                        $content = \SmallSmallRSS\Database::escapeString(
                             $item['summary']['content'],
                             false
                         );
                     }
 
                     if (is_array($item['content'])) {
-                        $content = \SmallSmallRSS\Database::escape_string(
+                        $content = \SmallSmallRSS\Database::escapeString(
                             $item['content']['content'],
                             false
                         );
@@ -139,15 +139,15 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                     if (is_array($item['origin'])) {
                         if (strpos($item['origin']['streamId'], 'feed/') === 0) {
 
-                            $orig_feed_data['feed_url'] = \SmallSmallRSS\Database::escape_string(
+                            $orig_feed_data['feed_url'] = \SmallSmallRSS\Database::escapeString(
                                 mb_substr(preg_replace("/^feed\//", "", $item['origin']['streamId']), 0, 200)
                             );
 
-                            $orig_feed_data['title'] = \SmallSmallRSS\Database::escape_string(
+                            $orig_feed_data['title'] = \SmallSmallRSS\Database::escapeString(
                                 mb_substr($item['origin']['title'], 0, 200)
                             );
 
-                            $orig_feed_data['site_url'] = \SmallSmallRSS\Database::escape_string(
+                            $orig_feed_data['site_url'] = \SmallSmallRSS\Database::escapeString(
                                 mb_substr($item['origin']['htmlUrl'], 0, 200)
                             );
                         }
@@ -218,8 +218,8 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                      AND owner_uid = $owner_uid"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+            if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                $feed_id = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
             } else {
                 // let's insert it
                 if (!$orig_feed_data['title']) {
@@ -244,8 +244,8 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                          AND owner_uid = $owner_uid"
                 );
 
-                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                    $feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+                if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                    $feed_id = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
                     $feed_inserted = true;
                 }
             }
@@ -260,8 +260,8 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                  feed_url = '".$orig_feed_data['feed_url']."' AND owner_uid = $owner_uid"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                $orig_feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+            if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                $orig_feed_id = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
             } else {
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_archived_feeds
@@ -275,8 +275,8 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                      WHERE feed_url = '" . $orig_feed_data['feed_url'] . "' AND owner_uid = $owner_uid"
                 );
 
-                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                    $orig_feed_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+                if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                    $orig_feed_id = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
                 }
             }
         }
@@ -295,7 +295,7 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
              guid = '$guid' AND ref_id = id AND owner_uid = '$owner_uid' LIMIT 1"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_entries
                  (title, guid, link, updated, content, content_hash, date_entered, date_updated, author)
@@ -309,8 +309,8 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                  WHERE guid = '$guid'"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+            if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                $ref_id = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_user_entries
                      (ref_id, uuid, feed_id, orig_feed_id, owner_uid, marked, tag_cache, label_cache,
@@ -327,8 +327,8 @@ class GoogleReaderImport extends \SmallSmallRSS\Plugin
                          AND ref_id = id
                          AND ref_id = $ref_id"
                 );
-                if (\SmallSmallRSS\Database::num_rows($result) != 0 && is_array($tags)) {
-                    $entry_int_id = \SmallSmallRSS\Database::fetch_result($result, 0, "int_id");
+                if (\SmallSmallRSS\Database::numRows($result) != 0 && is_array($tags)) {
+                    $entry_int_id = \SmallSmallRSS\Database::fetchResult($result, 0, "int_id");
                     $tags_to_cache = array();
                     foreach ($tags as $tag) {
                         $tag = \SmallSmallRSS\Tags::sanitize($tag);

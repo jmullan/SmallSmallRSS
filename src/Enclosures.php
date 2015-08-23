@@ -11,8 +11,8 @@ class Enclosures
                       AND content_url != ''";
         $rv = array();
         $result = \SmallSmallRSS\Database::query($query);
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        if (\SmallSmallRSS\Database::numRows($result) > 0) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 array_push($rv, $line);
             }
         }
@@ -22,9 +22,9 @@ class Enclosures
     {
         \SmallSmallRSS\Database::query('BEGIN');
         foreach ($enclosures as $enc) {
-            $enc_url = \SmallSmallRSS\Database::escape_string($enc[0]);
-            $enc_type = \SmallSmallRSS\Database::escape_string($enc[1]);
-            $enc_dur = \SmallSmallRSS\Database::escape_string($enc[2]);
+            $enc_url = \SmallSmallRSS\Database::escapeString($enc[0]);
+            $enc_type = \SmallSmallRSS\Database::escapeString($enc[1]);
+            $enc_dur = \SmallSmallRSS\Database::escapeString($enc[2]);
             $result = \SmallSmallRSS\Database::query(
                 "SELECT id
                  FROM ttrss_enclosures
@@ -32,7 +32,7 @@ class Enclosures
                      content_url = '$enc_url'
                      AND post_id = '$entry_ref_id'"
             );
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::numRows($result) == 0) {
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_enclosures
                      (content_url, content_type, title, duration, post_id)

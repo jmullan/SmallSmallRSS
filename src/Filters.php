@@ -5,7 +5,7 @@ class Filters
 {
     public static function getEnabled($owner_uid)
     {
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
         $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2
              WHERE
@@ -14,14 +14,14 @@ class Filters
              ORDER BY order_id, title"
         );
         $filters = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $filters[] = $line;
         }
         return $filters;
     }
     public static function resetFileters($owner_uid)
     {
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_filters2
              SET order_id = 0
@@ -31,7 +31,7 @@ class Filters
     }
     public static function updateOrder($index, $filter_id, $owner_uid)
     {
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
         $filter_id = (int) $filter_id;
         $index = (int) $index;
         \SmallSmallRSS\Database::query(
@@ -51,8 +51,8 @@ class Filters
         $match_any_rule = \SmallSmallRSS\Database::toSQLBool($match_any_rule);
         $inverse = \SmallSmallRSS\Database::toSQLBool($inverse);
 
-        $title = \SmallSmallRSS\Database::escape_string($title);
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $title = \SmallSmallRSS\Database::escapeString($title);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
         $result = \SmallSmallRSS\Database::query(
             "UPDATE ttrss_filters2
              SET enabled = $enabled,
@@ -70,7 +70,7 @@ class Filters
             return;
         }
         $filter_ids = join(',', $filter_ids);
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_filters2
              WHERE
@@ -87,8 +87,8 @@ class Filters
         $match_any_rule = \SmallSmallRSS\Database::toSQLBool($match_any_rule);
         $inverse = \SmallSmallRSS\Database::toSQLBool($inverse);
 
-        $title = \SmallSmallRSS\Database::escape_string($title);
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $title = \SmallSmallRSS\Database::escapeString($title);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
 
         $result = \SmallSmallRSS\Database::query(
             "INSERT INTO ttrss_filters2
@@ -102,7 +102,7 @@ class Filters
              FROM ttrss_filters2
              WHERE owner_uid = $owner_uid"
         );
-        return \SmallSmallRSS\Database::fetch_result($result, 0, 'max_id');
+        return \SmallSmallRSS\Database::fetchResult($result, 0, 'max_id');
 
     }
 }

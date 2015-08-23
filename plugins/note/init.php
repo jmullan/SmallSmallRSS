@@ -34,7 +34,7 @@ class Note extends \SmallSmallRSS\Plugin
 
     public function edit()
     {
-        $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
+        $param = \SmallSmallRSS\Database::escapeString($_REQUEST['param']);
         $note = \SmallSmallRSS\UserEntries::getNote($param, $_SESSION['uid']);
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$param\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" ";

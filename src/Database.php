@@ -39,32 +39,33 @@ class Database
                 \SmallSmallRSS\Config::get('DB_PORT')
             );
             if (!self::$link) {
-                die('Error connecting through adapter: ' . self::adapter()->last_error());
+                die('Error connecting through adapter: ' . self::adapter()->lastError());
             }
             error_reporting($er);
         }
         return self::$adapter;
     }
 
-    public static function getLink() {
+    public static function getLink()
+    {
         self::adapter();
         return self::$link;
     }
 
-    public static function escape_string($s, $strip_tags = true)
+    public static function escapeString($s, $strip_tags = true)
     {
-        return self::adapter()->escape_string($s, $strip_tags);
+        return self::adapter()->escapeString($s, $strip_tags);
     }
 
-    public static function quote_string($s, $strip_tags = true)
+    public static function quoteString($s, $strip_tags = true)
     {
-        return "'" . self::adapter()->escape_string($s, $strip_tags) . "'";
+        return "'" . self::adapter()->escapeString($s, $strip_tags) . "'";
     }
 
     public static function query($query, $die_on_error = true)
     {
         $result = self::adapter()->query($query, $die_on_error);
-        $error = self::last_error();
+        $error = self::lastError();
         if ($error) {
             \SmallSmallRSS\Logger::log('SQL error');
             \SmallSmallRSS\Logger::log($error);
@@ -73,29 +74,29 @@ class Database
         return $result;
     }
 
-    public static function fetch_assoc($result)
+    public static function fetchAssoc($result)
     {
-        return self::adapter()->fetch_assoc($result);
+        return self::adapter()->fetchAssoc($result);
     }
 
-    public static function num_rows($result)
+    public static function numRows($result)
     {
-        return self::adapter()->num_rows($result);
+        return self::adapter()->numRows($result);
     }
 
-    public static function fetch_result($result, $row, $param)
+    public static function fetchResult($result, $row, $param)
     {
-        return self::adapter()->fetch_result($result, $row, $param);
+        return self::adapter()->fetchResult($result, $row, $param);
     }
 
-    public static function affected_rows($result)
+    public static function affectedRows($result)
     {
-        return self::adapter()->affected_rows($result);
+        return self::adapter()->affectedRows($result);
     }
 
-    public static function last_error()
+    public static function lastError()
     {
-        return self::adapter()->last_error();
+        return self::adapter()->lastError();
     }
 
     public static function quote($str)
@@ -151,7 +152,7 @@ class Database
     public static function getPostgreSQLVersion()
     {
         $result = self::query('SELECT version() AS version');
-        $version = explode(' ', self::fetch_result($result, 0, 'version'));
+        $version = explode(' ', self::fetchResult($result, 0, 'version'));
         return $version[1];
     }
 }

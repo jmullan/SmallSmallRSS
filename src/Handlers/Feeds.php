@@ -211,10 +211,10 @@ class Feeds extends ProtectedHandler
                  FROM ttrss_feeds WHERE id = '$feed'"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                $last_updated = strtotime(\SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated'));
+            if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                $last_updated = strtotime(\SmallSmallRSS\Database::fetchResult($result, 0, 'last_updated'));
                 $cache_images = \SmallSmallRSS\Database::fromSQLBool(
-                    \SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images')
+                    \SmallSmallRSS\Database::fetchResult($result, 0, 'cache_images')
                 );
                 if (!$cache_images && time() - $last_updated > 120 || isset($_REQUEST['DevForceUpdate'])) {
                     \SmallSmallRSS\RSSUpdater::updateFeed($feed, true);
@@ -239,7 +239,7 @@ class Feeds extends ProtectedHandler
                 "SELECT id FROM ttrss_feeds WHERE id = '$feed' LIMIT 1"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::numRows($result) == 0) {
                 echo "<div align='center'>";
                 echo __('Feed not found.');
                 echo '</div>';
@@ -329,15 +329,15 @@ class Feeds extends ProtectedHandler
             $last_updated
         );
 
-        $headlines_count = \SmallSmallRSS\Database::num_rows($result);
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
+        $headlines_count = \SmallSmallRSS\Database::numRows($result);
+        if (\SmallSmallRSS\Database::numRows($result) > 0) {
             $lnum = $offset;
             $num_unread = 0;
             $cur_feed_title = '';
             $fresh_intl = \SmallSmallRSS\DBPrefs::read('FRESH_ARTICLE_MAX_AGE') * 60 * 60;
             $expand_cdm = \SmallSmallRSS\DBPrefs::read('CDM_EXPANDED');
 
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 $id = $line['id'];
                 $feed_id = $line['feed_id'];
                 $label_cache = $line['label_cache'];
@@ -654,11 +654,11 @@ class Feeds extends ProtectedHandler
                             'SELECT * FROM ttrss_archived_feeds
                              WHERE id = ' . $line['orig_feed_id']
                         );
-                        if (\SmallSmallRSS\Database::num_rows($tmp_result) != 0) {
+                        if (\SmallSmallRSS\Database::numRows($tmp_result) != 0) {
                             echo '<div clear="both">';
                             echo __('Originally from:');
                             echo '&nbsp;';
-                            $tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result);
+                            $tmp_line = \SmallSmallRSS\Database::fetchAssoc($tmp_result);
 
                             echo '<a target="_blank" href="';
                             echo htmlspecialchars($tmp_line['site_url']);
@@ -776,13 +776,13 @@ class Feeds extends ProtectedHandler
                      FROM ttrss_feeds
                      WHERE owner_uid = ' . $_SESSION['uid']
                 );
-                $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
+                $last_updated = \SmallSmallRSS\Database::fetchResult($result, 0, 'last_updated');
                 $last_updated = \SmallSmallRSS\Utils::makeLocalDatetime($last_updated, false, $_SESSION['uid']);
                 $result = \SmallSmallRSS\Database::query(
                     "SELECT COUNT(id) AS num_errors
                     FROM ttrss_feeds WHERE last_error != '' AND owner_uid = ".$_SESSION['uid']
                 );
-                $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_errors');
+                $num_errors = \SmallSmallRSS\Database::fetchResult($result, 0, 'num_errors');
 
                 echo '<p class="insensitive">';
                 echo sprintf(__('Feeds last updated at %s'), $last_updated);
@@ -886,7 +886,7 @@ class Feeds extends ProtectedHandler
             );
         }
 
-        if ($result && \SmallSmallRSS\Database::num_rows($result) == 0) {
+        if ($result && \SmallSmallRSS\Database::numRows($result) == 0) {
             \SmallSmallRSS\Logger::log("Feed not found: $feed_type $feed");
             echo json_encode($this->generateErrorFeed(__('Feed not found.')));
             return;
@@ -981,7 +981,7 @@ class Feeds extends ProtectedHandler
              WHERE owner_uid = ' . $_SESSION['uid']
         );
 
-        $last_updated = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_updated');
+        $last_updated = \SmallSmallRSS\Database::fetchResult($result, 0, 'last_updated');
         $last_updated = \SmallSmallRSS\Utils::makeLocalDatetime($last_updated, false, $_SESSION['uid']);
 
 
@@ -992,7 +992,7 @@ class Feeds extends ProtectedHandler
                  last_error != ''
                  AND owner_uid = " . $_SESSION['uid']
         );
-        $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_errors');
+        $num_errors = \SmallSmallRSS\Database::fetchResult($result, 0, 'num_errors');
 
         ob_start();
         echo '<div class="whiteBox">';

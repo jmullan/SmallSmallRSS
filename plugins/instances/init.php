@@ -59,7 +59,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
              ORDER BY last_connected"
         );
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $id = $line['id'];
             $fetch_url = $line['access_url'] . '/public.php?op=fbexport';
             $post_query = 'key=' . $line['access_key'];
@@ -89,10 +89,10 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
                                  WHERE instance_id = '$id'"
                             );
                             foreach ($feeds['feeds'] as $feed) {
-                                $feed_url = \SmallSmallRSS\Database::escape_string($feed['feed_url']);
-                                $title = \SmallSmallRSS\Database::escape_string($feed['title']);
-                                $subscribers = \SmallSmallRSS\Database::escape_string($feed['subscribers']);
-                                $site_url = \SmallSmallRSS\Database::escape_string($feed['site_url']);
+                                $feed_url = \SmallSmallRSS\Database::escapeString($feed['feed_url']);
+                                $title = \SmallSmallRSS\Database::escapeString($feed['title']);
+                                $subscribers = \SmallSmallRSS\Database::escapeString($feed['subscribers']);
+                                $site_url = \SmallSmallRSS\Database::escapeString($feed['site_url']);
 
                                 \SmallSmallRSS\Database::query(
                                     "INSERT INTO ttrss_linked_feeds
@@ -166,7 +166,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function remove()
     {
-        $ids = \SmallSmallRSS\Database::escape_string($_REQUEST['ids']);
+        $ids = \SmallSmallRSS\Database::escapeString($_REQUEST['ids']);
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_linked_instances WHERE id IN ($ids)"
         );
@@ -174,9 +174,9 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function add()
     {
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
-        $access_url = \SmallSmallRSS\Database::escape_string($_REQUEST["access_url"]);
-        $access_key = \SmallSmallRSS\Database::escape_string($_REQUEST["access_key"]);
+        $id = \SmallSmallRSS\Database::escapeString($_REQUEST["id"]);
+        $access_url = \SmallSmallRSS\Database::escapeString($_REQUEST["access_url"]);
+        $access_key = \SmallSmallRSS\Database::escapeString($_REQUEST["access_key"]);
 
         \SmallSmallRSS\Database::query("BEGIN");
 
@@ -185,7 +185,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
              WHERE access_url = '$access_url'"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_linked_instances
                  (access_url, access_key, last_connected, last_status_in, last_status_out)
@@ -200,7 +200,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function edit()
     {
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
+        $id = \SmallSmallRSS\Database::escapeString($_REQUEST["id"]);
         $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_linked_instances WHERE id = '$id'"
         );
@@ -212,7 +212,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         echo '"</div>';
         echo '<div class="dlgSecCont">';
         /* URL */
-        $access_url = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "access_url"));
+        $access_url = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, "access_url"));
         echo __("URL:") . " ";
         echo "<input data-dojo-type=\"dijit.form.ValidationTextBox\" required=\"1\"
             placeHolder=\"".__("Instance URL")."\"
@@ -220,7 +220,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
             style=\"font-size: 16px; width: 20em\" name=\"access_url\"
             value=\"$access_url\">";
         echo "<hr/>";
-        $access_key = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "access_key"));
+        $access_key = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, "access_key"));
 
         /* Access key */
         echo __("Access key:") . " ";
@@ -248,9 +248,9 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function editSave()
     {
-        $id = \SmallSmallRSS\Database::escape_string($_REQUEST["id"]);
-        $access_url = \SmallSmallRSS\Database::escape_string($_REQUEST["access_url"]);
-        $access_key = \SmallSmallRSS\Database::escape_string($_REQUEST["access_key"]);
+        $id = \SmallSmallRSS\Database::escapeString($_REQUEST["id"]);
+        $access_url = \SmallSmallRSS\Database::escapeString($_REQUEST["access_url"]);
+        $access_key = \SmallSmallRSS\Database::escapeString($_REQUEST["access_key"]);
 
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_linked_instances
@@ -277,7 +277,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
         echo "<div id=\"pref-instance-wrap\" data-dojo-type=\"dijit.layout.BorderContainer\" gutters=\"false\">";
         echo "<div id=\"pref-instance-header\" data-dojo-type=\"dijit.layout.ContentPane\" region=\"top\">";
         echo "<div id=\"pref-instance-toolbar\" data-dojo-type=\"dijit.Toolbar\">";
-        $sort = \SmallSmallRSS\Database::escape_string($_REQUEST["sort"]);
+        $sort = \SmallSmallRSS\Database::escapeString($_REQUEST["sort"]);
         if (!$sort || $sort == "undefined") {
             $sort = "access_url";
         }
@@ -320,7 +320,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
         $lnum = 0;
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $class = ($lnum % 2) ? "even" : "odd";
 
             $id = $line['id'];
@@ -357,7 +357,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
     public function fbexport()
     {
-        $access_key = \SmallSmallRSS\Database::escape_string($_POST["key"]);
+        $access_key = \SmallSmallRSS\Database::escapeString($_POST["key"]);
 
         // TODO: rate limit checking using last_connected
         $result = \SmallSmallRSS\Database::query(
@@ -366,9 +366,9 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
              WHERE access_key = '$access_key'"
         );
 
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
+        if (\SmallSmallRSS\Database::numRows($result) == 1) {
 
-            $instance_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+            $instance_id = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
 
             $result = \SmallSmallRSS\Database::query(
                 "SELECT feed_url, site_url, title, subscribers
@@ -377,7 +377,7 @@ class Instances extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Handlers
 
             $feeds = array();
 
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 array_push($feeds, $line);
             }
 

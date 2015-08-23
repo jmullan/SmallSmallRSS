@@ -343,8 +343,8 @@ class API extends Handler
                           AND owner_uid = " . $_SESSION['uid'];
             $result = \SmallSmallRSS\Database::query($query);
             $articles = array();
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                     $attachments = \SmallSmallRSS\Enclosures::get($line['id']);
                     $article = array(
                         'id' => $line['id'],
@@ -430,7 +430,7 @@ class API extends Handler
         $article_ids = array_filter(explode(',', $this->getSQLEscapedStringFromRequest('article_ids')), 'is_numeric');
         $label_id = (int) $this->getSQLEscapedStringFromRequest('label_id');
         $assign = (bool) $this->getSQLEscapedStringFromRequest('assign') == 'true';
-        $label = \SmallSmallRSS\Database::escape_string(
+        $label = \SmallSmallRSS\Database::escapeString(
             \SmallSmallRSS\Labels::findCaption($label_id, $_SESSION['uid'])
         );
         $num_updated = 0;
@@ -480,9 +480,9 @@ class API extends Handler
     public function shareToPublished()
     {
         # TODO: Move escaping into createPublishedArticle
-        $title = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST['title']));
-        $url = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST['url']));
-        $content = \SmallSmallRSS\Database::escape_string(strip_tags($_REQUEST['content']));
+        $title = \SmallSmallRSS\Database::escapeString(strip_tags($_REQUEST['title']));
+        $url = \SmallSmallRSS\Database::escapeString(strip_tags($_REQUEST['url']));
+        $content = \SmallSmallRSS\Database::escapeString(strip_tags($_REQUEST['content']));
         if (\SmallSmallRSS\Handlers\Article::createPublishedArticle($title, $url, $content, '', $_SESSION['uid'])) {
             $this->wrap(self::STATUS_OK, array('status' => 'OK'));
         } else {
@@ -540,7 +540,7 @@ class API extends Handler
                  ORDER BY id, title'
             );
 
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 $unread = (
                     countUnreadFeedArticles($line['id'], true, true, $_SESSION['uid'])
                     + getCategoryChildrenUnread($line['id'], $_SESSION['uid'])
@@ -592,7 +592,7 @@ class API extends Handler
                  $limit_qpart"
             );
         }
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $unread = countUnreadFeedArticles($line['id'], false, true, $_SESSION['uid']);
             $has_icon = \SmallSmallRSS\Feeds::hasIcon($line['id']);
             if ($unread || !$unread_only) {
@@ -649,7 +649,7 @@ class API extends Handler
 
         $headlines = array();
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $unread = \SmallSmallRSS\Database::fromSQLBool($line['unread']);
             $is_updated = ($line['last_read'] == '' && !$unread);
 

@@ -6,7 +6,7 @@ class Users
     public static function count()
     {
         $result = \SmallSmallRSS\Database::query('SELECT COUNT(*) AS cu FROM ttrss_users');
-        return \SmallSmallRSS\Database::fetch_result($result, 0, 'cu');
+        return \SmallSmallRSS\Database::fetchResult($result, 0, 'cu');
     }
 
     public static function clearExpired()
@@ -32,14 +32,14 @@ class Users
 
     public static function findUserByLogin($login)
     {
-        $login = \SmallSmallRSS\Database::escape_string($login);
+        $login = \SmallSmallRSS\Database::escapeString($login);
         $result = \SmallSmallRSS\Database::query(
             "SELECT id
              FROM ttrss_users
              WHERE login = '$login'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+        if (\SmallSmallRSS\Database::numRows($result) > 0) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
         } else {
             return false;
         }
@@ -48,13 +48,13 @@ class Users
 
     public static function isRegistered($login)
     {
-        $login = \SmallSmallRSS\Database::escape_string(mb_strtolower(trim($login)));
+        $login = \SmallSmallRSS\Database::escapeString(mb_strtolower(trim($login)));
         $result = \SmallSmallRSS\Database::query(
             "SELECT id
              FROM ttrss_users
              WHERE LOWER(login) = LOWER('$login')"
         );
-        return \SmallSmallRSS\Database::num_rows($result) > 0;
+        return \SmallSmallRSS\Database::numRows($result) > 0;
     }
 
     public static function makePassword($length = 8)
@@ -74,8 +74,8 @@ class Users
     
     public static function create($login, $email = '', $password = false)
     {
-        $login = \SmallSmallRSS\Database::escape_string(mb_strtolower(trim($login)));
-        $email = \SmallSmallRSS\Database::escape_string(trim($email));
+        $login = \SmallSmallRSS\Database::escapeString(mb_strtolower(trim($login)));
+        $email = \SmallSmallRSS\Database::escapeString(trim($email));
         if (!$password) {
             $password = self::makePassword();
         }
@@ -94,14 +94,14 @@ class Users
                  login = '$login'
                  AND pwd_hash = '$pwd_hash'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) != 1) {
+        if (\SmallSmallRSS\Database::numRows($result) != 1) {
             return false;
         }
-        return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+        return \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
     }
     public static function markLogin($id)
     {
-        $id = \SmallSmallRSS\Database::escape_string(trim($id));
+        $id = \SmallSmallRSS\Database::escapeString(trim($id));
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users
              SET last_login = NOW()
@@ -118,7 +118,7 @@ class Users
              FROM ttrss_users
              WHERE id = '$user_id'"
         );
-        return \SmallSmallRSS\Database::fetch_assoc($result);
+        return \SmallSmallRSS\Database::fetchAssoc($result);
     }
     public static function clearLastDigestSent($owner_uid)
     {
@@ -131,8 +131,8 @@ class Users
     }
     public static function update($owner_uid, $email, $full_name)
     {
-        $full_name = \SmallSmallRSS\Database::escape_string(trim($full_name));
-        $email = \SmallSmallRSS\Database::escape_string(trim($email));
+        $full_name = \SmallSmallRSS\Database::escapeString(trim($full_name));
+        $email = \SmallSmallRSS\Database::escapeString(trim($email));
         \SmallSmallRSS\Database::query(
             "UPDATE ttrss_users
              SET email = '$email',

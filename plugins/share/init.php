@@ -31,20 +31,20 @@ class Share extends \SmallSmallRSS\Plugin
 
     public function shareArticle()
     {
-        $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
+        $param = \SmallSmallRSS\Database::escapeString($_REQUEST['param']);
         $result = \SmallSmallRSS\Database::query(
             "SELECT uuid, ref_id
              FROM ttrss_user_entries
              WHERE int_id = '$param' AND owner_uid = " . $_SESSION['uid']
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             echo "Article not found.";
         } else {
-            $uuid = \SmallSmallRSS\Database::fetch_result($result, 0, "uuid");
-            $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "ref_id");
+            $uuid = \SmallSmallRSS\Database::fetchResult($result, 0, "uuid");
+            $ref_id = \SmallSmallRSS\Database::fetchResult($result, 0, "ref_id");
 
             if (!$uuid) {
-                $uuid = \SmallSmallRSS\Database::escape_string(sha1(uniqid(rand(), true)));
+                $uuid = \SmallSmallRSS\Database::escapeString(sha1(uniqid(rand(), true)));
                 \SmallSmallRSS\Database::query(
                     "UPDATE ttrss_user_entries
                      SET uuid = '$uuid'

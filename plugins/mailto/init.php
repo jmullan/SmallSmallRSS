@@ -30,7 +30,7 @@ class MailTo extends \SmallSmallRSS\Plugin
 
     public function emailArticle()
     {
-        $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
+        $param = \SmallSmallRSS\Database::escapeString($_REQUEST['param']);
         $tpl = new \MiniTemplator\Engine();
         $tpl_t = new \MiniTemplator\Engine();
         $tpl->readTemplateFromFile("templates/email_article_template.txt");
@@ -45,10 +45,10 @@ class MailTo extends \SmallSmallRSS\Plugin
                  AND id IN ($param)
                  AND owner_uid = " . $_SESSION["uid"]
         );
-        if (\SmallSmallRSS\Database::num_rows($result) > 1) {
+        if (\SmallSmallRSS\Database::numRows($result) > 1) {
             $subject = __("[Forwarded]") . " " . __("Multiple articles");
         }
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             if (!$subject) {
                 $subject = __("[Forwarded]") . " " . htmlspecialchars($line["title"]);
             }

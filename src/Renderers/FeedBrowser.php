@@ -77,7 +77,7 @@ class FeedBrowser extends \SmallSmallRSS\Renderers\Base
 
         $feedctr = 0;
         $lines = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $lines[] = $line;
         }
         $params = array('lines' => $lines);

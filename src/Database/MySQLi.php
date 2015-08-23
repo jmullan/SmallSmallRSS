@@ -21,7 +21,7 @@ class MySQLi implements DatabaseInterface
         }
     }
 
-    public function escape_string($s, $strip_tags = true)
+    public function escapeString($s, $strip_tags = true)
     {
         if ($strip_tags) {
             $s = strip_tags($s);
@@ -42,7 +42,7 @@ class MySQLi implements DatabaseInterface
         return $result;
     }
 
-    public function fetch_assoc($result)
+    public function fetchAssoc($result)
     {
         if (!$result) {
             trigger_error("Cannot return associative array from result", E_USER_NOTICE);
@@ -52,7 +52,7 @@ class MySQLi implements DatabaseInterface
     }
 
 
-    public function num_rows($result)
+    public function numRows($result)
     {
         if ($result) {
             return mysqli_num_rows($result);
@@ -62,7 +62,7 @@ class MySQLi implements DatabaseInterface
         }
     }
 
-    public function fetch_result($result, $row, $param)
+    public function fetchResult($result, $row, $param)
     {
         if (!$result) {
             \SmallSmallRSS\Logger::trace("Cannot get param from non-result");
@@ -72,7 +72,7 @@ class MySQLi implements DatabaseInterface
             \SmallSmallRSS\Logger::trace("Cannot seek '$row' in result");
             return false;
         }
-        $line = self::fetch_assoc($result);
+        $line = self::fetchAssoc($result);
         if (!$line) {
             \SmallSmallRSS\Logger::trace("Fetching an array returned nothing from result");
             return false;
@@ -89,12 +89,12 @@ class MySQLi implements DatabaseInterface
         return mysqli_close($this->link);
     }
 
-    public function affected_rows($result)
+    public function affectedRows($result)
     {
         return mysqli_affected_rows($this->link);
     }
 
-    public function last_error()
+    public function lastError()
     {
         return mysqli_error($this->link);
     }

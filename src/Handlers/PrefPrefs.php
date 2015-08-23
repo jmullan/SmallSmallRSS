@@ -143,8 +143,8 @@ class PrefPrefs extends ProtectedHandler
         }
         $need_reload = false;
         foreach (array_keys($_POST) as $pref_name) {
-            $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
-            $value = \SmallSmallRSS\Database::escape_string($_POST[$pref_name]);
+            $pref_name = \SmallSmallRSS\Database::escapeString($pref_name);
+            $value = \SmallSmallRSS\Database::escapeString($_POST[$pref_name]);
             if ($pref_name == 'DIGEST_PREFERRED_TIME') {
                 if (\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME') != $value) {
                     \SmallSmallRSS\Users::clearLastDigestSent($_SESSION['uid']);
@@ -253,9 +253,9 @@ class PrefPrefs extends ProtectedHandler
             WHERE id = '.$_SESSION['uid']
         );
 
-        $email = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'email'));
-        $full_name = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'full_name'));
-        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'otp_enabled'));
+        $email = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, 'email'));
+        $full_name = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, 'full_name'));
+        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetchResult($result, 0, 'otp_enabled'));
 
         echo '<tr><td width="40%">'.__('Full name').'</td>';
         echo '<td class="prefValue"><input data-dojo-type="dijit.form.ValidationTextBox"';
@@ -266,7 +266,7 @@ class PrefPrefs extends ProtectedHandler
         echo " name=\"email\" required=\"1\" value=\"$email\"></td></tr>";
 
         if (!\SmallSmallRSS\Auth::isSingleUserMode() && empty($_SESSION['hide_hello'])) {
-            $access_level = \SmallSmallRSS\Database::fetch_result($result, 0, 'access_level');
+            $access_level = \SmallSmallRSS\Database::fetchResult($result, 0, 'access_level');
             echo '<tr><td width="40%">'.__('Access level').'</td>';
             echo '<td>' . $access_level_names[$access_level] . '</td></tr>';
         }
@@ -296,7 +296,7 @@ class PrefPrefs extends ProtectedHandler
                 = 'SHA1:5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8'"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+            if (\SmallSmallRSS\Database::numRows($result) != 0) {
                 \SmallSmallRSS\Renderers\Messages::renderWarning(
                     __('Your password is at default value, please change it.'),
                     'default_pass_warning'
@@ -503,7 +503,7 @@ class PrefPrefs extends ProtectedHandler
         $lnum = 0;
         $active_section = '';
         $listed_boolean_prefs = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             if (in_array($line['pref_name'], $prefs_blacklist)) {
                 continue;
             }
@@ -850,11 +850,11 @@ class PrefPrefs extends ProtectedHandler
         );
 
         $base32 = new \OTPHP\Base32();
-        $login = \SmallSmallRSS\Database::fetch_result($result, 0, 'login');
-        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'otp_enabled'));
+        $login = \SmallSmallRSS\Database::fetchResult($result, 0, 'login');
+        $otp_enabled = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetchResult($result, 0, 'otp_enabled'));
 
         if (!$otp_enabled) {
-            $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetch_result($result, 0, 'salt')));
+            $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetchResult($result, 0, 'salt')));
             $topt = new \OTPHP\TOTP($secret);
             echo \PHPQRCode\QRcode::png($topt->provisioning_uri($login));
         }
@@ -874,7 +874,7 @@ class PrefPrefs extends ProtectedHandler
                  WHERE id = ' . $_SESSION['uid']
             );
             $base32 = new \OTPHP\Base32();
-            $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetch_result($result, 0, 'salt')));
+            $secret = $base32->encode(sha1(\SmallSmallRSS\Database::fetchResult($result, 0, 'salt')));
             $topt = new \OTPHP\TOTP($secret);
 
             $otp_check = $topt->now();
@@ -897,7 +897,7 @@ class PrefPrefs extends ProtectedHandler
 
     public function otpdisable()
     {
-        $password = \SmallSmallRSS\Database::escape_string($_REQUEST['password']);
+        $password = \SmallSmallRSS\Database::escapeString($_REQUEST['password']);
         $authenticator = \SmallSmallRSS\PluginHost::getInstance()->getPlugin($_SESSION['auth_module']);
         if ($authenticator->checkPassword($_SESSION['uid'], $password)) {
             \SmallSmallRSS\Database::query(
@@ -926,7 +926,7 @@ class PrefPrefs extends ProtectedHandler
 
     public function clearplugindata()
     {
-        $name = \SmallSmallRSS\Database::escape_string($_REQUEST['name']);
+        $name = \SmallSmallRSS\Database::escapeString($_REQUEST['name']);
 
         \SmallSmallRSS\PluginHost::getInstance()->clearData(\SmallSmallRSS\PluginHost::getInstance()->getPlugin($name));
     }
@@ -1011,7 +1011,7 @@ class PrefPrefs extends ProtectedHandler
         echo '</span></td>';
         echo '</tr>';
         $lnum = 1;
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $profile_id = htmlspecialchars($line['id']);
             echo '<tr class="placeholder" id="FCATR-' . $profile_id . '">';
             $edit_title = htmlspecialchars($line['title']);

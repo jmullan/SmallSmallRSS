@@ -30,7 +30,7 @@ class Mail extends \SmallSmallRSS\Plugin
 
     public function emailArticle()
     {
-        $param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
+        $param = \SmallSmallRSS\Database::escapeString($_REQUEST['param']);
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
         echo " name=\"op\" value=\"PluginHandler\">";
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\"";
@@ -40,8 +40,8 @@ class Mail extends \SmallSmallRSS\Plugin
         $result = \SmallSmallRSS\Database::query(
             "SELECT email, full_name FROM ttrss_users WHERE id = " . $_SESSION["uid"]
         );
-        $user_email = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "email"));
-        $user_name = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, "full_name"));
+        $user_email = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, "email"));
+        $user_name = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, "full_name"));
         if (!$user_name) {
             $user_name = $_SESSION['name'];
         }
@@ -63,10 +63,10 @@ class Mail extends \SmallSmallRSS\Plugin
                  AND id IN ($param)
                  AND owner_uid = " . $_SESSION["uid"]
         );
-        if (\SmallSmallRSS\Database::num_rows($result) > 1) {
+        if (\SmallSmallRSS\Database::numRows($result) > 1) {
             $subject = __("[Forwarded]") . " " . __("Multiple articles");
         }
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             if (!$subject) {
                 $subject = __("[Forwarded]") . " " . htmlspecialchars($line["title"]);
             }
@@ -143,7 +143,7 @@ class Mail extends \SmallSmallRSS\Plugin
             $reply['error'] = $mail->ErrorInfo;
         } else {
             foreach ($addresses as $address) {
-                save_email_address(\SmallSmallRSS\Database::escape_string($address));
+                save_email_address(\SmallSmallRSS\Database::escapeString($address));
             }
             $reply['message'] = "UPDATE_COUNTERS";
         }
@@ -152,7 +152,7 @@ class Mail extends \SmallSmallRSS\Plugin
 
     public function completeEmails()
     {
-        $search = \SmallSmallRSS\Database::escape_string($_REQUEST["search"]);
+        $search = \SmallSmallRSS\Database::escapeString($_REQUEST["search"]);
         echo "<ul>";
         foreach ($_SESSION['stored_emails'] as $email) {
             if (strpos($email, $search) !== false) {

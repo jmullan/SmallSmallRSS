@@ -21,7 +21,7 @@ class PDOWrapper implements DatabaseInterface
         return $this->pdo;
     }
 
-    public function escape_string($s, $strip_tags = true)
+    public function escapeString($s, $strip_tags = true)
     {
         if ($strip_tags) {
             $s = strip_tags($s);
@@ -39,7 +39,7 @@ class PDOWrapper implements DatabaseInterface
         }
     }
 
-    public function fetch_assoc($result)
+    public function fetchAssoc($result)
     {
         try {
             if ($result) {
@@ -52,7 +52,7 @@ class PDOWrapper implements DatabaseInterface
         }
     }
 
-    public function num_rows($result)
+    public function numRows($result)
     {
         try {
             if ($result) {
@@ -65,7 +65,7 @@ class PDOWrapper implements DatabaseInterface
         }
     }
 
-    public function fetch_result($result, $row, $param)
+    public function fetchResult($result, $row, $param)
     {
         return $result->fetch_result($row, $param);
     }
@@ -75,7 +75,7 @@ class PDOWrapper implements DatabaseInterface
         $this->pdo = null;
     }
 
-    public function affected_rows($result)
+    public function affectedRows($result)
     {
         try {
             if ($result) {
@@ -88,7 +88,7 @@ class PDOWrapper implements DatabaseInterface
         }
     }
 
-    public function last_error()
+    public function lastError()
     {
         $errorInfo = $this->pdo->errorInfo();
         if ($errorInfo[0] && $errorInfo[0] !== '00000') {

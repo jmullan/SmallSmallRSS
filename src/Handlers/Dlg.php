@@ -9,7 +9,7 @@ class Dlg extends ProtectedHandler
     {
         if (parent::before($method)) {
             header('Content-Type: text/html'); # required for iframe
-            $this->param = \SmallSmallRSS\Database::escape_string($_REQUEST['param']);
+            $this->param = \SmallSmallRSS\Database::escapeString($_REQUEST['param']);
             return true;
         }
         return false;
@@ -90,7 +90,7 @@ class Dlg extends ProtectedHandler
 
         $result = \SmallSmallRSS\Database::query($query);
         $tags = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $tags[$line['tag_name']] = $line['tag_count'];
         }
         if (!$tags) {
@@ -157,7 +157,7 @@ class Dlg extends ProtectedHandler
                  AND LENGTH(tag_name) <= 30
              ORDER BY tag_name ASC'
         );
-        while ($row = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($row = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $tag_name = htmlspecialchars($row['tag_name']);
             echo '<option value="' . str_replace(' ', '%20', $tagname) . '">';
             echo $tag_name;
@@ -179,7 +179,7 @@ class Dlg extends ProtectedHandler
     public function generatedFeed()
     {
         $this->params = explode(':', $this->param, 3);
-        $feed_id = \SmallSmallRSS\Database::escape_string($this->params[0]);
+        $feed_id = \SmallSmallRSS\Database::escapeString($this->params[0]);
         $is_cat = (bool) $this->params[1];
         $key = \SmallSmallRSS\AccessKeys::getForFeed($feed_id, $is_cat, $_SESSION['uid']);
         $url_path = htmlspecialchars($this->params[2]) . '&key=' . $key;

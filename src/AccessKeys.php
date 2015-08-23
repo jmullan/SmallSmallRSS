@@ -21,10 +21,10 @@ class AccessKeys
             WHERE feed_id = '$feed_id' AND is_cat = $sql_is_cat
             AND owner_uid = $owner_uid"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'access_key');
+        if (\SmallSmallRSS\Database::numRows($result) == 1) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'access_key');
         } else {
-            $key = \SmallSmallRSS\Database::escape_string(sha1(uniqid(rand(), true)));
+            $key = \SmallSmallRSS\Database::escapeString(sha1(uniqid(rand(), true)));
             $result = \SmallSmallRSS\Database::query(
                 "INSERT INTO ttrss_access_keys
                 (access_key, feed_id, is_cat, owner_uid)
@@ -42,7 +42,7 @@ class AccessKeys
     }
     public static function getOwner($key)
     {
-        $key = \SmallSmallRSS\Database::escape_string($key);
+        $key = \SmallSmallRSS\Database::escapeString($key);
         $result = \SmallSmallRSS\Database::query(
             "SELECT owner_uid
              FROM ttrss_access_keys
@@ -50,8 +50,8 @@ class AccessKeys
                  access_key = '$key'
                  AND feed_id = 'OPML:Publish'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'owner_uid');
+        if (\SmallSmallRSS\Database::numRows($result) == 1) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'owner_uid');
         }
         return false;
     }

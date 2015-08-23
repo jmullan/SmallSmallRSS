@@ -10,7 +10,7 @@ class Prefs
              FROM ttrss_prefs'
         );
         $prefs = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $pref_name = $line['pref_name'];
             $value = $line['def_value'];
             $prefs[$pref_name] = $value;
@@ -20,14 +20,14 @@ class Prefs
 
     public static function getHelp($pref_name)
     {
-        $pref_name = \SmallSmallRSS\Database::escape_string($pref_name);
+        $pref_name = \SmallSmallRSS\Database::escapeString($pref_name);
         $result = \SmallSmallRSS\Database::query(
             "SELECT help_text
              FROM ttrss_prefs
              WHERE pref_name = '$pref_name'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'help_text');
+        if (\SmallSmallRSS\Database::numRows($result) > 0) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'help_text');
         } else {
             return false;
         }

@@ -44,7 +44,7 @@ class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\AuthInt
 
     public function getLoginBySSLCertificate()
     {
-        $cert_serial = \SmallSmallRSS\Database::escape_string(self::getSSLCertificateId());
+        $cert_serial = \SmallSmallRSS\Database::escapeString(self::getSSLCertificateId());
         if ($cert_serial) {
             $result = \SmallSmallRSS\Database::query(
                 "SELECT login
@@ -54,9 +54,9 @@ class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\AuthInt
                      AND value = '$cert_serial'
                      AND owner_uid = ttrss_users.id"
             );
-            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                return \SmallSmallRSS\Database::escape_string(
-                    \SmallSmallRSS\Database::fetch_result($result, 0, "login")
+            if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                return \SmallSmallRSS\Database::escapeString(
+                    \SmallSmallRSS\Database::fetchResult($result, 0, "login")
                 );
             }
         }
@@ -65,10 +65,10 @@ class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\AuthInt
 
     public function authenticate($login, $password)
     {
-        $try_login = \SmallSmallRSS\Database::escape_string($_SERVER["REMOTE_USER"]);
+        $try_login = \SmallSmallRSS\Database::escapeString($_SERVER["REMOTE_USER"]);
         // php-cgi
         if (!$try_login) {
-            $try_login = \SmallSmallRSS\Database::escape_string($_SERVER["REDIRECT_REMOTE_USER"]);
+            $try_login = \SmallSmallRSS\Database::escapeString($_SERVER["REDIRECT_REMOTE_USER"]);
         }
         if (!$try_login) {
             $try_login = $this->getLoginBySSLCertificate();
@@ -89,7 +89,7 @@ class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\AuthInt
                         : $_SERVER['AUTHENTICATE_CN']
                     );
                     if ($fullname) {
-                        $fullname = \SmallSmallRSS\Database::escape_string($fullname);
+                        $fullname = \SmallSmallRSS\Database::escapeString($fullname);
                         \SmallSmallRSS\Database::query(
                             "UPDATE ttrss_users
                              SET full_name = '$fullname'
@@ -99,7 +99,7 @@ class AuthRemote extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\AuthInt
                     // update user mail
                     $email = $_SERVER['HTTP_USER_MAIL'] ? $_SERVER['HTTP_USER_MAIL'] : $_SERVER['AUTHENTICATE_MAIL'];
                     if ($email) {
-                        $email = \SmallSmallRSS\Database::escape_string($email);
+                        $email = \SmallSmallRSS\Database::escapeString($email);
                         \SmallSmallRSS\Database::query(
                             "UPDATE ttrss_users SET email = '$email' WHERE id = " . $user_id
                         );

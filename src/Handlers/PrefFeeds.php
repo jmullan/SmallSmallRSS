@@ -68,8 +68,7 @@ class PrefFeeds extends ProtectedHandler
                 WHERE owner_uid = ' . $_SESSION['uid'] . " AND parent_cat = '$cat_id' ORDER BY order_id, title"
         );
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
-
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $cat = array();
             $cat['id'] = 'CAT:' . $line['id'];
             $cat['bare_id'] = (int) $line['id'];
@@ -103,7 +102,7 @@ class PrefFeeds extends ProtectedHandler
              ORDER BY order_id, title"
         );
 
-        while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($feed_result)) {
+        while ($feed_line = \SmallSmallRSS\Database::fetchAssoc($feed_result)) {
             $feed = array();
             $feed['id'] = 'FEED:' . $feed_line['id'];
             $feed['bare_id'] = (int) $feed_line['id'];
@@ -151,7 +150,6 @@ class PrefFeeds extends ProtectedHandler
         $enable_cats = \SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS');
 
         if ($this->getMode() == 2) {
-
             if ($enable_cats) {
                 $cat = $this->initFeedlistCat(-1);
             } else {
@@ -222,7 +220,7 @@ class PrefFeeds extends ProtectedHandler
                      AND parent_cat IS NULL
                  ORDER BY order_id, title'
             );
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 $cat = array();
                 $cat['id'] = 'CAT:' . $line['id'];
                 $cat['bare_id'] = (int) $line['id'];
@@ -266,7 +264,7 @@ class PrefFeeds extends ProtectedHandler
                  ORDER BY order_id, title"
             );
 
-            while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($feed_result)) {
+            while ($feed_line = \SmallSmallRSS\Database::fetchAssoc($feed_result)) {
                 $feed = array();
                 $feed['id'] = 'FEED:' . $feed_line['id'];
                 $feed['bare_id'] = (int) $feed_line['id'];
@@ -303,7 +301,7 @@ class PrefFeeds extends ProtectedHandler
                 ORDER BY order_id, title"
             );
 
-            while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($feed_result)) {
+            while ($feed_line = \SmallSmallRSS\Database::fetchAssoc($feed_result)) {
                 $feed = array();
                 $feed['id'] = 'FEED:' . $feed_line['id'];
                 $feed['bare_id'] = (int) $feed_line['id'];
@@ -367,7 +365,7 @@ class PrefFeeds extends ProtectedHandler
         if ($item_id != 'root') {
             if ($parent_id && $parent_id != 'root') {
                 $parent_bare_id = substr($parent_id, strpos($parent_id, ':')+1);
-                $parent_qpart = \SmallSmallRSS\Database::escape_string($parent_bare_id);
+                $parent_qpart = \SmallSmallRSS\Database::escapeString($parent_bare_id);
             } else {
                 $parent_qpart = 'NULL';
             }
@@ -393,7 +391,7 @@ class PrefFeeds extends ProtectedHandler
                     if (strpos($id, 'FEED') === 0) {
 
                         $cat_id = ($item_id != 'root') ?
-                            \SmallSmallRSS\Database::escape_string($bare_item_id) : 'NULL';
+                            \SmallSmallRSS\Database::escapeString($bare_item_id) : 'NULL';
 
                         $cat_qpart = ($cat_id != 0) ? "cat_id = '$cat_id'" :
                             'cat_id = NULL';
@@ -415,7 +413,7 @@ class PrefFeeds extends ProtectedHandler
                         );
 
                         if ($item_id != 'root') {
-                            $parent_qpart = \SmallSmallRSS\Database::escape_string($bare_id);
+                            $parent_qpart = \SmallSmallRSS\Database::escapeString($bare_id);
                         } else {
                             $parent_qpart = 'NULL';
                         }
@@ -469,7 +467,7 @@ class PrefFeeds extends ProtectedHandler
                 id = '$feed_id'
                 AND owner_uid = ". $_SESSION['uid']
         );
-        if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+        if (\SmallSmallRSS\Database::numRows($result) != 0) {
             @unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico");
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_feeds
@@ -509,7 +507,7 @@ class PrefFeeds extends ProtectedHandler
                          AND owner_uid = ". $_SESSION['uid']
                 );
 
-                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                if (\SmallSmallRSS\Database::numRows($result) != 0) {
                     @unlink(\SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico");
                     if (rename($icon_file, \SmallSmallRSS\Config::get('ICONS_DIR') . "/$feed_id.ico")) {
                         \SmallSmallRSS\Database::query(
@@ -549,14 +547,14 @@ class PrefFeeds extends ProtectedHandler
         );
 
         $auth_pass_encrypted = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result(
+            \SmallSmallRSS\Database::fetchResult(
                 $result,
                 0,
                 'auth_pass_encrypted'
             )
         );
 
-        $title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'title'));
+        $title = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, 'title'));
 
         echo "<input data-dojo-type=\"dijit.form.TextBox\" style=\"display: none\" name=\"id\" value=\"$feed_id\" />";
         echo '<input data-dojo-type="dijit.form.TextBox" style="display: none" name="op" value="PrefFeeds" />';
@@ -573,7 +571,7 @@ class PrefFeeds extends ProtectedHandler
 
         /* Feed URL */
         $feed_url = htmlspecialchars(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'feed_url')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'feed_url')
         );
         echo '<hr/>';
         echo __('URL:') . ' ';
@@ -581,7 +579,7 @@ class PrefFeeds extends ProtectedHandler
         echo __('Feed URL');
         echo '\" regExp="^(http|https)://.*" name="feed_url"';
         echo " value=\"$feed_url\">";
-        $last_error = \SmallSmallRSS\Database::fetch_result($result, 0, 'last_error');
+        $last_error = \SmallSmallRSS\Database::fetchResult($result, 0, 'last_error');
         if ($last_error) {
             echo '&nbsp;<span title="';
             echo htmlspecialchars($last_error);
@@ -589,7 +587,7 @@ class PrefFeeds extends ProtectedHandler
         }
         /* Category */
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
-            $cat_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'cat_id');
+            $cat_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'cat_id');
             echo '<hr/>';
             echo __('Place in category:') . ' ';
             print_feed_cat_select(
@@ -604,7 +602,7 @@ class PrefFeeds extends ProtectedHandler
         echo '</div>';
         echo '<div class="dlgSecCont">';
         /* Update Interval */
-        $update_interval = \SmallSmallRSS\Database::fetch_result($result, 0, 'update_interval');
+        $update_interval = \SmallSmallRSS\Database::fetchResult($result, 0, 'update_interval');
         $form_elements_renderer = new \SmallSmallRSS\Renderers\FormElements();
         $form_elements_renderer->renderSelect(
             'update_interval',
@@ -613,7 +611,7 @@ class PrefFeeds extends ProtectedHandler
             'data-dojo-type="dijit.form.Select"'
         );
         /* Purge intl */
-        $purge_interval = \SmallSmallRSS\Database::fetch_result($result, 0, 'purge_interval');
+        $purge_interval = \SmallSmallRSS\Database::fetchResult($result, 0, 'purge_interval');
         echo '<hr/>';
         echo __('Article purging:') . ' ';
         $form_elements_renderer->renderSelect(
@@ -628,13 +626,13 @@ class PrefFeeds extends ProtectedHandler
         echo __('Authentication');
         echo '</div>';
         echo '<div class="dlgSecCont">';
-        $auth_login = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'auth_login'));
+        $auth_login = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, 'auth_login'));
         echo '<input data-dojo-type="dijit.form.TextBox" id="feedEditDlg_login"';
         echo ' placeHolder="';
         echo __('Login');
         echo "\" name=\"auth_login\" value=\"$auth_login\">";
         echo "<hr/>";
-        $auth_pass = \SmallSmallRSS\Database::fetch_result($result, 0, 'auth_pass');
+        $auth_pass = \SmallSmallRSS\Database::fetchResult($result, 0, 'auth_pass');
         if ($auth_pass_encrypted) {
             $auth_pass = \SmallSmallRSS\Crypt::de($auth_pass);
         }
@@ -651,7 +649,7 @@ class PrefFeeds extends ProtectedHandler
         echo __('Options');
         echo '</div>';
         echo '<div class="dlgSecCont">';
-        $private = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetch_result($result, 0, 'private'));
+        $private = \SmallSmallRSS\Database::fromSQLBool(\SmallSmallRSS\Database::fetchResult($result, 0, 'private'));
         if ($private) {
             $checked = ' checked="checked"';
         } else {
@@ -665,7 +663,7 @@ class PrefFeeds extends ProtectedHandler
         echo '</label>';
 
         $include_in_digest = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'include_in_digest')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'include_in_digest')
         );
 
         if ($include_in_digest) {
@@ -681,7 +679,7 @@ class PrefFeeds extends ProtectedHandler
         echo __('Include in e-mail digest');
         echo '</label>';
         $always_display_enclosures = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'always_display_enclosures')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'always_display_enclosures')
         );
 
         if ($always_display_enclosures) {
@@ -699,7 +697,7 @@ class PrefFeeds extends ProtectedHandler
         echo '</label>';
 
         $hide_images = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'hide_images')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'hide_images')
         );
         if ($hide_images) {
             $checked = ' checked="checked"';
@@ -716,7 +714,7 @@ class PrefFeeds extends ProtectedHandler
         echo '</label>';
 
         $cache_images = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'cache_images')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'cache_images')
         );
 
         if ($cache_images) {
@@ -734,7 +732,7 @@ class PrefFeeds extends ProtectedHandler
         echo '</label>';
 
         $mark_unread_on_update = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'mark_unread_on_update')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'mark_unread_on_update')
         );
 
         if ($mark_unread_on_update) {
@@ -794,7 +792,7 @@ class PrefFeeds extends ProtectedHandler
         echo '</button>';
 
         if (\SmallSmallRSS\Config::get('PUBSUBHUBBUB_ENABLED')) {
-            $pubsub_state = \SmallSmallRSS\Database::fetch_result($result, 0, 'pubsub_state');
+            $pubsub_state = \SmallSmallRSS\Database::fetchResult($result, 0, 'pubsub_state');
             $pubsub_btn_disabled = ($pubsub_state == 2) ? '' : 'disabled="1"';
 
             echo "<button data-dojo-type=\"dijit.form.Button\" id=\"pubsubReset_Btn\" $pubsub_btn_disabled
@@ -1020,14 +1018,14 @@ class PrefFeeds extends ProtectedHandler
     public function editsaveops($batch)
     {
 
-        $feed_title = \SmallSmallRSS\Database::escape_string(trim($_POST['title']));
-        $feed_link = \SmallSmallRSS\Database::escape_string(trim($_POST['feed_url']));
-        $upd_intl = (int) \SmallSmallRSS\Database::escape_string($_POST['update_interval']);
-        $purge_intl = (int) \SmallSmallRSS\Database::escape_string($_POST['purge_interval']);
-        $feed_id = (int) \SmallSmallRSS\Database::escape_string($_POST['id']); /* editSave */
-        $feed_ids = \SmallSmallRSS\Database::escape_string($_POST['ids']); /* batchEditSave */
-        $cat_id = (int) \SmallSmallRSS\Database::escape_string($_POST['cat_id']);
-        $auth_login = \SmallSmallRSS\Database::escape_string(trim($_POST['auth_login']));
+        $feed_title = \SmallSmallRSS\Database::escapeString(trim($_POST['title']));
+        $feed_link = \SmallSmallRSS\Database::escapeString(trim($_POST['feed_url']));
+        $upd_intl = (int) \SmallSmallRSS\Database::escapeString($_POST['update_interval']);
+        $purge_intl = (int) \SmallSmallRSS\Database::escapeString($_POST['purge_interval']);
+        $feed_id = (int) \SmallSmallRSS\Database::escapeString($_POST['id']); /* editSave */
+        $feed_ids = \SmallSmallRSS\Database::escapeString($_POST['ids']); /* batchEditSave */
+        $cat_id = (int) \SmallSmallRSS\Database::escapeString($_POST['cat_id']);
+        $auth_login = \SmallSmallRSS\Database::escapeString(trim($_POST['auth_login']));
         $auth_pass = trim($_POST['auth_pass']);
 
 
@@ -1049,7 +1047,7 @@ class PrefFeeds extends ProtectedHandler
             $auth_pass_encrypted = 'false';
         }
 
-        $auth_pass = \SmallSmallRSS\Database::escape_string($auth_pass);
+        $auth_pass = \SmallSmallRSS\Database::escapeString($auth_pass);
 
         if (\SmallSmallRSS\DBPrefs::read('ENABLE_FEED_CATS')) {
             if ($cat_id && $cat_id != 0) {
@@ -1225,7 +1223,7 @@ class PrefFeeds extends ProtectedHandler
                      AND owner_uid = " . $_SESSION['uid']
             );
             $scores = array();
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 $tags = get_article_tags($line['ref_id'], $_SESSION['uid']);
                 $article_filters = \SmallSmallRSS\ArticleFilters::get(
                     $filters,
@@ -1279,7 +1277,7 @@ class PrefFeeds extends ProtectedHandler
             'SELECT id FROM ttrss_feeds WHERE owner_uid = ' . $_SESSION['uid']
         );
 
-        while ($feed_line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($feed_line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $id = $feed_line['id'];
             $filters = load_filters($id, $_SESSION['uid'], 6);
             $substring_for_date = \SmallSmallRSS\Database::getSubstringForDateFunction();
@@ -1295,7 +1293,7 @@ class PrefFeeds extends ProtectedHandler
                      AND owner_uid = " . $_SESSION['uid']
             );
             $scores = array();
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($tmp_result)) {
                 $tags = get_article_tags($line['ref_id'], $_SESSION['uid']);
                 $article_filters = \SmallSmallRSS\ArticleFilters::get(
                     $filters,
@@ -1365,7 +1363,7 @@ class PrefFeeds extends ProtectedHandler
 
     public function addCat()
     {
-        $feed_cat = \SmallSmallRSS\Database::escape_string(trim($_REQUEST['cat']));
+        $feed_cat = \SmallSmallRSS\Database::escapeString(trim($_REQUEST['cat']));
         \SmallSmallRSS\FeedCategories::add($_SESSION['uid'], $feed_cat);
     }
 
@@ -1383,7 +1381,7 @@ class PrefFeeds extends ProtectedHandler
                  last_error != ''
                  AND owner_uid = " . $_SESSION['uid']
         );
-        $num_errors = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_errors');
+        $num_errors = \SmallSmallRSS\Database::fetchResult($result, 0, 'num_errors');
         if ($num_errors > 0) {
             $error_button = '<button data-dojo-type="dijit.form.Button"
                       onclick="showFeedsWithErrors()" id="errorButton">' .
@@ -1408,7 +1406,7 @@ class PrefFeeds extends ProtectedHandler
                      AND ttrss_feeds.owner_uid = " . $_SESSION['uid']
         );
 
-        $num_inactive = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_inactive');
+        $num_inactive = \SmallSmallRSS\Database::fetchResult($result, 0, 'num_inactive');
 
         $inactive_button = '';
         if ($num_inactive) {
@@ -1760,7 +1758,7 @@ class PrefFeeds extends ProtectedHandler
 
         $lnum = 1;
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
 
             $feed_id = $line['id'];
             $this_row_id = "id=\"FUPDD-$feed_id\"";
@@ -1839,7 +1837,7 @@ class PrefFeeds extends ProtectedHandler
 
         $lnum = 1;
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
 
             $feed_id = $line['id'];
             $this_row_id = "id=\"FERDD-$feed_id\"";
@@ -1944,8 +1942,8 @@ class PrefFeeds extends ProtectedHandler
                      id = $id
                      AND owner_uid = $owner_uid"
             );
-            $feed_url = \SmallSmallRSS\Database::escape_string(
-                \SmallSmallRSS\Database::fetch_result($result, 0, 'feed_url')
+            $feed_url = \SmallSmallRSS\Database::escapeString(
+                \SmallSmallRSS\Database::fetchResult($result, 0, 'feed_url')
             );
             $result = \SmallSmallRSS\Database::query(
                 "SELECT id
@@ -1954,9 +1952,9 @@ class PrefFeeds extends ProtectedHandler
                      feed_url = '$feed_url'
                      AND owner_uid = $owner_uid"
             );
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::numRows($result) == 0) {
                 $result = \SmallSmallRSS\Database::query('SELECT MAX(id) AS id FROM ttrss_archived_feeds');
-                $new_feed_id = (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'id') + 1;
+                $new_feed_id = (int) \SmallSmallRSS\Database::fetchResult($result, 0, 'id') + 1;
                 \SmallSmallRSS\Database::query(
                     "INSERT INTO ttrss_archived_feeds
                      (id, owner_uid, title, feed_url, site_url)
@@ -1966,7 +1964,7 @@ class PrefFeeds extends ProtectedHandler
                 );
                 $archive_id = $new_feed_id;
             } else {
-                $archive_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+                $archive_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
             }
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_user_entries
@@ -2064,7 +2062,7 @@ class PrefFeeds extends ProtectedHandler
         $pass = trim($_REQUEST['pass']);
 
         foreach ($feeds as $feed) {
-            $feed = \SmallSmallRSS\Database::escape_string(trim($feed));
+            $feed = \SmallSmallRSS\Database::escapeString(trim($feed));
 
             if (validate_feed_url($feed)) {
 
@@ -2088,9 +2086,9 @@ class PrefFeeds extends ProtectedHandler
                     $auth_pass_encrypted = 'false';
                 }
 
-                $pass = \SmallSmallRSS\Database::escape_string($pass);
+                $pass = \SmallSmallRSS\Database::escapeString($pass);
 
-                if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                if (\SmallSmallRSS\Database::numRows($result) == 0) {
                     $result = \SmallSmallRSS\Database::query(
                         "INSERT INTO ttrss_feeds
                             (owner_uid,feed_url,title,cat_id,auth_login,auth_pass,update_method,auth_pass_encrypted)
@@ -2129,8 +2127,8 @@ class PrefFeeds extends ProtectedHandler
                  AND is_cat = $sql_is_cat
                  AND owner_uid = " . $owner_uid
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 1) {
-            $key = \SmallSmallRSS\Database::escape_string(sha1(uniqid(rand(), true)));
+        if (\SmallSmallRSS\Database::numRows($result) == 1) {
+            $key = \SmallSmallRSS\Database::escapeString(sha1(uniqid(rand(), true)));
             \SmallSmallRSS\Database::query(
                 "UPDATE ttrss_access_keys
                  SET access_key = '$key'

@@ -6,7 +6,7 @@ class Updater
     public function getSchemaVersion()
     {
         $result = \SmallSmallRSS\Database::query('SELECT schema_version FROM ttrss_version');
-        return (int) \SmallSmallRSS\Database::fetch_result($result, 0, 'schema_version');
+        return (int) \SmallSmallRSS\Database::fetchResult($result, 0, 'schema_version');
     }
 
     public function isUpdateRequired()
@@ -70,7 +70,7 @@ class Updater
             );
         }
 
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             if (\SmallSmallRSS\Config::get('DB_TYPE') == 'pgsql') {
                 $statement = 'DROP INDEX ' . $line['relname'];
             } else {

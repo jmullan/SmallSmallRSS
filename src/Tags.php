@@ -24,13 +24,13 @@ class Tags
                       LIMIT $limit_part";
             $result = \SmallSmallRSS\Database::query($query);
             $ids = array();
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 array_push($ids, $line['id']);
             }
             if (count($ids) > 0) {
                 $ids = join(',', $ids);
                 $tmp_result = \SmallSmallRSS\Database::query("DELETE FROM ttrss_tags WHERE id IN ($ids)");
-                $tags_deleted += \SmallSmallRSS\Database::affected_rows($tmp_result);
+                $tags_deleted += \SmallSmallRSS\Database::affectedRows($tmp_result);
             } else {
                 break;
             }
@@ -82,15 +82,15 @@ class Tags
                   )
                   ORDER BY tag_name";
         $result = \SmallSmallRSS\Database::query($query);
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $tags[] = $line['tag_name'];
         }
         return $tags;
     }
     public static function deleteForPost($post_int_id, $owner_uid)
     {
-        $post_int_id = \SmallSmallRSS\Database::escape_string($post_int_id);
-        $owner_uid = \SmallSmallRSS\Database::escape_string($owner_uid);
+        $post_int_id = \SmallSmallRSS\Database::escapeString($post_int_id);
+        $owner_uid = \SmallSmallRSS\Database::escapeString($owner_uid);
         \SmallSmallRSS\Database::query(
             "DELETE FROM ttrss_tags
              WHERE
@@ -109,7 +109,7 @@ class Tags
                  AND owner_uid = '$owner_uid'
              LIMIT 1"
         );
-        return $result && \SmallSmallRSS\Database::num_rows($result);
+        return $result && \SmallSmallRSS\Database::numRows($result);
 
     }
     public static function setForPost($post_int_id, $owner_uid, $tags)
@@ -122,7 +122,7 @@ class Tags
                 continue;
             }
             $filtered_tags[] = $tag;
-            $escaped_tags[] = \SmallSmallRSS\Database::escape_string($tag);
+            $escaped_tags[] = \SmallSmallRSS\Database::escapeString($tag);
         }
         ob_start();
         echo "INSERT INTO ttrss_tags (post_int_id, owner_uid, tag_name)";

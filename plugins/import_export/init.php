@@ -26,15 +26,15 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
             return;
         }
         print "please enter your username: ";
-        $username = \SmallSmallRSS\Database::escape_string(trim(\SmallSmallRSS\Utils::readStdin()));
+        $username = \SmallSmallRSS\Database::escapeString(trim(\SmallSmallRSS\Utils::readStdin()));
         $result = \SmallSmallRSS\Database::query(
             "SELECT id FROM ttrss_users WHERE login = '$username'"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
             print "error: could not find user $username.\n";
             return;
         }
-        $owner_uid = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+        $owner_uid = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
 
         print "importing $filename for user $username...\n";
         $this->performDataImport($filename, $owner_uid);
@@ -42,7 +42,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
     public function save()
     {
-        $example_value = \SmallSmallRSS\Database::escape_string($_POST["example_value"]);
+        $example_value = \SmallSmallRSS\Database::escapeString($_POST["example_value"]);
 
         echo "Value set to $example_value (not really)";
     }
@@ -122,7 +122,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
     public function exportrun()
     {
-        $offset = (int) \SmallSmallRSS\Database::escape_string($_REQUEST['offset']);
+        $offset = (int) \SmallSmallRSS\Database::escapeString($_REQUEST['offset']);
         $exported = 0;
         $limit = 250;
 
@@ -163,7 +163,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
             if ($fp) {
 
-                while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+                while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                     fputs($fp, "<article>");
 
                     foreach ($line as $k => $v) {
@@ -174,7 +174,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                     fputs($fp, "</article>");
                 }
 
-                $exported = \SmallSmallRSS\Database::num_rows($result);
+                $exported = \SmallSmallRSS\Database::numRows($result);
 
                 if ($exported < $limit && $exported > 0) {
                     fputs($fp, "</articles>");
@@ -242,7 +242,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
 
                     foreach ($article_node->childNodes as $child) {
                         if ($child->nodeName != 'label_cache') {
-                            $article[$child->nodeName] = \SmallSmallRSS\Database::escape_string($child->nodeValue);
+                            $article[$child->nodeName] = \SmallSmallRSS\Database::escapeString($child->nodeValue);
                         } else {
                             $article[$child->nodeName] = $child->nodeValue;
                         }
@@ -255,7 +255,7 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                              FROM ttrss_entries
                              WHERE guid = '".$article['guid']."'"
                         );
-                        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                        if (\SmallSmallRSS\Database::numRows($result) == 0) {
                             $result = \SmallSmallRSS\Database::query(
                                 "INSERT INTO ttrss_entries
                                     (title,
@@ -290,12 +290,12 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                                  WHERE guid = '".$article['guid']."'"
                             );
 
-                            if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                                $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+                            if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                                $ref_id = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
                             }
 
                         } else {
-                            $ref_id = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+                            $ref_id = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
                         }
 
                         //print "Got ref ID: $ref_id\n";
@@ -313,8 +313,8 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                                      WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'"
                                 );
 
-                                if (\SmallSmallRSS\Database::num_rows($result) != 0) {
-                                    $feed = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+                                if (\SmallSmallRSS\Database::numRows($result) != 0) {
+                                    $feed = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
                                 } else {
                                     // try autocreating feed in Uncategorized...
                                     $result = \SmallSmallRSS\Database::query(
@@ -325,10 +325,10 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                                         "SELECT id FROM ttrss_feeds
                                          WHERE feed_url = '$feed_url' AND owner_uid = '$owner_uid'"
                                     );
-                                    if (\SmallSmallRSS\Database::num_rows($result) != 0) {
+                                    if (\SmallSmallRSS\Database::numRows($result) != 0) {
                                         ++$num_feeds_created;
 
-                                        $feed = \SmallSmallRSS\Database::fetch_result($result, 0, "id");
+                                        $feed = \SmallSmallRSS\Database::fetchResult($result, 0, "id");
                                     }
                                 }
                             }
@@ -343,14 +343,14 @@ class Import_Export extends \SmallSmallRSS\Plugin implements \SmallSmallRSS\Hand
                                  WHERE ref_id = '$ref_id' AND owner_uid = '$owner_uid' AND $feed_qpart"
                             );
 
-                            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+                            if (\SmallSmallRSS\Database::numRows($result) == 0) {
 
                                 $marked = \SmallSmallRSS\Database::toSQLBool(\SmallSmallRSS\Database::fromSQLBool($article['marked']));
                                 $published = \SmallSmallRSS\Database::toSQLBool(\SmallSmallRSS\Database::fromSQLBool($article['published']));
                                 $score = (int) $article['score'];
 
                                 $tag_cache = $article['tag_cache'];
-                                $label_cache = \SmallSmallRSS\Database::escape_string($article['label_cache']);
+                                $label_cache = \SmallSmallRSS\Database::escapeString($article['label_cache']);
                                 $note = $article['note'];
 
                                 //print "Importing " . $article['title'] . "<br/>";

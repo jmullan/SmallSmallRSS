@@ -14,7 +14,7 @@ class Sanity
             $result = \SmallSmallRSS\Database::query(
                 'SELECT schema_version FROM ttrss_version'
             );
-            $schema_version = \SmallSmallRSS\Database::fetch_result(
+            $schema_version = \SmallSmallRSS\Database::fetchResult(
                 $result,
                 0,
                 'schema_version'
@@ -137,7 +137,7 @@ class Sanity
             if (\SmallSmallRSS\Auth::isSingleUserMode()) {
                 $result = \SmallSmallRSS\Database::query('SELECT id FROM ttrss_users WHERE id = 1');
 
-                if (\SmallSmallRSS\Database::num_rows($result) != 1) {
+                if (\SmallSmallRSS\Database::numRows($result) != 1) {
                     array_push(
                         $errors,
                         'SINGLE_USER_MODE is enabled in config.ini but default admin account is not found.'

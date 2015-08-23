@@ -16,7 +16,7 @@ class SettingsProfiles
     }
     public static function findByTitle($title, $owner_uid)
     {
-        $title = \SmallSmallRSS\Database::escape_string($title);
+        $title = \SmallSmallRSS\Database::escapeString($title);
         $result = \SmallSmallRSS\Database::query(
             "SELECT id
                  FROM ttrss_settings_profiles
@@ -24,14 +24,14 @@ class SettingsProfiles
                      title = '$title'
                      AND owner_uid = $owner_id"
         );
-        if (\SmallSmallRSS\Database::num_rows($result) == 0) {
-            return \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+        if (\SmallSmallRSS\Database::numRows($result) == 0) {
+            return \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
         }
         return false;
     }
     public static function create($title, $owner_uid)
     {
-        $escaped_title = \SmallSmallRSS\Database::escape_string($title);
+        $escaped_title = \SmallSmallRSS\Database::escapeString($title);
         \SmallSmallRSS\Database::query(
             "INSERT INTO ttrss_settings_profiles
              (title, owner_uid)

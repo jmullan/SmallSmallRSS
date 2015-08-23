@@ -1,7 +1,7 @@
 <?php
 namespace SmallSmallRSS\Handlers;
 
-class backend extends Handler
+class Backend extends Handler
 {
     public function loading()
     {

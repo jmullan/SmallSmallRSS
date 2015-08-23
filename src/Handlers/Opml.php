@@ -87,7 +87,7 @@ class Opml extends ProtectedHandler
              ORDER BY order_id, title"
         );
 
-        while ($fline = \SmallSmallRSS\Database::fetch_assoc($feeds_result)) {
+        while ($fline = \SmallSmallRSS\Database::fetchAssoc($feeds_result)) {
             $title = htmlspecialchars($fline['title']);
             $url = htmlspecialchars($fline['feed_url']);
             $site_url = htmlspecialchars($fline['site_url']);
@@ -143,7 +143,7 @@ class Opml extends ProtectedHandler
                      ORDER BY pref_name'
             );
 
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 $name = $line['pref_name'];
                 $value = htmlspecialchars($line['value']);
 
@@ -161,7 +161,7 @@ class Opml extends ProtectedHandler
                      owner_uid = ' . $_SESSION['uid']
             );
 
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 $name = htmlspecialchars($line['caption']);
                 $fg_color = htmlspecialchars($line['fg_color']);
                 $bg_color = htmlspecialchars($line['bg_color']);
@@ -181,7 +181,7 @@ class Opml extends ProtectedHandler
                  ORDER BY id'
             );
 
-            while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+            while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
                 foreach (array('enabled', 'match_any_rule', 'inverse') as $b) {
                     $line[$b] = \SmallSmallRSS\Database::fromSQLBool($line[$b]);
                 }
@@ -194,7 +194,7 @@ class Opml extends ProtectedHandler
                     WHERE filter_id = '.$line['id']
                 );
 
-                while ($tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
+                while ($tmp_line = \SmallSmallRSS\Database::fetchAssoc($tmp_result)) {
                     unset($tmp_line['id']);
                     unset($tmp_line['filter_id']);
 
@@ -224,7 +224,7 @@ class Opml extends ProtectedHandler
                      WHERE filter_id = '.$line['id']
                 );
 
-                while ($tmp_line = \SmallSmallRSS\Database::fetch_assoc($tmp_result)) {
+                while ($tmp_line = \SmallSmallRSS\Database::fetchAssoc($tmp_result)) {
                     unset($tmp_line['id']);
                     unset($tmp_line['filter_id']);
                     array_push($line['actions'], $tmp_line);
@@ -260,24 +260,24 @@ class Opml extends ProtectedHandler
     private function importFeed($doc, $node, $cat_id, $owner_uid)
     {
         $attrs = $node->attributes;
-        $feed_title = \SmallSmallRSS\Database::escape_string(
+        $feed_title = \SmallSmallRSS\Database::escapeString(
             mb_substr($attrs->getNamedItem('text')->nodeValue, 0, 250)
         );
         if (!$feed_title) {
-            $feed_title = \SmallSmallRSS\Database::escape_string(
+            $feed_title = \SmallSmallRSS\Database::escapeString(
                 mb_substr($attrs->getNamedItem('title')->nodeValue, 0, 250)
             );
         }
-        $feed_url = \SmallSmallRSS\Database::escape_string(
+        $feed_url = \SmallSmallRSS\Database::escapeString(
             mb_substr($attrs->getNamedItem('xmlUrl')->nodeValue, 0, 250)
         );
         if (!$feed_url) {
-            $feed_url = \SmallSmallRSS\Database::escape_string(
+            $feed_url = \SmallSmallRSS\Database::escapeString(
                 mb_substr($attrs->getNamedItem('xmlURL')->nodeValue, 0, 250)
             );
         }
 
-        $site_url = \SmallSmallRSS\Database::escape_string(
+        $site_url = \SmallSmallRSS\Database::escapeString(
             mb_substr($attrs->getNamedItem('htmlUrl')->nodeValue, 0, 250)
         );
 
@@ -290,7 +290,7 @@ class Opml extends ProtectedHandler
                      AND owner_uid = '$owner_uid'"
             );
 
-            if (\SmallSmallRSS\Database::num_rows($result) == 0) {
+            if (\SmallSmallRSS\Database::numRows($result) == 0) {
                 $this->notice(T_sprintf('Adding feed: %s', $feed_title));
 
                 if (!$cat_id) {
@@ -312,10 +312,10 @@ class Opml extends ProtectedHandler
     private function importLabel($doc, $node, $owner_uid)
     {
         $attrs = $node->attributes;
-        $label_name = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-name')->nodeValue);
+        $label_name = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('label-name')->nodeValue);
         if ($label_name) {
-            $fg_color = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-fg-color')->nodeValue);
-            $bg_color = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('label-bg-color')->nodeValue);
+            $fg_color = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('label-fg-color')->nodeValue);
+            $bg_color = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('label-bg-color')->nodeValue);
             if (!\SmallSmallRSS\Labels::findID($label_name, $owner_uid)) {
                 $this->notice(T_sprintf('Adding label %s', htmlspecialchars($label_name)));
                 \SmallSmallRSS\Labels::create($label_name, $owner_uid, $fg_color, $bg_color);
@@ -328,10 +328,10 @@ class Opml extends ProtectedHandler
     private function importPreference($doc, $node, $owner_uid)
     {
         $attrs = $node->attributes;
-        $pref_name = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('pref-name')->nodeValue);
+        $pref_name = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('pref-name')->nodeValue);
 
         if ($pref_name) {
-            $pref_value = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('value')->nodeValue);
+            $pref_value = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('value')->nodeValue);
             $this->notice(
                 T_sprintf('Setting preference key %s to %s', $pref_name, $pref_value)
             );
@@ -343,7 +343,7 @@ class Opml extends ProtectedHandler
     {
         $attrs = $node->attributes;
 
-        $filter_type = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('filter-type')->nodeValue);
+        $filter_type = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('filter-type')->nodeValue);
 
         if ($filter_type == '2') {
             $filter = json_decode($node->nodeValue, true);
@@ -352,7 +352,7 @@ class Opml extends ProtectedHandler
                 $match_any_rule = \SmallSmallRSS\Database::toSQLBool($filter['match_any_rule']);
                 $enabled = \SmallSmallRSS\Database::toSQLBool($filter['enabled']);
                 $inverse = \SmallSmallRSS\Database::toSQLBool($filter['inverse']);
-                $title = \SmallSmallRSS\Database::escape_string($filter['title']);
+                $title = \SmallSmallRSS\Database::escapeString($filter['title']);
 
                 \SmallSmallRSS\Database::query('BEGIN');
 
@@ -368,7 +368,7 @@ class Opml extends ProtectedHandler
                      FROM ttrss_filters2
                      WHERE owner_uid = '.$_SESSION['uid']
                 );
-                $filter_id = \SmallSmallRSS\Database::fetch_result($result, 0, 'id');
+                $filter_id = \SmallSmallRSS\Database::fetchResult($result, 0, 'id');
 
                 if ($filter_id) {
                     $this->notice(T_sprintf('Adding filter...'));
@@ -381,25 +381,25 @@ class Opml extends ProtectedHandler
                             $tmp_result = \SmallSmallRSS\Database::query(
                                 "SELECT id FROM ttrss_feeds
                                  WHERE
-                                     title = '".\SmallSmallRSS\Database::escape_string($rule['feed']) . "'
+                                     title = '".\SmallSmallRSS\Database::escapeString($rule['feed']) . "'
                                      AND owner_uid = ".$_SESSION['uid']
                             );
-                            if (\SmallSmallRSS\Database::num_rows($tmp_result) > 0) {
-                                $feed_id = \SmallSmallRSS\Database::fetch_result($tmp_result, 0, 'id');
+                            if (\SmallSmallRSS\Database::numRows($tmp_result) > 0) {
+                                $feed_id = \SmallSmallRSS\Database::fetchResult($tmp_result, 0, 'id');
                             }
                         } else {
                             $tmp_result = \SmallSmallRSS\Database::query(
                                 "SELECT id FROM ttrss_feed_categories
                                  WHERE
-                                     title = '".\SmallSmallRSS\Database::escape_string($rule['feed'])."'
+                                     title = '".\SmallSmallRSS\Database::escapeString($rule['feed'])."'
                                      AND owner_uid = " . $_SESSION['uid']
                             );
-                            if (\SmallSmallRSS\Database::num_rows($tmp_result) > 0) {
-                                $cat_id = \SmallSmallRSS\Database::fetch_result($tmp_result, 0, 'id');
+                            if (\SmallSmallRSS\Database::numRows($tmp_result) > 0) {
+                                $cat_id = \SmallSmallRSS\Database::fetchResult($tmp_result, 0, 'id');
                             }
                         }
                         $cat_filter = \SmallSmallRSS\Database::toSQLBool($rule['cat_filter']);
-                        $reg_exp = \SmallSmallRSS\Database::escape_string($rule['reg_exp']);
+                        $reg_exp = \SmallSmallRSS\Database::escapeString($rule['reg_exp']);
                         $filter_type = (int) $rule['filter_type'];
 
                         \SmallSmallRSS\Database::query(
@@ -412,7 +412,7 @@ class Opml extends ProtectedHandler
 
                     foreach ($filter['actions'] as $action) {
                         $action_id = (int) $action['action_id'];
-                        $action_param = \SmallSmallRSS\Database::escape_string($action['action_param']);
+                        $action_param = \SmallSmallRSS\Database::escapeString($action['action_param']);
                         \SmallSmallRSS\Database::query(
                             "INSERT INTO ttrss_filters2_actions
                              (filter_id,action_id,action_param)
@@ -433,11 +433,11 @@ class Opml extends ProtectedHandler
         $default_cat_id = (int) \SmallSmallRSS\FeedCategories::get($owner_uid, 'Imported feeds', false);
 
         if ($root_node) {
-            $cat_title = \SmallSmallRSS\Database::escape_string(
+            $cat_title = \SmallSmallRSS\Database::escapeString(
                 mb_substr($root_node->attributes->getNamedItem('text')->nodeValue, 0, 250)
             );
             if (!$cat_title) {
-                $cat_title = \SmallSmallRSS\Database::escape_string(
+                $cat_title = \SmallSmallRSS\Database::escapeString(
                     mb_substr($root_node->attributes->getNamedItem('title')->nodeValue, 0, 250)
                 );
             }
@@ -469,13 +469,13 @@ class Opml extends ProtectedHandler
         foreach ($outlines as $node) {
             if ($node->hasAttributes() && strtolower($node->tagName) == 'outline') {
                 $attrs = $node->attributes;
-                $node_cat_title = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('text')->nodeValue);
+                $node_cat_title = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('text')->nodeValue);
 
                 if (!$node_cat_title) {
-                    $node_cat_title = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('title')->nodeValue);
+                    $node_cat_title = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('title')->nodeValue);
                 }
 
-                $node_feed_url = \SmallSmallRSS\Database::escape_string($attrs->getNamedItem('xmlUrl')->nodeValue);
+                $node_feed_url = \SmallSmallRSS\Database::escapeString($attrs->getNamedItem('xmlUrl')->nodeValue);
 
                 if ($node_cat_title && !$node_feed_url) {
                     $this->importCategory($doc, $node, $owner_uid, $cat_id);

@@ -28,7 +28,7 @@ class Digest
              WHERE email != '' AND (last_digest_sent IS NULL OR $interval_query)"
         );
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $uid = $line['id'];
             if (@\SmallSmallRSS\DBPrefs::read('DIGEST_ENABLE', $uid, false)) {
                 $preferred_ts = strtotime(\SmallSmallRSS\DBPrefs::read('DIGEST_PREFERRED_TIME', $uid, '00:00'));
@@ -123,11 +123,11 @@ class Digest
 
         $cur_feed_title = '';
 
-        $headlines_count = \SmallSmallRSS\Database::num_rows($result);
+        $headlines_count = \SmallSmallRSS\Database::numRows($result);
 
         $headlines = array();
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             array_push($headlines, $line);
         }
 

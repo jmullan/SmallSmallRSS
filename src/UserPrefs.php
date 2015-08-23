@@ -5,12 +5,12 @@ class UserPrefs
 {
     public static function getActive($owner_uid, $profile = false)
     {
-        $owner_uid = \SmallSmallRSS\Database::quote_string($owner_uid);
+        $owner_uid = \SmallSmallRSS\Database::quoteString($owner_uid);
         if (!$profile) {
             $profile = 'NULL';
             $profile_qpart = 'AND profile IS NULL';
         } else {
-            $profile = \SmallSmallRSS\Database::quote_string($profile);
+            $profile = \SmallSmallRSS\Database::quoteString($profile);
             $profile_qpart = "AND profile = $profile";
         }
         if (\SmallSmallRSS\Sanity::getSchemaVersion() < 63) {
@@ -23,17 +23,17 @@ class UserPrefs
              $profile_qpart"
         );
         $active_prefs = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($u_result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($u_result))) {
             $active_prefs[$line['pref_name']] = $line['value'];
         }
     }
     public static function insert($pref_name, $value, $owner_uid, $profile = false)
     {
-        $owner_uid = \SmallSmallRSS\Database::quote_string($owner_uid);
-        $value = \SmallSmallRSS\Database::quote_string($value);
-        $pref_name = \SmallSmallRSS\Database::quote_string($pref_name);
+        $owner_uid = \SmallSmallRSS\Database::quoteString($owner_uid);
+        $value = \SmallSmallRSS\Database::quoteString($value);
+        $pref_name = \SmallSmallRSS\Database::quoteString($pref_name);
         if ($profile) {
-            $profile = \SmallSmallRSS\Database::quote_string($profile);
+            $profile = \SmallSmallRSS\Database::quoteString($profile);
         } else {
             $profile = 'null';
         }

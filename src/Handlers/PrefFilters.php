@@ -11,6 +11,14 @@ class PrefFilters extends ProtectedHandler
         return array_search($method, $csrf_ignored) !== false;
     }
 
+    private function button($id, $do, $text)
+    {
+        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('$id').$do()\">";
+        echo $text;
+        echo '</button> ';
+
+    }
+
     public function filtersortreset()
     {
         \SmallSmallRSS\Filters::resetFilterOrders($_SESSION['uid']);
@@ -39,7 +47,7 @@ class PrefFilters extends ProtectedHandler
     {
         $result = \SmallSmallRSS\Database::query('SELECT id, name FROM ttrss_filter_types');
         $filter_types = array();
-        while (($line = \SmallSmallRSS\Database::fetch_assoc($result))) {
+        while (($line = \SmallSmallRSS\Database::fetchAssoc($result))) {
             $filter_types[$line['id']] = $line['name'];
         }
 
@@ -84,7 +92,7 @@ class PrefFilters extends ProtectedHandler
         echo __('Articles matching this filter:');
         echo '<div class="filterTestHolder">';
         echo '<table width="100%" cellspacing="0" id="prefErrorFeedList">';
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $entry_timestamp = strtotime($line['updated']);
             $entry_tags = get_article_tags($line['id'], $_SESSION['uid']);
             $content_preview = \SmallSmallRSS\Utils::truncateString(strip_tags($line['content_preview']), 100, '...');
@@ -122,9 +130,7 @@ class PrefFilters extends ProtectedHandler
         echo '</table>';
         echo '</div>';
         echo "<div style='text-align : center'>";
-        echo '<button data-dojo-type="dijit.form.Button" onclick="dijit.byId(\'filterTestDlg\').hide()">';
-        echo __('Close this window');
-        echo '</button>';
+        $this->button('filterTestDlg', 'hide', __('Close this window'));
         echo '</div>';
     }
 
@@ -162,7 +168,7 @@ class PrefFilters extends ProtectedHandler
         $folder = array();
         $folder['items'] = array();
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $name = $this->getFilterName($line['id']);
 
             $match_ok = false;
@@ -172,7 +178,7 @@ class PrefFilters extends ProtectedHandler
                      FROM ttrss_filters2_rules
                      WHERE filter_id = '.$line['id']
                 );
-                while ($rule_line = \SmallSmallRSS\Database::fetch_assoc($rules_result)) {
+                while ($rule_line = \SmallSmallRSS\Database::fetchAssoc($rules_result)) {
                     if (mb_strpos($rule_line['reg_exp'], $filter_search) !== false) {
                         $match_ok = true;
                         break;
@@ -181,7 +187,7 @@ class PrefFilters extends ProtectedHandler
             }
 
             if ($line['action_id'] == 7) {
-                $escaped_caption = \SmallSmallRSS\Database::escape_string($line['action_param']);
+                $escaped_caption = \SmallSmallRSS\Database::escapeString($line['action_param']);
                 $label_result = \SmallSmallRSS\Database::query(
                     "SELECT fg_color, bg_color
                      FROM ttrss_labels2
@@ -189,9 +195,9 @@ class PrefFilters extends ProtectedHandler
                         caption = '$escaped_caption'
                         AND owner_uid = " . $_SESSION['uid']
                 );
-                if (\SmallSmallRSS\Database::num_rows($label_result) > 0) {
-                    $fg_color = \SmallSmallRSS\Database::fetch_result($label_result, 0, 'fg_color');
-                    $bg_color = \SmallSmallRSS\Database::fetch_result($label_result, 0, 'bg_color');
+                if (\SmallSmallRSS\Database::numRows($label_result) > 0) {
+                    $fg_color = \SmallSmallRSS\Database::fetchResult($label_result, 0, 'fg_color');
+                    $bg_color = \SmallSmallRSS\Database::fetchResult($label_result, 0, 'bg_color');
 
                     $name[1] = "<span class=\"labelColorIndicator\" id=\"label-editor-indicator\""
                         . " style=\"color: $fg_color; background-color: $bg_color; margin-right: 4px\">"
@@ -226,7 +232,7 @@ class PrefFilters extends ProtectedHandler
     public function edit()
     {
 
-        $filter_id = \SmallSmallRSS\Database::escape_string($_REQUEST['id']);
+        $filter_id = \SmallSmallRSS\Database::escapeString($_REQUEST['id']);
 
         $result = \SmallSmallRSS\Database::query(
             "SELECT * FROM ttrss_filters2
@@ -236,15 +242,15 @@ class PrefFilters extends ProtectedHandler
         );
 
         $enabled = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'enabled')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'enabled')
         );
         $match_any_rule = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'match_any_rule')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'match_any_rule')
         );
         $inverse = \SmallSmallRSS\Database::fromSQLBool(
-            \SmallSmallRSS\Database::fetch_result($result, 0, 'inverse')
+            \SmallSmallRSS\Database::fetchResult($result, 0, 'inverse')
         );
-        $title = htmlspecialchars(\SmallSmallRSS\Database::fetch_result($result, 0, 'title'));
+        $title = htmlspecialchars(\SmallSmallRSS\Database::fetchResult($result, 0, 'title'));
 
         $rules_result = \SmallSmallRSS\Database::query(
             "SELECT *
@@ -299,19 +305,15 @@ class PrefFilters extends ProtectedHandler
         echo '</div>';
         echo '</div>';
 
-        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'filterEditDlg\').addRule()">';
-        echo __('Add');
-        echo '</button>';
+        $this->button('filterEditDlg', 'addRule', __('Add'));
         echo ' ';
-        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'filterEditDlg\').deleteRule()">';
-        echo __('Delete');
-        echo '</button>';
+        $this->button('filterEditDlg', 'deleteRule', __('Delete'));
 
         echo '</div>';
 
         echo '<ul id="filterDlg_Matches">';
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($rules_result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($rules_result)) {
             if (\SmallSmallRSS\Database::fromSQLBool($line['cat_filter'])) {
                 $line['feed_id'] = 'CAT:' . (int) $line['cat_id'];
             }
@@ -354,16 +356,13 @@ class PrefFilters extends ProtectedHandler
         echo __('Add');
         echo '</button> ';
 
-        echo '<button data-dojo-type="dijit.form.Button"';
-        echo ' onclick="return dijit.byId(\'filterEditDlg\').deleteAction()">';
-        echo __('Delete');
-        echo '</button> ';
+        $this->button('filterEditDlg', 'deleteAction', __('Delete'));
 
         echo '</div>';
 
         echo "<ul id='filterDlg_Actions'>";
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($actions_result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($actions_result)) {
             $line['action_param_label'] = $line['action_param'];
 
             unset($line['filter_id']);
@@ -424,7 +423,8 @@ class PrefFilters extends ProtectedHandler
         echo '<p/>';
         echo '<div class="dlgButtons">';
         echo '<div style="float: left">';
-        echo '<button data-dojo-type="dijit.form.Button" onclick="return dijit.byId(\'filterEditDlg\').removeFilter()">';
+        echo '<button data-dojo-type="dijit.form.Button"';
+        echo ' onclick="return dijit.byId(\'filterEditDlg\').removeFilter()">';
         echo __('Remove');
         echo '</button>';
         echo '</div>';
@@ -466,7 +466,7 @@ class PrefFilters extends ProtectedHandler
              FROM ttrss_filter_types
              WHERE id = '. (int) $rule['filter_type']
         );
-        $filter_type = \SmallSmallRSS\Database::fetch_result($result, 0, 'description');
+        $filter_type = \SmallSmallRSS\Database::fetchResult($result, 0, 'description');
 
         return T_sprintf(
             '%s on %s in %s %s',
@@ -489,7 +489,7 @@ class PrefFilters extends ProtectedHandler
             ttrss_filter_actions WHERE id = ' . (int) $action['action_id']
         );
 
-        $title = __(\SmallSmallRSS\Database::fetch_result($result, 0, 'description'));
+        $title = __(\SmallSmallRSS\Database::fetchResult($result, 0, 'description'));
 
         if ($action['action_id'] == 4 || $action['action_id'] == 6 ||
             $action['action_id'] == 7) {
@@ -559,15 +559,13 @@ class PrefFilters extends ProtectedHandler
 
             foreach ($rules as $rule) {
                 if ($rule) {
-
-                    $reg_exp = strip_tags(\SmallSmallRSS\Database::escape_string(trim($rule['reg_exp'])));
+                    $reg_exp = strip_tags(\SmallSmallRSS\Database::escapeString(trim($rule['reg_exp'])));
                     $inverse = isset($rule['inverse']) ? 'true' : 'false';
 
-                    $filter_type = (int) \SmallSmallRSS\Database::escape_string(trim($rule['filter_type']));
-                    $feed_id = \SmallSmallRSS\Database::escape_string(trim($rule['feed_id']));
+                    $filter_type = (int) \SmallSmallRSS\Database::escapeString(trim($rule['filter_type']));
+                    $feed_id = \SmallSmallRSS\Database::escapeString(trim($rule['feed_id']));
 
                     if (strpos($feed_id, 'CAT:') === 0) {
-
                         $cat_filter = \SmallSmallRSS\Database::toSQLBool(true);
                         $cat_id = (int) substr($feed_id, 4);
                         $feed_id = 'NULL';
@@ -593,10 +591,9 @@ class PrefFilters extends ProtectedHandler
 
             foreach ($actions as $action) {
                 if ($action) {
-
-                    $action_id = (int) \SmallSmallRSS\Database::escape_string($action['action_id']);
-                    $action_param = \SmallSmallRSS\Database::escape_string($action['action_param']);
-                    $action_param_label = \SmallSmallRSS\Database::escape_string($action['action_param_label']);
+                    $action_id = (int) \SmallSmallRSS\Database::escapeString($action['action_id']);
+                    $action_param = \SmallSmallRSS\Database::escapeString($action['action_param']);
+                    $action_param_label = \SmallSmallRSS\Database::escapeString($action['action_param_label']);
 
                     if ($action_id == 7) {
                         $action_param = $action_param_label;
@@ -639,13 +636,13 @@ class PrefFilters extends ProtectedHandler
     public function index()
     {
 
-        $sort = \SmallSmallRSS\Database::escape_string($_REQUEST['sort']);
+        $sort = \SmallSmallRSS\Database::escapeString($_REQUEST['sort']);
 
         if (!$sort || $sort == 'undefined') {
             $sort = 'reg_exp';
         }
 
-        $filter_search = \SmallSmallRSS\Database::escape_string($_REQUEST['search']);
+        $filter_search = \SmallSmallRSS\Database::escapeString($_REQUEST['search']);
 
         if (array_key_exists('search', $_REQUEST)) {
             $_SESSION['prefs_filter_search'] = $filter_search;
@@ -657,7 +654,7 @@ class PrefFilters extends ProtectedHandler
         echo '<div id="pref-filter-header" data-dojo-type="dijit.layout.ContentPane" region="top">';
         echo '<div id="pref-filter-toolbar" data-dojo-type="dijit.Toolbar">';
 
-        $filter_search = \SmallSmallRSS\Database::escape_string($_REQUEST['search']);
+        $filter_search = \SmallSmallRSS\Database::escapeString($_REQUEST['search']);
 
         if (array_key_exists('search', $_REQUEST)) {
             $_SESSION['prefs_filter_search'] = $filter_search;
@@ -774,7 +771,7 @@ class PrefFilters extends ProtectedHandler
         echo __('Caption');
         echo '</div>';
 
-        echo '<input required="true" data-dojo-type="dijit.form.ValidationTextBox" style="width: 20em;" name="title" value="">';
+        echo '<input required="true" data-dojo-type="dijit.form.ValidationTextBox" name="title" value="">';
 
         echo '<div class="dlgSec">';
         echo __('Match');
@@ -795,18 +792,13 @@ class PrefFilters extends ProtectedHandler
         echo '</div>';
         echo '</div></div>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addRule()\">";
-        echo __('Add');
-        echo '</button> ';
-
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').deleteRule()\">";
-        echo __('Delete');
-        echo '</button> ';
+        $this->button('filterEditDlg', 'addRule', __('Add'));
+        $this->button('filterEditDlg', 'deleteRule', __('Delete'));
 
         echo '</div>';
 
         echo "<ul id='filterDlg_Matches'>";
-        #        echo "<li>No rules</li>";
+        # echo "<li>No rules</li>";
         echo '</ul>';
 
         echo '</div>';
@@ -831,13 +823,8 @@ class PrefFilters extends ProtectedHandler
         echo '</div>';
         echo '</div></div>';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').addAction()\">";
-        echo __('Add');
-        echo '</button> ';
-
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').deleteAction()\">";
-        echo __('Delete');
-        echo '</button> ';
+        $this->button('filterEditDlg', 'addAction', __('Add'));
+        $this->button('filterEditDlg', 'deleteAction', __('Delete'));
 
         echo '</div>';
 
@@ -849,29 +836,23 @@ class PrefFilters extends ProtectedHandler
         echo __('Enabled');
         echo '</label>';
 
-        echo '<br/><input data-dojo-type="dijit.form.CheckBox" type="checkbox" name="match_any_rule" id="match_any_rule">
-                <label for="match_any_rule">';
+        echo '<br/>';
+        echo '<input data-dojo-type="dijit.form.CheckBox" type="checkbox" name="match_any_rule" id="match_any_rule">';
+        echo '<label for="match_any_rule">';
         echo __('Match any rule');
         echo '</label>';
 
-        echo '<br/><input data-dojo-type="dijit.form.CheckBox" type="checkbox" name="inverse" id="inverse">
-                <label for="inverse">';
+        echo '<br/>';
+        echo '<input data-dojo-type="dijit.form.CheckBox" type="checkbox" name="inverse" id="inverse">';
+        echo '<label for="inverse">';
         echo __('Inverse matching');
         echo '</label>';
 
         echo '<div class="dlgButtons">';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').test()\">";
-        echo __('Test');
-        echo '</button> ';
-
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').execute()\">";
-        echo __('Create');
-        echo '</button> ';
-
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterEditDlg').hide()\">";
-        echo __('Cancel');
-        echo '</button>';
+        $this->button('filterEditDlg', 'test', __('Test'));
+        $this->button('filterEditDlg', 'execute', __('Create'));
+        $this->button('filterEditDlg', 'hide', __('Cancel'));
 
         echo '</div>';
 
@@ -912,7 +893,7 @@ class PrefFilters extends ProtectedHandler
 
         $filter_types = array();
 
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $filter_types[$line['id']] = __($line['description']);
         }
 
@@ -959,13 +940,9 @@ class PrefFilters extends ProtectedHandler
 
         echo '<div class="dlgButtons">';
 
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewRuleDlg').execute()\">";
-        echo ($rule ? __('Save rule') : __('Add rule'));
-        echo '</button> ';
-
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewRuleDlg').hide()\">";
-        echo __('Cancel');
-        echo '</button>';
+        $label = ($rule ? __('Save rule') : __('Add rule'));
+        $this->button('filterNewRuleDlg', 'execute', $label);
+        $this->button('filterNewRuleDlg', 'hide', __('Cancel'));
 
         echo '</div>';
 
@@ -977,7 +954,7 @@ class PrefFilters extends ProtectedHandler
         $action = json_decode($_REQUEST['action'], true);
 
         if ($action) {
-            $action_param = \SmallSmallRSS\Database::escape_string($action['action_param']);
+            $action_param = \SmallSmallRSS\Database::escapeString($action['action_param']);
             $action_id = (int) $action['action_id'];
         } else {
             $action_param = '';
@@ -996,7 +973,7 @@ class PrefFilters extends ProtectedHandler
              FROM ttrss_filter_actions
              ORDER BY name'
         );
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $is_selected = ($line['id'] == $action_id) ? "selected='1'" : '';
             printf("<option $is_selected value='%d'>%s</option>", $line['id'], __($line['description']));
         }
@@ -1025,11 +1002,11 @@ class PrefFilters extends ProtectedHandler
         echo '&nbsp;'; // tiny layout hack
         echo '</div>';
         echo '<div class="dlgButtons">';
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewActionDlg').execute()\">";
-        echo ($action ? __('Save action') : __('Add action'));
-        echo '</button> ';
-        echo "<button data-dojo-type=\"dijit.form.Button\" onclick=\"return dijit.byId('filterNewActionDlg').hide()\">";
-        echo __('Cancel');
+
+        $label = ($action ? __('Save action') : __('Add action'));
+        $this->button('filterNewActionDlg', 'execute', $label);
+        $this->button('filterNewActionDlg', 'hide', __('Cancel'));
+
         echo '</button>';
         echo '</div>';
         echo '</form>';
@@ -1049,9 +1026,9 @@ class PrefFilters extends ProtectedHandler
              GROUP BY f.title"
         );
 
-        $title = \SmallSmallRSS\Database::fetch_result($result, 0, 'title');
-        $num_rules = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_rules');
-        $num_actions = \SmallSmallRSS\Database::fetch_result($result, 0, 'num_actions');
+        $title = \SmallSmallRSS\Database::fetchResult($result, 0, 'title');
+        $num_rules = \SmallSmallRSS\Database::fetchResult($result, 0, 'num_rules');
+        $num_actions = \SmallSmallRSS\Database::fetchResult($result, 0, 'num_actions');
 
         if (!$title) {
             $title = __('[No caption]');
@@ -1065,8 +1042,8 @@ class PrefFilters extends ProtectedHandler
 
         $actions = '';
 
-        if (\SmallSmallRSS\Database::num_rows($result) > 0) {
-            $line = \SmallSmallRSS\Database::fetch_assoc($result);
+        if (\SmallSmallRSS\Database::numRows($result) > 0) {
+            $line = \SmallSmallRSS\Database::fetchAssoc($result);
             $actions = $this->getActionName($line);
 
             $num_actions -= 1;
@@ -1082,7 +1059,7 @@ class PrefFilters extends ProtectedHandler
     public function join()
     {
         # TODO: check all ids against the currently logged in user
-        $ids = explode(',', \SmallSmallRSS\Database::escape_string($_REQUEST['ids']));
+        $ids = explode(',', \SmallSmallRSS\Database::escapeString($_REQUEST['ids']));
         if (count($ids) > 1) {
             $base_id = array_shift($ids);
             $ids_str = join(',', $ids);
@@ -1114,7 +1091,7 @@ class PrefFilters extends ProtectedHandler
 
         $tmp = array();
         $dupe_ids = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $id = $line['id'];
             unset($line['id']);
             if (array_search($line, $tmp) === false) {
@@ -1137,7 +1114,7 @@ class PrefFilters extends ProtectedHandler
         );
         $tmp = array();
         $dupe_ids = array();
-        while ($line = \SmallSmallRSS\Database::fetch_assoc($result)) {
+        while ($line = \SmallSmallRSS\Database::fetchAssoc($result)) {
             $id = $line['id'];
             unset($line['id']);
             if (array_search($line, $tmp) === false) {

@@ -43,7 +43,7 @@ class PDOWrapper implements DatabaseInterface
     {
         try {
             if ($result) {
-                return $result->fetch();
+                return $result->fetch(\PDO::FETCH_ASSOC);
             } else {
                 return null;
             }
@@ -67,7 +67,24 @@ class PDOWrapper implements DatabaseInterface
 
     public function fetchResult($result, $row, $param)
     {
-        return $result->fetch_result($row, $param);
+        if (!$result) {
+            \SmallSmallRSS\Logger::trace("Cannot get param from non-result");
+            return false;
+        }
+        if ($row) {
+            $line = $result->fetch(\PDO::FETCH_ASSOC, PDO::FETCH_ORI_ABS, $row);
+        } else {
+            $line = self::fetchAssoc($result);
+        }
+        if (!$line) {
+            \SmallSmallRSS\Logger::trace("Fetching an array returned nothing from result");
+            return false;
+        }
+        if (!array_key_exists($param, $line)) {
+            trigger_error("Cannot get row $row param $param from result", E_USER_NOTICE);
+            return false;
+        }
+        return $line[$param];
     }
 
     public function close()
